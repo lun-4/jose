@@ -602,7 +602,7 @@ def josecoin_saldo(message):
         accdata = res[1]
         yield from client.send_message(message.channel, '%s -> %.2f' % (accdata['name'], accdata['amount']))
     else:
-        yield from client.send_message(message.channel, 'conta não encontrada(%s)' % (id_check))
+        yield from client.send_message(message.channel, 'erro encontrando conta(id: %s)' % (id_check))
 
 @asyncio.coroutine
 def josecoin_write(message):
@@ -627,7 +627,7 @@ def josecoin_send(message):
     id_from = message.author.id
     id_to = yield from parse_id(id_to, message)
 
-    yield from jose_debug(message, "ids %s %s" % (id_from, id_to), False)
+    # yield from jose_debug(message, "ids %s %s" % (id_from, id_to), False)
 
     res = jcoin.transfer(id_from, id_to, amount)
     yield from josecoin_save(message, False)
@@ -690,7 +690,7 @@ def josecoin_top10(message):
 
 @asyncio.coroutine
 def show_jenv(message):
-    yield from client.send_message(message.channel, jose_env)
+    yield from client.send_message(message.channel, "`%r`" % jose_env)
 
 exact_commands = {
     'jose': show_help,
