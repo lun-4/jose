@@ -99,3 +99,6 @@ jose-data.txt
 
 # JoseCoin database
 jcoin/josecoin.db
+
+# config data
+jose-config.py
