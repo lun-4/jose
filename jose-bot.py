@@ -28,6 +28,7 @@ start_time = time.time()
 #config
 chattiness = .25
 MASTER_ROLE = 'mestra'
+LEARN_ROLE = 'cult'
 jc_probabiblity = .12
 JOSE_ANIMATION_LIMIT = 1 # 2 animações simultaneamente
 
@@ -510,9 +511,17 @@ def learn_data(message):
             "PermError: %s" % res[1])
         return
 
+    auth = yield from check_roles(LEARN_ROLE, message.author.roles)
+    if not auth:
+        yield from client.send_message(message.channel,
+            "JCError: usuário não autorizado a usar o !learn")
+        return
+
     args = message.content.split(' ')
     data_to_learn = ' '.join(args[1:])
     yield from add_sentence(data_to_learn, message.author)
+    yield from client.send_message(message.channel, "texto inserido no data.txt!")
+    return
 
 @asyncio.coroutine
 def nsfw_e621(message):
@@ -979,7 +988,7 @@ def on_message(message):
                 if res[0]:
                     acc_to = jcoin.get(author_id)[1]
                     # yield from client.send_message(message.channel, res[1])
-                    yield from client.send_message(message.channel, 'Parabéns %s, você ganhou %.2f JC$!' % (acc_to['name'], amount))
+                    yield from client.send_message(message.channel, 'Parabéns %s, você ganhou %.2f JC$! :clap: :clap: :ok_hand:' % (acc_to['name'], amount))
                 else:
                     yield from client.send_message(message.channel, 'erro em jc: %s' % res[1])
         else:

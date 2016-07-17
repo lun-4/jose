@@ -5,7 +5,7 @@ import re
 
 import jcoin.josecoin as jcoin
 
-JOSE_VERSION = '0.6.1'
+JOSE_VERSION = '0.6.2'
 JOSE_SPAM_TRIGGER = 2
 client = None
 
@@ -17,38 +17,51 @@ JOSE_HELP_TEXT = '''Oi, eu sou o josé(v%s), sou um bot trabalhadô!
 
 Eu tenho mais de 8000 comandos somente para você do grande serverzao!
 
+GERAL:
 jose - mostra essa ajuda
-$guess - jogo de adivinhar o numero aleatorio
+$guess - jogo de adivinhar o numero aleatório
 !xkcd [number|rand] - mostra ou o xkcd de número tal ou o mais recente se nenhum é dado
 !yt pesquisa - pesquisar no youtube e mostrar o primeiro resultado
-!setlmsg - altera a pequena mensagem
-!lilmsg - mostra a pequena mensagem
-!log - mostrar todos os logs do josé
-!dbgmsg - mandar uma mensagem de debug ao jose
-!xingar @mention - xinga a pessoa
-!elogiar @mention - elogia a pessoa
-!exit - desligar o jose(somente pessoas com o role "mestra" são autorizadas)
-!reboot - reinicia o jose(somente role "mestra")
-!version - mostra a versão do jose-bot
 !pisca mensagem - PISCA A MENSAGEM(entre normal e negrito)
 !animate mensagem - anima a mensagem(wip)
 !money amount from to - conversão entre moedas
-!fullwidth mensagem - você sabe
-!playing jogo - muda o jogo que o josé tá jogando
-!uptime - você também sabe
+!version - mostra a versão do jose-bot
+!playing jogo - muda o jogo que o josé está jogando
+!fullwidth mensagem - converte texto para fullwidth
 !escolha escolha1;escolha2;escolha3... - José escolhe por você!
+!learn <texto> - josé aprende textos!
 
+Jose faz coisas pra pessoas:
+!xingar @mention - xinga a pessoa
+!elogiar @mention - elogia a pessoa
+!causar @mention @mention - faz um causo entre pessoas
+
+Administradores(role "mestra"):
+!exit - desligar o jose(somente pessoas com o role "mestra" são autorizadas)
+!reboot - reinicia o jose(somente role "mestra")
+!setlmsg - altera a pequena mensagem
+!lilmsg - mostra a pequena mensagem
+
+PORN:
 !hypno <termos | :latest> - busca por termos no Hypnohub (custa 1 JC)
-!josetxt - mostra quantas mensagens o José tem na memória dele (custa 1 JC)
+!e621 <termos | :latest> - busca por tags no e621 (custa 1 JC)
 
+Developers:
+!log - mostrar todos os logs do josé
+!dbgmsg - mandar uma mensagem de debug ao jose
+!uptime - mostra o uptime do jose
+!josetxt - mostra quantas mensagens o José tem na memória dele(data.txt)
+
+Pesquisa:
 !pesquisa tipo nome:op1,op2,op3... - cria uma pesquisa
 !voto comando id voto - vota em uma pesquisa
 
+Programação:
 $repl - inicia um repl de python
 $josescript - inicia um repl de JoseScript
 
 (não inclui comandos que o josé responde dependendo das mensagens)
-(nem como funciona a JoseCoin)
+(nem como funciona a JoseCoin, use !josecoin pra isso)
 ''' % JOSE_VERSION
 
 JOSESCRIPT_HELP_TEXT = '''Bem vindo ao JoséScript!
@@ -56,7 +69,8 @@ colocar variáveis: "nome=valor" (todas as variáveis são strings por padrão)
 
 Variáveis são definidas por usuário: assim nenhum usuário mexe nas variáveis de outro usuário :DD
 pegar valor de variável: "g nome"
-printar todas as variáveis definidas: "pv" '''
+printar todas as variáveis definidas: "pv"
+'''
 
 @asyncio.coroutine
 def show_version(message):
