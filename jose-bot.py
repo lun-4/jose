@@ -805,6 +805,7 @@ def on_message(message):
     if message.content == '!exit':
         try:
             if message.author.roles[1].name == MASTER_ROLE:
+                yield from jcoin.save(jconfig.jcoin_path)
                 yield from jose_debug(message, "saindo")
                 yield from client.logout()
                 sys.exit(0)
@@ -817,6 +818,7 @@ def on_message(message):
     elif message.content == '!reboot':
         try:
             if message.author.roles[1].name == MASTER_ROLE:
+                yield from jcoin.save(jconfig.jcoin_path)
                 yield from jose_debug(message, "reiniciando")
                 yield from client.logout()
                 os.system("./reload_jose.sh &")
