@@ -693,6 +693,12 @@ def josecoin_top10(message):
 def show_jenv(message):
     yield from client.send_message(message.channel, "`%r`" % jose_env)
 
+def show_tijolo(message):
+    yield from client.send_message(message.channel, "http://www.ceramicabelem.com.br/produtos/TIJOLO%20DE%2006%20FUROS.%209X14X19.gif")
+
+def show_mc(message):
+    yield from client.send_message(message.channel, "https://cdn.discordapp.com/attachments/202055538773721099/203989039504687104/unknown.png")
+
 exact_commands = {
     'jose': show_help,
     'josé': show_help,
@@ -767,6 +773,8 @@ commands_match = {
     'que tampa': show_tampa,
 
     "me abraça, josé": show_noabraco,
+    'tijolo': show_tijolo,
+    "mc gorila": show_mc,
 }
 
 counter = 0
