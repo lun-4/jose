@@ -607,7 +607,7 @@ def josecoin_saldo(message):
 
 @asyncio.coroutine
 def josecoin_write(message):
-    if not (message.author.roles[1].name == MASTER_ROLE):
+    if not check_roles(MASTER_ROLE, message.author.roles):
         yield from jose_debug(message, "PermissionError: sem permissão para alterar dados da JC")
 
     args = message.content.split(' ')
@@ -812,29 +812,31 @@ def on_message(message):
 
     if message.content == '!exit':
         try:
-            if message.author.roles[1].name == MASTER_ROLE:
-                yield from jcoin.save(jconfig.jcoin_path)
+            auth = yield from check_roles(MASTER_ROLE, message.author.roles)
+            if auth:
+                yield from josecoin_save(message)
                 yield from jose_debug(message, "saindo")
                 yield from client.logout()
                 sys.exit(0)
             else:
                 yield from jose_debug(message, "PermError: sem permissão para desligar jose-bot")
-        except:
-            yield from jose_debug(message, "PermError: sem permissão para desligar jose-bot")
+        except Exception as e:
+            yield from jose_debug(message, "ErroGeral: %s" % str(e))
         return
 
     elif message.content == '!reboot':
         try:
-            if message.author.roles[1].name == MASTER_ROLE:
-                yield from jcoin.save(jconfig.jcoin_path)
+            auth = yield from check_roles(MASTER_ROLE, message.author.roles)
+            if auth:
+                yield from josecoin_save(message)
                 yield from jose_debug(message, "reiniciando")
                 yield from client.logout()
                 os.system("./reload_jose.sh &")
                 sys.exit(0)
             else:
                 yield from jose_debug(message, "PermError: sem permissão para desligar jose-bot")
-        except:
-            yield from jose_debug(message, "PermError: sem permissão para desligar jose-bot")
+        except Exception as e:
+            yield from jose_debug(message, "ErroGeral: %s" % str(e))
         return
 
     elif message.content.startswith("!cabalo"):

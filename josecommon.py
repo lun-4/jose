@@ -5,13 +5,13 @@ import re
 
 import jcoin.josecoin as jcoin
 
-JOSE_VERSION = '0.6'
+JOSE_VERSION = '0.6.1'
 JOSE_SPAM_TRIGGER = 2
 client = None
 
 def set_client(cl):
-	global client
-	client = cl
+    global client
+    client = cl
 
 JOSE_HELP_TEXT = '''Oi, eu sou o josé(v%s), sou um bot trabalhadô!
 
@@ -104,3 +104,12 @@ def random_yt(message):
 @asyncio.coroutine
 def rodei_teu_cu(message):
     yield from client.send_message(message.channel, 'RODEI MEU PAU NO TEU CU')
+
+@asyncio.coroutine
+def check_roles(correct, rolelist):
+    for role in rolelist:
+        print('cr', role, correct)
+        if role.name == correct:
+            print("CORECTO")
+            return True
+    return False
