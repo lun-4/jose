@@ -3,12 +3,6 @@ import time
 import asyncio
 import pickle
 
-#aaaaa
-'''
-<@196461455569059840>
-<@!162819866682851329>
-'''
-
 JOSECOIN_VERSION = '0.2'
 
 JOSECOIN_HELP_TEXT = '''JoseCoin(%s) é a melhor moeda que o josé pode te oferecer!
