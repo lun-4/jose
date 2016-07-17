@@ -21,6 +21,7 @@ from xml.etree import ElementTree
 from josecommon import *
 import josespeak as jspeak
 import jcoin.josecoin as jcoin
+import joseconfig as jconfig
 
 start_time = time.time()
 

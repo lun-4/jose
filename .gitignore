@@ -101,4 +101,4 @@ jose-data.txt
 jcoin/josecoin.db
 
 # config data
-jose-config.py
+joseconfig.py
