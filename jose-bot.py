@@ -663,7 +663,12 @@ def josecoin_load(message, dbg_flag=True):
 
 @asyncio.coroutine
 def josecoin_top10(message):
+    args = message.content.split(' ')
     jcdata = dict(jcoin.data)
+
+    range_max = 11
+    if len(args) > 1:
+        range_max = int(args[1])
 
     res = 'Top 10 pessoas que tem mais JC$\n'
     maior = {
@@ -672,7 +677,7 @@ def josecoin_top10(message):
         'amount': 0.0,
     }
 
-    for i in range(1,10):
+    for i in range(1,range_max):
         if len(jcdata) < 1:
             break
 
