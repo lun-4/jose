@@ -631,20 +631,23 @@ def josecoin_write(message):
 def josecoin_send(message):
     args = message.content.split(' ')
 
-    id_to = args[1]
-    amount = float(args[2])
+    try:
+        id_to = args[1]
+        amount = float(args[2])
 
-    id_from = message.author.id
-    id_to = yield from parse_id(id_to, message)
+        id_from = message.author.id
+        id_to = yield from parse_id(id_to, message)
 
-    # yield from jose_debug(message, "ids %s %s" % (id_from, id_to), False)
+        # yield from jose_debug(message, "ids %s %s" % (id_from, id_to), False)
 
-    res = jcoin.transfer(id_from, id_to, amount)
-    yield from josecoin_save(message, False)
-    if res[0]:
-        yield from client.send_message(message.channel, res[1])
-    else:
-        yield from client.send_message(message.channel, 'erro em jc: %s' % res[1])
+        res = jcoin.transfer(id_from, id_to, amount)
+        yield from josecoin_save(message, False)
+        if res[0]:
+            yield from client.send_message(message.channel, res[1])
+        else:
+            yield from client.send_message(message.channel, 'erro em jc: %s' % res[1])
+    except Exception as e:
+        yield from jose_debug(message, "jc: %s" % str(e))
 
 
 @asyncio.coroutine

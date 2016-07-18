@@ -5,8 +5,8 @@ import re
 
 import jcoin.josecoin as jcoin
 
-JOSE_VERSION = '0.6.2.1'
-JOSE_SPAM_TRIGGER = 2
+JOSE_VERSION = '0.6.3'
+JOSE_SPAM_TRIGGER = 4
 client = None
 
 def set_client(cl):
