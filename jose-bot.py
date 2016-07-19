@@ -12,6 +12,7 @@ import ast
 import time
 import subprocess
 import pickle
+from lxml import html
 
 import urllib.request
 import urllib.parse
@@ -745,7 +746,7 @@ def change_nickname(message):
 
     return
 
-@asyncio.coroutine
+'''@asyncio.coroutine
 def search_ddg(message):
     args = message.content.split(' ')
     search_term = ' '.join(args[1:])
@@ -755,7 +756,7 @@ def search_ddg(message):
 
     res = requests.get(query_url).json()
 
-    yield from client.send_message(message.channel, str(res))
+    yield from client.send_message(message.channel, str(res))'''
 
 demon_videos = [
     'https://www.youtube.com/watch?v=-y73eXfQU6c',
@@ -790,6 +791,16 @@ pong = make_func('pong')
 help_josecoin = make_func(jcoin.JOSECOIN_HELP_TEXT)
 show_tijolo = make_func("http://www.ceramicabelem.com.br/produtos/TIJOLO%20DE%2006%20FUROS.%209X14X19.gif")
 show_mc = make_func("https://cdn.discordapp.com/attachments/202055538773721099/203989039504687104/unknown.png")
+
+'''@asyncio.coroutine
+def search_google(message):
+    args = message.content.split(' ')
+    search_term = ' '.join(args[1:])
+    url = 'https://www.google.com/search?q=%s&num=20' % search_term
+
+    r = requests.get(url)
+    tree = html.fromstring(r.content)'''
+
 
 exact_commands = {
     'jose': show_help,
@@ -858,10 +869,12 @@ commands_start = {
     '!jenv': show_jenv,
 
     '!nick': change_nickname,
-    '!ddg': search_ddg,
+    # '!ddg': search_ddg,
     '!ping': pong,
     '!xuxa': demon,
     '!emoji': rand_emoji,
+
+    # '!google': search_google,
 }
 
 commands_match = {
