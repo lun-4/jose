@@ -496,7 +496,7 @@ def nsfw_hypnohub(message):
             yield from client.send_message(message.channel, '%s' % root[0].attrib['file_url'])
             return
         except Exception as e:
-            yield from jose_debug(message, "erro no !hypno: %s" % str(e))
+            yield from jose_debug(message, "erro no !hypno: provavelmente nada foi encontrado, seu merda. (%s)" % str(e))
             return
 
 @asyncio.coroutine
@@ -552,7 +552,7 @@ def nsfw_e621(message):
             yield from client.send_message(message.channel, '%s' % r[0]['sample_url'])
             return
         except Exception as e:
-            yield from jose_debug(message, "erro no !e621: %s" % str(e))
+            yield from jose_debug(message, "erro no !e621: provavelmente nada foi encontrado, seu merda. (%s)" % str(e))
             return
 
 @asyncio.coroutine

@@ -3,7 +3,7 @@ import time
 import asyncio
 import pickle
 
-JOSECOIN_VERSION = '0.2'
+JOSECOIN_VERSION = '0.2.1'
 
 JOSECOIN_HELP_TEXT = '''JoseCoin(%s) é a melhor moeda que o josé pode te oferecer!
 
@@ -12,7 +12,7 @@ Alguns comandos pedem JC$ em troca da sua funcionalidade(*comandos nsfw incluíd
 
 !conta - cria uma nova conta
 !enviar mention quantidade - envia josecoins para alguém
-!saldo mention - mostra o quanto que tal conta tem em josecoins
+!saldo [mention] - mostra o quanto que tal conta tem em josecoins
 
 ''' % JOSECOIN_VERSION
 
@@ -44,7 +44,7 @@ def gen():
 
 def transfer(id_from, id_to, amnt):
     amnt = float(amnt)
-    print('idf', id_from, 'idt', id_to)
+    # print('idf', id_from, 'idt', id_to)
 
     if not (id_from in data):
         return False, 'conta para extrair fundos não existe'
@@ -70,14 +70,20 @@ def transfer(id_from, id_to, amnt):
 
 def load(fname):
     global data
-    with open(fname, 'rb') as f:
-        data = pickle.load(f)
+    try:
+        with open(fname, 'rb') as f:
+            data = pickle.load(f)
+    except Exception as e:
+        return False, str(e)
 
     # data[jose_id] = empty_acc('jose-bot', 2000)
     return True, "load %s" % fname
 
 def save(fname):
     global data
-    with open(fname, 'wb') as f:
-        pickle.dump(data, f)
+    try:
+        with open(fname, 'wb') as f:
+            pickle.dump(data, f)
+    except Exception as e:
+        return False, str(e)
     return True, "save %s" % fname
