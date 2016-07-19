@@ -4,10 +4,14 @@ import urllib
 import re
 import randemoji as emoji
 
+from random import SystemRandom
+random = SystemRandom()
+
 import jcoin.josecoin as jcoin
 
 JOSE_VERSION = '0.6.5.4'
 JOSE_SPAM_TRIGGER = 4
+PIRU_ACTIVITY = .01
 client = None
 
 def set_client(cl):
@@ -135,3 +139,12 @@ def random_emoji(maxn):
     for i in range(maxn):
         res += str(emoji.random_emoji())
     return res
+
+atividade = [
+    'http://i.imgur.com/lkZVh3K.jpg',
+]
+
+@asyncio.coroutine
+def gorila_routine(ch):
+    if random.random() < PIRU_ACTIVITY:
+        yield from client.send_message(ch, random.choice(atividade))

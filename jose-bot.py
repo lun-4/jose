@@ -1086,7 +1086,8 @@ def on_message(message):
                 if res[0]:
                     acc_to = jcoin.get(author_id)[1]
                     # yield from client.send_message(message.channel, res[1])
-                    yield from client.send_message(message.channel, 'Parabéns %s < %.2f JC! %s' % (acc_to['name'], amount, random_emoji(3)))
+                    emoji_res = yield from random_emoji(3)
+                    yield from client.send_message(message.channel, 'Parabéns %s < %.2f JC! %s' % (acc_to['name'], amount, emoji_res))
                 else:
                     yield from client.send_message(message.channel, 'erro em jc: %s' % res[1])
         else:
@@ -1095,6 +1096,7 @@ def on_message(message):
     #else:
     #    yield from add_sentence(message)
         yield from speak_routine(message.channel)
+        yield from gorila_routine(message.channel)
 
 @client.event
 @asyncio.coroutine
