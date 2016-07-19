@@ -286,8 +286,11 @@ def convert_money(message):
 
     baseurl = "http://api.fixer.io/latest?base={}".format(currency_from.upper())
     data = requests.get(baseurl).json()
-    rate = data['rates'][currency_to]
+    if 'error' in data:
+        yield from jose_debug(message, "!money error: %s" % data['error'])
+        return
 
+    rate = data['rates'][currency_to]
     res = amount * rate
 
     yield from client.send_message(message.channel, '{} {} = {} {}'.format(
@@ -722,19 +725,34 @@ def show_mc(message):
 @asyncio.coroutine
 def change_nickname(message):
     global JOSE_NICK
-    if not check_roles(MASTER_ROLE, message.author.roles):
+
+    auth = yield from check_roles(MASTER_ROLE, message.author.roles)
+    if not auth:
         yield from jose_debug(message, "PermissionError: Não pode mudar o nick do josé.")
+        return
 
     args = message.content.split(' ')
     if len(args) < 2:
         JOSE_NICK = None
-    JOSE_NICK = args[1]
+    JOSE_NICK = ' '.join(args[1:])
 
     for server in client.servers:
         m = server.get_member(jcoin.jose_id)
         yield from client.change_nickname(m, args[1])
 
     return
+
+@asyncio.coroutine
+def search_ddg(message):
+    args = message.content.split(' ')
+    search_term = ' '.join(args[1:])
+    query_url = 'http://api.duckduckgo.com/?q="%s"&format=json' % search_term
+
+    yield from client.send_message(message.channel, query_url)
+
+    res = requests.get(query_url).json()
+
+    yield from client.send_message(message.channel, str(res))
 
 exact_commands = {
     'jose': show_help,
@@ -803,6 +821,7 @@ commands_start = {
     '!jenv': show_jenv,
 
     '!nick': change_nickname,
+    '!ddg': search_ddg,
 }
 
 commands_match = {
