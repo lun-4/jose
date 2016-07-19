@@ -9,7 +9,7 @@ random = SystemRandom()
 
 import jcoin.josecoin as jcoin
 
-JOSE_VERSION = '0.6.6'
+JOSE_VERSION = '0.6.6.1'
 JOSE_SPAM_TRIGGER = 4
 PIRU_ACTIVITY = .01
 client = None
@@ -127,9 +127,7 @@ def rodei_teu_cu(message):
 @asyncio.coroutine
 def check_roles(correct, rolelist):
     for role in rolelist:
-        print('cr', role, correct)
         if role.name == correct:
-            print("CORECTO")
             return True
     return False
 
@@ -147,4 +145,5 @@ atividade = [
 @asyncio.coroutine
 def gorila_routine(ch):
     if random.random() < PIRU_ACTIVITY:
+        print("THE ACTIVITY HAS BORN")
         yield from client.send_message(ch, random.choice(atividade))

@@ -672,12 +672,16 @@ def josecoin_dbg(message):
 @asyncio.coroutine
 def josecoin_save(message, dbg_flag=True):
     yield from jose_debug(message, "saving josecoin data", dbg_flag)
-    yield from jose_debug(message, jcoin.save('jcoin/josecoin.db'), dbg_flag)
+    res = jcoin.save('jcoin/josecoin.db')
+    if not res[0]:
+        yield from jose_debug(message, 'error: %r' % res, dbg_flag)
 
 @asyncio.coroutine
 def josecoin_load(message, dbg_flag=True):
     yield from jose_debug(message, "loading josecoin data", dbg_flag)
-    yield from jose_debug(message, jcoin.load('jcoin/josecoin.db'), dbg_flag)
+    res = jcoin.load('jcoin/josecoin.db')
+    if not res[0]:
+        yield from jose_debug(message, 'error: %r' % res, dbg_flag)
 
 @asyncio.coroutine
 def josecoin_top10(message):
@@ -912,7 +916,7 @@ def on_message(message):
 
     if not started:
         started = True
-        initmsg = "jose v%s iniciou em %s" % (JOSE_VERSION, message.channel)
+        initmsg = "Bem vindo ao josé v%s iniciou em %s" % (JOSE_VERSION, message.channel)
         yield from jose_debug(message, initmsg)
         yield from josecoin_load(message)
         return
