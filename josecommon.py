@@ -9,9 +9,9 @@ random = SystemRandom()
 
 import jcoin.josecoin as jcoin
 
-JOSE_VERSION = '0.6.6.3'
+JOSE_VERSION = '0.6.6.4'
 JOSE_SPAM_TRIGGER = 4
-PIRU_ACTIVITY = .01
+PIRU_ACTIVITY = .045
 client = None
 
 def set_client(cl):
@@ -131,7 +131,7 @@ def make_func(res):
 rodei_teu_cu = make_func("RODEI MEU PAU NO TEU CU")
 show_noabraco = make_func("não vou abraçar")
 show_tampa = make_func("A DO TEU CU\nHÁ, TROLEI")
-show_vtnc = make_func("AH VAI SE FUDER")
+show_vtnc = make_func("OQ VC DISSE?\nhttp://i.imgur.com/Otky963.jpg")
 show_shit = make_func("tbm amo vc humano <3")
 show_help = make_func(JOSE_HELP_TEXT)
 show_version = make_func("José v%s" % JOSE_VERSION)
