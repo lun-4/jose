@@ -31,9 +31,10 @@ MASTER_ROLE = 'mestra'
 LEARN_ROLE = 'cult'
 jc_probabiblity = .12
 JOSE_ANIMATION_LIMIT = 1 # 2 animações simultaneamente
+PORN_LIMIT = 14
 
 # prices
-PORN_PRICE = 1
+PORN_PRICE = 2
 LEARN_PRICE = 5
 
 #default stuff
@@ -480,23 +481,25 @@ def nsfw_hypnohub(message):
 
     if search_term == ':latest':
         yield from client.send_message(message.channel, 'getting latest post in hypnohub')
-        r = requests.get('http://hypnohub.net/post/index.xml?limit=1')
+        r = requests.get('http://hypnohub.net/post/index.xml?limit=%s' % PORN_LIMIT)
         tree = ElementTree.fromstring(r.content)
         root = tree
         try:
-            yield from client.send_message(message.channel, '%s' % root[0].attrib['file_url'])
+            post = random.choice(root)
+            yield from client.send_message(message.channel, '%s' % post.attrib['file_url'])
             return
         except Exception as e:
             yield from jose_debug(message, "erro em !hypno: %s" % str(e))
             return
 
     else:
-        yield from client.send_message(message.channel, 'searching for %s in hypnohub' % search_term)
-        r = requests.get('http://hypnohub.net/post/index.xml?limit=1&tags=%s' % search_term)
+        yield from client.send_message(message.channel, 'searching for %r in hypnohub' % search_term)
+        r = requests.get('http://hypnohub.net/post/index.xml?limit=%s&tags=%s' % (PORN_LIMIT, search_term))
         tree = ElementTree.fromstring(r.content)
         root = tree
         try:
-            yield from client.send_message(message.channel, '%s' % root[0].attrib['file_url'])
+            post = random.choice(root)
+            yield from client.send_message(message.channel, '%s' % post.attrib['file_url'])
             return
         except Exception as e:
             yield from jose_debug(message, "erro no !hypno: provavelmente nada foi encontrado, seu merda. (%s)" % str(e))
@@ -540,19 +543,21 @@ def nsfw_e621(message):
 
     if search_term == ':latest' or search_term == '' or search_term == ' ':
         yield from client.send_message(message.channel, 'getting latest post in e621')
-        r = requests.get('https://e621.net/post/index.json?limit=1').json()
+        r = requests.get('https://e621.net/post/index.json?limit=%s' % PORN_LIMIT).json()
         try:
-            yield from client.send_message(message.channel, '%s' % r[0]['sample_url'])
+            post = random.choice(r)
+            yield from client.send_message(message.channel, '%s' % post['sample_url'])
             return
         except Exception as e:
             yield from jose_debug(message, "erro em !e621: %s" % str(e))
             return
 
     else:
-        yield from client.send_message(message.channel, 'searching for %s in e621' % search_term)
-        r = requests.get('https://e621.net/post/index.json?limit=1&tags=%s' % search_term).json()
+        yield from client.send_message(message.channel, 'searching for %r in e621' % search_term)
+        r = requests.get('https://e621.net/post/index.json?limit=%s&tags=%s' % (PORN_LIMIT, search_term)).json()
         try:
-            yield from client.send_message(message.channel, '%s' % r[0]['sample_url'])
+            post = random.choice(r)
+            yield from client.send_message(message.channel, '%s' % post['sample_url'])
             return
         except Exception as e:
             yield from jose_debug(message, "erro no !e621: provavelmente nada foi encontrado, seu merda. (%s)" % str(e))
