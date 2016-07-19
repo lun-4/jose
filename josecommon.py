@@ -9,7 +9,7 @@ random = SystemRandom()
 
 import jcoin.josecoin as jcoin
 
-JOSE_VERSION = '0.6.6.1'
+JOSE_VERSION = '0.6.6.3'
 JOSE_SPAM_TRIGGER = 4
 PIRU_ACTIVITY = .01
 client = None
@@ -35,6 +35,7 @@ $guess - jogo de adivinhar o numero aleatório
 !fullwidth mensagem - converte texto para fullwidth
 !escolha escolha1;escolha2;escolha3... - José escolhe por você!
 !learn <texto> - josé aprende textos!
+!ping - pong
 
 Jose faz coisas pra pessoas:
 !xingar @mention - xinga a pessoa
@@ -78,34 +79,10 @@ printar todas as variáveis definidas: "pv"
 '''
 
 @asyncio.coroutine
-def show_version(message):
-    yield from client.send_message(message.channel, "José v%s" % JOSE_VERSION)
-
-@asyncio.coroutine
-def show_help(message):
-    yield from client.send_message(message.author, JOSE_HELP_TEXT)
-
-@asyncio.coroutine
-def show_shit(message):
-    yield from client.send_message(message.channel, "tbm amo vc humano <3")
-
-@asyncio.coroutine
-def show_vtnc(message):
-    yield from client.send_message(message.channel, "AH VAI SE FUDER")
-
-@asyncio.coroutine
 def show_top(message):
     yield from client.send_message(message.channel, "BALADINHA TOPPER %s %s" % (
         (":joy:" * random.randint(1,5)),
         (":ok_hand:" * random.randint(1,6))))
-
-@asyncio.coroutine
-def show_tampa(message):
-    yield from client.send_message(message.channel, "A DO TEU CU\nHÁ, TROLEI")
-
-@asyncio.coroutine
-def show_noabraco(message):
-    yield from client.send_message(message.channel, "nao vou abraçar")
 
 @asyncio.coroutine
 def random_yt(message):
@@ -119,10 +96,6 @@ def random_yt(message):
     search_results = re.findall(r'href=\"\/watch\?v=(.{11})', html_content.read().decode())
 
     yield from client.send_message(message.channel, "http://www.youtube.com/watch?v=" + search_results[0])
-
-@asyncio.coroutine
-def rodei_teu_cu(message):
-    yield from client.send_message(message.channel, 'RODEI MEU PAU NO TEU CU')
 
 @asyncio.coroutine
 def check_roles(correct, rolelist):
@@ -147,3 +120,18 @@ def gorila_routine(ch):
     if random.random() < PIRU_ACTIVITY:
         print("THE ACTIVITY HAS BORN")
         yield from client.send_message(ch, random.choice(atividade))
+
+def make_func(res):
+    @asyncio.coroutine
+    def response(message):
+        yield from client.send_message(message.channel, res)
+
+    return response
+
+rodei_teu_cu = make_func("RODEI MEU PAU NO TEU CU")
+show_noabraco = make_func("não vou abraçar")
+show_tampa = make_func("A DO TEU CU\nHÁ, TROLEI")
+show_vtnc = make_func("AH VAI SE FUDER")
+show_shit = make_func("tbm amo vc humano <3")
+show_help = make_func(JOSE_HELP_TEXT)
+show_version = make_func("José v%s" % JOSE_VERSION)

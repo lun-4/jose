@@ -599,10 +599,6 @@ def jcoin_control(id_user, amnt):
     return jcoin.transfer(id_user, jcoin.jose_id, amnt)
 
 @asyncio.coroutine
-def help_josecoin(message):
-    yield from client.send_message(message.channel, jcoin.JOSECOIN_HELP_TEXT)
-
-@asyncio.coroutine
 def josecoin_new(message):
     print("new jcoin account %s" % message.author.id)
 
@@ -730,14 +726,6 @@ def show_jenv(message):
     yield from client.send_message(message.channel, "`%r`" % jose_env)
 
 @asyncio.coroutine
-def show_tijolo(message):
-    yield from client.send_message(message.channel, "http://www.ceramicabelem.com.br/produtos/TIJOLO%20DE%2006%20FUROS.%209X14X19.gif")
-
-@asyncio.coroutine
-def show_mc(message):
-    yield from client.send_message(message.channel, "https://cdn.discordapp.com/attachments/202055538773721099/203989039504687104/unknown.png")
-
-@asyncio.coroutine
 def change_nickname(message):
     global JOSE_NICK
 
@@ -769,10 +757,6 @@ def search_ddg(message):
 
     yield from client.send_message(message.channel, str(res))
 
-@asyncio.coroutine
-def pong(message):
-    yield from client.send_message(message.channel, 'pong')
-
 demon_videos = [
     'https://www.youtube.com/watch?v=-y73eXfQU6c',
     'https://www.youtube.com/watch?v=1GhFj54x1iM',
@@ -795,17 +779,17 @@ def demon(message):
         yield from client.send_message(message.channel, "espere até que o modo demônio seja sumonado.")
 
 @asyncio.coroutine
-def show_frozen_2(message):
-    yield from client.send_message(message.channel, 'http://i.imgur.com/HIcjyoW.jpg')
-
-@asyncio.coroutine
 def rand_emoji(message):
     res = yield from random_emoji(random.randint(1,5))
     yield from client.send_message(message.channel, "%s" % res)
 
-@asyncio.coroutine
-def show_emule(message):
-    yield from client.send_message(message.channel, "http://i.imgur.com/GO90sEv.png")
+show_emule = make_func("http://i.imgur.com/GO90sEv.png")
+show_frozen_2 = make_func('http://i.imgur.com/HIcjyoW.jpg')
+pong = make_func('pong')
+
+help_josecoin = make_func(jcoin.JOSECOIN_HELP_TEXT)
+show_tijolo = make_func("http://www.ceramicabelem.com.br/produtos/TIJOLO%20DE%2006%20FUROS.%209X14X19.gif")
+show_mc = make_func("https://cdn.discordapp.com/attachments/202055538773721099/203989039504687104/unknown.png")
 
 exact_commands = {
     'jose': show_help,
