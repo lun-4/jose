@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 '''
-	Modified version of:
-	https://gist.github.com/shello/efa2655e8a7bce52f273
+    Modified version of:
+    https://gist.github.com/shello/efa2655e8a7bce52f273
 '''
 
 from itertools import accumulate
@@ -81,6 +81,6 @@ def random_emoji(unicode_version = 6):
     emoji_codepoint = "U+{}".format(hex(ord(emoji))[2:].upper())
 
     #return (emoji, emoji_codepoint, emoji_name)
-	return emoji
+    return emoji
 
 # print(*random_emoji(UNICODE_VERSION), sep='\t')
