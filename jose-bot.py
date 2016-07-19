@@ -35,7 +35,7 @@ JOSE_ANIMATION_LIMIT = 1 # 2 animações simultaneamente
 PORN_LIMIT = 14
 
 #just for 0.6.6.6 and 6.6.6
-DEMON_MODE = False
+DEMON_MODE = True
 
 # prices
 PORN_PRICE = 2
@@ -914,7 +914,10 @@ def on_message(message):
     if not started:
         started = True
         initmsg = "Bem vindo ao josé v%s iniciou em %s" % (JOSE_VERSION, message.channel)
-        yield from jose_debug(message, initmsg)
+        if DEMON_MODE:
+            yield from jose_debug(message, initmsg[::-1])
+        else:
+            yield from jose_debug(message, initmsg)
         yield from josecoin_load(message)
         return
 
