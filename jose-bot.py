@@ -792,7 +792,12 @@ def demon(message):
 
 @asyncio.coroutine
 def show_frozen_2(message):
-    yield from client.send_message(message.channel, 'http://puu.sh/q7mJp/94f6e3ad54.jpg')
+    yield from client.send_message(message.channel, 'http://i.imgur.com/HIcjyoW.jpg')
+
+@asyncio.coroutine
+def rand_emoji(message):
+    res = yield from random_emoji(random.randint(1,5))
+    yield from client.send_message(message.channel, "%s" % res)
 
 exact_commands = {
     'jose': show_help,
@@ -864,6 +869,7 @@ commands_start = {
     '!ddg': search_ddg,
     '!ping': pong,
     '!xuxa': demon,
+    '!emoji': rand_emoji,
 }
 
 commands_match = {
@@ -1080,7 +1086,7 @@ def on_message(message):
                 if res[0]:
                     acc_to = jcoin.get(author_id)[1]
                     # yield from client.send_message(message.channel, res[1])
-                    yield from client.send_message(message.channel, 'Parabéns %s, você ganhou %.2f JC$! :clap: :clap: :ok_hand:' % (acc_to['name'], amount))
+                    yield from client.send_message(message.channel, 'Parabéns %s < %.2f JC! %s' % (acc_to['name'], amount, random_emoji(3)))
                 else:
                     yield from client.send_message(message.channel, 'erro em jc: %s' % res[1])
         else:

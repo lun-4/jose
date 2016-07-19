@@ -2,10 +2,11 @@ import discord
 import asyncio
 import urllib
 import re
+import randemoji as emoji
 
 import jcoin.josecoin as jcoin
 
-JOSE_VERSION = '0.6.5.1'
+JOSE_VERSION = '0.6.5.4'
 JOSE_SPAM_TRIGGER = 4
 client = None
 
@@ -91,8 +92,8 @@ def show_vtnc(message):
 @asyncio.coroutine
 def show_top(message):
     yield from client.send_message(message.channel, "BALADINHA TOPPER %s %s" % (
-        (":joy:" * 5),
-        (":ok_hand:" * 6)))
+        (":joy:" * random.randint(1,5)),
+        (":ok_hand:" * random.randint(1,6))))
 
 @asyncio.coroutine
 def show_tampa(message):
@@ -127,3 +128,10 @@ def check_roles(correct, rolelist):
             print("CORECTO")
             return True
     return False
+
+@asyncio.coroutine
+def random_emoji(maxn):
+    res = ''
+    for i in range(maxn):
+        res += str(emoji.random_emoji())
+    return res
