@@ -33,6 +33,9 @@ jc_probabiblity = .12
 JOSE_ANIMATION_LIMIT = 1 # 2 animações simultaneamente
 PORN_LIMIT = 14
 
+#just for 0.6.6.6 and 6.6.6
+DEMON_MODE = False
+
 # prices
 PORN_PRICE = 2
 LEARN_PRICE = 5
@@ -466,7 +469,10 @@ def add_sentence(content, author):
 @asyncio.coroutine
 def speak_routine(channel, run=False):
     if (random.random() < chattiness) or run:
-        yield from client.send_message(channel, jspeak.genSentence(1, 50))
+        res = jspeak.genSentence(1, 50)
+        if DEMON_MODE:
+            res = res[::-1]
+        yield from client.send_message(channel, res)
 
 @asyncio.coroutine
 def nsfw_hypnohub(message):
@@ -759,6 +765,35 @@ def search_ddg(message):
 
     yield from client.send_message(message.channel, str(res))
 
+@asyncio.coroutine
+def pong(message):
+    yield from client.send_message(message.channel, 'pong')
+
+demon_videos = [
+    'https://www.youtube.com/watch?v=-y73eXfQU6c',
+    'https://www.youtube.com/watch?v=1GhFj54x1iM',
+    'https://www.youtube.com/watch?v=cXzT3IDNwEw',
+    'https://www.youtube.com/watch?v=WDKcod-mOIE',
+    'https://www.youtube.com/watch?v=br3KwhALEvw',
+    'https://www.youtube.com/watch?v=MzRDZpyOMFM',
+    'https://www.youtube.com/watch?v=LHJC41YP5ec',
+    'https://www.youtube.com/watch?v=ae9GEf7K8DM',
+    'https://www.youtube.com/watch?v=03KHCQZ6Faw',
+    'https://www.youtube.com/watch?v=9NCWKd8lL3o',
+
+]
+
+@asyncio.coroutine
+def demon(message):
+    if DEMON_MODE:
+        yield from client.send_message(message.channel, random.choice(demon_videos))
+    else:
+        yield from client.send_message(message.channel, "espere até que o modo demônio seja sumonado.")
+
+@asyncio.coroutine
+def show_frozen_2(message):
+    yield from client.send_message(message.channel, 'http://puu.sh/q7mJp/94f6e3ad54.jpg')
+
 exact_commands = {
     'jose': show_help,
     'josé': show_help,
@@ -827,6 +862,8 @@ commands_start = {
 
     '!nick': change_nickname,
     '!ddg': search_ddg,
+    '!ping': pong,
+    '!xuxa': demon,
 }
 
 commands_match = {
@@ -838,6 +875,7 @@ commands_match = {
     "me abraça, josé": show_noabraco,
     'tijolo': show_tijolo,
     "mc gorila": show_mc,
+    'frozen 2': show_frozen_2,
 }
 
 counter = 0
