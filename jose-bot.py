@@ -40,6 +40,7 @@ LEARN_PRICE = 5
 client = discord.Client()
 set_client(client)
 
+JOSE_NICK = 'jose-bot'
 lil_message = ''
 msmsg = ''
 started = False
@@ -260,10 +261,10 @@ def show_msmsg(message):
     global msmsg
     yield from client.send_message(message.channel, msmsg)
 
-causos = {
+causos = [
     '{} foi no matinho com {}',
     '{} inventou de fumar com {} e deu merda',
-}
+]
 
 @asyncio.coroutine
 def make_causo(message):
@@ -710,11 +711,30 @@ def josecoin_top10(message):
 def show_jenv(message):
     yield from client.send_message(message.channel, "`%r`" % jose_env)
 
+@asyncio.coroutine
 def show_tijolo(message):
     yield from client.send_message(message.channel, "http://www.ceramicabelem.com.br/produtos/TIJOLO%20DE%2006%20FUROS.%209X14X19.gif")
 
+@asyncio.coroutine
 def show_mc(message):
     yield from client.send_message(message.channel, "https://cdn.discordapp.com/attachments/202055538773721099/203989039504687104/unknown.png")
+
+@asyncio.coroutine
+def change_nickname(message):
+    global JOSE_NICK
+    if not check_roles(MASTER_ROLE, message.author.roles):
+        yield from jose_debug(message, "PermissionError: Não pode mudar o nick do josé.")
+
+    args = message.content.split(' ')
+    if len(args) < 2:
+        JOSE_NICK = None
+    JOSE_NICK = args[1]
+
+    for server in client.servers:
+        m = server.get_member(jcoin.jose_id)
+        yield from client.change_nickname(m, args[1])
+
+    return
 
 exact_commands = {
     'jose': show_help,
@@ -781,6 +801,8 @@ commands_start = {
     '!top10': josecoin_top10,
     '!write': josecoin_write,
     '!jenv': show_jenv,
+
+    '!nick': change_nickname,
 }
 
 commands_match = {

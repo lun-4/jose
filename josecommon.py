@@ -5,7 +5,7 @@ import re
 
 import jcoin.josecoin as jcoin
 
-JOSE_VERSION = '0.6.3'
+JOSE_VERSION = '0.6.4.1'
 JOSE_SPAM_TRIGGER = 4
 client = None
 
