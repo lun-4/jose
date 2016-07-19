@@ -799,6 +799,10 @@ def rand_emoji(message):
     res = yield from random_emoji(random.randint(1,5))
     yield from client.send_message(message.channel, "%s" % res)
 
+@asyncio.coroutine
+def show_emule(message):
+    yield from client.send_message(message.channel, "http://i.imgur.com/GO90sEv.png")
+
 exact_commands = {
     'jose': show_help,
     'josé': show_help,
@@ -882,6 +886,7 @@ commands_match = {
     'tijolo': show_tijolo,
     "mc gorila": show_mc,
     'frozen 2': show_frozen_2,
+    'emule': show_emule,
 }
 
 counter = 0
@@ -941,7 +946,22 @@ def on_message(message):
                 os.system("./reload_jose.sh &")
                 sys.exit(0)
             else:
-                yield from jose_debug(message, "PermError: sem permissão para desligar jose-bot")
+                yield from jose_debug(message, "PermError: sem permissão para reiniciar jose-bot")
+        except Exception as e:
+            yield from jose_debug(message, "ErroGeral: %s" % str(e))
+        return
+
+    elif message.content == '!update':
+        try:
+            auth = yield from check_roles(MASTER_ROLE, message.author.roles)
+            if auth:
+                yield from josecoin_save(message)
+                yield from jose_debug(message, "atualizando josé para nova versão(era %s)" % JOSE_VERSION)
+                yield from client.logout()
+                os.system("./reload_jose.sh &")
+                sys.exit(0)
+            else:
+                yield from jose_debug(message, "PermError: sem permissão para atualizar jose-bot")
         except Exception as e:
             yield from jose_debug(message, "ErroGeral: %s" % str(e))
         return
