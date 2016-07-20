@@ -833,7 +833,7 @@ def search_soundcloud(message):
                 yield from client.send_message(message.channel, entity['permalink_url'])
                 return
 
-        yield from client.send_message(message.channel, "verifique sua pesquisa, por que nenhuma track foi encontrada.")
+        yield from client.send_message(message.channel, "verifique sua pesquisa, porque nenhuma track foi encontrada.")
         return
 
         url = doc.get('next_href')
