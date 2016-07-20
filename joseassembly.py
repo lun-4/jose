@@ -78,6 +78,15 @@ def parse_value(val):
     else:
         return None
 
+'''
+
+mov r1,"nopOS. The OS that does nothing. Also known as Unoperational System. Made by TE VIRA"
+write r1
+nop
+ret
+
+'''
+
 @asyncio.coroutine
 def execute(instructions, env):
     stdout = ''
@@ -99,6 +108,12 @@ def execute(instructions, env):
                     return False, env, 'registrador não encontrado'
             except Exception as e:
                 return False, env, 'pyerr: %s' % str(e)
+
+        elif command == 'nop':
+            pass
+
+        elif command == 'ret':
+            return True, env, ''
 
         elif command == 'write':
             try:
