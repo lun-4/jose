@@ -1137,12 +1137,15 @@ def on_message(message):
                 yield from client.send_message(message.channel, 'saindo do REPL')
                 break
             else:
-                insts = jasm.parse(data.content)
+                insts = yield from jasm.parse(data.content)
                 res = yield from jasm.execute(insts, pointer)
                 if res[0] == True:
-                    yield from client.send_message(message.channel, res[2])
+                    if len(res[2]) < 1:
+                        yield from client.send_message(message.channel, "**nenhum resultado**")
+                    else:
+                        yield from client.send_message(message.channel, res[2])
                 else:
-                    yield from jose_debug(message, "jasm error: %r %s" % (res[1], res[2]))
+                    yield from jose_debug(message, "jasm error: %s" % (res[1], res[2]))
                 pointer = res[1]
                 # yield from client.send_message(message.channel, 'eval: %s' % )
         return

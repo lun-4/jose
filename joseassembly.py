@@ -31,21 +31,73 @@ def empty_env():
 def parse(text):
     insts = []
     for line in text.split('\n'):
+        print(line)
         s = line.split(' ')
         command = s[0]
         args = ' '.join(s[1:])
-        insts.append([command, args])
+        inst = [command, args]
+        print(line, inst)
+        insts.append(inst)
     return insts
+
+def is_numeric(lit):
+    'Return value of numeric literal string or ValueError exception'
+
+    # Handle '0'
+    if lit == '0': return 0
+    # Hex/Binary
+    litneg = lit[1:] if lit[0] == '-' else lit
+    if litneg[0] == '0':
+        if litneg[1] in 'xX':
+            return int(lit,16)
+        elif litneg[1] in 'bB':
+            return int(lit,2)
+        else:
+            try:
+                return int(lit,8)
+            except ValueError:
+                pass
+
+    # Int/Float/Complex
+    try:
+        return int(lit)
+    except ValueError:
+        pass
+    try:
+        return float(lit)
+    except ValueError:
+        pass
+    return complex(lit)
+
+@asyncio.coroutine
+def parse_value(val):
+    if val[0] == '\"' and val[-1] == '\"':
+        return val[1:-1]
+    elif is_numeric(val):
+        return is_numeric(val)
+    else:
+        return None
 
 @asyncio.coroutine
 def execute(instructions, env):
-    stdout = '> '
+    stdout = ''
     for inst in instructions:
         if inst[0] == 'mov' or inst[0] == 'set':
             try:
                 reg, val = inst[1].split(',')
-                print('mov %r %r' % (reg, val))
                 stdout += '%r %r' % (reg, val)
+                val = yield from parse_value(val)
+
+                if val is None:
+                    return False, env, 'erro parseando valor'
+
+                if reg in env['registers']:
+                    env['registers'][reg] = val
+                    return True, env, "set %r to %r" % (reg, val)
+                else:
+                    return False, env, 'registrador não encontrado'
             except Exception as e:
-                return False, env, str(e)
+                return False, env, 'pyerr: %s' % str(e)
+        else:
+            return False, env, "nenhum comando encontrado"
     return True, env, stdout
