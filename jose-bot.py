@@ -24,6 +24,7 @@ from josecommon import *
 import josespeak as jspeak
 import jcoin.josecoin as jcoin
 import joseconfig as jconfig
+import joseassembly as jasm
 
 start_time = time.time()
 
@@ -36,7 +37,7 @@ JOSE_ANIMATION_LIMIT = 1 # 2 animações simultaneamente
 PORN_LIMIT = 14
 
 #just for 0.6.6.6 and 6.6.6
-DEMON_MODE = True
+DEMON_MODE = False
 
 # prices
 PORN_PRICE = 2
@@ -60,6 +61,7 @@ jose_env = {
     'spamcl': {},
 }
 survey_id = 0
+jasm_env = {}
 
 # !pesquisa 1 Qual o melhor mensageiro:discord,skype,teamspeak,raidcall
 
@@ -1118,6 +1120,30 @@ def on_message(message):
                 break
             else:
                 yield from josescript_eval(data)
+                # yield from client.send_message(message.channel, 'eval: %s' % )
+        return
+
+    elif message.content.startswith('$jasm'):
+        yield from client.send_message(message.channel, 'Bem vindo ao REPL do JoseAssembly!\nPara sair, digite "exit"')
+
+        if not (message.author.id in jasm_env):
+            jasm_env[message.author.id] = jasm.empty_env()
+
+        pointer = jasm_env[message.author.id]
+
+        while True:
+            data = yield from client.wait_for_message(author=message.author)
+            if data.content == 'exit':
+                yield from client.send_message(message.channel, 'saindo do REPL')
+                break
+            else:
+                insts = jasm.parse(data.content)
+                res = yield from jasm.execute(insts, pointer)
+                if res[0] == True:
+                    yield from client.send_message(message.channel, res[2])
+                else:
+                    yield from jose_debug(message, "jasm error: %r %s" % (res[1], res[2]))
+                pointer = res[1]
                 # yield from client.send_message(message.channel, 'eval: %s' % )
         return
 

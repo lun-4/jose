@@ -9,8 +9,8 @@ random = SystemRandom()
 
 import jcoin.josecoin as jcoin
 
-JOSE_VERSION = '0.6.6.6.1'
-JOSE_BUILD = 105
+JOSE_VERSION = '0.6.7'
+JOSE_BUILD = 107
 
 JOSE_SPAM_TRIGGER = 4
 PIRU_ACTIVITY = .05
@@ -68,6 +68,7 @@ Pesquisa:
 Programação:
 $repl - inicia um repl de python
 $josescript - inicia um repl de JoseScript
+$jasm - JoseAssembly
 
 (não inclui comandos que o josé responde dependendo das mensagens)
 (nem como funciona a JoseCoin, use !josecoin pra isso)
