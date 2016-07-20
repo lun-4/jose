@@ -1,14 +1,23 @@
 
 import asyncio
 import discord
+import math
 
-JASM_VERSION = '0.0.2'
+JASM_VERSION = '0.0.3'
 
 JASM_HELP_TEXT = '''JoséAssembly é o melhor dialeto de Assembly que o José pode te oferecer!
 
-A arquitetura do JASM
+A arquitetura do JASM tem 10 registradores que podem ser usados de qualquer forma.
 
-Comandos:
+Comandos e suas traduções:
+
+mov a,b         a = b
+add a,b         a = a + b
+sub a,b         a = a - b
+mul a,b         a = a * b
+div a,b         a = a / b
+pow a,b         a = a ** b
+sqrt a          a = sqrt(a)
 
 '''
 
@@ -186,6 +195,14 @@ def execute(instructions, env):
             env = res[1]
             if not res[0]:
                 return False, env, res[2]
+
+        elif command == 'sqrt':
+            try:
+                reg = inst[1]
+
+                env['registers'][reg] = math.sqrt(env['registers'][reg])
+            except Exception as e:
+                return False, env, 'pyerr: %s' % str(e)
 
         elif command == 'nop':
             pass

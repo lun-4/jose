@@ -919,6 +919,7 @@ commands_start = {
 
     '!sndc': search_soundcloud,
     # '!google': search_google,
+    '!jasm': make_func(jasm.JASM_HELP_TEXT),
 }
 
 commands_match = {
