@@ -10,7 +10,7 @@ random = SystemRandom()
 import jcoin.josecoin as jcoin
 
 JOSE_VERSION = '0.6.6.6.1'
-JOSE_BUILD = 100
+JOSE_BUILD = 101
 
 JOSE_SPAM_TRIGGER = 4
 PIRU_ACTIVITY = .05
@@ -20,7 +20,7 @@ def set_client(cl):
     global client
     client = cl
 
-JOSE_HELP_TEXT = '''Oi, eu sou o josé(v%s), sou um bot trabalhadô!
+JOSE_HELP_TEXT = '''Oi, eu sou o josé(v%s b%d), sou um bot trabalhadô!
 
 Eu tenho mais de 8000 comandos somente para você do grande serverzao!
 
@@ -71,7 +71,7 @@ $josescript - inicia um repl de JoseScript
 
 (não inclui comandos que o josé responde dependendo das mensagens)
 (nem como funciona a JoseCoin, use !josecoin pra isso)
-''' % JOSE_VERSION
+''' % (JOSE_VERSION, JOSE_BUILD)
 
 JOSESCRIPT_HELP_TEXT = '''Bem vindo ao JoséScript!
 colocar variáveis: "nome=valor" (todas as variáveis são strings por padrão)
@@ -140,4 +140,4 @@ show_noabraco = make_func("não vou abraçar")
 show_tampa = make_func("A DO TEU CU\nHÁ, TROLEI")
 show_vtnc = make_func("OQ VC DISSE?\nhttp://i.imgur.com/Otky963.jpg")
 show_shit = make_func("tbm amo vc humano <3")
-show_version = make_func("José v%s" % JOSE_VERSION)
+show_version = make_func("José v%s b%d" % (JOSE_VERSION, JOSE_BUILD))

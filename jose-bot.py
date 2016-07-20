@@ -806,6 +806,7 @@ def search_google(message):
 def search_soundcloud(message):
     args = message.content.split(' ')
     query = ' '.join(args[1:])
+    print("soundcloud -> %s" % query)
 
     if len(query) < 3:
         yield from client.send_message(message.channel, "preciso de mais coisas para pesquisar")
@@ -949,7 +950,7 @@ def on_message(message):
 
     if not started:
         started = True
-        initmsg = "Bem vindo ao josé v%s iniciou em %s" % (JOSE_VERSION, message.channel)
+        initmsg = "Bem vindo ao josé v%s b%d iniciou em %s" % (JOSE_VERSION, JOSE_BUILD, message.channel)
         if DEMON_MODE:
             yield from jose_debug(message, initmsg[::-1])
         else:
@@ -996,7 +997,7 @@ def on_message(message):
             auth = yield from check_roles(MASTER_ROLE, message.author.roles)
             if auth:
                 yield from josecoin_save(message)
-                yield from jose_debug(message, "atualizando josé para nova versão(era %s)" % JOSE_VERSION)
+                yield from jose_debug(message, "atualizando josé para nova versão(era v%s b%d)" % (JOSE_VERSION, JOSE_BUILD))
                 yield from client.logout()
                 os.system("./reload_jose.sh &")
                 sys.exit(0)
