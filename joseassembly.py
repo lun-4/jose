@@ -86,7 +86,7 @@ def execute(instructions, env):
         if command == 'mov' or command == 'set':
             try:
                 reg, val = inst[1].split(',')
-                stdout += '%r %r' % (reg, val)
+                # stdout += '%r %r' % (reg, val)
                 val = yield from parse_value(val)
 
                 if val is None:

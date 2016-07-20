@@ -10,7 +10,7 @@ random = SystemRandom()
 import jcoin.josecoin as jcoin
 
 JOSE_VERSION = '0.6.7'
-JOSE_BUILD = 111
+JOSE_BUILD = 112
 
 JOSE_SPAM_TRIGGER = 4
 PIRU_ACTIVITY = .05
