@@ -13,6 +13,7 @@ import time
 import subprocess
 import pickle
 from lxml import html
+import json
 
 import urllib.request
 import urllib.parse
@@ -801,6 +802,39 @@ def search_google(message):
     r = requests.get(url)
     tree = html.fromstring(r.content)'''
 
+@asyncio.coroutine
+def search_soundcloud(message):
+    args = message.content.split(' ')
+    query = ' '.join(args[1:])
+
+    if len(query) < 3:
+        yield from client.send_message(message.channel, "preciso de mais coisas para pesquisar")
+        return
+
+    search_url = 'https://api.soundcloud.com/search?q=%s&facet=model&limit=10&offset=0&linked_partitioning=1&client_id='+jconfig.soundcloud_id
+
+    url = search_url % query
+
+    while url:
+        response = requests.get(url)
+
+        if response.status_code != 200:
+            yield from jose_debug(message, "erro no !sndc: status code != 200")
+            return
+        try:
+            doc = json.loads(response.text)
+        except Exception as e:
+            yield from jose_debug(message, "erro no !sndc: %s" % str(e))
+            return
+
+        for entity in doc['collection']:
+            if entity['kind'] == 'track':
+                yield from client.send_message(message.channel, entity['permalink_url'])
+                return
+
+        url = doc.get('next_href')
+
+
 
 exact_commands = {
     'jose': show_help,
@@ -872,8 +906,10 @@ commands_start = {
     # '!ddg': search_ddg,
     '!ping': pong,
     '!xuxa': demon,
+    'axux!': demon,
     '!emoji': rand_emoji,
 
+    '!sndc': search_soundcloud,
     # '!google': search_google,
 }
 

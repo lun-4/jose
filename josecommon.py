@@ -9,9 +9,11 @@ random = SystemRandom()
 
 import jcoin.josecoin as jcoin
 
-JOSE_VERSION = '0.6.6.6'
+JOSE_VERSION = '0.6.6.6.1'
+JOSE_BUILD = 100
+
 JOSE_SPAM_TRIGGER = 4
-PIRU_ACTIVITY = .045
+PIRU_ACTIVITY = .05
 client = None
 
 def set_client(cl):
@@ -36,6 +38,7 @@ $guess - jogo de adivinhar o numero aleatório
 !escolha escolha1;escolha2;escolha3... - José escolhe por você!
 !learn <texto> - josé aprende textos!
 !ping - pong
+!sndc termos - pesquisa no SoundCloud
 
 Jose faz coisas pra pessoas:
 !xingar @mention - xinga a pessoa
@@ -77,6 +80,10 @@ Variáveis são definidas por usuário: assim nenhum usuário mexe nas variávei
 pegar valor de variável: "g nome"
 printar todas as variáveis definidas: "pv"
 '''
+
+@asyncio.coroutine
+def show_help(message):
+    yield from client.send_message(message.author, JOSE_HELP_TEXT)
 
 @asyncio.coroutine
 def show_top(message):
@@ -133,5 +140,4 @@ show_noabraco = make_func("não vou abraçar")
 show_tampa = make_func("A DO TEU CU\nHÁ, TROLEI")
 show_vtnc = make_func("OQ VC DISSE?\nhttp://i.imgur.com/Otky963.jpg")
 show_shit = make_func("tbm amo vc humano <3")
-show_help = make_func(JOSE_HELP_TEXT)
 show_version = make_func("José v%s" % JOSE_VERSION)
