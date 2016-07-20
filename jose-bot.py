@@ -804,6 +804,8 @@ def search_google(message):
     r = requests.get(url)
     tree = html.fromstring(r.content)'''
 
+show_vinheta = make_func('http://prntscr.com/bvcbju')
+
 @asyncio.coroutine
 def search_soundcloud(message):
     args = message.content.split(' ')
@@ -930,6 +932,7 @@ commands_match = {
     "mc gorila": show_mc,
     'frozen 2': show_frozen_2,
     'emule': show_emule,
+    'vinheta': show_vinheta
 }
 
 counter = 0
