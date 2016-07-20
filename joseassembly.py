@@ -87,11 +87,57 @@ ret
 
 '''
 
+'''
+    JASM Instruction set:
+
+    MOV         A B     A = B
+
+    ADD         A B     A = A + B
+    SUB         A B     A = A - B
+    MUL         A B     A = A * B
+    DIV         A B     A = A / B
+    POW         A B     A = A ^ B
+    UNM         A B     A = -B
+
+    BNOT        A B     A = not B
+    BAND        A B     A = A and B
+    BOR         A B     A = A or B
+
+    WRITE       A       echo(a)
+
+'''
+
+def math_calc(opstr, inst, env):
+    try:
+        a, b = inst[1].split(',')
+        if a not in env['registers']:
+            return False, env, "first operand not found"
+
+        if b not in env['registers']:
+            return False, env, "second operand not found"
+
+        val_a = env['registers'][a]
+        val_b = env['registers'][b]
+
+        if opstr == '+':
+            env['registers'][a] = val_a + val_b
+        elif opstr == '-':
+            env['registers'][a] = val_a - val_b
+        elif opstr == '*':
+            env['registers'][a] = val_a * val_b
+        elif opstr == '/':
+            env['registers'][a] = val_a / val_b
+        elif opstr == '^':
+            env['registers'][a] = val_a ** val_b
+        return True, env, ''
+    except Exception as e:
+        return False, env, 'pyerr: %s' % str(e)
+
 @asyncio.coroutine
 def execute(instructions, env):
     stdout = ''
     for inst in instructions:
-        command = inst[0]
+        command = inst[0].lower()
         if command == 'mov' or command == 'set':
             try:
                 reg, val = inst[1].split(',')
@@ -108,6 +154,34 @@ def execute(instructions, env):
                     return False, env, 'registrador não encontrado'
             except Exception as e:
                 return False, env, 'pyerr: %s' % str(e)
+
+        # maths
+        elif command == 'add':
+            res = math_calc('+', inst, env)
+            env = res[1]
+            if not res[0]:
+                return False, env, res[2]
+        elif command == 'sub':
+            res = math_calc('-', inst, env)
+            env = res[1]
+            if not res[0]:
+                return False, env, res[2]
+
+        elif command == 'mul':
+            res = math_calc('*', inst, env)
+            env = res[1]
+            if not res[0]:
+                return False, env, res[2]
+        elif command == 'div':
+            res = math_calc('/', inst, env)
+            env = res[1]
+            if not res[0]:
+                return False, env, res[2]
+        elif command == 'pow':
+            res = math_calc('^', inst, env)
+            env = res[1]
+            if not res[0]:
+                return False, env, res[2]
 
         elif command == 'nop':
             pass
