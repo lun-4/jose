@@ -94,7 +94,7 @@ def execute(instructions, env):
 
                 if reg in env['registers']:
                     env['registers'][reg] = val
-                    stdout += "set %r to %r" % (reg, val)
+                    # stdout += "set %r to %r" % (reg, val)
                 else:
                     return False, env, 'registrador não encontrado'
             except Exception as e:
@@ -104,7 +104,7 @@ def execute(instructions, env):
             try:
                 reg = inst[1]
                 if reg in env['registers']:
-                    stdout += '%s' % env['registers'][reg]
+                    stdout += '%s\n' % env['registers'][reg]
                 else:
                     return False, env, 'registrador não encontrado'
             except:
