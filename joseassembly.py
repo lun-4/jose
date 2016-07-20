@@ -2,7 +2,7 @@
 import asyncio
 import discord
 
-JASM_VERSION = '0.0.1'
+JASM_VERSION = '0.0.2'
 
 JASM_HELP_TEXT = '''JoséAssembly é o melhor dialeto de Assembly que o José pode te oferecer!
 
@@ -15,12 +15,16 @@ Comandos:
 def empty_env():
     return {
         'registers': {
+            'r0': None,
             'r1': None,
             'r2': None,
             'r3': None,
             'r4': None,
             'r5': None,
             'r6': None,
+            'r7': None,
+            'r8': None,
+            'r9': None,
         },
         'consts':{
             'JASM_VER': JASM_VERSION,
