@@ -82,7 +82,8 @@ def parse_value(val):
 def execute(instructions, env):
     stdout = ''
     for inst in instructions:
-        if inst[0] == 'mov' or inst[0] == 'set':
+        command = inst[0]
+        if command == 'mov' or command == 'set':
             try:
                 reg, val = inst[1].split(',')
                 stdout += '%r %r' % (reg, val)
@@ -93,11 +94,22 @@ def execute(instructions, env):
 
                 if reg in env['registers']:
                     env['registers'][reg] = val
-                    return True, env, "set %r to %r" % (reg, val)
+                    stdout += "set %r to %r" % (reg, val)
                 else:
                     return False, env, 'registrador não encontrado'
             except Exception as e:
                 return False, env, 'pyerr: %s' % str(e)
+
+        elif command == 'write':
+            try:
+                reg = inst[1]
+                if reg in env['registers']:
+                    stdout += '%s' % env['registers'][reg]
+                else:
+                    return False, env, 'registrador não encontrado'
+            except:
+                return False, env, 'pyerr: %s' % str(e)
+
         else:
             return False, env, "nenhum comando encontrado"
     return True, env, stdout

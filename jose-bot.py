@@ -1145,7 +1145,7 @@ def on_message(message):
                     else:
                         yield from client.send_message(message.channel, res[2])
                 else:
-                    yield from jose_debug(message, "jasm error: %s" % (res[1], res[2]))
+                    yield from jose_debug(message, "jasm error: %s" % res[2])
                 pointer = res[1]
                 # yield from client.send_message(message.channel, 'eval: %s' % )
         return
