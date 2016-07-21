@@ -837,7 +837,7 @@ commands_match = {
     "mc gorila": show_mc,
     'frozen 2': show_frozen_2,
     'emule': show_emule,
-    'vinheta': show_vinheta
+    'vinheta': show_vinheta,
     'top': show_top,
 
     "se fude jose": show_vtnc,
