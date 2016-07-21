@@ -117,6 +117,18 @@ xingamentos = [
     "vai tomar no cu",
 ]
 
+demon_videos = [
+    'https://www.youtube.com/watch?v=-y73eXfQU6c',
+    'https://www.youtube.com/watch?v=1GhFj54x1iM',
+    'https://www.youtube.com/watch?v=cXzT3IDNwEw',
+    'https://www.youtube.com/watch?v=WDKcod-mOIE',
+    'https://www.youtube.com/watch?v=br3KwhALEvw',
+    'https://www.youtube.com/watch?v=MzRDZpyOMFM',
+    'https://www.youtube.com/watch?v=LHJC41YP5ec',
+    'https://www.youtube.com/watch?v=ae9GEf7K8DM',
+    'https://www.youtube.com/watch?v=03KHCQZ6Faw',
+    'https://www.youtube.com/watch?v=9NCWKd8lL3o',
+]
 
 @asyncio.coroutine
 def show_help(message):

@@ -81,30 +81,20 @@ def jose_debug(message, dbg_msg, flag=True):
     if flag:
         yield from client.send_message(message.channel, "debug-jose: {}".format(dbg_msg))
 
-@asyncio.coroutine
-def show_xingar(message):
-    d = message.content.split(' ')
-    user_xingar = d[1]
+def make_something(fmt, dict_messages):
+    @asyncio.coroutine
+    def func(message):
+        d = message.content.split(' ')
+        user_use = d[1]
 
-    xingamento = random.choice(xingamentos)
-    yield from client.send_message(message.channel, "{}, {}".format(user_xingar, xingamento))
+        new_message = random.choice(dict_messages)
+        yield from client.send_message(message.channel, fmt.format(user_use, new_message))
 
-@asyncio.coroutine
-def show_elogio(message):
-    d = message.content.split(' ')
-    user_xingar = d[1]
+    return func
 
-    elogio = random.choice(elogios)
-    yield from client.send_message(message.channel, "{}, {}".format(user_xingar, elogio))
-
-@asyncio.coroutine
-def show_cantada(message):
-    d = message.content.split(' ')
-    user_cantar = d[1]
-
-    elogio = random.choice(cantadas)
-    yield from client.send_message(message.channel, "Ei {}, {}".format(user_cantar, elogio))
-
+show_xingar = make_something('{}, {}', xingamentos)
+show_elogio = make_something('{}, {}', elogios)
+show_cantada = make_something('Ei {}, {}', cantadas)
 
 @asyncio.coroutine
 def set_lilmsg(message):
@@ -619,8 +609,6 @@ def josecoin_send(message):
         id_from = message.author.id
         id_to = yield from parse_id(id_to, message)
 
-        # yield from jose_debug(message, "ids %s %s" % (id_from, id_to), False)
-
         res = jcoin.transfer(id_from, id_to, amount, jcoin.LEDGER_PATH)
         yield from josecoin_save(message, False)
         if res[0]:
@@ -714,32 +702,6 @@ def change_nickname(message):
         yield from client.change_nickname(m, args[1])
 
     return
-
-'''@asyncio.coroutine
-def search_ddg(message):
-    args = message.content.split(' ')
-    search_term = ' '.join(args[1:])
-    query_url = 'http://api.duckduckgo.com/?q="%s"&format=json' % search_term
-
-    yield from client.send_message(message.channel, query_url)
-
-    res = requests.get(query_url).json()
-
-    yield from client.send_message(message.channel, str(res))'''
-
-demon_videos = [
-    'https://www.youtube.com/watch?v=-y73eXfQU6c',
-    'https://www.youtube.com/watch?v=1GhFj54x1iM',
-    'https://www.youtube.com/watch?v=cXzT3IDNwEw',
-    'https://www.youtube.com/watch?v=WDKcod-mOIE',
-    'https://www.youtube.com/watch?v=br3KwhALEvw',
-    'https://www.youtube.com/watch?v=MzRDZpyOMFM',
-    'https://www.youtube.com/watch?v=LHJC41YP5ec',
-    'https://www.youtube.com/watch?v=ae9GEf7K8DM',
-    'https://www.youtube.com/watch?v=03KHCQZ6Faw',
-    'https://www.youtube.com/watch?v=9NCWKd8lL3o',
-
-]
 
 @asyncio.coroutine
 def demon(message):
