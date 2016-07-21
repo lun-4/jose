@@ -7,7 +7,7 @@ JOSECOIN_VERSION = '0.2.3'
 
 JOSECOIN_HELP_TEXT = '''JoseCoin(%s) é a melhor moeda que o josé pode te oferecer!
 
-Toda mensagem enviada tem 12%% de chance de conseguir 2, 5, 10, 15 ou 20 JC$ para o autor da mensagem
+Toda mensagem enviada tem 12%% de chance de conseguir 1, 1.2, 2, 2.5, 5, 5.1 ou 7.4JC$ para o autor da mensagem
 Alguns comandos pedem JC$ em troca da sua funcionalidade(*comandos nsfw incluídos*)
 
 !conta - cria uma nova conta

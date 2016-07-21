@@ -232,6 +232,7 @@ def op3_calc(opstr, inst, env):
 def execute(instructions, env):
     stdout = ''
     pc = 0 # program counter
+    lp = 0 # loop counter
     print("execute %r" % instructions)
     # time.sleep(2)
     while pc < len(instructions):

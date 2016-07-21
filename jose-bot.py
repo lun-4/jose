@@ -81,17 +81,6 @@ def jose_debug(message, dbg_msg, flag=True):
     if flag:
         yield from client.send_message(message.channel, "debug-jose: {}".format(dbg_msg))
 
-xingamentos = [
-    "Tu fica na merda",
-    "Vai se fuder!",
-    "pq colocou man",
-    "MANO PQ",
-    "vsf",
-    "seu FILHO DA PUTA",
-    "se fosse eu não deixava",
-    "vai tomar no cu",
-]
-
 @asyncio.coroutine
 def show_xingar(message):
     d = message.content.split(' ')
@@ -100,12 +89,6 @@ def show_xingar(message):
     xingamento = random.choice(xingamentos)
     yield from client.send_message(message.channel, "{}, {}".format(user_xingar, xingamento))
 
-elogios = [
-    "sua linda! <3",
-    "sabia que você pode ser alguém na vida?",
-    "eu acredito em você",
-]
-
 @asyncio.coroutine
 def show_elogio(message):
     d = message.content.split(' ')
@@ -113,23 +96,6 @@ def show_elogio(message):
 
     elogio = random.choice(elogios)
     yield from client.send_message(message.channel, "{}, {}".format(user_xingar, elogio))
-
-cantadas = [
-    'ô lá em casa',
-    'vc é o feijao do meu acaraje',
-    'gate, teu cu tem air bag?? pq meu pau tá sem freio',
-    'se merda fosse beleza você estaria toda cagada',
-    'me chama de bombeiro e deixa eu apagar seu fogo com a minha mangueira',
-    'to no hospital esperando uma doaçao de coraçao, pq vc roubou o meu',
-    'me chama de piraque e vamos pra minha casa',
-    'me chama de gorila e deixa eu te sarrar no ritmo do seu coração',
-    'meu nome é arlindo, mas pode me chamar de lindo pq perdi o ar quando te vi',
-    'me chama de lula e deixa eu roubar seu coração',
-    'espero que o seu dia seja tão bom quanto sua bunda',
-    'chama meu pau de Jean Willys e deixa ele cuspir na sua cara',
-    'deixe eu ser a bala do seu hamilton e acertar seu coração',
-    'me chama de terrorista e deixa eu explodir dentro de você',
-]
 
 @asyncio.coroutine
 def show_cantada(message):
@@ -1019,10 +985,6 @@ def on_message(message):
             yield from jose_debug(message, "ErroGeral: %s" % str(e))
         return
 
-    elif message.content.startswith("!cabalo"):
-        yield from client.send_message(message.channel, "imundo")
-        return
-
     elif message.content in exact_commands:
         func = exact_commands[message.content]
         yield from func(message)
@@ -1072,11 +1034,11 @@ def on_message(message):
             n_min = int(args[1])
             n_max = int(args[2])
         except:
-            yield from jose_debug(message, "erro parseando os numeros para a função.")
+            yield from jose_debug(message, "erro parseando os números para a função.")
             return
 
         if n_min > n_max:
-            yield from jose_debug(message, "minimo > máximo, erro gerando número")
+            yield from jose_debug(message, "minimo > máximo, intervalo não permitido")
             return
 
         n_rand = random.randint(n_min, n_max)
@@ -1148,7 +1110,7 @@ def on_message(message):
                 res = yield from jasm.execute(insts, pointer)
                 if res[0] == True:
                     if len(res[2]) < 1:
-                        yield from client.send_message(message.channel, "**nenhum resultado**")
+                        yield from client.send_message(message.channel, "**debug: nenhum resultado**")
                     else:
                         yield from client.send_message(message.channel, res[2])
                 else:
@@ -1175,11 +1137,10 @@ def on_message(message):
                         yield from client.send_message(message.channel, 'spam detectado a @%s! cooldown de 5 minutos foi aplicado!' % message.author)
                         return
                     else:
-                        print("already made timeout")
                         return
 
                 author_id = str(message.author.id)
-                amount = random.choice([2, 5, 10, 15, 20])
+                amount = random.choice([1, 1.2, 2, 2.5, 5, 5.1, 7.4])
 
                 res = jcoin.transfer(jcoin.jose_id, author_id, amount, jcoin.LEDGER_PATH)
                 yield from josecoin_save(message, False)

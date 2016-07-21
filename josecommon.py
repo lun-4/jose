@@ -82,6 +82,42 @@ pegar valor de variável: "g nome"
 printar todas as variáveis definidas: "pv"
 '''
 
+
+cantadas = [
+    'ô lá em casa',
+    'vc é o feijao do meu acaraje',
+    'gate, teu cu tem air bag?? pq meu pau tá sem freio',
+    'se merda fosse beleza você estaria toda cagada',
+    'me chama de bombeiro e deixa eu apagar seu fogo com a minha mangueira',
+    'to no hospital esperando uma doaçao de coraçao, pq vc roubou o meu',
+    'me chama de piraque e vamos pra minha casa',
+    'me chama de gorila e deixa eu te sarrar no ritmo do seu coração',
+    'meu nome é arlindo, mas pode me chamar de lindo pq perdi o ar quando te vi',
+    'me chama de lula e deixa eu roubar seu coração',
+    'espero que o seu dia seja tão bom quanto sua bunda',
+    'chama meu pau de Jean Willys e deixa ele cuspir na sua cara',
+    'deixe eu ser a bala do seu Hamilton e acertar seu coração',
+    'me chama de terrorista e deixa eu explodir dentro de você',
+]
+
+elogios = [
+    "você é linde! <3",
+    "sabia que você pode ser alguém na vida?",
+    "eu acredito em você",
+]
+
+xingamentos = [
+    "Tu fica na merda",
+    "Vai se fuder!",
+    "pq colocou man",
+    "MANO PQ",
+    "vsf",
+    "seu FILHO DA PUTA",
+    "se fosse eu não deixava",
+    "vai tomar no cu",
+]
+
+
 @asyncio.coroutine
 def show_help(message):
     yield from client.send_message(message.author, JOSE_HELP_TEXT)
