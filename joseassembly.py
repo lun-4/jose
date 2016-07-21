@@ -97,10 +97,11 @@ def parse_value(val, env):
         return env['registers'][reg]
     elif val[0] == '\"' and val[-1] == '\"':
         return val[1:-1]
-    elif is_numeric(val):
-        return is_numeric(val)
     else:
-        return None
+        try:
+            return is_numeric(val)
+        except:
+            return None
 
 '''
 
@@ -177,10 +178,10 @@ def execute(instructions, env):
     stdout = ''
     i = 0
     print("execute %r" % instructions)
-    time.sleep(2)
+    # time.sleep(2)
     while i < len(instructions):
         inst = instructions[i]
-        print("instruction: %r" % inst)
+        # print("instruction: %r" % inst)
         if inst == ['', '']:
             print("skip")
             i += 1
