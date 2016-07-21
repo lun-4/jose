@@ -3,7 +3,7 @@ import time
 import asyncio
 import pickle
 
-JOSECOIN_VERSION = '0.2.1'
+JOSECOIN_VERSION = '0.2.2'
 
 JOSECOIN_HELP_TEXT = '''JoseCoin(%s) é a melhor moeda que o josé pode te oferecer!
 
@@ -18,6 +18,13 @@ Alguns comandos pedem JC$ em troca da sua funcionalidade(*comandos nsfw incluíd
 
 data = {}
 jose_id = '202587271679967232'
+
+LEDGER_PATH = 'jcoin/josecoin.journal'
+
+def ledger_data(fpath, data):
+    with open(fpath, 'a') as f:
+        f.write(data)
+    return
 
 def empty_acc(name, amnt):
     return {
@@ -42,7 +49,7 @@ def gen():
         acc = data[acc_id]
         yield (acc_id, acc['name'], acc['amount'])
 
-def transfer(id_from, id_to, amnt):
+def transfer(id_from, id_to, amnt, file_name):
     amnt = float(amnt)
     # print('idf', id_from, 'idt', id_to)
 
@@ -66,6 +73,8 @@ def transfer(id_from, id_to, amnt):
     acc_to['amount'] += amnt
     acc_from['amount'] -= amnt
 
+    ledger_data(file_name, "%f,TR,%s,%s,%f" % (time.time(), id_from, id_to, amnt))
+
     return True, "%.2f foram enviados de %s para %s" % (amnt, acc_from['name'], acc_to['name'])
 
 def load(fname):
@@ -77,6 +86,7 @@ def load(fname):
         return False, str(e)
 
     # data[jose_id] = empty_acc('jose-bot', 2000)
+    ledger_data(fname.replace('db', 'journal'), '%f,LOAD,%r' % (time.time(), data))
     return True, "load %s" % fname
 
 def save(fname):
@@ -86,4 +96,6 @@ def save(fname):
             pickle.dump(data, f)
     except Exception as e:
         return False, str(e)
+
+    ledger_data(fname.replace('db', 'journal'), '%f,SAVE,%r' % (time.time(), data))
     return True, "save %s" % fname

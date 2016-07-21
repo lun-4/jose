@@ -600,7 +600,7 @@ def jcoin_control(id_user, amnt):
     '''
     returns True if user can access
     '''
-    return jcoin.transfer(id_user, jcoin.jose_id, amnt)
+    return jcoin.transfer(id_user, jcoin.jose_id, amnt, jcoin.LEDGER_PATH)
 
 @asyncio.coroutine
 def josecoin_new(message):
@@ -655,7 +655,7 @@ def josecoin_send(message):
 
         # yield from jose_debug(message, "ids %s %s" % (id_from, id_to), False)
 
-        res = jcoin.transfer(id_from, id_to, amount)
+        res = jcoin.transfer(id_from, id_to, amount, jcoin.LEDGER_PATH)
         yield from josecoin_save(message, False)
         if res[0]:
             yield from client.send_message(message.channel, res[1])
@@ -955,7 +955,10 @@ def on_message(message):
     if message.author == client.user:
         return
 
-    print('%s(%r) : %s : %r' % (message.channel, message.channel.is_private, message.author, message.content))
+    bnr = '%s(%r) : %s : %r' % (message.channel, message.channel.is_private, message.author, message.content)
+    print(bnr)
+
+    # TODO: log message
 
     if not started:
         started = True
@@ -1178,7 +1181,7 @@ def on_message(message):
                 author_id = str(message.author.id)
                 amount = random.choice([2, 5, 10, 15, 20])
 
-                res = jcoin.transfer(jcoin.jose_id, author_id, amount)
+                res = jcoin.transfer(jcoin.jose_id, author_id, amount, jcoin.LEDGER_PATH)
                 yield from josecoin_save(message, False)
                 if res[0]:
                     acc_to = jcoin.get(author_id)[1]
