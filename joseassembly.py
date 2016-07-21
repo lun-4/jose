@@ -34,6 +34,13 @@ def empty_env():
             'r7': None,
             'r8': None,
             'r9': None,
+            'r10': None,
+            'r11': None,
+            'r12': None,
+            'r13': None,
+            'r14': None,
+            'r15': None,
+            'r16': None,
         },
         'consts':{
             'JASM_VER': JASM_VERSION,
@@ -83,8 +90,11 @@ def is_numeric(lit):
     return complex(lit)
 
 @asyncio.coroutine
-def parse_value(val):
-    if val[0] == '\"' and val[-1] == '\"':
+def parse_value(val, env):
+    if val[0] == '$':
+        reg = val[val.find('(')+1:val.find(')')]
+        return env['registers'][reg]
+    elif val[0] == '\"' and val[-1] == '\"':
         return val[1:-1]
     elif is_numeric(val):
         return is_numeric(val)
@@ -120,6 +130,49 @@ ret
 
 '''
 
+'''
+mov r1,1
+mov r2,2
+mov r3,1
+
+# b ao quadrado
+mov r4,$(r2)
+mov r5,2
+pow r4,r5
+
+mov r5,4
+mov r6,$(r1)
+mov r7,$(r3)
+mul r5,r6
+mul r5,r7
+
+sub r4,r5
+
+mov r5,$(r4)
+sqrt r5
+
+# second part
+mov r11,2
+mul r7,r11
+
+
+unm r6,r2
+
+# soma com r5
+add r6,r5
+
+# divide por r7
+div r6,r7
+
+# x2 = x1 - sqrt(delta)
+mov r7,$(r6)
+sub r7,r5
+
+write r6
+write r7
+
+'''
+
 def math_calc(opstr, inst, env):
     try:
         a, b = inst[1].split(',')
@@ -142,6 +195,8 @@ def math_calc(opstr, inst, env):
             env['registers'][a] = val_a / val_b
         elif opstr == '^':
             env['registers'][a] = val_a ** val_b
+        elif opstr == 'u':
+            env['registers'][a] = -val_b
         return True, env, ''
     except Exception as e:
         return False, env, 'pyerr: %s' % str(e)
@@ -150,12 +205,23 @@ def math_calc(opstr, inst, env):
 def execute(instructions, env):
     stdout = ''
     for inst in instructions:
+        if len(inst[0]) > 1:
+            if inst[0][0] == '#':
+                continue
+        else:
+            pass
         command = inst[0].lower()
-        if command == 'mov' or command == 'set':
+
+        if command.strip() == '':
+            continue
+        elif command == '#':
+            continue
+        elif command == 'mov' or command == 'set':
             try:
+                print('inst[1]', inst[1])
                 reg, val = inst[1].split(',')
                 # stdout += '%r %r' % (reg, val)
-                val = yield from parse_value(val)
+                val = yield from parse_value(val, env)
 
                 if val is None:
                     return False, env, 'erro parseando valor'
@@ -195,6 +261,11 @@ def execute(instructions, env):
             env = res[1]
             if not res[0]:
                 return False, env, res[2]
+        elif command == 'unm':
+            res = math_calc('u', inst, env)
+            env = res[1]
+            if not res[0]:
+                return False, env, res[2]
 
         elif command == 'sqrt':
             try:
@@ -221,5 +292,5 @@ def execute(instructions, env):
                 return False, env, 'pyerr: %s' % str(e)
 
         else:
-            return False, env, "nenhum comando encontrado"
+            return False, env, "nenhum comando encontrado %s " % command
     return True, env, stdout
