@@ -3,7 +3,7 @@ import time
 import asyncio
 import pickle
 
-JOSECOIN_VERSION = '0.2.2'
+JOSECOIN_VERSION = '0.2.3'
 
 JOSECOIN_HELP_TEXT = '''JoseCoin(%s) é a melhor moeda que o josé pode te oferecer!
 
@@ -73,7 +73,7 @@ def transfer(id_from, id_to, amnt, file_name):
     acc_to['amount'] += amnt
     acc_from['amount'] -= amnt
 
-    ledger_data(file_name, "%f,TR,%s,%s,%f" % (time.time(), id_from, id_to, amnt))
+    ledger_data(file_name, "%f;TR;%s;%s;%f" % (time.time(), id_from, id_to, amnt))
 
     return True, "%.2f foram enviados de %s para %s" % (amnt, acc_from['name'], acc_to['name'])
 
@@ -86,7 +86,7 @@ def load(fname):
         return False, str(e)
 
     # data[jose_id] = empty_acc('jose-bot', 2000)
-    ledger_data(fname.replace('db', 'journal'), '%f,LOAD,%r' % (time.time(), data))
+    ledger_data(fname.replace('db', 'journal'), '%f;LOAD;%r' % (time.time(), data))
     return True, "load %s" % fname
 
 def save(fname):
@@ -97,5 +97,5 @@ def save(fname):
     except Exception as e:
         return False, str(e)
 
-    ledger_data(fname.replace('db', 'journal'), '%f,SAVE,%r' % (time.time(), data))
+    ledger_data(fname.replace('db', 'journal'), '%f;SAVE;%r' % (time.time(), data))
     return True, "save %s" % fname
