@@ -4,11 +4,12 @@ import discord
 import cmath as math
 import time
 
-JASM_VERSION = '0.2'
+JASM_VERSION = '0.2.1'
+MAX_LOOP = 50
 
 JASM_HELP_TEXT = '''JoséAssembly(v%s) é o melhor dialeto de Assembly que o José pode te oferecer!
 
-A arquitetura do JASM tem 10 registradores que podem ser usados de qualquer forma.
+A arquitetura do JASM tem 17 registradores(r0 até r16) que podem ser usados de qualquer forma.
 
 Comandos e suas traduções:
 
@@ -19,6 +20,11 @@ mul a,b         a = a * b
 div a,b         a = a / b
 pow a,b         a = a ** b
 sqrt a          a = sqrt(a)
+
+bnot a,b        a = ~b
+band a,b        a = (a and b)
+bor a,b         a = (a or b)
+bxor a,b        a = (a xor b)
 
 ''' % JASM_VERSION
 
@@ -142,10 +148,11 @@ mov r2,15
 
 inc r1
 echo r1
-blet r1,r2,r5 # r5 = r1 >= r2
+# r5 = r1 >= r2
+mblet r5,r1,r2
 bnot r5
 
-lpe # loop end
+loopend # loop end
 mov r10,"loop terminated"
 echo r10
 
@@ -202,6 +209,25 @@ def math_calc(opstr, inst, env):
     except Exception as e:
         return False, env, 'pyerr: %s' % str(e)
 
+def op3_calc(opstr, inst, env):
+    try:
+        r, a, b = inst[1].split(',')
+        if a not in env['registers']:
+            return False, env, "primeiro operando não encontrado"
+
+        if b not in env['registers']:
+            return False, env, "segundo operando não encontrado"
+
+        env['registers'][r]
+        val_a = env['registers'][a]
+        val_b = env['registers'][b]
+
+        if opstr == 'let':
+            env['registers'][r] = val_a <= val_b
+        return True, env, ''
+    except Exception as e:
+        return False, env, 'pyerr: %s' % str(e)
+
 @asyncio.coroutine
 def execute(instructions, env):
     stdout = ''
@@ -209,6 +235,8 @@ def execute(instructions, env):
     print("execute %r" % instructions)
     # time.sleep(2)
     while pc < len(instructions):
+        if lp > MAX_LOOP:
+            return False, env, "loop pointer > %d" % MAX_LOOP
         inst = instructions[pc]
         print("instruction: %r" % inst)
         if inst == ['', '']:
@@ -325,7 +353,7 @@ def execute(instructions, env):
                 val_a = env['registers'][rega]
                 val_b = env['registers'][regb]
 
-                print('cmp', val_a, val_b, val_a == val_b)
+                # print('cmp', val_a, val_b, val_a == val_b)
 
                 if val_a == val_b:
                     pc += 1
@@ -379,6 +407,32 @@ def execute(instructions, env):
             env = res[1]
             if not res[0]:
                 return False, env, res[2]
+
+        elif command == 'mblet':
+            res = op3_calc('let', inst, env)
+            env = res[1]
+            if not res[0]:
+                return False, env, res[2]
+
+        elif command == '.loop':
+            reg = inst[1]
+            if reg not in env['registers']:
+                return False, env, "registrador de controle não encontrado"
+
+            control_register = reg
+
+            # get length of block
+            lp = 0 # loop pointer
+            lp_c = 0 # loop counter
+
+            while inst[0].lower() != 'loopend':
+                lp_c += 1
+                inst = instructions[pc + lp_c]
+
+            continue
+
+        elif command == 'loopend':
+            pass
 
         else:
             return False, env, "comando %r não encontrado" % command
