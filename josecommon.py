@@ -141,7 +141,7 @@ def show_top(message):
         (":ok_hand:" * random.randint(1,6))))
 
 @asyncio.coroutine
-def random_yt(message):
+def search_youtube(message):
     d = message.content.split(' ')
     search_term = ' '.join(d[1:])
 

@@ -75,11 +75,12 @@ def debug_log(string):
 
 @asyncio.coroutine
 def jose_debug(message, dbg_msg, flag=True):
-    dbg_msg = str(dbg_msg)
+    message_banner = '%s[%s]: %r' % (message.author, message.channel, message.content)
+    dbg_msg = '%s -> %s' % (message_banner, str(dbg_msg))
     debug_logs.append(dbg_msg)
     debug_log('%s : %s' % (time.strftime("%d-%m-%Y %H:%M:%S"), dbg_msg))
     if flag:
-        yield from client.send_message(message.channel, "debug-jose: {}".format(dbg_msg))
+        yield from client.send_message(message.channel, "jdebug: {}".format(dbg_msg))
 
 def make_something(fmt, dict_messages):
     @asyncio.coroutine
@@ -644,9 +645,9 @@ def josecoin_top10(message):
 
     range_max = 11
     if len(args) > 1:
-        range_max = int(args[1])
+        range_max = int(args[1]) + 1
 
-    res = 'Top 10 pessoas que tem mais JC$\n'
+    res = 'Top %d pessoas que tem mais JC$\n' % (range_max - 1)
     maior = {
         'id': 0,
         'name': '',
@@ -665,8 +666,6 @@ def josecoin_top10(message):
                 maior['name'] = name
                 maior['amount'] = amount
 
-        # yield from client.send_message(message.channel, 'del %r' % (maior['id']))
-        # yield from client.send_message(message.channel, 'jcd %r' % (jcdata))
         del jcdata[maior['id']]
         res += '%d. %s -> %.2f\n' % (i, maior['name'], maior['amount'])
 
@@ -699,7 +698,7 @@ def change_nickname(message):
 
     for server in client.servers:
         m = server.get_member(jcoin.jose_id)
-        yield from client.change_nickname(m, args[1])
+        yield from client.change_nickname(m, JOSE_NICK)
 
     return
 
@@ -708,7 +707,7 @@ def demon(message):
     if DEMON_MODE:
         yield from client.send_message(message.channel, random.choice(demon_videos))
     else:
-        yield from client.send_message(message.channel, "espere até que o modo demônio seja sumonado.")
+        yield from client.send_message(message.channel, "espere até que o modo demônio seja sumonado em momentos específicos.")
 
 @asyncio.coroutine
 def rand_emoji(message):
@@ -722,16 +721,6 @@ pong = make_func('pong')
 help_josecoin = make_func(jcoin.JOSECOIN_HELP_TEXT)
 show_tijolo = make_func("http://www.ceramicabelem.com.br/produtos/TIJOLO%20DE%2006%20FUROS.%209X14X19.gif")
 show_mc = make_func("https://cdn.discordapp.com/attachments/202055538773721099/203989039504687104/unknown.png")
-
-'''@asyncio.coroutine
-def search_google(message):
-    args = message.content.split(' ')
-    search_term = ' '.join(args[1:])
-    url = 'https://www.google.com/search?q=%s&num=20' % search_term
-
-    r = requests.get(url)
-    tree = html.fromstring(r.content)'''
-
 show_vinheta = make_func('http://prntscr.com/bvcbju')
 
 @asyncio.coroutine
@@ -750,7 +739,6 @@ def search_soundcloud(message):
 
     while url:
         response = requests.get(url)
-
         if response.status_code != 200:
             yield from jose_debug(message, "erro no !sndc: status code != 200")
             return
@@ -771,33 +759,24 @@ def search_soundcloud(message):
         url = doc.get('next_href')
 
 
-
 exact_commands = {
     'jose': show_help,
     'josé': show_help,
     'Jose': show_help,
     'José': show_help,
     '!help': show_help,
-
     'melhor bot': show_shit,
-
-    'top': show_top,
 }
 
 commands_start = {
     "!setmsmsg": set_msmsg,
     "!msmsg": show_msmsg,
 
-    "se fude jose": show_vtnc,
-    "jose se fude": show_vtnc,
-    "vtnc jose": show_vtnc,
-    'que rodeio': rodei_teu_cu,
-
     '!xingar': show_xingar,
     '!elogiar': show_elogio,
     '!cantar': show_cantada,
 
-    '!yt': random_yt,
+    '!yt': search_youtube,
     '!setlmsg': set_lilmsg,
     '!version': show_version,
 
@@ -830,7 +809,6 @@ commands_start = {
     '!load': josecoin_load,
     # '!jcdebug': josecoin_dbg,
     '!jcdata': josecoin_dbg,
-
     '!conta': josecoin_new,
     '!enviar': josecoin_send,
     '!saldo': josecoin_saldo,
@@ -839,14 +817,12 @@ commands_start = {
     '!jenv': show_jenv,
 
     '!nick': change_nickname,
-    # '!ddg': search_ddg,
     '!ping': pong,
     '!xuxa': demon,
     'axux!': demon,
     '!emoji': rand_emoji,
 
     '!sndc': search_soundcloud,
-    # '!google': search_google,
     '!jasm': make_func(jasm.JASM_HELP_TEXT),
 }
 
@@ -862,6 +838,12 @@ commands_match = {
     'frozen 2': show_frozen_2,
     'emule': show_emule,
     'vinheta': show_vinheta
+    'top': show_top,
+
+    "se fude jose": show_vtnc,
+    "jose se fude": show_vtnc,
+    "vtnc jose": show_vtnc,
+    'que rodeio': rodei_teu_cu,
 }
 
 counter = 0
