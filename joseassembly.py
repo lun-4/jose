@@ -280,7 +280,7 @@ def execute(instructions, env):
                     i += 1
                     continue
                 else:
-                    while inst[0] != 'else':
+                    pass
             except Exception as e:
                 return False, env, 'pyerr: %s' % str(e)
 
