@@ -106,3 +106,15 @@ write r11
 write r6
 write r11
 ```
+
+Equality:
+```assembly
+mov r1,1
+mov r2,1
+cmp r1,r2
+mov r10,"equal"
+else
+mov r10,"not equal"
+cmpe
+write r10
+```

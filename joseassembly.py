@@ -4,9 +4,9 @@ import discord
 import cmath as math
 import time
 
-JASM_VERSION = '0.1.1'
+JASM_VERSION = '0.2'
 
-JASM_HELP_TEXT = '''JoséAssembly é o melhor dialeto de Assembly que o José pode te oferecer!
+JASM_HELP_TEXT = '''JoséAssembly(v%s) é o melhor dialeto de Assembly que o José pode te oferecer!
 
 A arquitetura do JASM tem 10 registradores que podem ser usados de qualquer forma.
 
@@ -20,7 +20,7 @@ div a,b         a = a / b
 pow a,b         a = a ** b
 sqrt a          a = sqrt(a)
 
-'''
+''' % JASM_VERSION
 
 def empty_env():
     return {
@@ -145,6 +145,23 @@ cmpe
 write r10
 '''
 
+'''
+loops:
+
+
+mov r1,0
+mov r2,15
+.loop r5
+
+inc r1
+echo r1
+blet r1,r2,r5 # boolean less than or equal
+bnot r5 # boolean not
+
+lpe # loop end
+
+'''
+
 def math_calc(opstr, inst, env):
     try:
         a, b = inst[1].split(',')
@@ -176,34 +193,32 @@ def math_calc(opstr, inst, env):
 @asyncio.coroutine
 def execute(instructions, env):
     stdout = ''
-    i = 0
+    pc = 0 # program counter
     print("execute %r" % instructions)
     # time.sleep(2)
-    while i < len(instructions):
-        inst = instructions[i]
-        # print("instruction: %r" % inst)
+    while pc < len(instructions):
+        inst = instructions[pc]
+        print("instruction: %r" % inst)
         if inst == ['', '']:
-            print("skip")
-            i += 1
+            pc += 1
             continue
 
         if len(inst[0]) > 1:
             if inst[0][0] == '#':
-                i += 1
+                pc += 1
                 continue
         else:
             pass
         command = inst[0].lower()
 
         if command.strip() == '':
-            i += 1
+            pc += 1
             continue
         elif command == '#' or command == '':
-            i += 1
+            pc += 1
             continue
         elif command == 'mov' or command == 'set':
             try:
-                print('inst[1]', inst[1])
                 reg, val = inst[1].split(',')
                 # stdout += '%r %r' % (reg, val)
                 val = yield from parse_value(val, env)
@@ -269,14 +284,68 @@ def execute(instructions, env):
             try:
                 reg = inst[1]
                 if reg in env['registers']:
+                    stdout += '%s' % env['registers'][reg]
+                else:
+                    return False, env, 'registrador não encontrado'
+            except Exception as e:
+                return False, env, 'pyerr: %s' % str(e)
+
+        elif command == 'echo':
+            try:
+                reg = inst[1]
+                if reg in env['registers']:
                     stdout += '%s\n' % env['registers'][reg]
                 else:
                     return False, env, 'registrador não encontrado'
             except Exception as e:
                 return False, env, 'pyerr: %s' % str(e)
 
+        elif command == 'cmp':
+            try:
+                rega, regb = inst[1].split(',')
+
+                if rega not in env['registers']:
+                    return False, env, 'registrador não encontrado'
+
+                if regb not in env['registers']:
+                    return False, env, 'registrador não encontrado'
+
+                val_a = env['registers'][rega]
+                val_b = env['registers'][regb]
+
+                print('cmp', val_a, val_b, val_a == val_b)
+
+                if val_a == val_b:
+                    pc += 1
+                    # start from here
+                    continue
+                else:
+                    # increment PC until 'else'(or cmpe found) found
+                    while True:
+                        if inst[0].lower() == 'else': break
+                        if inst[0].lower() == 'cmpe': break
+                        pc += 1
+                        inst = instructions[pc]
+                    pc += 1 # step else
+                    continue #work it on from it
+
+            except Exception as e:
+                return False, env, 'pyerr: %s' % str(e)
+
+        elif command == 'else':
+            # increment until cmpe
+            while True:
+                if inst[0].lower() == 'cmpe': break
+                pc += 1
+                inst = instructions[pc]
+            pc += 1 #step cmpe
+            continue
+
+        elif command == 'cmpe':
+            pass
+
         else:
             return False, env, "comando %r não encontrado" % command
 
-        i += 1
+        pc += 1
     return True, env, stdout
