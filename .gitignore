@@ -98,7 +98,8 @@ learning_data/
 jose-data.txt
 
 # JoseCoin database
-jcoin/josecoin.db
+jcoin/*.db
+jcoin/*.journal
 
 # config data
 joseconfig.py
