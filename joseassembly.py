@@ -3,7 +3,7 @@ import asyncio
 import discord
 import math
 
-JASM_VERSION = '0.0.3'
+JASM_VERSION = '0.1'
 
 JASM_HELP_TEXT = '''JoséAssembly é o melhor dialeto de Assembly que o José pode te oferecer!
 
@@ -131,46 +131,16 @@ ret
 '''
 
 '''
+test comparison:
+
 mov r1,1
-mov r2,2
-mov r3,1
-
-# b ao quadrado
-mov r4,$(r2)
-mov r5,2
-pow r4,r5
-
-mov r5,4
-mov r6,$(r1)
-mov r7,$(r3)
-mul r5,r6
-mul r5,r7
-
-sub r4,r5
-
-mov r5,$(r4)
-sqrt r5
-
-# second part
-mov r11,2
-mul r7,r11
-
-
-unm r6,r2
-
-# soma com r5
-add r6,r5
-
-# divide por r7
-div r6,r7
-
-# x2 = x1 - sqrt(delta)
-mov r7,$(r6)
-sub r7,r5
-
-write r6
-write r7
-
+mov r2,1
+cmp r1,r2
+mov r10,"equal"
+else
+mov r10,"not equal"
+cmpe
+write r10
 '''
 
 def math_calc(opstr, inst, env):
@@ -204,7 +174,9 @@ def math_calc(opstr, inst, env):
 @asyncio.coroutine
 def execute(instructions, env):
     stdout = ''
-    for inst in instructions:
+    i = 0
+    while i < len(instructions):
+        inst = instructions[i]
         if len(inst[0]) > 1:
             if inst[0][0] == '#':
                 continue
@@ -288,9 +260,31 @@ def execute(instructions, env):
                     stdout += '%s\n' % env['registers'][reg]
                 else:
                     return False, env, 'registrador não encontrado'
-            except:
+            except Exception as e:
+                return False, env, 'pyerr: %s' % str(e)
+
+        elif command == 'cmp': #equality
+            try:
+                reg1, reg2 = inst[1].split(',')
+
+                if reg1 not in env['registers']:
+                    return False, env, "primeiro registrador não encontrado"
+
+                if reg2 not in env['registers']:
+                    return False, env, "segundo registrador não encontrado"
+
+                vr1 = env['registers'][reg1]
+                vr2 = env['registers'][reg2]
+
+                if vr1 == vr2:
+                    i += 1
+                    continue
+                else:
+                    while inst[0] != 'else':
+            except Exception as e:
                 return False, env, 'pyerr: %s' % str(e)
 
         else:
             return False, env, "nenhum comando encontrado %s " % command
+        i += 1
     return True, env, stdout
