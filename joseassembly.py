@@ -133,19 +133,6 @@ ret
 '''
 
 '''
-test comparison:
-
-mov r1,1
-mov r2,1
-cmp r1,r2
-mov r10,"equal"
-else
-mov r10,"not equal"
-cmpe
-write r10
-'''
-
-'''
 loops:
 
 
@@ -155,21 +142,38 @@ mov r2,15
 
 inc r1
 echo r1
-blet r1,r2,r5 # boolean less than or equal
-bnot r5 # boolean not
+blet r1,r2,r5 # r5 = r1 >= r2
+bnot r5
 
 lpe # loop end
+mov r10,"loop terminated"
+echo r10
 
 '''
+
+def syscall_nop(env):
+    pass
+
+def syscall_write(env):
+    pass
+
+def syscall_read(env):
+    pass
+
+syscall_table = {
+    0: syscall_nop,
+    1: syscall_write,
+    2: syscall_read,
+}
 
 def math_calc(opstr, inst, env):
     try:
         a, b = inst[1].split(',')
         if a not in env['registers']:
-            return False, env, "first operand not found"
+            return False, env, "primeiro operando não encontrado"
 
         if b not in env['registers']:
-            return False, env, "second operand not found"
+            return False, env, "segundo operando não encontrado"
 
         val_a = env['registers'][a]
         val_b = env['registers'][b]
@@ -186,6 +190,14 @@ def math_calc(opstr, inst, env):
             env['registers'][a] = val_a ** val_b
         elif opstr == 'u':
             env['registers'][a] = -val_b
+        elif opstr == 'bn':
+            env['registers'][a] = not val_b
+        elif opstr == 'ba':
+            env['registers'][a] = val_a and val_b
+        elif opstr == 'bo':
+            env['registers'][a] = val_a or val_b
+        elif opstr == 'bx':
+            env['registers'][a] = val_a ^ val_b
         return True, env, ''
     except Exception as e:
         return False, env, 'pyerr: %s' % str(e)
@@ -343,6 +355,30 @@ def execute(instructions, env):
 
         elif command == 'cmpe':
             pass
+
+        elif command == 'bnot':
+            res = math_calc('bn', inst, env)
+            env = res[1]
+            if not res[0]:
+                return False, env, res[2]
+
+        elif command == 'band':
+            res = math_calc('ba', inst, env)
+            env = res[1]
+            if not res[0]:
+                return False, env, res[2]
+
+        elif command == 'bor':
+            res = math_calc('bo', inst, env)
+            env = res[1]
+            if not res[0]:
+                return False, env, res[2]
+
+        elif command == 'bxor':
+            res = math_calc('bx', inst, env)
+            env = res[1]
+            if not res[0]:
+                return False, env, res[2]
 
         else:
             return False, env, "comando %r não encontrado" % command

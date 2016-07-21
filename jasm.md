@@ -30,8 +30,8 @@ add r6,r5
 div r6,r7
 div r11,r7
 
-write r6
-write r11
+echo r6
+echo r11
 ```
 
 comentado:
@@ -57,12 +57,12 @@ mov r5,$(r4)
 sqrt r5
 
 #mov r10,"delta"
-#write r10
-#write r4
+#echo r10
+#echo r4
 
 #mov r10,"raiz de delta"
-#write r10
-#write r5
+#echo r10
+#echo r5
 
 # second part
 mov r11,2
@@ -71,14 +71,14 @@ mul r7,r11
 
 #a * 2
 mov r10,"a vezes 2"
-write r10
-write r7
+echo r10
+echo r7
 
 unm r6,r2
 
 mov r10,"menos b"
-write r10
-write r6
+echo r10
+echo r6
 
 mov r11,$(r6)
 sub r11,r5
@@ -87,24 +87,24 @@ sub r11,r5
 add r6,r5
 
 mov r10,"- b + sqrt(delta)"
-write r10
-write r6
+echo r10
+echo r6
 
 mov r10,"- b - sqrt(delta)"
-write r10
-write r11
+echo r10
+echo r11
 
 # divide por r7
 div r6,r7
 div r11,r7
 
 mov r10,"divide os dois por 2*a"
-write r10
-write r6
-write r11
+echo r10
+echo r6
+echo r11
 
-write r6
-write r11
+echo r6
+echo r11
 ```
 
 Equality:
@@ -116,5 +116,5 @@ mov r10,"equal"
 else
 mov r10,"not equal"
 cmpe
-write r10
+echo r10
 ```
