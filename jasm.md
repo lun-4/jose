@@ -35,7 +35,7 @@ write r11
 ```
 
 comentado:
-```
+```assembly
 mov r1,2
 mov r2,-14
 mov r3,12
