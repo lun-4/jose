@@ -39,10 +39,6 @@ PORN_LIMIT = 14
 #just for 0.6.6.6 and 6.6.6
 DEMON_MODE = False
 
-# prices
-PORN_PRICE = 2
-LEARN_PRICE = 5
-
 #default stuff
 client = discord.Client()
 set_client(client)
@@ -714,15 +710,6 @@ def rand_emoji(message):
     res = yield from random_emoji(random.randint(1,5))
     yield from client.send_message(message.channel, "%s" % res)
 
-show_emule = make_func("http://i.imgur.com/GO90sEv.png")
-show_frozen_2 = make_func('http://i.imgur.com/HIcjyoW.jpg')
-pong = make_func('pong')
-
-help_josecoin = make_func(jcoin.JOSECOIN_HELP_TEXT)
-show_tijolo = make_func("http://www.ceramicabelem.com.br/produtos/TIJOLO%20DE%2006%20FUROS.%209X14X19.gif")
-show_mc = make_func("https://cdn.discordapp.com/attachments/202055538773721099/203989039504687104/unknown.png")
-show_vinheta = make_func('http://prntscr.com/bvcbju')
-
 @asyncio.coroutine
 def search_soundcloud(message):
     args = message.content.split(' ')
@@ -757,7 +744,6 @@ def search_soundcloud(message):
         return
 
         url = doc.get('next_href')
-
 
 exact_commands = {
     'jose': show_help,
@@ -844,6 +830,7 @@ commands_match = {
     "jose se fude": show_vtnc,
     "vtnc jose": show_vtnc,
     'que rodeio': rodei_teu_cu,
+    'anal giratorio': show_agira,
 }
 
 counter = 0
@@ -1092,9 +1079,9 @@ def on_message(message):
                     acc_to = jcoin.get(author_id)[1]
                     # yield from client.send_message(message.channel, res[1])
                     emoji_res = yield from random_emoji(3)
-                    yield from client.send_message(message.channel, 'Parabéns %s < %.2f JC! %s' % (acc_to['name'], amount, emoji_res))
+                    yield from client.send_message(message.channel, '%s %.2fJC > %s' % (emoji_res, amount, acc_to['name']))
                 else:
-                    yield from client.send_message(message.channel, 'erro em jc: %s' % res[1])
+                    yield from jose_debug(message, 'jc_error: %s' % res[1])
         else:
             yield from jose_debug(message, 'erro conseguindo JC$ para %s(canal %r) porquê você está em um canal privado.' % (message.author.id, message.channel))
 

@@ -9,16 +9,27 @@ random = SystemRandom()
 
 import jcoin.josecoin as jcoin
 
-JOSE_VERSION = '0.6.8'
-JOSE_BUILD = 128
+JOSE_VERSION = '0.7.0'
+JOSE_BUILD = 131
 
 JOSE_SPAM_TRIGGER = 4
 PIRU_ACTIVITY = .05
+
+# prices
+PORN_PRICE = 5
+LEARN_PRICE = 5
+
 client = None
 
 def set_client(cl):
     global client
     client = cl
+
+JOSE_PORN_HTEXT = '''Pornô(Tudo tem preço de %.2fJC):
+!hypno <termos | :latest> - busca por termos no Hypnohub
+!e621 <termos | :latest> - busca por tags no e621
+!xvideos <termos> - busca no XVideos
+''' % (PORN_PRICE)
 
 JOSE_HELP_TEXT = '''Oi, eu sou o josé(v%s b%d), sou um bot trabalhadô!
 
@@ -51,9 +62,7 @@ Administradores(role "mestra"):
 !setlmsg - altera a pequena mensagem
 !lilmsg - mostra a pequena mensagem
 
-PORN:
-!hypno <termos | :latest> - busca por termos no Hypnohub (custa 1 JC)
-!e621 <termos | :latest> - busca por tags no e621 (custa 1 JC)
+%s
 
 Developers:
 !log - mostrar todos os logs do josé
@@ -72,7 +81,7 @@ $jasm - JoseAssembly
 
 (não inclui comandos que o josé responde dependendo das mensagens)
 (nem como funciona a JoseCoin, use !josecoin pra isso)
-''' % (JOSE_VERSION, JOSE_BUILD)
+''' % (JOSE_VERSION, JOSE_BUILD, JOSE_PORN_HTEXT)
 
 JOSESCRIPT_HELP_TEXT = '''Bem vindo ao JoséScript!
 colocar variáveis: "nome=valor" (todas as variáveis são strings por padrão)
@@ -151,6 +160,10 @@ def search_youtube(message):
     html_content = urllib.request.urlopen("http://www.youtube.com/results?" + query_string)
     search_results = re.findall(r'href=\"\/watch\?v=(.{11})', html_content.read().decode())
 
+    if len(search_results) < 2:
+        yield from client.send_message(message.channel, "!yt: Nenhum resultado encontrado.")
+        return
+
     yield from client.send_message(message.channel, "http://www.youtube.com/watch?v=" + search_results[0])
 
 @asyncio.coroutine
@@ -174,7 +187,6 @@ atividade = [
 @asyncio.coroutine
 def gorila_routine(ch):
     if random.random() < PIRU_ACTIVITY:
-        print("THE ACTIVITY HAS BORN")
         yield from client.send_message(ch, random.choice(atividade))
 
 def make_func(res):
@@ -190,3 +202,12 @@ show_tampa = make_func("A DO TEU CU\nHÁ, TROLEI")
 show_vtnc = make_func("OQ VC DISSE?\nhttp://i.imgur.com/Otky963.jpg")
 show_shit = make_func("tbm amo vc humano <3")
 show_version = make_func("José v%s b%d" % (JOSE_VERSION, JOSE_BUILD))
+show_emule = make_func("http://i.imgur.com/GO90sEv.png")
+show_frozen_2 = make_func('http://i.imgur.com/HIcjyoW.jpg')
+pong = make_func('pong')
+
+help_josecoin = make_func(jcoin.JOSECOIN_HELP_TEXT)
+show_tijolo = make_func("http://www.ceramicabelem.com.br/produtos/TIJOLO%20DE%2006%20FUROS.%209X14X19.gif")
+show_mc = make_func("https://cdn.discordapp.com/attachments/202055538773721099/203989039504687104/unknown.png")
+show_vinheta = make_func('http://prntscr.com/bvcbju')
+show_agira = make_func("http://docs.unity3d.com/uploads/Main/SL-DebugNormals.png")
