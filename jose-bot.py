@@ -477,8 +477,6 @@ def nsfw_e621(message):
 
 @asyncio.coroutine
 def nsfw_porn(message):
-    'http://api.porn.com/videos/find.json'
-
     res = yield from jcoin_control(message.author.id, PORN_PRICE)
     if not res[0]:
         yield from client.send_message(message.channel,
@@ -777,6 +775,8 @@ commands_start = {
     '!hypno': nsfw_hypnohub,
     '!e621': nsfw_e621,
     '!yandere': nsfw_yandere,
+    '!porn': nsfw_porn,
+
     '!josetxt': show_josetxt,
     '!learn': learn_data,
     '!escolha': make_escolha,
