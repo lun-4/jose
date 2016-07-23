@@ -9,8 +9,8 @@ random = SystemRandom()
 
 import jcoin.josecoin as jcoin
 
-JOSE_VERSION = '0.7.1'
-JOSE_BUILD = 135
+JOSE_VERSION = '0.7.2'
+JOSE_BUILD = 136
 
 JOSE_SPAM_TRIGGER = 4
 PIRU_ACTIVITY = .05
@@ -40,7 +40,7 @@ def set_client(cl):
 JOSE_PORN_HTEXT = '''Pornô(Tudo tem preço de %.2fJC):
 !hypno <termos | :latest> - busca por termos no Hypnohub
 !e621 <termos | :latest> - busca por tags no e621
-!xvideos <termos> - busca no XVideos
+!yandere <termos | :latest> - busca no yande.re
 ''' % (PORN_PRICE)
 
 JOSE_HELP_TEXT = '''Oi, eu sou o josé(v%s b%d), sou um bot trabalhadô!
@@ -207,6 +207,46 @@ def make_func(res):
         yield from client.send_message(message.channel, res)
 
     return response
+
+def make_xmlporn(baseurl):
+    @asyncio.coroutine
+    def func(message):
+        res = yield from jcoin_control(message.author.id, PORN_PRICE)
+        if not res[0]:
+            yield from client.send_message(message.channel,
+                "PermError: %s" % res[1])
+            return
+
+        args = message.content.split(' ')
+        search_term = ' '.join(args[1:])
+
+        if search_term == ':latest':
+            yield from client.send_message(message.channel, 'procurando post mais recente')
+            r = requests.get('%s?limit=%s' % (baseurl, PORN_LIMIT))
+            tree = ElementTree.fromstring(r.content)
+            root = tree
+            try:
+                post = random.choice(root)
+                yield from client.send_message(message.channel, '%s' % post.attrib['file_url'])
+                return
+            except Exception as e:
+                yield from jose_debug(message, "erro: %s" % str(e))
+                return
+
+        else:
+            yield from client.send_message(message.channel, 'procurando por %r' % search_term)
+            r = requests.get('%s?limit=%s&tags=%s' % (baseurl, PORN_LIMIT, search_term))
+            tree = ElementTree.fromstring(r.content)
+            root = tree
+            try:
+                post = random.choice(root)
+                yield from client.send_message(message.channel, '%s' % post.attrib['file_url'])
+                return
+            except Exception as e:
+                yield from jose_debug(message, "erro: provavelmente nada foi encontrado, seu merda. (%s)" % str(e))
+                return
+
+    return func
 
 rodei_teu_cu = make_func("RODEI MEU PAU NO TEU CU")
 show_noabraco = make_func("não vou abraçar")

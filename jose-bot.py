@@ -432,42 +432,8 @@ def speak_routine(channel, run=False):
             res = res[::-1]
         yield from client.send_message(channel, res)
 
-@asyncio.coroutine
-def nsfw_hypnohub(message):
-    res = yield from jcoin_control(message.author.id, PORN_PRICE)
-    if not res[0]:
-        yield from client.send_message(message.channel,
-            "PermError: %s" % res[1])
-        return
-
-    args = message.content.split(' ')
-    search_term = ' '.join(args[1:])
-
-    if search_term == ':latest':
-        yield from client.send_message(message.channel, 'getting latest post in hypnohub')
-        r = requests.get('http://hypnohub.net/post/index.xml?limit=%s' % PORN_LIMIT)
-        tree = ElementTree.fromstring(r.content)
-        root = tree
-        try:
-            post = random.choice(root)
-            yield from client.send_message(message.channel, '%s' % post.attrib['file_url'])
-            return
-        except Exception as e:
-            yield from jose_debug(message, "erro em !hypno: %s" % str(e))
-            return
-
-    else:
-        yield from client.send_message(message.channel, 'searching for %r in hypnohub' % search_term)
-        r = requests.get('http://hypnohub.net/post/index.xml?limit=%s&tags=%s' % (PORN_LIMIT, search_term))
-        tree = ElementTree.fromstring(r.content)
-        root = tree
-        try:
-            post = random.choice(root)
-            yield from client.send_message(message.channel, '%s' % post.attrib['file_url'])
-            return
-        except Exception as e:
-            yield from jose_debug(message, "erro no !hypno: provavelmente nada foi encontrado, seu merda. (%s)" % str(e))
-            return
+nsfw_hypnohub = make_xmlporn('http://hypnohub.net/post/index.xml')
+nsfw_yandere = make_xmlporn('https://yande.re/post.xml')
 
 @asyncio.coroutine
 def show_josetxt(message):
@@ -800,6 +766,7 @@ commands_start = {
 
     '!hypno': nsfw_hypnohub,
     '!e621': nsfw_e621,
+    '!yandere': nsfw_yandere,
     '!josetxt': show_josetxt,
     '!learn': learn_data,
     '!escolha': make_escolha,
