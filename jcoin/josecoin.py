@@ -19,7 +19,7 @@ Alguns comandos pedem JC$ em troca da sua funcionalidade(*comandos nsfw incluíd
 data = {}
 jose_id = '202587271679967232'
 
-LEDGER_PATH = 'jcoin/josecoin.journal'
+LEDGER_PATH = 'jcoin/josecoin-2.journal'
 
 def ledger_data(fpath, data):
     with open(fpath, 'a') as f:
@@ -32,7 +32,7 @@ def empty_acc(name, amnt):
         'name': name
     }
 
-def new_acc(id_acc, name, init_amnt=10.0):
+def new_acc(id_acc, name, init_amnt=25.0):
     if id_acc in data:
         return False, 'conta já existe'
 
@@ -51,7 +51,6 @@ def gen():
 
 def transfer(id_from, id_to, amnt, file_name):
     amnt = float(amnt)
-    # print('idf', id_from, 'idt', id_to)
 
     if not (id_from in data):
         return False, 'conta para extrair fundos não existe'
@@ -65,8 +64,7 @@ def transfer(id_from, id_to, amnt, file_name):
     except Exception as e:
         return False, str(e)
 
-    print('acf', acc_from, 'act', acc_to)
-    print('amount', amnt)
+    print('acf', acc_from, 'act', acc_to, 'amount', amnt)
     if not (acc_from['amount'] >= amnt):
         return False, "conta não possui fundos suficientes para a transação"
 
@@ -85,7 +83,7 @@ def load(fname):
     except Exception as e:
         return False, str(e)
 
-    # data[jose_id] = empty_acc('jose-bot', 2000)
+    data[jose_id] = empty_acc('jose-bot', 50000)
     ledger_data(fname.replace('db', 'journal'), '%f;LOAD;%r\n' % (time.time(), data))
     return True, "load %s" % fname
 
