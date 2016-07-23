@@ -762,8 +762,11 @@ def init_aposta(message):
 
 @asyncio.coroutine
 def aposta_start(message):
-    PORCENTAGEM_GANHADOR = (76.54/100)
+    PORCENTAGEM_GANHADOR = 76.54
     PORCENTAGEM_OUTROS = 100 - PORCENTAGEM_GANHADOR
+
+    PORCENTAGEM_GANHADOR /= 100
+    PORCENTAGEM_OUTROS /= 100
 
     winner = random.choice(list(jose_env['apostas'].keys()))
 
