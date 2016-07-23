@@ -869,6 +869,7 @@ commands_start = {
     '!jasm': make_func(jasm.JASM_HELP_TEXT),
     '!construção': main_status,
     '!aposta': init_aposta,
+    '!rolar': aposta_start,
 }
 
 commands_match = {
