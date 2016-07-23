@@ -48,6 +48,7 @@ msmsg = ''
 started = False
 bank = None
 MAINTENANCE_MODE = False
+GAMBLING_MODE = False
 
 #enviroment things
 josescript_env = {}
@@ -55,6 +56,7 @@ jose_env = {
     'survey': {},
     'spam': {},
     'spamcl': {},
+    'apostas': {},
 }
 survey_id = 0
 jasm_env = {}
@@ -585,10 +587,16 @@ def josecoin_send(message):
         yield from josecoin_save(message, False)
         if res[0]:
             yield from client.send_message(message.channel, res[1])
+            if GAMBLING_MODE:
+                if id_to == jcoin.jose_id:
+                    # use jenv
+                    jenv['apostas'][id_from] = amount
+                    yield from client.send_message("jc_aposta: aposta de %.2f processada de <@%s>" % (amount, id_from))
+            return
         else:
             yield from client.send_message(message.channel, 'erro em jc: %s' % res[1])
     except Exception as e:
-        yield from jose_debug(message, "jc: %s" % str(e))
+        yield from jose_debug(message, "jc_error: %s" % str(e))
 
 
 @asyncio.coroutine
@@ -730,8 +738,24 @@ def main_status(message):
     else:
         yield from jose_debug(message, "PermError: Não permitido alterar o status do jose")
 
+@asyncio.coroutine
 def show_maintenance(message):
     yield from client.send_message(message.channel, "==JOSÉ EM CONSTRUÇÃO, AGUARDE==\nhttps://umasofe.files.wordpress.com/2012/11/placa.jpg")
+
+@asyncio.coroutine
+def init_aposta(message):
+    global GAMBLING_MODE
+    if message.channel.is_private:
+        yield from client.send_message(message.channel, "Nenhum canal privado é autorizado a iniciar apostas")
+        return
+
+    if not GAMBLING_MODE:
+        GAMBLING_MODE = True
+        yield from client.send_message(message.channel, "Modo aposta ativado, mandem seus JC$!")
+        return
+    else:
+        yield from client.send_message(message.channel, "Modo aposta já foi ativado.")
+        return
 
 exact_commands = {
     'jose': show_help,
