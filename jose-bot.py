@@ -48,6 +48,7 @@ lil_message = ''
 msmsg = ''
 started = False
 bank = None
+MAINTENANCE_MODE = False
 
 #enviroment things
 josescript_env = {}
@@ -745,6 +746,19 @@ def search_soundcloud(message):
 
         url = doc.get('next_href')
 
+@asyncio.coroutine
+def main_status(message):
+    global MAINTENANCE_MODE
+    auth = yield from check_roles(MASTER_ROLE, message.author.roles)
+    if auth:
+        MAINTENANCE_MODE = not MAINTENANCE_MODE
+        yield from jose_debug(message, "Modo de construção: %s" % (MAINTENANCE_MODE))
+    else:
+        yield from jose_debug(message, "PermError: Não permitido alterar o status do jose")
+
+def show_maintenance(message):
+    yield from client.send_message(message.channel, "==JOSÉ EM CONSTRUÇÃO, AGUARDE==\nhttps://umasofe.files.wordpress.com/2012/11/placa.jpg")
+
 exact_commands = {
     'jose': show_help,
     'josé': show_help,
@@ -810,6 +824,7 @@ commands_start = {
 
     '!sndc': search_soundcloud,
     '!jasm': make_func(jasm.JASM_HELP_TEXT),
+    '!construção': main_status,
 }
 
 commands_match = {
@@ -831,6 +846,8 @@ commands_match = {
     "vtnc jose": show_vtnc,
     'que rodeio': rodei_teu_cu,
     'anal giratorio': show_agira,
+
+    'lenny face': make_func("( ͡° ͜ʖ ͡°)")
 }
 
 counter = 0
@@ -917,18 +934,27 @@ def on_message(message):
         return
 
     elif message.content in exact_commands:
+        if MAINTENANCE_MODE:
+            yield from show_maintenance(message)
+            return
         func = exact_commands[message.content]
         yield from func(message)
         return
 
     for command in commands_start:
         if message.content.startswith(command):
+            if MAINTENANCE_MODE:
+                yield from show_maintenance(message)
+                return
             func = commands_start[command]
             yield from func(message)
             return
 
     for command in commands_match:
         if command in message.content:
+            if MAINTENANCE_MODE:
+                yield from show_maintenance(message)
+                return
             func = commands_match[command]
             yield from func(message)
             return
@@ -1011,6 +1037,9 @@ def on_message(message):
         return
 
     elif message.content.startswith('$josescript'):
+        if MAINTENANCE_MODE:
+            yield from show_maintenance(message)
+            return
         yield from client.send_message(message.channel, 'Bem vindo ao REPL do JoseScript!\nPara sair, digite "exit"')
 
         while True:
@@ -1024,6 +1053,9 @@ def on_message(message):
         return
 
     elif message.content.startswith('$jasm'):
+        if MAINTENANCE_MODE:
+            yield from show_maintenance(message)
+            return
         yield from client.send_message(message.channel, 'Bem vindo ao REPL do JoseAssembly!\nPara sair, digite "exit"')
 
         if not (message.author.id in jasm_env):
@@ -1069,6 +1101,9 @@ def on_message(message):
                         return
                     else:
                         return
+
+                if MAINTENANCE_MODE:
+                    return
 
                 author_id = str(message.author.id)
                 amount = random.choice([1, 1.2, 2, 2.5, 5, 5.1, 7.4])
