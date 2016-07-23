@@ -5,7 +5,7 @@ import re
 import requests
 import urllib.request
 import urllib.parse
-import re
+import time
 from xml.etree import ElementTree
 
 import randemoji as emoji
