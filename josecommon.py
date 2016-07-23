@@ -15,8 +15,8 @@ random = SystemRandom()
 
 import jcoin.josecoin as jcoin
 
-JOSE_VERSION = '0.7.4.1'
-JOSE_BUILD = 142
+JOSE_VERSION = '0.7.5'
+JOSE_BUILD = 143
 
 JOSE_SPAM_TRIGGER = 4
 PIRU_ACTIVITY = .05
@@ -160,6 +160,8 @@ xingamentos = [
     "seu FILHO DA PUTA",
     "se fosse eu não deixava",
     "vai tomar no cu",
+    'CABALO IMUNDO',
+    'HIJO DE PUTA',
 ]
 
 demon_videos = [
@@ -294,3 +296,4 @@ show_tijolo = make_func("http://www.ceramicabelem.com.br/produtos/TIJOLO%20DE%20
 show_mc = make_func("https://cdn.discordapp.com/attachments/202055538773721099/203989039504687104/unknown.png")
 show_vinheta = make_func('http://prntscr.com/bvcbju')
 show_agira = make_func("http://docs.unity3d.com/uploads/Main/SL-DebugNormals.png")
+show_casa = make_func("https://thumbs.dreamstime.com/z/locais-de-trabalho-em-um-escrit%C3%B3rio-panor%C3%A2mico-moderno-opini%C3%A3o-de-new-york-city-das-janelas-tabelas-pretas-e-cadeiras-de-couro-59272285.jpg")

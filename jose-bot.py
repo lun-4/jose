@@ -895,7 +895,8 @@ commands_match = {
     'que rodeio': rodei_teu_cu,
     'anal giratorio': show_agira,
 
-    'lenny face': make_func("( ͡° ͜ʖ ͡°)")
+    'lenny face': make_func("( ͡° ͜ʖ ͡°)"),
+    'nossa casa': show_casa,
 }
 
 counter = 0
