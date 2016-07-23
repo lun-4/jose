@@ -2,6 +2,12 @@ import discord
 import asyncio
 import urllib
 import re
+import requests
+import urllib.request
+import urllib.parse
+import re
+from xml.etree import ElementTree
+
 import randemoji as emoji
 
 from random import SystemRandom
@@ -10,11 +16,12 @@ random = SystemRandom()
 import jcoin.josecoin as jcoin
 
 JOSE_VERSION = '0.7.2'
-JOSE_BUILD = 136
+JOSE_BUILD = 138
 
 JOSE_SPAM_TRIGGER = 4
 PIRU_ACTIVITY = .05
 
+PORN_LIMIT = 14
 TOTAL = 13.0
 PORN_MEMBERS = 8.0
 LEARN_MEMBERS = 1.0
@@ -102,6 +109,23 @@ Variáveis são definidas por usuário: assim nenhum usuário mexe nas variávei
 pegar valor de variável: "g nome"
 printar todas as variáveis definidas: "pv"
 '''
+
+debug_logs = []
+
+def debug_log(string):
+    print(string)
+    today_str = time.strftime("%d-%m-%Y")
+    with open("logs/jose_debug-%s.log" % today_str, 'a') as f:
+        f.write(string+'\n')
+
+@asyncio.coroutine
+def jose_debug(message, dbg_msg, flag=True):
+    message_banner = '%s[%s]: %r' % (message.author, message.channel, message.content)
+    dbg_msg = '%s -> %s' % (message_banner, str(dbg_msg))
+    debug_logs.append(dbg_msg)
+    debug_log('%s : %s' % (time.strftime("%d-%m-%Y %H:%M:%S"), dbg_msg))
+    if flag:
+        yield from client.send_message(message.channel, "jdebug: {}".format(dbg_msg))
 
 
 cantadas = [
@@ -207,6 +231,13 @@ def make_func(res):
         yield from client.send_message(message.channel, res)
 
     return response
+
+@asyncio.coroutine
+def jcoin_control(id_user, amnt):
+    '''
+    returns True if user can access
+    '''
+    return jcoin.transfer(id_user, jcoin.jose_id, amnt, jcoin.LEDGER_PATH)
 
 def make_xmlporn(baseurl):
     @asyncio.coroutine

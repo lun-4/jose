@@ -34,7 +34,6 @@ MASTER_ROLE = 'mestra'
 LEARN_ROLE = 'cult'
 jc_probabiblity = .12
 JOSE_ANIMATION_LIMIT = 1 # 2 animações simultaneamente
-PORN_LIMIT = 14
 
 #just for 0.6.6.6 and 6.6.6
 DEMON_MODE = False
@@ -61,23 +60,6 @@ survey_id = 0
 jasm_env = {}
 
 # !pesquisa 1 Qual o melhor mensageiro:discord,skype,teamspeak,raidcall
-
-debug_logs = []
-
-def debug_log(string):
-    print(string)
-    today_str = time.strftime("%d-%m-%Y")
-    with open("logs/jose_debug-%s.log" % today_str, 'a') as f:
-        f.write(string+'\n')
-
-@asyncio.coroutine
-def jose_debug(message, dbg_msg, flag=True):
-    message_banner = '%s[%s]: %r' % (message.author, message.channel, message.content)
-    dbg_msg = '%s -> %s' % (message_banner, str(dbg_msg))
-    debug_logs.append(dbg_msg)
-    debug_log('%s : %s' % (time.strftime("%d-%m-%Y %H:%M:%S"), dbg_msg))
-    if flag:
-        yield from client.send_message(message.channel, "jdebug: {}".format(dbg_msg))
 
 def make_something(fmt, dict_messages):
     @asyncio.coroutine
@@ -514,13 +496,6 @@ def parse_id(data, message):
     else:
         yield from jose_debug(message, "error parsing id %s" % data)
         return
-
-@asyncio.coroutine
-def jcoin_control(id_user, amnt):
-    '''
-    returns True if user can access
-    '''
-    return jcoin.transfer(id_user, jcoin.jose_id, amnt, jcoin.LEDGER_PATH)
 
 @asyncio.coroutine
 def josecoin_new(message):
