@@ -590,8 +590,11 @@ def josecoin_send(message):
             if GAMBLING_MODE:
                 if id_to == jcoin.jose_id:
                     # use jenv
-                    jenv['apostas'][id_from] = amount
-                    yield from client.send_message("jc_aposta: aposta de %.2f processada de <@%s>" % (amount, id_from))
+                    if not id_from in jose_env['apostas']:
+                        jose_env['apostas'][id_from] = 0
+
+                    jose_env['apostas'][id_from] += amount
+                    yield from client.send_message(message.channel, "jc_aposta: aposta de %.2f processada de <@%s>" % (amount, id_from))
             return
         else:
             yield from client.send_message(message.channel, 'erro em jc: %s' % res[1])
@@ -757,6 +760,45 @@ def init_aposta(message):
         yield from client.send_message(message.channel, "Modo aposta já foi ativado.")
         return
 
+@asyncio.coroutine
+def aposta_start(message):
+    PORCENTAGEM_GANHADOR = (76.54/100)
+    PORCENTAGEM_OUTROS = 100 - PORCENTAGEM_GANHADOR
+
+    winner = random.choice(list(jose_env['apostas'].keys()))
+
+    M = sum(jose_env['apostas'].values()) # total
+    apostadores = len(jose_env['apostas'])-1 # remove one because of the winner
+    P = (M * PORCENTAGEM_GANHADOR)
+    p = (M * PORCENTAGEM_OUTROS) / apostadores
+
+    res = jcoin.transfer(jcoin.jose_id, winner, P, jcoin.LEDGER_PATH)
+    if res[0]:
+        yield from client.send_message(message.channel, "<@%s> ganhou %.2fJC nessa aposta por ser o ganhador!" % (winner, P))
+    else:
+        yield from jose_debug(message, "erro no jc_aposta->jcoin: %s" % res[1])
+        yield from jose_debug(message, "aposta abortada.")
+        return
+
+    del jose_env['apostas'][winner]
+
+    # going well...
+    for apostador in jose_env['apostas']:
+        res = jcoin.transfer(jcoin.jose_id, apostador, p, jcoin.LEDGER_PATH)
+        if res[0]:
+            yield from client.send_message(message.channel, "<@%s> ganhou %.2fJC nessa aposta!" % (apostador, p))
+        else:
+            yield from jose_debug(message, "erro no jc_aposta->jcoin: %s" % res[1])
+            yield from jose_debug(message, "aposta abortada.")
+            return
+
+    yield from client.send_message(message.channel, "Modo aposta desativado!")
+
+    # clear everything
+    jose_env['apostas'] = {}
+    GAMBLING_MODE = False
+    return
+
 exact_commands = {
     'jose': show_help,
     'josé': show_help,
@@ -826,6 +868,7 @@ commands_start = {
     '!sndc': search_soundcloud,
     '!jasm': make_func(jasm.JASM_HELP_TEXT),
     '!construção': main_status,
+    '!aposta': init_aposta,
 }
 
 commands_match = {
