@@ -16,12 +16,13 @@ random = SystemRandom()
 import jcoin.josecoin as jcoin
 
 JOSE_VERSION = '0.7.5'
-JOSE_BUILD = 154
+JOSE_BUILD = 155
 
 JOSE_SPAM_TRIGGER = 4
 PIRU_ACTIVITY = .05
 
 PORN_LIMIT = 14
+GAMBLING_FEE = 5 # 5 percent
 TOTAL = 13.0
 PORN_MEMBERS = 8.0
 LEARN_MEMBERS = 1.0

@@ -49,6 +49,7 @@ started = False
 bank = None
 MAINTENANCE_MODE = False
 GAMBLING_MODE = False
+GAMBLING_LAST_BID = 0.0
 
 #enviroment things
 josescript_env = {}
@@ -580,6 +581,7 @@ def josecoin_write(message):
 
 @asyncio.coroutine
 def josecoin_send(message):
+    global GAMBLING_LAST_BID
     args = message.content.split(' ')
 
     try:
@@ -588,6 +590,19 @@ def josecoin_send(message):
 
         id_from = message.author.id
         id_to = yield from parse_id(id_to, message)
+
+        atleast = (amount + (amount * (GAMBLING_FEE/100.)))
+
+        if GAMBLING_MODE:
+            if jcoin.get(id_from)[1]['amount'] <= atleast:
+                yield from client.send_message(message.channel, "sua conta não possui fundos suficientes para apostar(%.2fJC são necessários)" % atleast)
+                return
+            else:
+                amount += (amount * (GAMBLING_FEE/100.))
+
+            if amount < GAMBLING_LAST_BID:
+                yield from client.send_message(message.channel, "sua aposta tem que ser maior do que a última, que foi %.2fJC" % GAMBLING_LAST_BID)
+                return
 
         res = jcoin.transfer(id_from, id_to, amount, jcoin.LEDGER_PATH)
         yield from josecoin_save(message, False)
@@ -601,12 +616,13 @@ def josecoin_send(message):
 
                     jose_env['apostas'][id_from] += amount
                     val = jose_env['apostas'][id_from]
+                    GAMBLING_LAST_BID = amount
                     yield from client.send_message(message.channel, "jc_aposta: aposta total de %.2f de <@%s>" % (val, id_from))
             return
         else:
             yield from client.send_message(message.channel, 'erro em jc: %s' % res[1])
     except Exception as e:
-        yield from jose_debug(message, "jc_error: %s" % str(e))
+        yield from jose_debug(message, "py_error: %s" % str(e))
 
 
 @asyncio.coroutine
