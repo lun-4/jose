@@ -594,7 +594,8 @@ def josecoin_send(message):
                         jose_env['apostas'][id_from] = 0
 
                     jose_env['apostas'][id_from] += amount
-                    yield from client.send_message(message.channel, "jc_aposta: aposta de %.2f processada de <@%s>" % (amount, id_from))
+                    val = jose_env['apostas'][id_from]
+                    yield from client.send_message(message.channel, "jc_aposta: aposta total de %.2f de <@%s>" % (val, id_from))
             return
         else:
             yield from client.send_message(message.channel, 'erro em jc: %s' % res[1])
