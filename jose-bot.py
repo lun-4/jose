@@ -896,7 +896,8 @@ commands_match = {
     'anal giratorio': show_agira,
 
     'lenny face': make_func("( ͡° ͜ʖ ͡°)"),
-    'nossa casa': show_casa,
+    'janela': show_casa,
+    'frozen3': make_func("https://thumbs.dreamstime.com/t/construo-refletiu-nas-janelas-do-prdio-de-escritrios-moderno-contra-47148949.jpg"),
 }
 
 counter = 0
