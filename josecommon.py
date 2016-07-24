@@ -174,7 +174,7 @@ def jose_debug(message, dbg_msg, flag=True):
 
 cantadas = [
     'ô lá em casa',
-    'vc é o feijao do meu acaraje',
+    'vc é o feijão do meu acarajé',
     'gate, teu cu tem air bag?? pq meu pau tá sem freio',
     'se merda fosse beleza você estaria toda cagada',
     'me chama de bombeiro e deixa eu apagar seu fogo com a minha mangueira',
