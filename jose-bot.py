@@ -786,6 +786,7 @@ def init_aposta(message):
 @asyncio.coroutine
 def aposta_start(message):
     global GAMBLING_MODE
+    global GAMBLING_LAST_BID
     PORCENTAGEM_GANHADOR = 76.54
     PORCENTAGEM_OUTROS = 100 - PORCENTAGEM_GANHADOR
 
@@ -831,13 +832,17 @@ def aposta_start(message):
     # clear everything
     jose_env['apostas'] = {}
     GAMBLING_MODE = False
+    GAMBLING_LAST_BID = 0.0
     return
 
 @asyncio.coroutine
 def aposta_report(message):
     res = ''
+    total = 0.0
     for apostador in jose_env['apostas']:
         res += '<@%s> apostou %.2fJC\n' % (apostador, jose_env['apostas'][apostador])
+        total += jose_env['apostas'][apostador]
+    res += 'Total apostado: %.2fJC' % ()
     yield from client.send_message(message.channel, res)
     return
 
