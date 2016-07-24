@@ -769,7 +769,12 @@ def aposta_start(message):
     PORCENTAGEM_GANHADOR /= 100
     PORCENTAGEM_OUTROS /= 100
 
-    winner = random.choice(list(jose_env['apostas'].keys()))
+    K = list(jose_env['apostas'].keys())
+    if len(K) < 2:
+        yield from client.send_message("Nenhuma aposta com mais de 1 jogador foi feita, modo aposta desativado.")
+        GAMBLING_MODE = False
+        return
+    winner = random.choice(K)
 
     M = sum(jose_env['apostas'].values()) # total
     apostadores = len(jose_env['apostas'])-1 # remove one because of the winner
