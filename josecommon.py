@@ -16,7 +16,7 @@ random = SystemRandom()
 import jcoin.josecoin as jcoin
 
 JOSE_VERSION = '0.7.5'
-JOSE_BUILD = 152
+JOSE_BUILD = 153
 
 JOSE_SPAM_TRIGGER = 4
 PIRU_ACTIVITY = .05
@@ -218,6 +218,19 @@ demon_videos = [
     'https://www.youtube.com/watch?v=ae9GEf7K8DM',
     'https://www.youtube.com/watch?v=03KHCQZ6Faw',
     'https://www.youtube.com/watch?v=9NCWKd8lL3o',
+]
+
+aviaos = [
+    'https://www.aboutcar.com/car-advice/wp-content/uploads/2011/02/Spoiler.jpg',
+    'http://i.imgur.com/eL2hUyd.jpg',
+    'http://i.imgur.com/8kS03gI.jpg',
+    'http://i.imgur.com/Zfb05Qh.jpg',
+    'http://i.imgur.com/w8Tp5z2.jpg',
+    'http://i.imgur.com/ptpQdQx.jpg',
+    'http://i.imgur.com/szx1S9n.jpg',
+    'http://i.imgur.com/GG3zk49.jpg',
+    'http://i.imgur.com/9Jq6oo6.jpg',
+    'http://i.imgur.com/AIbjvX7.jpg',
 ]
 
 @asyncio.coroutine

@@ -79,6 +79,12 @@ show_elogio = make_something('{}, {}', elogios)
 show_cantada = make_something('Ei {}, {}', cantadas)
 
 @asyncio.coroutine
+def show_aerotrem(message):
+    ch = discord.Object(id='206590341317394434')
+    aviao = random.choice(aviaos)
+    yield from client.send_message(ch, aviao)
+
+@asyncio.coroutine
 def set_lilmsg(message):
     global lil_message
     d = message.content.split(' ')
@@ -786,7 +792,7 @@ def aposta_start(message):
 
     res = jcoin.transfer(jcoin.jose_id, winner, P, jcoin.LEDGER_PATH)
     if res[0]:
-        report += "<@%s> ganhou %.2fJC nessa aposta por ser o ganhador!" % (winner, P)
+        report += "<@%s> ganhou %.2fJC nessa aposta por ser o ganhador!\n" % (winner, P)
     else:
         yield from jose_debug(message, "erro no jc_aposta->jcoin: %s" % res[1])
         yield from jose_debug(message, "aposta abortada.")
@@ -809,6 +815,14 @@ def aposta_start(message):
     # clear everything
     jose_env['apostas'] = {}
     GAMBLING_MODE = False
+    return
+
+@asyncio.coroutine
+def aposta_report(message):
+    res = ''
+    for apostador in jose_env['apostas']:
+        res += '<@%s> apostou %.2fJC\n' % (apostador, jose_env['apostas'][apostador])
+    yield from client.send_message(message.channel, res)
     return
 
 exact_commands = {
@@ -884,6 +898,8 @@ commands_start = {
     '!rolar': aposta_start,
     '!ahelp': show_gambling_full,
     '!adummy': show_gambling,
+    '!areport': aposta_report,
+    '!airport': show_aerotrem,
 }
 
 commands_match = {
@@ -910,6 +926,7 @@ commands_match = {
     'janela': show_casa,
     'frozen3': make_func("https://thumbs.dreamstime.com/t/construo-refletiu-nas-janelas-do-prdio-de-escritrios-moderno-contra-47148949.jpg"),
     'q fita': make_func("http://i.imgur.com/DQ3YnI0.jpg"),
+    'compiuter': make_func("https://i.ytimg.com/vi/cU3330gwoh8/hqdefault.jpg"),
 }
 
 counter = 0
