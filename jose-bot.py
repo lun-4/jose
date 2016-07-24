@@ -879,6 +879,8 @@ commands_start = {
     '!construção': main_status,
     '!aposta': init_aposta,
     '!rolar': aposta_start,
+    '!ahelp': show_gambling_full,
+    '!adummy': show_gambling,
 }
 
 commands_match = {

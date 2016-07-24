@@ -16,7 +16,7 @@ random = SystemRandom()
 import jcoin.josecoin as jcoin
 
 JOSE_VERSION = '0.7.5'
-JOSE_BUILD = 147
+JOSE_BUILD = 149
 
 JOSE_SPAM_TRIGGER = 4
 PIRU_ACTIVITY = .05
@@ -75,6 +75,9 @@ Jose faz coisas pra pessoas:
 !elogiar @mention - elogia a pessoa
 !causar @mention @mention - faz um causo entre pessoas
 
+Apostas:
+!ahelp e !adummy irão te mostrar os textos de ajuda para apostadores
+
 Administradores(role "mestra"):
 !exit - desligar o jose(somente pessoas com o role "mestra" são autorizadas)
 !reboot - reinicia o jose(somente role "mestra")
@@ -108,6 +111,46 @@ colocar variáveis: "nome=valor" (todas as variáveis são strings por padrão)
 Variáveis são definidas por usuário: assim nenhum usuário mexe nas variáveis de outro usuário :DD
 pegar valor de variável: "g nome"
 printar todas as variáveis definidas: "pv"
+'''
+
+GAMBLING_HELP_TEXT = '''O que é: Função que permite dois (ou mais) usuários apostarem josecoins por esporte.
+
+Como funciona:
+-Primeiro, ativar o "modo aposta" do jose-bot com o comando: !aposta (qualquer um pode começar uma aposta)
+-jose-bot printa a mensagem "Modo aposta ativado. Joguem suas granas!" ou algo do tipo
+-Enquanto o "modo aposta" estiver ativado, qualquer um que !enviar josecoins para o jose-bot entra na aposta, o jose-bot grava o nome da pessoa
+temporariamente como se fosse um "acesso a memória RAM"
+-As apostas são cumulativas, ou seja, se uma mesma pessoa !enviar 20 e depois !enviar 40, é como se ela apostasse 60 josecoins de uma vez
+-Quando todos tiverem feito suas apostas, inserir o comando !rolar (ou outro nome sla), o que fará com que o jose-bot sorteie aleatoriamente uma pessoa com base na fórmula: n = 1/x (x sendo o número de pessoas que entraram na aposta)
+-A pessoa sorteada ganha a aposta, recebendo 76.54% do montante, e os outros apostadores ficam com o que sobrou, que será dividido igualmente.
+-Após o pagamento, o modo aposta se desativa automaticamente(editado)
+
+Exemplo:
+Número de apostadores = 3 (pessoas A, B e C, respectivamente)
+Inserindo o comando ---> !aposta
+jose-bot printa: "Modo aposta ativado. Joguem suas granas!"
+A pessoa A aposta 50 josecoins ---> !enviar @ZELAO 50
+A pessoa B aposta 30 josecoins ---> !enviar @ZELAO 30
+A pessoa C aposta 20 josecoins ---> !enviar @ZELAO 20
+"Rolando o dado" ---> !rolar
+
+Cálculo do prêmio:
+M = montante acumulado de todas as apostas
+P = total de josecoins que o vencedor da aposta ganha
+p = total de josecoins que cada um dos perdedores da aposta ganha
+x = número de pessoas que entraram na aposta
+
+P = M * 0.7654
+p = M * 0.2346 / x
+Pegando os valores anteriores, o montante é 50+30+20=100
+A pessoa B ganhou a aposta, sendo assim ela ganha 76.54 josecoins, sobrando 23.46 josecoins.
+Desses 23.46 josecoins, as pessoas A e C vão receber, cada uma, 11.73 josecoins.
+'''
+
+GAMBLING_HELP_TEXT_SMALL = '''Aposta for Dummies:
+!aposta - inicia modo de aposta do jose
+!enviar <mention pro jose> <quantidade> - aposta propiamente dita
+!rolar - quando você já está pronto pra ver quem é o ganhador
 '''
 
 debug_logs = []
@@ -180,6 +223,14 @@ demon_videos = [
 @asyncio.coroutine
 def show_help(message):
     yield from client.send_message(message.author, JOSE_HELP_TEXT)
+
+@asyncio.coroutine
+def show_gambling_full(message):
+    yield from client.send_message(message.author, GAMBLING_HELP_TEXT)
+
+@asyncio.coroutine
+def show_gambling(message):
+    yield from client.send_message(message.author, GAMBLING_HELP_TEXT_SMALL)
 
 @asyncio.coroutine
 def show_top(message):
