@@ -899,6 +899,7 @@ commands_match = {
     'lenny face': make_func("( ͡° ͜ʖ ͡°)"),
     'janela': show_casa,
     'frozen3': make_func("https://thumbs.dreamstime.com/t/construo-refletiu-nas-janelas-do-prdio-de-escritrios-moderno-contra-47148949.jpg"),
+    'q fita': make_func("http://i.imgur.com/DQ3YnI0.jpg"),
 }
 
 counter = 0
