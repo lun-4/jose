@@ -16,7 +16,7 @@ random = SystemRandom()
 import jcoin.josecoin as jcoin
 
 JOSE_VERSION = '0.7.5'
-JOSE_BUILD = 153
+JOSE_BUILD = 154
 
 JOSE_SPAM_TRIGGER = 4
 PIRU_ACTIVITY = .05
@@ -186,6 +186,7 @@ cantadas = [
     'chama meu pau de Jean Willys e deixa ele cuspir na sua cara',
     'deixe eu ser a bala do seu Hamilton e acertar seu coração',
     'me chama de terrorista e deixa eu explodir dentro de você',
+    'me chama de lava jato e me deixa te taxar de tão linde',
 ]
 
 elogios = [

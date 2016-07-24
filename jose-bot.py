@@ -894,12 +894,15 @@ commands_start = {
     '!sndc': search_soundcloud,
     '!jasm': make_func(jasm.JASM_HELP_TEXT),
     '!construção': main_status,
+
     '!aposta': init_aposta,
     '!rolar': aposta_start,
     '!ahelp': show_gambling_full,
     '!adummy': show_gambling,
     '!areport': aposta_report,
     '!airport': show_aerotrem,
+
+    '!awoo': make_func("https://images-2.discordapp.net/.eJwVyEEOwiAQAMC_8ABgEdi2nzGEIsW0LmHXeDD-vfUyh_mq99jVojaRzosxa-NMY9UsNFItuhLVvaTeWGc6TBJJeTvKS9g4e3M--BmiB8QJcLoqRnAWg50RA4TgTPoQ3f-0Ryusn72q3wkG3CWg.CTrgww5nr8mw_Fkm0BcEsEGV8t0.jpg")
 }
 
 commands_match = {
@@ -941,7 +944,6 @@ def on_message(message):
         if time.time() > jose_env['spamcl'][user_id]:
             del jose_env['spamcl'][user_id]
             del jose_env['spam'][user_id]
-            # yield from client.send_message(message.channel, "`%r`" % jose_env)
             yield from client.send_message(message.channel, "<@%s> : cooldown destruído" % user_id)
 
     # we do not want the bot to reply to itself
@@ -955,7 +957,7 @@ def on_message(message):
 
     if not started:
         started = True
-        initmsg = "Bem vindo ao josé v%s b%d iniciou em %s" % (JOSE_VERSION, JOSE_BUILD, message.channel)
+        initmsg = "josé v%s b%d iniciou em %s" % (JOSE_VERSION, JOSE_BUILD, message.channel)
         if DEMON_MODE:
             yield from jose_debug(message, initmsg[::-1])
         else:
@@ -964,7 +966,7 @@ def on_message(message):
         return
 
     counter += 1
-    if counter > 10:
+    if counter > 11:
         yield from josecoin_save(message, False)
         counter = 0
 
@@ -1185,7 +1187,7 @@ def on_message(message):
                     return
 
                 author_id = str(message.author.id)
-                amount = random.choice([1, 1.2, 2, 2.5, 5, 5.1, 7.4])
+                amount = random.choice([1, 1.2, 2, 2.5, 3.14, 5, 5.1, 6.28, 7.4])
 
                 res = jcoin.transfer(jcoin.jose_id, author_id, amount, jcoin.LEDGER_PATH)
                 yield from josecoin_save(message, False)
@@ -1199,8 +1201,6 @@ def on_message(message):
         else:
             yield from jose_debug(message, 'erro conseguindo JC$ para %s(canal %r) porquê você está em um canal privado.' % (message.author.id, message.channel))
 
-    #else:
-    #    yield from add_sentence(message)
         yield from speak_routine(message.channel)
         yield from gorila_routine(message.channel)
 
@@ -1216,3 +1216,4 @@ def on_ready():
 jcoin.load(jconfig.jcoin_path)
 jspeak.buildMapping(jspeak.wordlist('jose-data.txt'), 1)
 client.run(jconfig.discord_token)
+print("jose: finish line")
