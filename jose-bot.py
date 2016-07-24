@@ -782,9 +782,11 @@ def aposta_start(message):
     P = (M * PORCENTAGEM_GANHADOR)
     p = (M * PORCENTAGEM_OUTROS) / apostadores
 
+    report = ''
+
     res = jcoin.transfer(jcoin.jose_id, winner, P, jcoin.LEDGER_PATH)
     if res[0]:
-        yield from client.send_message(message.channel, "<@%s> ganhou %.2fJC nessa aposta por ser o ganhador!" % (winner, P))
+        report += "<@%s> ganhou %.2fJC nessa aposta por ser o ganhador!" % (winner, P))
     else:
         yield from jose_debug(message, "erro no jc_aposta->jcoin: %s" % res[1])
         yield from jose_debug(message, "aposta abortada.")
@@ -796,13 +798,13 @@ def aposta_start(message):
     for apostador in jose_env['apostas']:
         res = jcoin.transfer(jcoin.jose_id, apostador, p, jcoin.LEDGER_PATH)
         if res[0]:
-            yield from client.send_message(message.channel, "<@%s> ganhou %.2fJC nessa aposta!" % (apostador, p))
+            report += "<@%s> ganhou %.2fJC nessa aposta!\n" % (apostador, p)
         else:
             yield from jose_debug(message, "erro no jc_aposta->jcoin: %s" % res[1])
             yield from jose_debug(message, "aposta abortada.")
             return
 
-    yield from client.send_message(message.channel, "Modo aposta desativado!")
+    yield from client.send_message(message.channel, "%s\nModo aposta desativado!" % (report))
 
     # clear everything
     jose_env['apostas'] = {}
