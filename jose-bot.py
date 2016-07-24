@@ -772,7 +772,7 @@ def aposta_start(message):
 
     K = list(jose_env['apostas'].keys())
     if len(K) < 2:
-        yield from client.send_message("Nenhuma aposta com mais de 1 jogador foi feita, modo aposta desativado.")
+        yield from client.send_message(message.channel, "Nenhuma aposta com mais de 1 jogador foi feita, modo aposta desativado.")
         GAMBLING_MODE = False
         return
     winner = random.choice(K)
