@@ -762,6 +762,7 @@ def init_aposta(message):
 
 @asyncio.coroutine
 def aposta_start(message):
+    global GAMBLING_MODE
     PORCENTAGEM_GANHADOR = 76.54
     PORCENTAGEM_OUTROS = 100 - PORCENTAGEM_GANHADOR
 
