@@ -178,7 +178,7 @@ cantadas = [
     'gate, teu cu tem air bag?? pq meu pau tá sem freio',
     'se merda fosse beleza você estaria toda cagada',
     'me chama de bombeiro e deixa eu apagar seu fogo com a minha mangueira',
-    'to no hospital esperando uma doaçao de coraçao, pq vc roubou o meu',
+    'tô no hospital esperando uma doaçao de coração, pq vc roubou o meu',
     'me chama de piraque e vamos pra minha casa',
     'me chama de gorila e deixa eu te sarrar no ritmo do seu coração',
     'meu nome é arlindo, mas pode me chamar de lindo pq perdi o ar quando te vi',
