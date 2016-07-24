@@ -37,6 +37,7 @@ JOSE_ANIMATION_LIMIT = 1 # 2 animações simultaneamente
 
 #just for 0.6.6.6 and 6.6.6
 DEMON_MODE = False
+PARABENS_MODE = True
 
 #default stuff
 client = discord.Client()
@@ -61,6 +62,15 @@ jose_env = {
 }
 survey_id = 0
 jasm_env = {}
+
+if PARABENS_MODE:
+    old_send = client.send_message
+
+    @asyncio.coroutine
+    def newsend(ch, d):
+        return old_send(ch, 'Parabéns %s' % d)
+
+    client.send_message = newsend
 
 # !pesquisa 1 Qual o melhor mensageiro:discord,skype,teamspeak,raidcall
 
@@ -421,6 +431,8 @@ def speak_routine(channel, run=False):
         res = jspeak.genSentence(1, 50)
         if DEMON_MODE:
             res = res[::-1]
+        elif PARABENS_MODE:
+            res = 'Parabéns %s' % res
         yield from client.send_message(channel, res)
 
 nsfw_hypnohub = make_xmlporn('http://hypnohub.net/post/index.xml')
@@ -923,7 +935,8 @@ commands_start = {
     '!areport': aposta_report,
     '!airport': show_aerotrem,
 
-    '!awoo': make_func("https://images-2.discordapp.net/.eJwVyEEOwiAQAMC_8ABgEdi2nzGEIsW0LmHXeDD-vfUyh_mq99jVojaRzosxa-NMY9UsNFItuhLVvaTeWGc6TBJJeTvKS9g4e3M--BmiB8QJcLoqRnAWg50RA4TgTPoQ3f-0Ryusn72q3wkG3CWg.CTrgww5nr8mw_Fkm0BcEsEGV8t0.jpg")
+    '!awoo': make_func("https://images-2.discordapp.net/.eJwVyEEOwiAQAMC_8ABgEdi2nzGEIsW0LmHXeDD-vfUyh_mq99jVojaRzosxa-NMY9UsNFItuhLVvaTeWGc6TBJJeTvKS9g4e3M--BmiB8QJcLoqRnAWg50RA4TgTPoQ3f-0Ryusn72q3wkG3CWg.CTrgww5nr8mw_Fkm0BcEsEGV8t0.jpg"),
+    '!Parabéns': make_func("http://puu.sh/qcSLD/f82b7f48c3.png"),
 }
 
 commands_match = {
@@ -981,6 +994,8 @@ def on_message(message):
         initmsg = "josé v%s b%d iniciou em %s" % (JOSE_VERSION, JOSE_BUILD, message.channel)
         if DEMON_MODE:
             yield from jose_debug(message, initmsg[::-1])
+        elif PARABENS_MODE:
+            yield from jose_debug(message, "Parabéns %s" % initmsg)
         else:
             yield from jose_debug(message, initmsg)
         yield from josecoin_load(message)
@@ -1199,7 +1214,7 @@ def on_message(message):
                     # set timeout of user
                     if not message.author.id in jose_env['spamcl']:
                         jose_env['spamcl'][message.author.id] = time.time() + 300
-                        yield from client.send_message(message.channel, 'spam detectado a @%s! cooldown de 5 minutos foi aplicado!' % message.author)
+                        yield from client.send_message(message.channel, 'spam de @%s! Parabéns de 5 minutos foi aplicado!' % message.author)
                         return
                     else:
                         return
@@ -1216,7 +1231,10 @@ def on_message(message):
                     acc_to = jcoin.get(author_id)[1]
                     # yield from client.send_message(message.channel, res[1])
                     emoji_res = yield from random_emoji(3)
-                    yield from client.send_message(message.channel, '%s %.2fJC > %s' % (emoji_res, amount, acc_to['name']))
+                    if PARABENS_MODE:
+                        yield from client.send_message(message.channel, "Parabéns")
+                    else:
+                        yield from client.send_message(message.channel, '%s %.2fJC > %s' % (emoji_res, amount, acc_to['name']))
                 else:
                     yield from jose_debug(message, 'jc_error: %s' % res[1])
         else:
