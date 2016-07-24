@@ -842,7 +842,7 @@ def aposta_report(message):
     for apostador in jose_env['apostas']:
         res += '<@%s> apostou %.2fJC\n' % (apostador, jose_env['apostas'][apostador])
         total += jose_env['apostas'][apostador]
-    res += 'Total apostado: %.2fJC' % ()
+    res += 'Total apostado: %.2fJC' % (total)
     yield from client.send_message(message.channel, res)
     return
 
