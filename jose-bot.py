@@ -37,7 +37,7 @@ JOSE_ANIMATION_LIMIT = 1 # 2 animações simultaneamente
 
 #just for 0.6.6.6 and 6.6.6
 DEMON_MODE = False
-PARABENS_MODE = True
+PARABENS_MODE = False
 
 #default stuff
 client = discord.Client()
@@ -963,7 +963,7 @@ commands_match = {
     'janela': show_casa,
     'frozen3': make_func("https://thumbs.dreamstime.com/t/construo-refletiu-nas-janelas-do-prdio-de-escritrios-moderno-contra-47148949.jpg"),
     'q fita': make_func("http://i.imgur.com/DQ3YnI0.jpg"),
-    'compiuter': make_func("https://i.ytimg.com/vi/cU3330gwoh8/hqdefault.jpg"),
+    'compiuter': make_func("https://i.ytimg.com/vi/cU3330gwoh8/hqdefault.jpg\nhttp://puu.sh/qcVi0/04d58f422d.JPG"),
 }
 
 counter = 0

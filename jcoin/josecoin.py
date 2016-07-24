@@ -3,7 +3,7 @@ import time
 import asyncio
 import pickle
 
-JOSECOIN_VERSION = '0.2.3'
+JOSECOIN_VERSION = '0.3'
 
 JOSECOIN_HELP_TEXT = '''JoseCoin(%s) é a melhor moeda que o josé pode te oferecer!
 
@@ -51,6 +51,9 @@ def gen():
 
 def transfer(id_from, id_to, amnt, file_name):
     amnt = float(amnt)
+
+    if amnt < 0:
+        return False, "valores menores do que zero não são permitidos"
 
     if not (id_from in data):
         return False, 'conta para extrair fundos não existe'
