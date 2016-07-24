@@ -786,7 +786,7 @@ def aposta_start(message):
 
     res = jcoin.transfer(jcoin.jose_id, winner, P, jcoin.LEDGER_PATH)
     if res[0]:
-        report += "<@%s> ganhou %.2fJC nessa aposta por ser o ganhador!" % (winner, P))
+        report += "<@%s> ganhou %.2fJC nessa aposta por ser o ganhador!" % (winner, P)
     else:
         yield from jose_debug(message, "erro no jc_aposta->jcoin: %s" % res[1])
         yield from jose_debug(message, "aposta abortada.")
