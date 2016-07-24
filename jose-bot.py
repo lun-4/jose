@@ -580,7 +580,8 @@ def josecoin_saldo(message):
 
 @asyncio.coroutine
 def josecoin_write(message):
-    if not check_roles(MASTER_ROLE, message.author.roles):
+    auth = yield from check_roles(MASTER_ROLE, message.author.roles)
+    if not auth:
         yield from jose_debug(message, "PermissionError: sem permissão para alterar dados da JC")
 
     args = message.content.split(' ')
@@ -606,8 +607,9 @@ def josecoin_send(message):
         atleast = (amount + (amount * (GAMBLING_FEE/100.)))
 
         if GAMBLING_MODE:
-            if jcoin.get(id_from)[1]['amount'] <= atleast:
-                yield from client.send_message(message.channel, "sua conta não possui fundos suficientes para apostar(%.2fJC são necessários)" % atleast)
+            a = jcoin.get(id_from)[1]
+            if a['amount'] <= atleast:
+                yield from client.send_message(message.channel, "sua conta não possui fundos suficientes para apostar(%.2fJC são necessários, você tem %.2fJC, falta %.2fJC)" % (atleast, a['amount'], atleast - a['amount']))
                 return
             else:
                 amount += (amount * (GAMBLING_FEE/100.))
@@ -839,7 +841,7 @@ def aposta_start(message):
             yield from jose_debug(message, "aposta abortada.")
             return
 
-    yield from client.send_message(message.channel, "%s\nModo aposta desativado!" % (report))
+    yield from client.send_message(message.channel, "%s\nModo aposta desativado!\nhttp://i.imgur.com/huUlJhR.jpg" % (report))
 
     # clear everything
     jose_env['apostas'] = {}
@@ -937,6 +939,7 @@ commands_start = {
 
     '!awoo': make_func("https://images-2.discordapp.net/.eJwVyEEOwiAQAMC_8ABgEdi2nzGEIsW0LmHXeDD-vfUyh_mq99jVojaRzosxa-NMY9UsNFItuhLVvaTeWGc6TBJJeTvKS9g4e3M--BmiB8QJcLoqRnAWg50RA4TgTPoQ3f-0Ryusn72q3wkG3CWg.CTrgww5nr8mw_Fkm0BcEsEGV8t0.jpg"),
     '!Parabéns': make_func("http://puu.sh/qcSLD/f82b7f48c3.png"),
+    '!vtnc': make_func("vai toma no cu 2"),
 }
 
 commands_match = {
