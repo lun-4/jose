@@ -194,6 +194,8 @@ elogios = [
     "você é linde! <3",
     "sabia que você pode ser alguém na vida?",
     "eu acredito em você",
+    'vc é FODA',
+    'Parabéns',
 ]
 
 xingamentos = [
