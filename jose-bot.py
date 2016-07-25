@@ -865,7 +865,7 @@ def show_price(message):
 
     for k in PRICE_TABLE:
         d = PRICE_TABLE[k]
-        res += "categoria %r: %s > %.2f" % (k, d[0], d[1])
+        res += "categoria %r: %s > %.2f\n" % (k, d[0], d[1])
 
     yield from client.send_message(message.channel, res)
     return
