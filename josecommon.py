@@ -16,7 +16,7 @@ random = SystemRandom()
 import jcoin.josecoin as jcoin
 
 JOSE_VERSION = '0.7.6'
-JOSE_BUILD = 163
+JOSE_BUILD = 164
 
 JOSE_SPAM_TRIGGER = 4
 PIRU_ACTIVITY = .05
@@ -24,14 +24,14 @@ PIRU_ACTIVITY = .05
 PORN_LIMIT = 14
 GAMBLING_FEE = 5 # 5 percent
 TOTAL = 13.0
-PORN_MEMBERS = 8.0
+PORN_MEMBERS = 7.0
 LEARN_MEMBERS = 1.0
 
 # prices
 '''
 P = maior recompensa(7.4) * probabilidade(0.12)/ quantidade de membros(12 porquê a hachi não possui conta)
 P = (7.4*0.12) / 12
-P  = 0.888/12
+P = 0.888/12
 P = 0.74
 '''
 BASE_PRICE = 0.74

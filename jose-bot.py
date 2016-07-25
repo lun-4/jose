@@ -604,21 +604,20 @@ def josecoin_send(message):
         id_from = message.author.id
         id_to = yield from parse_id(id_to, message)
 
-        atleast = (amount + (amount * (GAMBLING_FEE/100.)))
+        fee_amount = amount * (GAMBLING_FEE/100.)
+        atleast = (amount + fee_amount)
 
         if GAMBLING_MODE:
             a = jcoin.get(id_from)[1]
             if a['amount'] <= atleast:
-                yield from client.send_message(message.channel, "sua conta não possui fundos suficientes para apostar(%.2fJC são necessários, você tem %.2fJC, falta %.2fJC)" % (atleast, a['amount'], atleast - a['amount']))
+                yield from client.send_message(message.channel, "sua conta não possui fundos suficientes para apostar(%.2fJC são necessários, você tem %.2fJC, faltam %.2fJC)" % (atleast, a['amount'], atleast - a['amount']))
                 return
-            else:
-                amount += (amount * (GAMBLING_FEE/100.))
 
             if amount < GAMBLING_LAST_BID:
                 yield from client.send_message(message.channel, "sua aposta tem que ser maior do que a última, que foi %.2fJC" % GAMBLING_LAST_BID)
                 return
 
-        res = jcoin.transfer(id_from, id_to, amount, jcoin.LEDGER_PATH)
+        res = jcoin.transfer(id_from, id_to, atleast, jcoin.LEDGER_PATH)
         yield from josecoin_save(message, False)
         if res[0]:
             yield from client.send_message(message.channel, res[1])
