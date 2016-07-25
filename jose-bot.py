@@ -428,7 +428,7 @@ def add_sentence(content, author):
 @asyncio.coroutine
 def speak_routine(channel, run=False):
     if (random.random() < chattiness) or run:
-        res = jspeak.genSentence(1, 50)
+        res = jspeak.genSentence(1, 100)
         if DEMON_MODE:
             res = res[::-1]
         elif PARABENS_MODE:
@@ -939,6 +939,7 @@ commands_start = {
     '!awoo': make_func("https://images-2.discordapp.net/.eJwVyEEOwiAQAMC_8ABgEdi2nzGEIsW0LmHXeDD-vfUyh_mq99jVojaRzosxa-NMY9UsNFItuhLVvaTeWGc6TBJJeTvKS9g4e3M--BmiB8QJcLoqRnAWg50RA4TgTPoQ3f-0Ryusn72q3wkG3CWg.CTrgww5nr8mw_Fkm0BcEsEGV8t0.jpg"),
     '!Parabéns': make_func("http://puu.sh/qcSLD/f82b7f48c3.png"),
     '!vtnc': make_func("vai toma no cu 2"),
+    '!sigabem': make_func("SIGA BEM CAMINHONEIRO"),
 }
 
 commands_match = {

@@ -16,7 +16,7 @@ random = SystemRandom()
 import jcoin.josecoin as jcoin
 
 JOSE_VERSION = '0.7.6'
-JOSE_BUILD = 164
+JOSE_BUILD = 165
 
 JOSE_SPAM_TRIGGER = 4
 PIRU_ACTIVITY = .05
@@ -38,6 +38,11 @@ BASE_PRICE = 0.74
 
 PORN_PRICE = (BASE_PRICE) * ((TOTAL-1) / PORN_MEMBERS)
 LEARN_PRICE = (BASE_PRICE) * ((TOTAL-1) / LEARN_MEMBERS)
+
+PRICE_TABLE = {
+    'porn': ("Comandos relacionados a pornografia", PORN_PRICE),
+    'learn': ("Comandos relacionados ao josé aprender textos", LEARN_PRICE),
+}
 
 client = None
 
