@@ -859,6 +859,17 @@ def aposta_report(message):
     yield from client.send_message(message.channel, res)
     return
 
+@asyncio.coroutine
+def show_price(message):
+    res = ''
+
+    for k in PRICE_TABLE:
+        d = PRICE_TABLE[k]
+        res += "categoria %r: %s > %.2f" % (k, d[0], d[1])
+
+    yield from client.send_message(message.channel, res)
+    return
+
 exact_commands = {
     'jose': show_help,
     'josé': show_help,
@@ -940,6 +951,8 @@ commands_start = {
     '!Parabéns': make_func("http://puu.sh/qcSLD/f82b7f48c3.png"),
     '!vtnc': make_func("vai toma no cu 2"),
     '!sigabem': make_func("SIGA BEM CAMINHONEIRO"),
+
+    '!price': show_price,
 }
 
 commands_match = {
