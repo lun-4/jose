@@ -460,7 +460,14 @@ def learn_data(message):
     args = message.content.split(' ')
     data_to_learn = ' '.join(args[1:])
     yield from add_sentence(data_to_learn, message.author)
-    yield from client.send_message(message.channel, "texto inserido no data.txt!")
+    feedback = 'texto inserido no jose-data.txt!\n'
+
+    # quick'n'easy solution
+    line_count = data_to_learn.count('\n')
+    word_count = data_to_learn.count(' ')
+    byte_count = len(data_to_learn)
+    feedback += "%d linhas, %d palavras e %d bytes foram inseridos\n" % (line_count, word_count, byte_count)
+    yield from client.send_message(message.channel, feedback)
     return
 
 @asyncio.coroutine
