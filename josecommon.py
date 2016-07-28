@@ -16,7 +16,7 @@ random = SystemRandom()
 import jcoin.josecoin as jcoin
 
 JOSE_VERSION = '0.7.7'
-JOSE_BUILD = 171
+JOSE_BUILD = 172
 
 JOSE_SPAM_TRIGGER = 4
 PIRU_ACTIVITY = .008
@@ -24,17 +24,17 @@ PIRU_ACTIVITY = .008
 PORN_LIMIT = 14
 GAMBLING_FEE = 5 # 5 percent
 TOTAL = 14.0
-PORN_MEMBERS = 7.0
+PORN_MEMBERS = 8.0
 LEARN_MEMBERS = 1.0
 
 # prices
 '''
-P = maior recompensa(7.4) * probabilidade(0.12)/ quantidade de membros(12 menos o josé)
-P = (7.4*0.12) / 12
-P = 0.888/12
+P = maior recompensa(7.4) * probabilidade(0.12)/ quantidade de membros(13 menos o josé)
+P = (7.4*0.12) / 13
+P = 0.888 / 13
 P = 0.74
 '''
-BASE_PRICE = 0.74
+BASE_PRICE = 0.68
 
 PORN_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / PORN_MEMBERS)
 LEARN_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / LEARN_MEMBERS)
