@@ -16,28 +16,28 @@ random = SystemRandom()
 import jcoin.josecoin as jcoin
 
 JOSE_VERSION = '0.7.7'
-JOSE_BUILD = 168
+JOSE_BUILD = 171
 
 JOSE_SPAM_TRIGGER = 4
-PIRU_ACTIVITY = .05
+PIRU_ACTIVITY = .008
 
 PORN_LIMIT = 14
 GAMBLING_FEE = 5 # 5 percent
-TOTAL = 13.0
+TOTAL = 14.0
 PORN_MEMBERS = 7.0
 LEARN_MEMBERS = 1.0
 
 # prices
 '''
-P = maior recompensa(7.4) * probabilidade(0.12)/ quantidade de membros(12 porquê a hachi não possui conta)
+P = maior recompensa(7.4) * probabilidade(0.12)/ quantidade de membros(12 menos o josé)
 P = (7.4*0.12) / 12
 P = 0.888/12
 P = 0.74
 '''
 BASE_PRICE = 0.74
 
-PORN_PRICE = (BASE_PRICE) * ((TOTAL-1) / PORN_MEMBERS)
-LEARN_PRICE = (BASE_PRICE) * ((TOTAL-1) / LEARN_MEMBERS)
+PORN_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / PORN_MEMBERS)
+LEARN_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / LEARN_MEMBERS)
 
 PRICE_TABLE = {
     'porn': ("Comandos relacionados a pornografia", PORN_PRICE),
@@ -56,11 +56,7 @@ JOSE_PORN_HTEXT = '''Pornô(Tudo tem preço de %.2fJC):
 !yandere <termos | :latest> - busca no yande.re
 ''' % (PORN_PRICE)
 
-JOSE_HELP_TEXT = '''Oi, eu sou o josé(v%s b%d), sou um bot trabalhadô!
-
-Eu tenho mais de 8000 comandos somente para você do grande serverzao!
-
-GERAL:
+JOSE_GENERAL_HTEXT = '''
 jose - mostra essa ajuda
 $guess - jogo de adivinhar o numero aleatório
 !xkcd [number|rand] - mostra ou o xkcd de número tal ou o mais recente se nenhum é dado
@@ -75,6 +71,12 @@ $guess - jogo de adivinhar o numero aleatório
 !learn <texto> - josé aprende textos!
 !ping - pong
 !sndc termos - pesquisa no SoundCloud
+'''
+
+JOSE_HELP_TEXT = '''Oi, eu sou o josé(v%s b%d), sou um bot trabalhadô!
+Eu tenho mais de 8000 comandos somente para você do grande serverzao!
+
+!htgeral - abre o texto de comandos gerais(o mais recomendado)
 
 Jose faz coisas pra pessoas:
 !xingar @mention - xinga a pessoa

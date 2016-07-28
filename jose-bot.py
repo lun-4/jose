@@ -960,6 +960,7 @@ commands_start = {
     '!sigabem': make_func("SIGA BEM CAMINHONEIRO"),
 
     '!price': show_price,
+    '!htgeral': make_func(JOSE_GENERAL_HTEXT),
 }
 
 commands_match = {
