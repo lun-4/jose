@@ -1000,6 +1000,7 @@ counter = 0
 def on_message(message):
     global started
     global counter
+    global debug_channel
 
     for user_id in list(jose_env['spamcl']):
         if time.time() > jose_env['spamcl'][user_id]:
@@ -1022,8 +1023,7 @@ def on_message(message):
 
     bnr = '%s(%r) : %s : %r' % (message.channel, message.channel.is_private, message.author, message.content)
     print(bnr)
-
-    # TODO: log message
+    yield from client.send_message(debug_channel, bnr)
 
     if not started:
         started = True
