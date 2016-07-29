@@ -17,7 +17,7 @@ random = SystemRandom()
 import jcoin.josecoin as jcoin
 
 JOSE_VERSION = '0.7.8'
-JOSE_BUILD = 179
+JOSE_BUILD = 180
 
 JOSE_SPAM_TRIGGER = 4
 PIRU_ACTIVITY = .008
@@ -389,7 +389,7 @@ show_casa = make_func("https://thumbs.dreamstime.com/z/locais-de-trabalho-em-um-
 def xor_strings(s,t):
     return "".join(chr(ord(a)^ord(b)) for a,b in zip(s,t))
 
-JCRYPT_KEY = 'vcefodaparabensfrozen2meuovomeuovinho'
+JCRYPT_KEY = 'vcefodaparabensfrozen2meuovomeuovinhoayylmaogordoquaseexploderindo'
 
 @asyncio.coroutine
 def ovocrypt_enc(message):
@@ -401,7 +401,7 @@ def ovocrypt_enc(message):
         res = base64.b64encode(bytes(res, 'UTF-8'))
         yield from client.send_message(message.channel, 'resultado encriptado: %s' % res.decode('UTF-8'))
     except Exception as e:
-        jose_debug(message, "ovocrypt_enc: pyerr: %s" % e)
+        yield from jose_debug(message, "ovocrypt_enc: pyerr: %s" % e)
 
 @asyncio.coroutine
 def ovocrypt_dec(message):
@@ -413,4 +413,4 @@ def ovocrypt_dec(message):
         res = yield from xor_strings(content, JCRYPT_KEY)
         yield from client.send_message(message.channel, 'resultado desencriptado: %s' % res)
     except Exception as e:
-        jose_debug(message, "ovocrypt_enc: pyerr: %s" % e)
+        yield from jose_debug(message, "ovocrypt_enc: pyerr: %s" % e)
