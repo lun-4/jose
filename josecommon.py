@@ -395,11 +395,11 @@ JCRYPT_KEY = 'vcefodaparabensfrozen2meuovomeuovinho'
 def ovocrypt_enc(message):
     res = ''
     args = message.content.split(' ')
-    content = ' '.join(args[1:])
     try:
+        content = ' '.join(args[1:])
         res = yield from xor_strings(content, JCRYPT_KEY)
         res = base64.b64encode(bytes(res, 'UTF-8'))
-        yield from client.send_message(message.channel, 'resultado encriptado: %s' % str(res))
+        yield from client.send_message(message.channel, 'resultado encriptado: %s' % res.decode('UTF-8'))
     except Exception as e:
         jose_debug(message, "ovocrypt_enc: pyerr: %s" % e)
 
@@ -407,9 +407,9 @@ def ovocrypt_enc(message):
 def ovocrypt_dec(message):
     res = ''
     args = message.content.split(' ')
-    content = ' '.join(args[1:])
-    content = base64.b64decode(content).decode('UTF-8')
     try:
+        content = ' '.join(args[1:])
+        content = base64.b64decode(content).decode('UTF-8')
         res = yield from xor_strings(content, JCRYPT_KEY)
         yield from client.send_message(message.channel, 'resultado desencriptado: %s' % res)
     except Exception as e:
