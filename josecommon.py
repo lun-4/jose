@@ -37,6 +37,7 @@ BASE_PRICE = 3 * ((len(JC_REWARDS) * (JC_REWARDS[len(JC_REWARDS)-1] * jc_probabi
 
 PORN_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / PORN_MEMBERS)
 LEARN_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / LEARN_MEMBERS)
+LEARN_PRICE -= 12
 
 PRICE_TABLE = {
     'porn': ("Comandos relacionados a pornografia", PORN_PRICE),
