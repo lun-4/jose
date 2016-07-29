@@ -17,7 +17,7 @@ random = SystemRandom()
 import jcoin.josecoin as jcoin
 
 JOSE_VERSION = '0.7.8'
-JOSE_BUILD = 182
+JOSE_BUILD = 185
 
 JOSE_SPAM_TRIGGER = 4
 PIRU_ACTIVITY = .008
@@ -175,18 +175,23 @@ GAMBLING_HELP_TEXT_SMALL = '''Aposta for Dummies:
 
 debug_logs = []
 
+debug_channel = discord.Object(id='208728345775439872')
+
+@asyncio.coroutine
 def debug_log(string):
+    global debug_channel
     print(string)
     today_str = time.strftime("%d-%m-%Y")
     with open("logs/jose_debug-%s.log" % today_str, 'a') as f:
         f.write(string+'\n')
+    yield from client.send_message(debug_channel, string)
 
 @asyncio.coroutine
 def jose_debug(message, dbg_msg, flag=True):
     message_banner = '%s[%s]: %r' % (message.author, message.channel, message.content)
     dbg_msg = '%s -> %s' % (message_banner, str(dbg_msg))
     debug_logs.append(dbg_msg)
-    debug_log('%s : %s' % (time.strftime("%d-%m-%Y %H:%M:%S"), dbg_msg))
+    yield from debug_log('%s : %s' % (time.strftime("%d-%m-%Y %H:%M:%S"), dbg_msg))
     if flag:
         yield from client.send_message(message.channel, "jdebug: {}".format(dbg_msg))
 

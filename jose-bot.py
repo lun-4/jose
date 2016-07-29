@@ -1007,6 +1007,15 @@ def on_message(message):
             del jose_env['spam'][user_id]
             yield from client.send_message(message.channel, "<@%s> : cooldown destruído" % user_id)
 
+    if message.author.id in jcoin.data:
+        if message.author.nick != None:
+            jcoin.data[message.author.id]['name'] = message.author.nick
+        else:
+            try:
+                jcoin.data[message.author.id]['name'] = message.author.name
+            except Exception as e:
+                yield from jose_debug(message, "nc: pyerr: %s" % e)
+
     # we do not want the bot to reply to itself
     if message.author == client.user:
         return
