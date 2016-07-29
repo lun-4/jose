@@ -6,6 +6,7 @@ import requests
 import urllib.request
 import urllib.parse
 import time
+import base64
 from xml.etree import ElementTree
 
 import randemoji as emoji
@@ -16,7 +17,7 @@ random = SystemRandom()
 import jcoin.josecoin as jcoin
 
 JOSE_VERSION = '0.7.8'
-JOSE_BUILD = 177
+JOSE_BUILD = 178
 
 JOSE_SPAM_TRIGGER = 4
 PIRU_ACTIVITY = .008
@@ -397,6 +398,7 @@ def ovocrypt_enc(message):
     content = ' '.join(args[1:])
     try:
         res = yield from xor_strings(content, JCRYPT_KEY)
+        res = base64.b64encode(res)
         yield from client.send_message(message.channel, 'resultado encriptado: %s' % res)
     except Exception as e:
         jose_debug("ovocrypt_enc: pyerr: %s" % e)
@@ -406,6 +408,7 @@ def ovocrypt_dec(message):
     res = ''
     args = message.content.split(' ')
     content = ' '.join(args[1:])
+    content = base64.b64decode(content)
     try:
         res = yield from xor_strings(content, JCRYPT_KEY)
         yield from client.send_message(message.channel, 'resultado desencriptado: %s' % res)
