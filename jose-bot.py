@@ -960,6 +960,10 @@ commands_start = {
 
     '!price': show_price,
     '!htgeral': make_func(JOSE_GENERAL_HTEXT),
+    '!htech': make_func(JOSE_TECH_HTEXT),
+
+    '!enc': ovocrypt_enc,
+    '!dec': ovocrypt_dec,
 }
 
 commands_match = {

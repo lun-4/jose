@@ -16,7 +16,7 @@ random = SystemRandom()
 import jcoin.josecoin as jcoin
 
 JOSE_VERSION = '0.7.8'
-JOSE_BUILD = 173
+JOSE_BUILD = 177
 
 JOSE_SPAM_TRIGGER = 4
 PIRU_ACTIVITY = .008
@@ -39,9 +39,12 @@ PORN_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / PORN_MEMBERS)
 LEARN_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / LEARN_MEMBERS)
 LEARN_PRICE -= 12
 
+OP_TAX_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / TOTAL)
+
 PRICE_TABLE = {
     'porn': ("Comandos relacionados a pornografia", PORN_PRICE),
     'learn': ("Comandos relacionados ao josé aprender textos", LEARN_PRICE),
+    'operational': ("Taxa operacional de alguns comandos(normalmente relacionados a muito processamento)", OP_TAX_PRICE)
 }
 
 client = None
@@ -73,10 +76,23 @@ $guess - jogo de adivinhar o numero aleatório
 !sndc termos - pesquisa no SoundCloud
 '''
 
+JOSE_TECH_HTEXT = '''Comandos relacionados a coisas *TECNOLÓGICAS*
+
+!enc texto - encripta um texto usando OvoCrypt
+!dec texto - desencripta um texto encriptado com OvoCrypt
+
+Programação:
+$repl - inicia um repl de python
+$josescript - inicia um repl de JoseScript
+$jasm - JoseAssembly
+
+'''
+
 JOSE_HELP_TEXT = '''Oi, eu sou o josé(v%s b%d), sou um bot trabalhadô!
 Eu tenho mais de 8000 comandos somente para você do grande serverzao!
 
 !htgeral - abre o texto de comandos gerais(o mais recomendado)
+!htech - texto de ajuda para comandos *NERDS*
 
 Jose faz coisas pra pessoas:
 !xingar @mention - xinga a pessoa
@@ -103,11 +119,6 @@ Developers:
 Pesquisa:
 !pesquisa tipo nome:op1,op2,op3... - cria uma pesquisa
 !voto comando id voto - vota em uma pesquisa
-
-Programação:
-$repl - inicia um repl de python
-$josescript - inicia um repl de JoseScript
-$jasm - JoseAssembly
 
 (não inclui comandos que o josé responde dependendo das mensagens)
 (nem como funciona a JoseCoin, use !josecoin pra isso)
@@ -372,3 +383,31 @@ show_mc = make_func("https://cdn.discordapp.com/attachments/202055538773721099/2
 show_vinheta = make_func('http://prntscr.com/bvcbju')
 show_agira = make_func("http://docs.unity3d.com/uploads/Main/SL-DebugNormals.png")
 show_casa = make_func("https://thumbs.dreamstime.com/z/locais-de-trabalho-em-um-escrit%C3%B3rio-panor%C3%A2mico-moderno-opini%C3%A3o-de-new-york-city-das-janelas-tabelas-pretas-e-cadeiras-de-couro-59272285.jpg")
+
+@asyncio.coroutine
+def xor_strings(s,t):
+    return "".join(chr(ord(a)^ord(b)) for a,b in zip(s,t))
+
+JCRYPT_KEY = 'vcefodaparabensfrozen2meuovomeuovinho'
+
+@asyncio.coroutine
+def ovocrypt_enc(message):
+    res = ''
+    args = message.content.split(' ')
+    content = ' '.join(args[1:])
+    try:
+        res = yield from xor_strings(content, JCRYPT_KEY)
+        yield from client.send_message(message.channel, 'resultado encriptado: %s' % res)
+    except Exception as e:
+        jose_debug("ovocrypt_enc: pyerr: %s" % e)
+
+@asyncio.coroutine
+def ovocrypt_dec(message):
+    res = ''
+    args = message.content.split(' ')
+    content = ' '.join(args[1:])
+    try:
+        res = yield from xor_strings(content, JCRYPT_KEY)
+        yield from client.send_message(message.channel, 'resultado desencriptado: %s' % res)
+    except Exception as e:
+        jose_debug("ovocrypt_enc: pyerr: %s" % e)
