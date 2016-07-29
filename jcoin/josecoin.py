@@ -87,7 +87,7 @@ def load(fname):
         return False, str(e)
 
     # data[jose_id] = empty_acc('jose-bot', 50000)
-    ledger_data(fname.replace('db', 'journal'), '%f;LOAD;%r\n' % (time.time(), data))
+    #ledger_data(fname.replace('db', 'journal'), '%f;LOAD;%r\n' % (time.time(), data))
     return True, "load %s" % fname
 
 def save(fname):
@@ -98,5 +98,5 @@ def save(fname):
     except Exception as e:
         return False, str(e)
 
-    ledger_data(fname.replace('db', 'journal'), '%f;SAVE;%r\n' % (time.time(), data))
+    #ledger_data(fname.replace('db', 'journal'), '%f;SAVE;%r\n' % (time.time(), data))
     return True, "save %s" % fname
