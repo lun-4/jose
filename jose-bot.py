@@ -32,7 +32,6 @@ start_time = time.time()
 chattiness = .25
 MASTER_ROLE = 'mestra'
 LEARN_ROLE = 'cult'
-jc_probabiblity = .12
 JOSE_ANIMATION_LIMIT = 1 # 2 animações simultaneamente
 
 #just for 0.6.6.6 and 6.6.6
@@ -1247,7 +1246,7 @@ def on_message(message):
                     return
 
                 author_id = str(message.author.id)
-                amount = random.choice([1, 1.2, 2, 2.5, 3.14, 5, 5.1, 6.28, 7.4])
+                amount = random.choice(JC_REWARDS)
 
                 res = jcoin.transfer(jcoin.jose_id, author_id, amount, jcoin.LEDGER_PATH)
                 yield from josecoin_save(message, False)

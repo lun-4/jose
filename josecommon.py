@@ -20,6 +20,8 @@ JOSE_BUILD = 172
 
 JOSE_SPAM_TRIGGER = 4
 PIRU_ACTIVITY = .008
+jc_probabiblity = .12
+JC_REWARDS = [1, 1.2, 2, 2.5, 3.14, 5, 5.1, 6.28, 7.4]
 
 PORN_LIMIT = 14
 GAMBLING_FEE = 5 # 5 percent
@@ -29,12 +31,9 @@ LEARN_MEMBERS = 1.0
 
 # prices
 '''
-P = maior recompensa(7.4) * probabilidade(0.12)/ quantidade de membros(13 menos o josé)
-P = (7.4*0.12) / 13
-P = 0.888 / 13
-P = 0.74
+P = len_recompensas * (recompensa * prob) / TOTAL
 '''
-BASE_PRICE = 0.68
+BASE_PRICE = 3 * ((len(JC_REWARDS) * (JC_REWARDS[len(JC_REWARDS)-1] * jc_probabiblity)) / TOTAL)
 
 PORN_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / PORN_MEMBERS)
 LEARN_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / LEARN_MEMBERS)
