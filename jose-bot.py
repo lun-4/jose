@@ -44,7 +44,7 @@ DEMON_MODE = False
 PARABENS_MODE = False
 
 #mode changes
-MAINTENANCE_MODE = True
+MAINTENANCE_MODE = False
 GAMBLING_MODE = False
 
 #default stuff
