@@ -17,7 +17,7 @@ random = SystemRandom()
 import jcoin.josecoin as jcoin
 
 JOSE_VERSION = '0.7.9'
-JOSE_BUILD = 207
+JOSE_BUILD = 209
 
 #config
 chattiness = .25
@@ -373,9 +373,15 @@ def make_xmlporn(baseurl):
         args = message.content.split(' ')
         search_term = ' '.join(args[1:])
 
+        loop = asyncio.get_event_loop()
+
         if search_term == ':latest':
-            yield from client.send_message(message.channel, 'procurando post mais recente')
-            r = requests.get('%s?limit=%s' % (baseurl, PORN_LIMIT))
+            yield from client.send_message(message.channel, 'procurando nos posts mais recentes')
+
+            url = '%s?limit=%s' % (baseurl, PORN_LIMIT)
+            future_stmt = loop.run_in_executor(None, requests.get, url)
+            r = yield from future_stmt
+
             tree = ElementTree.fromstring(r.content)
             root = tree
             try:
@@ -388,7 +394,11 @@ def make_xmlporn(baseurl):
 
         else:
             yield from client.send_message(message.channel, 'procurando por %r' % search_term)
-            r = requests.get('%s?limit=%s&tags=%s' % (baseurl, PORN_LIMIT, search_term))
+
+            url = '%s?limit=%s&tags=%s' % (baseurl, PORN_LIMIT, search_term)
+            future_stmt = loop.run_in_executor(None, requests.get, url)
+            r = yield from future_stmt
+
             tree = ElementTree.fromstring(r.content)
             root = tree
             try:

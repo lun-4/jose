@@ -76,7 +76,13 @@ class JoseBot:
         if len(args) > 1:
             n = args[1]
 
-        info_latest = info = requests.get("http://xkcd.com/info.0.json").json()
+        loop = asyncio.get_event_loop()
+
+        url = "http://xkcd.com/info.0.json"
+        future_stmt = loop.run_in_executor(None, requests.get, url)
+        r = yield from future_stmt
+
+        info_latest = info = r.json()
         info = None
         try:
             if not n:
@@ -84,9 +90,16 @@ class JoseBot:
                 n = info['num']
             elif n == 'random' or n == 'r' or n == 'rand':
                 rn_xkcd = random.randint(0, info_latest['num'])
-                info = requests.get("http://xkcd.com/{0}/info.0.json".format(rn_xkcd)).json()
+
+                url = "http://xkcd.com/{0}/info.0.json".format(rn_xkcd)
+                future_stmt = loop.run_in_executor(None, requests.get, url)
+                r = yield from future_stmt
+                info = r.json()
             else:
-                info = requests.get("http://xkcd.com/{0}/info.0.json".format(n)).json()
+                url = "http://xkcd.com/{0}/info.0.json".format(n)
+                future_stmt = loop.run_in_executor(None, requests.get, url)
+                r = yield from future_stmt
+                info = r.json()
             yield from self.say('xkcd número %s : %s' % (n, info['img']))
 
         except Exception as e:
@@ -117,4 +130,3 @@ class JoseBot:
     @asyncio.coroutine
     def recv(self, message):
         self.current = message
-        self.curcxt = jcommon.Context(message)

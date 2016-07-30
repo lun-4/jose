@@ -103,3 +103,5 @@ jcoin/*.journal
 
 # config data
 joseconfig.py
+
+*.profile

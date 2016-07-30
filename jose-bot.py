@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import discord
+import cProfile
 
 if not discord.opus.is_loaded():
     discord.opus.load_opus('opus')
@@ -471,9 +472,14 @@ def nsfw_e621(message):
     args = message.content.split(' ')
     search_term = ' '.join(args[1:])
 
+    loop = asyncio.get_event_loop()
+
     if search_term == ':latest' or search_term == '' or search_term == ' ':
         yield from client.send_message(message.channel, 'getting latest post in e621')
-        r = requests.get('https://e621.net/post/index.json?limit=%s' % PORN_LIMIT).json()
+        url = 'http://e621.net/post/index.json?limit=%s' % PORN_LIMIT
+        future_latest = loop.run_in_executor(None, requests.get, url)
+        r = yield from future_latest
+        r = r.json()
         try:
             post = random.choice(r)
             yield from client.send_message(message.channel, '%s' % post['sample_url'])
@@ -484,7 +490,10 @@ def nsfw_e621(message):
 
     else:
         yield from client.send_message(message.channel, 'searching for %r in e621' % search_term)
-        r = requests.get('https://e621.net/post/index.json?limit=%s&tags=%s' % (PORN_LIMIT, search_term)).json()
+        url = 'https://e621.net/post/index.json?limit=%s&tags=%s' % (PORN_LIMIT, search_term)
+        future_stmt = loop.run_in_executor(None, requests.get, url)
+        r = yield from future_stmt
+        r = r.json()
         try:
             post = random.choice(r)
             yield from client.send_message(message.channel, '%s' % post['sample_url'])
