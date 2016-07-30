@@ -5,6 +5,8 @@ if not discord.opus.is_loaded():
     discord.opus.load_opus('opus')
 
 import ext.josemusic as jmusic
+import ext.jose as jose_bot
+import ext.joseassembly as jasm
 
 from random import SystemRandom
 random = SystemRandom()
@@ -16,20 +18,16 @@ import os
 import ast
 import time
 import subprocess
-import pickle
-from lxml import html
 import json
 
 import urllib.request
 import urllib.parse
 import re
-from xml.etree import ElementTree
 
 from josecommon import *
 import josespeak as jspeak
 import jcoin.josecoin as jcoin
 import joseconfig as jconfig
-import joseassembly as jasm
 
 start_time = time.time()
 
@@ -1002,9 +1000,12 @@ commands_match = {
 
 counter = 0
 
+jose = jose_bot.JoseBot(client)
+
 @client.event
 @asyncio.coroutine
 def on_message(message):
+    global jose
     global started
     global counter
     global debug_channel
@@ -1034,6 +1035,7 @@ def on_message(message):
 
     # signal JoseMusic about the message etc
     yield from jmusic.jm.recv(message)
+    yield from jose.recv(message)
 
     # log stuff
     bnr = '%s(%r) : %s : %r' % (message.channel, message.channel.is_private, message.author, message.content)
@@ -1056,6 +1058,28 @@ def on_message(message):
     if counter > 11:
         yield from josecoin_save(message, False)
         counter = 0
+
+    if message.content[0] == '!':
+        #parse command
+        #rules:
+        # !{command} {args...}
+        k = message.content.find(" ")
+        command = message.content[1:k]
+        if k == -1:
+            command = message.content[1:]
+        args = message.content.split(' ')
+        try:
+            method = "c_%s" % command
+            yield from jose.say("comando: %s" % method)
+            yield from jose.say(str(getattr(jose, method)))
+            yield from getattr(jose, method)(message, args)
+            return
+        except KeyError as e:
+            yield from jose.say("jose: %s: comando não encontrado" % command)
+            return
+        except Exception as e:
+            yield from jose.say("jose: pyerr: %s" % e)
+            return
 
     if message.content == '!exit':
         try:
