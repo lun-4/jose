@@ -2,9 +2,19 @@ import asyncio
 import discord
 from discord.ext import commands
 
+MUSIC_ROLE = 'music'
+
 # sanity test
 if not discord.opus.is_loaded():
     discord.opus.load_opus('opus')
+
+@asyncio.coroutine
+def check_roles(correct, rolelist):
+    for role in rolelist:
+        if role.name == correct:
+            return True
+    return False
+
 
 class Entry:
     def __init__(self, m, pl):
@@ -107,6 +117,11 @@ class JoseMusic:
 
     @asyncio.coroutine
     def c_init(self, msg):
+        auth = yield from check_roles(MUSIC_ROLE, msg.author.roles)
+        if not auth:
+            yield from self.say("jm_PermissionError: usuário não autorizado")
+            return
+
         if self.init_flag:
             yield from self.say("JMusic já conectado")
             return
@@ -118,6 +133,11 @@ class JoseMusic:
 
     @asyncio.coroutine
     def c_play(self, message):
+        auth = yield from check_roles(MUSIC_ROLE, message.author.roles)
+        if not auth:
+            yield from self.say("jm_PermissionError: usuário não autorizado")
+            return
+
         if not self.init_flag:
             yield from self.say("JMusic não foi iniciado")
             return
@@ -143,18 +163,32 @@ class JoseMusic:
 
     @asyncio.coroutine
     def c_pause(self, message):
+        auth = yield from check_roles(MUSIC_ROLE, message.author.roles)
+        if not auth:
+            yield from self.say("jm_PermissionError: usuário não autorizado")
+            return
+
         if self.state.is_playing():
             player = self.state.current.player
             player.pause()
 
     @asyncio.coroutine
     def c_resume(self, message):
+        auth = yield from check_roles(MUSIC_ROLE, message.author.roles)
+        if not auth:
+            yield from self.say("jm_PermissionError: usuário não autorizado")
+            return
+
         if self.state.is_playing():
             player = self.state.current.player
             player.resume()
 
     @asyncio.coroutine
     def c_queue(self, message):
+        auth = yield from check_roles(MUSIC_ROLE, message.author.roles)
+        if not auth:
+            yield from self.say("jm_PermissionError: usuário não autorizado")
+            return
         res = 'Lista de sons: \n'
         for song in self.state.songlist:
             res += ' * %s\n' % song
@@ -172,6 +206,10 @@ class JoseMusic:
 
     @asyncio.coroutine
     def c_stop(self, message):
+        auth = yield from check_roles(MUSIC_ROLE, message.author.roles)
+        if not auth:
+            yield from self.say("jm_PermissionError: usuário não autorizado")
+            return
         state = self.state
 
         if state.is_playing():
@@ -187,6 +225,10 @@ class JoseMusic:
 
     @asyncio.coroutine
     def c_zelao(self, message):
+        auth = yield from check_roles(MUSIC_ROLE, message.author.roles)
+        if not auth:
+            yield from self.say("jm_PermissionError: usuário não autorizado")
+            return
         if not self.loop_started:
             self.loop_started = True
             yield from self.state.player_task()
