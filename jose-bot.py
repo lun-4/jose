@@ -31,20 +31,6 @@ import joseconfig as jconfig
 
 start_time = time.time()
 
-#config
-chattiness = .25
-MASTER_ROLE = 'mestra'
-LEARN_ROLE = 'cult'
-JOSE_ANIMATION_LIMIT = 1 # 2 animações simultaneamente
-
-#just for 0.6.6.6 and 6.6.6
-DEMON_MODE = False
-PARABENS_MODE = False
-
-#mode changes
-MAINTENANCE_MODE = False
-GAMBLING_MODE = False
-
 #default stuff
 client = discord.Client()
 set_client(client)
@@ -1059,6 +1045,7 @@ def on_message(message):
         yield from josecoin_save(message, False)
         counter = 0
 
+    # get command and push it to jose
     if message.content[0] == '!':
         #parse command
         #rules:

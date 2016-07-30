@@ -17,7 +17,21 @@ random = SystemRandom()
 import jcoin.josecoin as jcoin
 
 JOSE_VERSION = '0.7.9'
-JOSE_BUILD = 202
+JOSE_BUILD = 203
+
+#config
+chattiness = .25
+MASTER_ROLE = 'mestra'
+LEARN_ROLE = 'cult'
+JOSE_ANIMATION_LIMIT = 1 # 2 animações simultaneamente
+
+#just for 0.6.6.6 and 6.6.6
+DEMON_MODE = False
+PARABENS_MODE = False
+
+#mode changes
+MAINTENANCE_MODE = False
+GAMBLING_MODE = False
 
 JOSE_SPAM_TRIGGER = 4
 PIRU_ACTIVITY = .008
