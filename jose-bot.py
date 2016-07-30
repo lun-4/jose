@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 import discord
 
+if not discord.opus.is_loaded():
+    discord.opus.load_opus('opus')
+
+import ext.josemusic as jmusic
+
 from random import SystemRandom
 random = SystemRandom()
 
@@ -38,6 +43,10 @@ JOSE_ANIMATION_LIMIT = 1 # 2 animações simultaneamente
 DEMON_MODE = False
 PARABENS_MODE = False
 
+#mode changes
+MAINTENANCE_MODE = True
+GAMBLING_MODE = False
+
 #default stuff
 client = discord.Client()
 set_client(client)
@@ -47,8 +56,6 @@ lil_message = ''
 msmsg = ''
 started = False
 bank = None
-MAINTENANCE_MODE = False
-GAMBLING_MODE = False
 GAMBLING_LAST_BID = 0.0
 
 #enviroment things
@@ -1002,6 +1009,10 @@ def on_message(message):
     global counter
     global debug_channel
 
+    if message.content == '!construção': #override maintenance mode
+        yield from main_status(message)
+        return
+
     for user_id in list(jose_env['spamcl']):
         if time.time() > jose_env['spamcl'][user_id]:
             del jose_env['spamcl'][user_id]
@@ -1021,6 +1032,10 @@ def on_message(message):
     if message.author == client.user:
         return
 
+    # signal JoseMusic about the message etc
+    yield from jmusic.jm.recv(message)
+
+    # log stuff
     bnr = '%s(%r) : %s : %r' % (message.channel, message.channel.is_private, message.author, message.content)
     print(bnr)
     yield from client.send_message(debug_channel, bnr)
@@ -1287,6 +1302,9 @@ def on_ready():
     print('name', client.user.name)
     print('id', client.user.id)
     print('='*25)
+
+commands_start.update(jmusic.cmds_start)
+jmusic.jm.client = client
 
 jcoin.load(jconfig.jcoin_path)
 jspeak.buildMapping(jspeak.wordlist('jose-data.txt'), 1)
