@@ -973,6 +973,16 @@ commands_match = {
 counter = 0
 
 jose = jose_bot.JoseBot(client)
+commands_start.update(jmusic.cmds_start)
+jmusic.jm.client = client
+
+def from_dict(f):
+    def a(m, args):
+        yield from f(m)
+    return a
+
+for cmd in commands_start:
+    setattr(jose, 'c_%s' % cmd[1:], from_dict(commands_start[cmd]))
 
 @client.event
 @asyncio.coroutine
@@ -1047,12 +1057,12 @@ def on_message(message):
             # yield from jose.say(str(getattr(jose, method)))
             yield from getattr(jose, method)(message, args)
             return
-        except KeyError as e:
-            yield from jose.say("jose: %s: comando não encontrado" % command)
-            return
+        except AttributeError:
+            yield from jose.say("jose.py: %s: comando não encontrado" % command)
+            #return
         except Exception as e:
             yield from jose.say("jose: pyerr: %s" % e)
-            return
+            # return
 
     if message.content in exact_commands:
         if MAINTENANCE_MODE:
@@ -1255,9 +1265,6 @@ def on_ready():
     print('name', client.user.name)
     print('id', client.user.id)
     print('='*25)
-
-commands_start.update(jmusic.cmds_start)
-jmusic.jm.client = client
 
 jcoin.load(jconfig.jcoin_path)
 jspeak.buildMapping(jspeak.wordlist('jose-data.txt'), 1)

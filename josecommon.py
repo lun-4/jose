@@ -17,7 +17,7 @@ random = SystemRandom()
 import jcoin.josecoin as jcoin
 
 JOSE_VERSION = '0.7.9'
-JOSE_BUILD = 203
+JOSE_BUILD = 205
 
 #config
 chattiness = .25
