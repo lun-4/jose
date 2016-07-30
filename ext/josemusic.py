@@ -13,8 +13,8 @@ class Entry:
         self.player = pl
 
     def __str__(self):
-        fmt = '*%s* pedido por %s'
-        return (fmt % (self.player.title, self.requester))
+        fmt = '*%s* por %s, pedido por %s'
+        return (fmt % (self.player.title, self.player.uploader, self.requester))
 
 
 class VoiceState:
@@ -41,22 +41,20 @@ class VoiceState:
     def skip(self):
         self.skip_votes.clear()
         if self.is_playing():
-            self.player.stop()
+            self.current.player.stop()
 
     def toggle_next(self):
         self.play_next_song.set()
 
     @asyncio.coroutine
     def player_task(self):
-        yield from self.jm.say("ZELAO INCORPORATED MUSIC START LOOP")
         while True:
             self.play_next_song.clear()
-            yield from self.jm.say("ZELAO INCORPORATED CLEAR MUSIC LIST")
             self.current = yield from self.songs.get()
-            yield from self.jm.say('ZELAO INC. ESTA TOCANDO %s' % str(self.current))
+            self.songlist.pop()
+            yield from self.jm.say('ZELAO® tocando: %s' % str(self.current))
             self.current.player.start()
             yield from self.play_next_song.wait()
-            yield from self.jm.say("ZELAO INCORPORATED WAIT FOR PROXIMO SOM")
 
 class JoseMusic:
     def __init__(self, cl):
@@ -86,12 +84,12 @@ class JoseMusic:
     @asyncio.coroutine
     def c_status(self, msg):
         res = ''
-        res += 'JMusic iniciado: %s' % self.init_flag
+        res += 'JMusic iniciado: %s\n' % self.init_flag
         if self.init_flag and self.state:
             ispl = self.state.is_playing()
             res += 'tocando música? %s\n' % ispl
             if ispl:
-                res += 'Música sendo tocada: %s' % self.state.current
+                res += 'Música sendo tocada: %s\n' % self.state.current
         yield from self.say("%s" % res)
 
     @asyncio.coroutine
@@ -127,35 +125,69 @@ class JoseMusic:
             player.volume = 0.6
             entry = Entry(message, player)
             yield from self.say('Colocado na fila: %s' % entry)
+            state.songlist.append(entry)
             yield from state.songs.put(entry)
 
     @asyncio.coroutine
     def c_pause(self, message):
         if self.state.is_playing():
-            player = self.state.player
+            player = self.state.current.player
             player.pause()
 
     @asyncio.coroutine
-    def resume(self, message):
+    def c_resume(self, message):
         if self.state.is_playing():
-            player = self.state.player
+            player = self.state.current.player
             player.resume()
 
     @asyncio.coroutine
     def c_queue(self, message):
-        yield from self.say("queue: %s" % self.state.songs)
+        res = ''
+        for song in self.state.songlist:
+            res += 'Som: %s\n' % song
+        yield from self.say(res)
 
     @asyncio.coroutine
     def c_playing(self, message):
-        pass
+        if self.loop_started:
+            if self.state.is_playing():
+                yield from self.say('Música sendo tocada: %s\n' % self.state.current)
+            else:
+                yield from self.say("Nenhuma música sendo tocada")
+        else:
+            yield from self.say("Loop não iniciado")
 
     @asyncio.coroutine
     def c_zelao(self, message):
         if not self.loop_started:
             self.loop_started = True
             yield from self.state.player_task()
+            yield from self.say("o player terminou... isso não deveria acontecer... né?")
         else:
             yield from self.say("Player já iniciado")
+
+    @asyncio.coroutine
+    def c_skip(self, message):
+        if not self.state.is_playing():
+            yield from self.bot.say('Nenhuma música sendo tocada para pular')
+            return
+
+        voter = message.author
+        state = self.state
+        if voter == state.current.requester:
+            yield from self.say('Solicitante pediu para pular a música...')
+            state.skip()
+
+        elif voter.id not in state.skip_votes:
+            state.skip_votes.add(voter.id)
+            total_votes = len(state.skip_votes)
+            if total_votes >= 3:
+                yield from self.say('3 votos, pulando...')
+                state.skip()
+            else:
+                yield from self.say('Voto adicionado, já existem [{}/3]'.format(total_votes))
+        else:
+            yield from self.say('Você já votou.')
 
     @asyncio.coroutine
     def recv(self, msg):
@@ -166,7 +198,13 @@ jm = JoseMusic(None)
 cmds_start = {
     '!mstat': jm.c_status,
     '!minit': jm.c_init,
+
     '!play': jm.c_play,
     '!queue': jm.c_queue,
     '!zelao': jm.c_zelao,
+
+    '!pause': jm.c_pause,
+    '!resume': jm.c_resume,
+    '!skip': jm.c_skip,
+    '!playing': jm.c_playing,
 }
