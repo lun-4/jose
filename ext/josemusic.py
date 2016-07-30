@@ -95,7 +95,7 @@ class JoseMusic:
     @asyncio.coroutine
     def c_init(self, msg):
         if self.init_flag:
-            yield from self.jm.say("JMusic já conectado")
+            yield from self.say("JMusic já conectado")
             return
 
         voice = yield from self.client.join_voice_channel(self.voice_channel)
