@@ -17,7 +17,7 @@ random = SystemRandom()
 import jcoin.josecoin as jcoin
 
 JOSE_VERSION = '0.7.9'
-JOSE_BUILD = 209
+JOSE_BUILD = 210
 
 #config
 chattiness = .25
@@ -429,35 +429,10 @@ show_agira = make_func("http://docs.unity3d.com/uploads/Main/SL-DebugNormals.png
 show_casa = make_func("https://thumbs.dreamstime.com/z/locais-de-trabalho-em-um-escrit%C3%B3rio-panor%C3%A2mico-moderno-opini%C3%A3o-de-new-york-city-das-janelas-tabelas-pretas-e-cadeiras-de-couro-59272285.jpg")
 
 @asyncio.coroutine
-def xor_strings(s,t):
+def str_xor(s,t):
     return "".join(chr(ord(a)^ord(b)) for a,b in zip(s,t))
 
 JCRYPT_KEY = 'vcefodaparabensfrozen2meuovomeuovinhoayylmaogordoquaseexploderindo'
-
-@asyncio.coroutine
-def ovocrypt_enc(message):
-    res = ''
-    args = message.content.split(' ')
-    try:
-        content = ' '.join(args[1:])
-        res = yield from xor_strings(content, JCRYPT_KEY)
-        res = base64.a85encode(bytes(res, 'UTF-8'))
-        yield from client.send_message(message.channel, 'resultado encriptado: %s' % res.decode('UTF-8'))
-    except Exception as e:
-        yield from jose_debug(message, "ovocrypt_enc: pyerr: %s" % e)
-
-@asyncio.coroutine
-def ovocrypt_dec(message):
-    res = ''
-    args = message.content.split(' ')
-    try:
-        content = ' '.join(args[1:])
-        content = content.encode('UTF-8')
-        content = base64.a85decode(content).decode('UTF-8')
-        res = yield from xor_strings(content, JCRYPT_KEY)
-        yield from client.send_message(message.channel, 'resultado desencriptado: %s' % res)
-    except Exception as e:
-        yield from jose_debug(message, "ovocrypt_dec: pyerr: %s" % e)
 
 class Context:
     def __init__(self, message):

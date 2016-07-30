@@ -947,9 +947,6 @@ commands_start = {
     '!price': show_price,
     '!htgeral': make_func(JOSE_GENERAL_HTEXT),
     '!htech': make_func(JOSE_TECH_HTEXT),
-
-    '!enc': ovocrypt_enc,
-    '!dec': ovocrypt_dec,
 }
 
 commands_match = {
@@ -1073,6 +1070,11 @@ def on_message(message):
             yield from jose.say("time taken: %.2fms" % (end-st))
             return
         except AttributeError:
+            for cmd in commands_start:
+                if message.content.startswith(cmd):
+                    func = commands_start[cmd]
+                    yield from func(message)
+                    return
             yield from jose.say("jose.py: %s: comando não encontrado" % command)
             #return
         except Exception as e:

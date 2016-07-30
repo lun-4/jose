@@ -124,6 +124,25 @@ class JoseBot:
         return
 
     @asyncio.coroutine
+    def c_enc(self, message, args):
+        to_encrypt = ' '.join(args[1:])
+        encdata = yield from jcommon.str_xor(to_encrypt, jcommon.JCRYPT_KEY)
+        a85data = base64.a85encode(bytes(encdata, 'UTF-8'))
+        yield from self.say('resultado(enc): %s' % a85data.decode('UTF-8'))
+
+    @asyncio.coroutine
+    def c_dec(self, message, args):
+        to_decrypt = ' '.join(args[1:])
+        to_decrypt = to_decrypt.encode('UTF-8')
+        to_decrypt = base64.a85decode(to_decrypt).decode('UTF-8')
+        plaintext = yield from jcommon.str_xor(to_decrypt, jcommon.JCRYPT_KEY)
+        yield from self.say("resultado(dec): %s" % plaintext)
+
+    @asyncio.coroutine
+    def c_money(self, message, args):
+        pass
+
+    @asyncio.coroutine
     def c_jbot(self, message, args):
         yield from self.say("Olá do módulo jose.py")
 
