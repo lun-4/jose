@@ -23,6 +23,7 @@ class VoiceState:
         self.voice = None
         self.jm = jm
         self.songlist = []
+        self.taskflag = True
 
         self.play_next_song = asyncio.Event()
         self.songs = asyncio.Queue()
@@ -39,27 +40,31 @@ class VoiceState:
     def player(self):
         return self.current.player
 
+    @asyncio.coroutine
     def skip(self):
         self.skip_votes.clear()
         if self.is_playing():
             try:
+                self.current.player.stop()
                 self.songlist.pop()
             except Exception as e:
                 yield from self.jm.say('pyerr: %s' % e)
-            self.current.player.stop()
+        else:
+            yield from self.jm.say("c_skip: não estou tocando nada")
 
     def toggle_next(self):
         self.play_next_song.set()
 
     @asyncio.coroutine
     def player_task(self):
-        while True:
+        while self.taskflag:
             self.play_next_song.clear()
             self.current = yield from self.songs.get()
             try:
                 self.songlist.pop()
             except Exception as e:
                 yield from self.jm.say('pyerr: %s' % e)
+
             yield from self.jm.say('ZELAO® tocando: %s' % str(self.current))
             self.current.player.start()
             yield from self.play_next_song.wait()
@@ -174,11 +179,11 @@ class JoseMusic:
             player.stop()
 
         try:
-            state.current.player.cancel()
+            state.taskflag = False
             yield from self.state.voice.disconnect()
             del self.state
-        except:
-            pass
+        except Exception as e:
+            yield from self.say("c_stop: pyerr: %s" % e)
 
     @asyncio.coroutine
     def c_zelao(self, message):
@@ -192,21 +197,23 @@ class JoseMusic:
     @asyncio.coroutine
     def c_skip(self, message):
         if not self.state.is_playing():
-            yield from self.bot.say('Nenhuma música sendo tocada para pular')
+            yield from self.say('Nenhuma música sendo tocada para pular')
             return
 
         voter = message.author
         state = self.state
         if voter == state.current.requester:
             yield from self.say('Solicitante pediu para pular a música...')
-            state.skip()
+            yield from state.skip()
+            return
 
         elif voter.id not in state.skip_votes:
             state.skip_votes.add(voter.id)
             total_votes = len(state.skip_votes)
             if total_votes >= 3:
                 yield from self.say('3 votos, pulando...')
-                state.skip()
+                yield from state.skip()
+                return
             else:
                 yield from self.say('Voto adicionado, já existem [{}/3]'.format(total_votes))
         else:

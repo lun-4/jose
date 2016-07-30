@@ -1265,7 +1265,7 @@ def on_message(message):
                     # set timeout of user
                     if not message.author.id in jose_env['spamcl']:
                         jose_env['spamcl'][message.author.id] = time.time() + 300
-                        yield from client.send_message(message.channel, 'spam de @%s! Parabéns de 5 minutos foi aplicado!' % message.author)
+                        yield from client.send_message(message.channel, 'spam de @%s! cooldown de 5 minutos foi aplicado!' % message.author)
                         return
                     else:
                         return
