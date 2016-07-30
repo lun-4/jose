@@ -42,7 +42,10 @@ class VoiceState:
     def skip(self):
         self.skip_votes.clear()
         if self.is_playing():
-            self.songlist.pop()
+            try:
+                self.songlist.pop()
+            except Exception as e:
+                yield from self.jm.say('pyerr: %s' % e)
             self.current.player.stop()
 
     def toggle_next(self):
@@ -53,7 +56,10 @@ class VoiceState:
         while True:
             self.play_next_song.clear()
             self.current = yield from self.songs.get()
-            self.songlist.pop()
+            try:
+                self.songlist.pop()
+            except Exception as e:
+                yield from self.jm.say('pyerr: %s' % e)
             yield from self.jm.say('ZELAO® tocando: %s' % str(self.current))
             self.current.player.start()
             yield from self.play_next_song.wait()
@@ -160,6 +166,21 @@ class JoseMusic:
             yield from self.say("Loop não iniciado")
 
     @asyncio.coroutine
+    def c_stop(self, message):
+        state = self.state
+
+        if state.is_playing():
+            player = state.current.player
+            player.stop()
+
+        try:
+            state.current.player.cancel()
+            yield from self.state.voice.disconnect()
+            del self.state
+        except:
+            pass
+
+    @asyncio.coroutine
     def c_zelao(self, message):
         if not self.loop_started:
             self.loop_started = True
@@ -207,6 +228,8 @@ cmds_start = {
 
     '!pause': jm.c_pause,
     '!resume': jm.c_resume,
+    '!stop': jm.c_stop,
+
     '!skip': jm.c_skip,
     '!playing': jm.c_playing,
 }
