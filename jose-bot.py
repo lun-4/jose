@@ -1041,6 +1041,7 @@ def on_message(message):
         yield from josecoin_save(message, False)
         counter = 0
 
+    st = time.time()
     # get command and push it to jose
     if message.content[0] == '!':
         #parse command
@@ -1055,7 +1056,12 @@ def on_message(message):
             method = "c_%s" % command
             # yield from jose.say("comando: %s" % method)
             # yield from jose.say(str(getattr(jose, method)))
+            if MAINTENANCE_MODE:
+                yield from show_maintenance(message)
+                return
             yield from getattr(jose, method)(message, args)
+            end = time.time()
+            yield from jose.say("time taken: %.2fms" % (end-st))
             return
         except AttributeError:
             yield from jose.say("jose.py: %s: comando não encontrado" % command)
@@ -1072,15 +1078,6 @@ def on_message(message):
         yield from func(message)
         return
 
-    for command in commands_start:
-        if message.content.startswith(command):
-            if MAINTENANCE_MODE:
-                yield from show_maintenance(message)
-                return
-            func = commands_start[command]
-            yield from func(message)
-            return
-
     for command in commands_match:
         if command in message.content:
             if MAINTENANCE_MODE:
@@ -1090,50 +1087,7 @@ def on_message(message):
             yield from func(message)
             return
 
-    if message.content.startswith("!xkcd"):
-        k = message.content.split(' ')
-        n = False
-        if len(k) > 1:
-            n = k[1]
-
-        info_latest = info = requests.get("http://xkcd.com/info.0.json").json()
-        info = None
-        try:
-            if not n:
-                info = info_latest
-            elif n == 'random' or n == 'r' or n == 'rand':
-                rn_xkcd = random.randint(0, info_latest['num'])
-                info = requests.get("http://xkcd.com/{0}/info.0.json".format(rn_xkcd)).json()
-            else:
-                info = requests.get("http://xkcd.com/{0}/info.0.json".format(n)).json()
-
-            yield from client.send_message(message.channel, 'xkcd {} : {}'.format(n, info['img']))
-        except ValueError as e:
-            yield from client.send_message(message.channel, "ValueError: provavelmente deu merda baixando o info.0.json da sua comic, seu fdp.")
-        except Exception as e:
-            yield from client.send_message(message.channel, "ERRO: %s" % str(e))
-
-        return
-
-    elif message.content.startswith("!rand"):
-        args = message.content.split()
-        n_min, n_max = 0,0
-        try:
-            n_min = int(args[1])
-            n_max = int(args[2])
-        except:
-            yield from jose_debug(message, "erro parseando os números para a função.")
-            return
-
-        if n_min > n_max:
-            yield from jose_debug(message, "minimo > máximo, intervalo não permitido")
-            return
-
-        n_rand = random.randint(n_min, n_max)
-        yield from client.send_message(message.channel, "Número aleatório de %d a %d: %d" % (n_min, n_max, n_rand))
-        return
-
-    elif message.content.startswith('$guess'):
+    if message.content.startswith('$guess'):
         yield from client.send_message(message.channel, 'Me fale um número de 0 a 10, imundo.')
 
         def guess_check(m):

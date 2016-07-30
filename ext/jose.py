@@ -4,6 +4,10 @@ import asyncio
 import sys
 import time
 import os
+from random import SystemRandom
+random = SystemRandom()
+
+import requests
 
 sys.path.append("..")
 import josecommon as jcommon
@@ -67,9 +71,50 @@ class JoseBot:
         yield from self.sec_auth(self.update)
 
     @asyncio.coroutine
+    def c_xkcd(self, message, args):
+        n = False
+        if len(args) > 1:
+            n = args[1]
+
+        info_latest = info = requests.get("http://xkcd.com/info.0.json").json()
+        info = None
+        try:
+            if not n:
+                info = info_latest
+                n = info['num']
+            elif n == 'random' or n == 'r' or n == 'rand':
+                rn_xkcd = random.randint(0, info_latest['num'])
+                info = requests.get("http://xkcd.com/{0}/info.0.json".format(rn_xkcd)).json()
+            else:
+                info = requests.get("http://xkcd.com/{0}/info.0.json".format(n)).json()
+            yield from self.say('xkcd número %s : %s' % (n, info['img']))
+
+        except Exception as e:
+            yield from self.debug("xkcd: pyerr: %s" % str(e))
+
+    @asyncio.coroutine
+    def c_rand(self, message, args):
+        n_min, n_max = 0,0
+        try:
+            n_min = int(args[1])
+            n_max = int(args[2])
+        except:
+            yield from self.debug("erro parseando os números para a função.")
+            return
+
+        if n_min > n_max:
+            yield from self.debug("minimo > máximo, intervalo não permitido")
+            return
+
+        n_rand = random.randint(n_min, n_max)
+        yield from self.say("Número aleatório de %d a %d: %d" % (n_min, n_max, n_rand))
+        return
+
+    @asyncio.coroutine
     def c_jbot(self, message, args):
         yield from self.say("Olá do módulo jose.py")
 
     @asyncio.coroutine
     def recv(self, message):
         self.current = message
+        self.curcxt = jcommon.Context(message)

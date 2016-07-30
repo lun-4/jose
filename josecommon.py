@@ -17,7 +17,7 @@ random = SystemRandom()
 import jcoin.josecoin as jcoin
 
 JOSE_VERSION = '0.7.9'
-JOSE_BUILD = 205
+JOSE_BUILD = 207
 
 #config
 chattiness = .25
@@ -448,3 +448,8 @@ def ovocrypt_dec(message):
         yield from client.send_message(message.channel, 'resultado desencriptado: %s' % res)
     except Exception as e:
         yield from jose_debug(message, "ovocrypt_dec: pyerr: %s" % e)
+
+class Context:
+    def __init__(self, message):
+        self.rtime = time.time()
+        self.message = message
