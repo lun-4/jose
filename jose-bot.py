@@ -640,20 +640,6 @@ def josecoin_dbg(message):
     yield from client.send_message(message.channel, jcoin.data)
 
 @asyncio.coroutine
-def josecoin_save(message, dbg_flag=True):
-    yield from jose_debug(message, "saving josecoin data", dbg_flag)
-    res = jcoin.save('jcoin/josecoin.db')
-    if not res[0]:
-        yield from jose_debug(message, 'error: %r' % res, dbg_flag)
-
-@asyncio.coroutine
-def josecoin_load(message, dbg_flag=True):
-    yield from jose_debug(message, "loading josecoin data", dbg_flag)
-    res = jcoin.load('jcoin/josecoin.db')
-    if not res[0]:
-        yield from jose_debug(message, 'error: %r' % res, dbg_flag)
-
-@asyncio.coroutine
 def josecoin_top10(message):
     args = message.content.split(' ')
     jcdata = dict(jcoin.data)

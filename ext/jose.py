@@ -5,8 +5,8 @@ import sys
 import time
 import os
 
-from .. import josecommon as jcommon
-from .. import jcoin.josecoin as jcoin
+sys.path.append("..")
+import josecommon as jcommon
 
 jose_debug = jcommon.jose_debug
 
@@ -24,22 +24,22 @@ class JoseBot:
         yield from jose_debug(self.current, msg)
 
     @asyncio.coroutine
-    def c_exit(self, args, message):
+    def c_exit(self, message, args):
         try:
             auth = yield from jcommon.check_roles(jcommon.MASTER_ROLE, message.author.roles)
             if auth:
-                yield from jcoin.josecoin_save(message)
-                yield from self.debug("saindo")
+                yield from self.debug("AuthModule: autorização concluída")
+                yield from jcommon.josecoin_save(message, True)
                 yield from self.client.logout()
                 sys.exit(0)
             else:
-                yield from self.debug(message, "PermError: sem permissão para desligar jose-bot")
+                yield from self.debug("PermError: sem permissão para desligar jose-bot")
         except Exception as e:
-            yield from self.debug(message, "c_exit: pyerr: %s" % e)
+            yield from self.debug("c_exit: pyerr: %s" % e)
         return
 
     @asyncio.coroutine
-    def c_jbot(self, args, message):
+    def c_jbot(self, message, args):
         yield from self.say("Olá do módulo jose.py")
 
     @asyncio.coroutine
