@@ -22,6 +22,7 @@ class VoiceState:
         self.current = None
         self.voice = None
         self.jm = jm
+        self.songlist = []
 
         self.play_next_song = asyncio.Event()
         self.songs = asyncio.Queue()
@@ -41,6 +42,7 @@ class VoiceState:
     def skip(self):
         self.skip_votes.clear()
         if self.is_playing():
+            self.songlist.pop()
             self.current.player.stop()
 
     def toggle_next(self):
@@ -142,9 +144,9 @@ class JoseMusic:
 
     @asyncio.coroutine
     def c_queue(self, message):
-        res = ''
+        res = 'Lista de sons: \n'
         for song in self.state.songlist:
-            res += 'Som: %s\n' % song
+            res += ' * %s\n' % song
         yield from self.say(res)
 
     @asyncio.coroutine
