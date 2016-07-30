@@ -1043,8 +1043,8 @@ def on_message(message):
         args = message.content.split(' ')
         try:
             method = "c_%s" % command
-            yield from jose.say("comando: %s" % method)
-            yield from jose.say(str(getattr(jose, method)))
+            # yield from jose.say("comando: %s" % method)
+            # yield from jose.say(str(getattr(jose, method)))
             yield from getattr(jose, method)(message, args)
             return
         except KeyError as e:
@@ -1054,51 +1054,7 @@ def on_message(message):
             yield from jose.say("jose: pyerr: %s" % e)
             return
 
-    if message.content == '!exit':
-        try:
-            auth = yield from check_roles(MASTER_ROLE, message.author.roles)
-            if auth:
-                yield from josecoin_save(message)
-                yield from jose_debug(message, "saindo")
-                yield from client.logout()
-                sys.exit(0)
-            else:
-                yield from jose_debug(message, "PermError: sem permissão para desligar jose-bot")
-        except Exception as e:
-            yield from jose_debug(message, "ErroGeral: %s" % str(e))
-        return
-
-    elif message.content == '!reboot':
-        try:
-            auth = yield from check_roles(MASTER_ROLE, message.author.roles)
-            if auth:
-                yield from josecoin_save(message)
-                yield from jose_debug(message, "reiniciando")
-                yield from client.logout()
-                os.system("./reload_jose.sh &")
-                sys.exit(0)
-            else:
-                yield from jose_debug(message, "PermError: sem permissão para reiniciar jose-bot")
-        except Exception as e:
-            yield from jose_debug(message, "ErroGeral: %s" % str(e))
-        return
-
-    elif message.content == '!update':
-        try:
-            auth = yield from check_roles(MASTER_ROLE, message.author.roles)
-            if auth:
-                yield from josecoin_save(message)
-                yield from jose_debug(message, "atualizando josé para nova versão(era v%s b%d)" % (JOSE_VERSION, JOSE_BUILD))
-                yield from client.logout()
-                os.system("./reload_jose.sh &")
-                sys.exit(0)
-            else:
-                yield from jose_debug(message, "PermError: sem permissão para atualizar jose-bot")
-        except Exception as e:
-            yield from jose_debug(message, "ErroGeral: %s" % str(e))
-        return
-
-    elif message.content in exact_commands:
+    if message.content in exact_commands:
         if MAINTENANCE_MODE:
             yield from show_maintenance(message)
             return

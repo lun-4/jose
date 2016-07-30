@@ -24,19 +24,47 @@ class JoseBot:
         yield from jose_debug(self.current, msg)
 
     @asyncio.coroutine
+    def sec_auth(self, f):
+        auth = yield from jcommon.check_roles(jcommon.MASTER_ROLE, self.current.author.roles)
+        if auth:
+            yield from self.debug("auth: autorizado")
+            f()
+        else:
+            yield from self.debug("PermError: sem permissão")
+
+    @asyncio.coroutine
+    def turnoff(self):
+        yield from jcommon.josecoin_save(message, True)
+        yield from self.client.logout()
+        sys.exit(0)
+
+    @asyncio.coroutine
+    def reboot(self):
+        yield from jcommon.josecoin_save(message, True)
+        yield from self.client.logout()
+        os.system("./reload_jose.sh &")
+        sys.exit(0)
+
+    @asyncio.coroutine
+    def update(self):
+        banner = "atualizando josé para nova versão(era v%s b%d)" % (jcommon.JOSE_VERSION, jcommon.JOSE_BUILD)
+        yield from self.debug(banner)
+        yield from jcommon.josecoin_save(message, True)
+        yield from client.logout()
+        os.system("./reload_jose.sh &")
+        sys.exit(0)
+
+    @asyncio.coroutine
     def c_exit(self, message, args):
-        try:
-            auth = yield from jcommon.check_roles(jcommon.MASTER_ROLE, message.author.roles)
-            if auth:
-                yield from self.debug("AuthModule: autorização concluída")
-                yield from jcommon.josecoin_save(message, True)
-                yield from self.client.logout()
-                sys.exit(0)
-            else:
-                yield from self.debug("PermError: sem permissão para desligar jose-bot")
-        except Exception as e:
-            yield from self.debug("c_exit: pyerr: %s" % e)
-        return
+        yield from self.sec_auth(self.turnoff)
+
+    @asyncio.coroutine
+    def c_reboot(self, message, args):
+        yield from self.sec_auth(self.reboot)
+
+    @asyncio.coroutine
+    def c_update(self, message, args):
+        yield from self.sec_auth(self.update)
 
     @asyncio.coroutine
     def c_jbot(self, message, args):
