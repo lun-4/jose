@@ -14,8 +14,8 @@ import randemoji as emoji
 from random import SystemRandom
 random = SystemRandom()
 
-JOSE_VERSION = '0.8.0-alpha3'
-JOSE_BUILD = 221
+JOSE_VERSION = '0.8.0-alpha4'
+JOSE_BUILD = 222
 
 #config
 chattiness = .25
@@ -59,6 +59,9 @@ PRICE_TABLE = {
     'learn': ("Comandos relacionados ao josé aprender textos", LEARN_PRICE),
     'operational': ("Taxa operacional de alguns comandos(normalmente relacionados a muito processamento)", OP_TAX_PRICE)
 }
+
+ascii_to_wide = dict((i, chr(i + 0xfee0)) for i in range(0x21, 0x7f))
+ascii_to_wide.update({0x20: u'\u3000', 0x2D: u'\u2212'})  # space and minus
 
 client = None
 
@@ -293,10 +296,7 @@ def show_top(message):
 
 @asyncio.coroutine
 def check_roles(correct, rolelist):
-    for role in rolelist:
-        if role.name == correct:
-            return True
-    return False
+    return correct in rolelist #AAAAHHH
 
 @asyncio.coroutine
 def random_emoji(maxn):
@@ -337,6 +337,9 @@ show_vinheta = make_func('http://prntscr.com/bvcbju')
 show_agira = make_func("http://docs.unity3d.com/uploads/Main/SL-DebugNormals.png")
 show_casa = make_func("https://thumbs.dreamstime.com/z/locais-de-trabalho-em-um-escrit%C3%B3rio-panor%C3%A2mico-moderno-opini%C3%A3o-de-new-york-city-das-janelas-tabelas-pretas-e-cadeiras-de-couro-59272285.jpg")
 
+meme_ratelimit = make_func("http://i.imgur.com/P6bDtR9.gif")
+meme_dank_memes = make_func("http://i.imgur.com/Fzk4jfl.png")
+
 @asyncio.coroutine
 def str_xor(s,t):
     return "".join(chr(ord(a)^ord(b)) for a,b in zip(s,t))
@@ -375,3 +378,11 @@ class Extension:
     @asyncio.coroutine
     def recv(self, msg):
         self.current = msg
+
+    @asyncio.coroutine
+    def rolecheck(self, role):
+        return role in self.current.author.roles
+
+    @asyncio.coroutine
+    def debug(self, msg):
+        yield from jose_debug(self.current, msg)

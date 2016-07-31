@@ -304,28 +304,6 @@ def make_xmlporn(baseurl):
 
     return func
 
-# globals
-ascii_to_wide = dict((i, chr(i + 0xfee0)) for i in range(0x21, 0x7f))
-ascii_to_wide.update({0x20: u'\u3000', 0x2D: u'\u2212'})  # space and minus
-wide_to_ascii = dict((i, chr(i - 0xfee0)) for i in range(0xff01, 0xff5f))
-wide_to_ascii.update({0x3000: u' ', 0x2212: u'-'})        # space and minus
-
-@asyncio.coroutine
-def convert_fullwidth(message):
-    args = message.content.split(' ')
-    ascii_text = ' '.join(args[1:])
-
-    res = ascii_text.translate(ascii_to_wide)
-    yield from client.send_message(message.channel, res)
-
-@asyncio.coroutine
-def change_playing(message):
-    args = message.content.split(' ')
-    gameid = ' '.join(args[1:])
-
-    g = discord.Game(name=gameid, url=gameid, type='game')
-    yield from client.change_status(g)
-
 @asyncio.coroutine
 def show_uptime(message):
     global start_time
@@ -587,24 +565,6 @@ def nsfw_porn(message):
         except Exception as e:
             yield from jose_debug(message, "erro: provavelmente nada foi encontrado, seu merda. (%s)" % str(e))
             return
-
-@asyncio.coroutine
-def make_escolha(message):
-    args = message.content.split(' ')
-    escolhas = ' '.join(args[1:])
-    escolhas = escolhas.split(';')
-    choice = random.choice(escolhas)
-    yield from client.send_message(message.channel, "Eu escolho %s" % choice)
-
-@asyncio.coroutine
-def josecoin_new(message):
-    print("new jcoin account %s" % message.author.id)
-
-    res = jcoin.new_acc(message.author.id, str(message.author))
-    if res[0]:
-        yield from client.send_message(message.channel, res[1])
-    else:
-        yield from client.send_message(message.channel, 'erro: %s' % res[1])
 
 @asyncio.coroutine
 def josecoin_write(message):

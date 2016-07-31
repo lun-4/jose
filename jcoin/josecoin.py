@@ -127,3 +127,25 @@ class JoseCoin(jcommon.Extension):
             yield from self.say('%s -> %.2f' % (accdata['name'], accdata['amount']))
         else:
             yield from self.say('erro encontrando conta(id: %s)' % (id_check))
+
+    @asyncio.coroutine
+    def c_conta(self, message, args):
+        print("new jcoin account %s" % message.author.id)
+
+        res = new_acc(message.author.id, str(message.author))
+        if res[0]:
+            yield from self.say(res[1])
+        else:
+            yield from self.say('jc_error: %s' % res[1])
+
+    @asyncio.coroutine
+    def c_write(self, message, args):
+        auth = yield from self.rolecheck(jcommon.MASTER_ROLE)
+        if not auth:
+            yield from self.debug("PermissionError: sem permissão para alterar dados da JC")
+
+        id_from = yield from jcommon.parse_id(args[1], message)
+        new_amount = float(args[2])
+
+        jcoin.data[id_from]['amount'] = new_amount
+        yield from self.say("conta <@%s>: %.2f" % (id_from, jcoin.data[id_from]['amount']))

@@ -228,6 +228,23 @@ class JoseBot:
             yield from self.say("verifique sua pesquisa, porque nenhuma track foi encontrada.")
             return
 
+    @asyncio.coroutine
+    def c_playing(self, message, args):
+        playing_name = ' '.join(args[1:])
+        g = discord.Game(name=playing_name, url=playing_name, type='game')
+        yield from self.client.change_status(g)
+
+    @asyncio.coroutine
+    def c_fullwidth(self, message, args):
+        ascii_text = ' '.join(args[1:])
+        res = ascii_text.translate(jcommon.ascii_to_wide)
+        yield from self.say(res)
+
+    @asyncio.coroutine
+    def c_escolha(self, message, args):
+        escolhas = (' '.join(args[1:])).split(';')
+        choice = random.choice(escolhas)
+        yield from self.say("Eu escolho %s" % choice)
 
     @asyncio.coroutine
     def c_jbot(self, message, args):
