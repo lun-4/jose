@@ -231,26 +231,6 @@ def make_causo(message):
 
     yield from client.send_message(message.channel, causo.format(x, y))
 
-@asyncio.coroutine
-def convert_money(message):
-    args = message.content.split(' ')
-    amount = float(args[1])
-    currency_from = args[2]
-    currency_to = args[3]
-
-    baseurl = "http://api.fixer.io/latest?base={}".format(currency_from.upper())
-    data = requests.get(baseurl).json()
-    if 'error' in data:
-        yield from jose_debug(message, "!money error: %s" % data['error'])
-        return
-
-    rate = data['rates'][currency_to]
-    res = amount * rate
-
-    yield from client.send_message(message.channel, '{} {} = {} {}'.format(
-        amount, currency_from, res, currency_to
-    ))
-
 # globals
 ascii_to_wide = dict((i, chr(i + 0xfee0)) for i in range(0x21, 0x7f))
 ascii_to_wide.update({0x20: u'\u3000', 0x2D: u'\u2212'})  # space and minus
@@ -892,7 +872,6 @@ commands_start = {
     '!pisca': make_pisca,
 
     '!causar': make_causo,
-    '!money': convert_money,
     '!fullwidth': convert_fullwidth,
     '!playing': change_playing,
     '!uptime': show_uptime,
@@ -1022,7 +1001,6 @@ def on_message(message):
 
     # signal JoseMusic about the message etc
     yield from jmusic.jm.recv(message)
-    yield from jose.recv(message)
 
     # log stuff
     bnr = '%s(%r) : %s : %r' % (message.channel, message.channel.is_private, message.author, message.content)
@@ -1061,12 +1039,13 @@ def on_message(message):
             method = "c_%s" % command
             # yield from jose.say("comando: %s" % method)
             # yield from jose.say(str(getattr(jose, method)))
+            yield from jose.recv(message)
             if MAINTENANCE_MODE:
                 yield from show_maintenance(message)
                 return
             yield from getattr(jose, method)(message, args)
             end = time.time()
-            yield from jose.say("time taken: %.2fms" % (end-st))
+            yield from jose.say("time: real %.4fs user %.4fs" % (end-st, 1.5+end-st))
             return
         except AttributeError:
             for cmd in commands_start:
