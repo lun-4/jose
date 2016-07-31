@@ -16,6 +16,7 @@ import json
 
 sys.path.append("..")
 import josecommon as jcommon
+import jcoin.josecoin as jcoin
 
 jose_debug = jcommon.jose_debug
 
@@ -35,13 +36,13 @@ class JoseBot(jcommon.Extension):
 
     @asyncio.coroutine
     def turnoff(self):
-        yield from jcommon.josecoin_save(self.current, True)
+        yield from jcoin.JoseCoin(self.client).josecoin_save(self.current, True)
         yield from self.client.logout()
         sys.exit(0)
 
     @asyncio.coroutine
     def reboot(self):
-        yield from jcommon.josecoin_save(self.current, True)
+        yield from jcoin.JoseCoin(self.client).josecoin_save(self.current, True)
         yield from self.client.logout()
         os.system("./reload_jose.sh &")
         sys.exit(0)
@@ -50,7 +51,7 @@ class JoseBot(jcommon.Extension):
     def update(self):
         banner = "atualizando josé para nova versão(era v%s b%d)" % (jcommon.JOSE_VERSION, jcommon.JOSE_BUILD)
         yield from self.debug(banner)
-        yield from jcommon.josecoin_save(self.current, True)
+        yield from jcoin.JoseCoin(self.client).josecoin_save(self.current, True)
         yield from self.client.logout()
         os.system("./reload_jose.sh &")
         sys.exit(0)

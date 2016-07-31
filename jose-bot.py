@@ -8,6 +8,7 @@ if not discord.opus.is_loaded():
 import ext.josemusic as jmusic
 import ext.jose as jose_bot
 import ext.joseassembly as jasm
+import ext.josensfw as jnsfw
 
 from random import SystemRandom
 random = SystemRandom()
@@ -201,20 +202,6 @@ def make_animation(message):
 
     animation_counter -= 1
 
-@asyncio.coroutine
-def set_msmsg(message):
-    global msmsg
-
-    args = message.content.split(' ')
-    msmsg = ' '.join(args[1:])
-
-    yield from client.send_message(message.channel, 'msmsg: %s' % msmsg)
-
-@asyncio.coroutine
-def show_msmsg(message):
-    global msmsg
-    yield from client.send_message(message.channel, msmsg)
-
 causos = [
     '{} foi no matinho com {}',
     '{} inventou de fumar com {} e deu merda',
@@ -232,20 +219,8 @@ def make_causo(message):
     yield from client.send_message(message.channel, causo.format(x, y))
 
 help_josecoin = make_func(jcoin.JOSECOIN_HELP_TEXT)
-
-@asyncio.coroutine
-def josecoin_save(message, dbg_flag=True):
-    yield from jose_debug(message, "saving josecoin data", dbg_flag)
-    res = jcoin.save('jcoin/josecoin.db')
-    if not res[0]:
-        yield from jose_debug(message, 'error: %r' % res, dbg_flag)
-
-@asyncio.coroutine
-def josecoin_load(message, dbg_flag=True):
-    yield from jose_debug(message, "loading josecoin data", dbg_flag)
-    res = jcoin.load('jcoin/josecoin.db')
-    if not res[0]:
-        yield from jose_debug(message, 'error: %r' % res, dbg_flag)
+josecoin_save = lambda x,y: None
+josecoin_load = lambda x,y: None
 
 @asyncio.coroutine
 def jcoin_control(id_user, amnt):
@@ -852,7 +827,13 @@ for cmd in commands_start:
 
 jcoin.load(jconfig.jcoin_path)
 jc = jcoin.JoseCoin(client)
+
+josecoin_save = jc.josecoin_save
+josecoin_load = jc.josecoin_load
+
+jn = jnsfw.JoseNSFW(client)
 jose.load_ext(jc, 'josecoin')
+jose.load_ext(jn, 'jose-nsfw')
 
 print("carregando jspeak")
 jspeak.buildMapping(jspeak.wordlist('jose-data.txt'), 1)
@@ -938,14 +919,6 @@ def on_message(message):
             end = time.time()
             yield from jose.say("time: real %.4fs user %.4fs" % (end-st, 1.5+end-st))
             return
-        except AttributeError:
-            for cmd in commands_start:
-                if message.content.startswith(cmd):
-                    func = commands_start[cmd]
-                    yield from func(message)
-                    return
-            yield from jose.say("jose.py: %s: comando não encontrado" % command)
-            #return
         except Exception as e:
             yield from jose.say("jose: pyerr: %s" % e)
             # return

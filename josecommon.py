@@ -15,7 +15,7 @@ from random import SystemRandom
 random = SystemRandom()
 
 JOSE_VERSION = '0.8.0-alpha4'
-JOSE_BUILD = 223
+JOSE_BUILD = 225
 
 #config
 chattiness = .25
@@ -298,7 +298,13 @@ def show_top(message):
 
 @asyncio.coroutine
 def check_roles(correct, rolelist):
-    return correct in rolelist #AAAAHHH
+    #for role in rolelist:
+    #    if role.name == correct:
+    #        return True
+    #return False
+
+    c = [role.name == correct for role in rolelist]
+    return True in c
 
 @asyncio.coroutine
 def random_emoji(maxn):
@@ -375,13 +381,14 @@ class Extension:
         yield from self.client.send_message(self.current.channel, msg)
 
     @asyncio.coroutine
-    def debug(self, msg):
-        yield from jose_debug(self.current, msg)
+    def debug(self, msg, flag=True):
+        yield from jose_debug(self.current, msg, flag)
 
     @asyncio.coroutine
     def recv(self, msg):
         self.current = msg
 
     @asyncio.coroutine
-    def rolecheck(self, role):
-        return role in self.current.author.roles
+    def rolecheck(self, correct_role):
+        c = [role.name == correct_role for role in self.current.author.roles]
+        return True in c

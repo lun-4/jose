@@ -112,6 +112,22 @@ class JoseCoin(jcommon.Extension):
         jcommon.Extension.__init__(self, cl)
 
     @asyncio.coroutine
+    def josecoin_save(self, message, dbg_flag=True):
+        self.current = message
+        yield from self.debug("saving josecoin data", dbg_flag)
+        res = save('jcoin/josecoin.db')
+        if not res[0]:
+            yield from self.debug('error: %r' % res)
+
+    @asyncio.coroutine
+    def josecoin_load(self, message, dbg_flag=True):
+        self.current = message
+        yield from self.debug("loading josecoin data", dbg_flag)
+        res = load('jcoin/josecoin.db')
+        if not res[0]:
+            yield from self.debug('error: %r' % res)
+
+    @asyncio.coroutine
     def c_saldo(self, message, args):
         args = message.content.split(' ')
 
