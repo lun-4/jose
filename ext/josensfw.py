@@ -98,8 +98,10 @@ class JoseNSFW(jcommon.Extension):
     def c_e621(self, message, args):
         access = yield from self.porn_routine()
         if access:
-            yield from self.json_api('', ' '.join(args[1:]))
+            yield from self.json_api('https://e621.net/post/index.json', ' '.join(args[1:]), 'file_url')
 
     @asyncio.coroutine
     def c_porn(self, message, args):
-        pass
+        access = yield from self.porn_routine()
+        if access:
+            yield from self.json_api('http://api.porn.com/videos/find.json', ' '.join(args[1:]), 'url')

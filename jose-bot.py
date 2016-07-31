@@ -414,39 +414,6 @@ def learn_data(message):
     return
 
 @asyncio.coroutine
-def nsfw_porn(message):
-    res = yield from jcoin_control(message.author.id, PORN_PRICE)
-    if not res[0]:
-        yield from client.send_message(message.channel,
-            "PermError: %s" % res[1])
-        return
-
-    args = message.content.split(' ')
-    search_term = ' '.join(args[1:])
-
-    if search_term == ':latest' or search_term == '' or search_term == ' ':
-        yield from client.send_message(message.channel, 'procurando posts')
-        r = requests.get('http://api.porn.com/videos/find.json?limit=%s' % PORN_LIMIT).json()
-        try:
-            post = random.choice(r['result'])
-            yield from client.send_message(message.channel, '%s' % post['url'])
-            return
-        except Exception as e:
-            yield from jose_debug(message, "erro em !e621: %s" % str(e))
-            return
-
-    else:
-        yield from client.send_message(message.channel, 'procurando por %r' % search_term)
-        r = requests.get('http://api.porn.com/videos/find.json?limit=%s&tags=%s' % (PORN_LIMIT, search_term)).json()
-        try:
-            post = random.choice(r['result'])
-            yield from client.send_message(message.channel, '%s' % post['url'])
-            return
-        except Exception as e:
-            yield from jose_debug(message, "erro: provavelmente nada foi encontrado, seu merda. (%s)" % str(e))
-            return
-
-@asyncio.coroutine
 def josecoin_send(message):
     global GAMBLING_LAST_BID
     args = message.content.split(' ')
