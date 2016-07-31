@@ -14,8 +14,6 @@ import randemoji as emoji
 from random import SystemRandom
 random = SystemRandom()
 
-import jcoin.josecoin as jcoin
-
 JOSE_VERSION = '0.8.0-alpha3'
 JOSE_BUILD = 221
 
@@ -307,20 +305,6 @@ def random_emoji(maxn):
         res += str(emoji.random_emoji())
     return res
 
-@asyncio.coroutine
-def josecoin_save(message, dbg_flag=True):
-    yield from jose_debug(message, "saving josecoin data", dbg_flag)
-    res = jcoin.save('jcoin/josecoin.db')
-    if not res[0]:
-        yield from jose_debug(message, 'error: %r' % res, dbg_flag)
-
-@asyncio.coroutine
-def josecoin_load(message, dbg_flag=True):
-    yield from jose_debug(message, "loading josecoin data", dbg_flag)
-    res = jcoin.load('jcoin/josecoin.db')
-    if not res[0]:
-        yield from jose_debug(message, 'error: %r' % res, dbg_flag)
-
 atividade = [
     'http://i.imgur.com/lkZVh3K.jpg',
 ]
@@ -337,63 +321,6 @@ def make_func(res):
 
     return response
 
-@asyncio.coroutine
-def jcoin_control(id_user, amnt):
-    '''
-    returns True if user can access
-    '''
-    return jcoin.transfer(id_user, jcoin.jose_id, amnt, jcoin.LEDGER_PATH)
-
-def make_xmlporn(baseurl):
-    @asyncio.coroutine
-    def func(message):
-        res = yield from jcoin_control(message.author.id, PORN_PRICE)
-        if not res[0]:
-            yield from client.send_message(message.channel,
-                "PermError: %s" % res[1])
-            return
-
-        args = message.content.split(' ')
-        search_term = ' '.join(args[1:])
-
-        loop = asyncio.get_event_loop()
-
-        if search_term == ':latest':
-            yield from client.send_message(message.channel, 'procurando nos posts mais recentes')
-
-            url = '%s?limit=%s' % (baseurl, PORN_LIMIT)
-            future_stmt = loop.run_in_executor(None, requests.get, url)
-            r = yield from future_stmt
-
-            tree = ElementTree.fromstring(r.content)
-            root = tree
-            try:
-                post = random.choice(root)
-                yield from client.send_message(message.channel, '%s' % post.attrib['file_url'])
-                return
-            except Exception as e:
-                yield from jose_debug(message, "erro: %s" % str(e))
-                return
-
-        else:
-            yield from client.send_message(message.channel, 'procurando por %r' % search_term)
-
-            url = '%s?limit=%s&tags=%s' % (baseurl, PORN_LIMIT, search_term)
-            future_stmt = loop.run_in_executor(None, requests.get, url)
-            r = yield from future_stmt
-
-            tree = ElementTree.fromstring(r.content)
-            root = tree
-            try:
-                post = random.choice(root)
-                yield from client.send_message(message.channel, '%s' % post.attrib['file_url'])
-                return
-            except Exception as e:
-                yield from jose_debug(message, "erro: provavelmente nada foi encontrado, seu merda. (%s)" % str(e))
-                return
-
-    return func
-
 rodei_teu_cu = make_func("RODEI MEU PAU NO TEU CU")
 show_noabraco = make_func("não vou abraçar")
 show_tampa = make_func("A DO TEU CU\nHÁ, TROLEI")
@@ -404,7 +331,6 @@ show_emule = make_func("http://i.imgur.com/GO90sEv.png")
 show_frozen_2 = make_func('http://i.imgur.com/HIcjyoW.jpg')
 pong = make_func('pong')
 
-help_josecoin = make_func(jcoin.JOSECOIN_HELP_TEXT)
 show_tijolo = make_func("http://www.ceramicabelem.com.br/produtos/TIJOLO%20DE%2006%20FUROS.%209X14X19.gif")
 show_mc = make_func("https://cdn.discordapp.com/attachments/202055538773721099/203989039504687104/unknown.png")
 show_vinheta = make_func('http://prntscr.com/bvcbju')
@@ -421,3 +347,31 @@ class Context:
     def __init__(self, message):
         self.rtime = time.time()
         self.message = message
+
+@asyncio.coroutine
+def parse_id(data, message):
+    '''
+    <@196461455569059840>
+    <@!162819866682851329>
+    '''
+    if data[0:2] == '<@':
+        if data[2] == '!':
+            return data[3:-1]
+        else:
+            return data[2:-1]
+    else:
+        yield from jose_debug(message, "error parsing id %s" % data)
+        return
+
+class Extension:
+    def __init__(self, cl):
+        self.client = cl
+        self.current = None
+
+    @asyncio.coroutine
+    def say(self, msg):
+        yield from self.client.send_message(self.current.channel, msg)
+
+    @asyncio.coroutine
+    def recv(self, msg):
+        self.current = msg

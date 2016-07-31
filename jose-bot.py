@@ -231,6 +231,79 @@ def make_causo(message):
 
     yield from client.send_message(message.channel, causo.format(x, y))
 
+help_josecoin = make_func(jcoin.JOSECOIN_HELP_TEXT)
+
+@asyncio.coroutine
+def josecoin_save(message, dbg_flag=True):
+    yield from jose_debug(message, "saving josecoin data", dbg_flag)
+    res = jcoin.save('jcoin/josecoin.db')
+    if not res[0]:
+        yield from jose_debug(message, 'error: %r' % res, dbg_flag)
+
+@asyncio.coroutine
+def josecoin_load(message, dbg_flag=True):
+    yield from jose_debug(message, "loading josecoin data", dbg_flag)
+    res = jcoin.load('jcoin/josecoin.db')
+    if not res[0]:
+        yield from jose_debug(message, 'error: %r' % res, dbg_flag)
+
+@asyncio.coroutine
+def jcoin_control(id_user, amnt):
+    '''
+    returns True if user can access
+    '''
+    return jcoin.transfer(id_user, jcoin.jose_id, amnt, jcoin.LEDGER_PATH)
+
+def make_xmlporn(baseurl):
+    @asyncio.coroutine
+    def func(message):
+        res = yield from jcoin_control(message.author.id, PORN_PRICE)
+        if not res[0]:
+            yield from client.send_message(message.channel,
+                "PermError: %s" % res[1])
+            return
+
+        args = message.content.split(' ')
+        search_term = ' '.join(args[1:])
+
+        loop = asyncio.get_event_loop()
+
+        if search_term == ':latest':
+            yield from client.send_message(message.channel, 'procurando nos posts mais recentes')
+
+            url = '%s?limit=%s' % (baseurl, PORN_LIMIT)
+            future_stmt = loop.run_in_executor(None, requests.get, url)
+            r = yield from future_stmt
+
+            tree = ElementTree.fromstring(r.content)
+            root = tree
+            try:
+                post = random.choice(root)
+                yield from client.send_message(message.channel, '%s' % post.attrib['file_url'])
+                return
+            except Exception as e:
+                yield from jose_debug(message, "erro: %s" % str(e))
+                return
+
+        else:
+            yield from client.send_message(message.channel, 'procurando por %r' % search_term)
+
+            url = '%s?limit=%s&tags=%s' % (baseurl, PORN_LIMIT, search_term)
+            future_stmt = loop.run_in_executor(None, requests.get, url)
+            r = yield from future_stmt
+
+            tree = ElementTree.fromstring(r.content)
+            root = tree
+            try:
+                post = random.choice(root)
+                yield from client.send_message(message.channel, '%s' % post.attrib['file_url'])
+                return
+            except Exception as e:
+                yield from jose_debug(message, "erro: provavelmente nada foi encontrado, seu merda. (%s)" % str(e))
+                return
+
+    return func
+
 # globals
 ascii_to_wide = dict((i, chr(i + 0xfee0)) for i in range(0x21, 0x7f))
 ascii_to_wide.update({0x20: u'\u3000', 0x2D: u'\u2212'})  # space and minus
@@ -523,20 +596,6 @@ def make_escolha(message):
     choice = random.choice(escolhas)
     yield from client.send_message(message.channel, "Eu escolho %s" % choice)
 
-def parse_id(data, message):
-    '''
-    <@196461455569059840>
-    <@!162819866682851329>
-    '''
-    if data[0:2] == '<@':
-        if data[2] == '!':
-            return data[3:-1]
-        else:
-            return data[2:-1]
-    else:
-        yield from jose_debug(message, "error parsing id %s" % data)
-        return
-
 @asyncio.coroutine
 def josecoin_new(message):
     print("new jcoin account %s" % message.author.id)
@@ -546,23 +605,6 @@ def josecoin_new(message):
         yield from client.send_message(message.channel, res[1])
     else:
         yield from client.send_message(message.channel, 'erro: %s' % res[1])
-
-@asyncio.coroutine
-def josecoin_saldo(message):
-    args = message.content.split(' ')
-
-    id_check = None
-    if len(args) < 2:
-        id_check = message.author.id
-    else:
-        id_check = yield from parse_id(args[1], message)
-
-    res = jcoin.get(id_check)
-    if res[0]:
-        accdata = res[1]
-        yield from client.send_message(message.channel, '%s -> %.2f' % (accdata['name'], accdata['amount']))
-    else:
-        yield from client.send_message(message.channel, 'erro encontrando conta(id: %s)' % (id_check))
 
 @asyncio.coroutine
 def josecoin_write(message):
@@ -817,31 +859,25 @@ def show_price(message):
 
 exact_commands = {
     'jose': show_help,
-    'josé': show_help,
-    'Jose': show_help,
-    'José': show_help,
     '!help': show_help,
     'melhor bot': show_shit,
 }
 
-commands_start = {
-    "!setmsmsg": set_msmsg,
-    "!msmsg": show_msmsg,
+'''
+    RMV : removed
+    DEAC : deactivated until better solution
+'''
 
+commands_start = {
     '!xingar': show_xingar,
     '!elogiar': show_elogio,
     '!cantar': show_cantada,
-
-    '!setlmsg': set_lilmsg,
     '!version': show_version,
-
-    '!lilmsg': show_lilmsg,
-    '!lmsg': show_lilmsg,
 
     '!log': show_debug,
     '!dbgmsg': new_debug,
 
-    '!animate': make_animation,
+    # DEAC '!animate': make_animation,
     '!pisca': make_pisca,
 
     '!causar': make_causo,
@@ -849,8 +885,8 @@ commands_start = {
     '!playing': change_playing,
     '!uptime': show_uptime,
 
-    '!pesquisa': make_pesquisa,
-    '!voto': make_voto,
+    # DEAC '!pesquisa': make_pesquisa,
+    # DEAC '!voto': make_voto,
 
     '!hypno': nsfw_hypnohub,
     '!e621': nsfw_e621,
@@ -868,7 +904,7 @@ commands_start = {
     '!jcdata': josecoin_dbg,
     '!conta': josecoin_new,
     '!enviar': josecoin_send,
-    '!saldo': josecoin_saldo,
+    # RMV '!saldo': josecoin_saldo,
     '!top10': josecoin_top10,
     '!write': josecoin_write,
     '!jenv': show_jenv,
@@ -911,7 +947,6 @@ commands_match = {
     'frozen 2': show_frozen_2,
     'emule': show_emule,
     'vinheta': show_vinheta,
-    'top': show_top,
 
     "se fude jose": show_vtnc,
     "jose se fude": show_vtnc,

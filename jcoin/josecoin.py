@@ -3,6 +3,10 @@ import time
 import asyncio
 import pickle
 
+import sys
+sys.path.append("..")
+import josecommon as jcommon
+
 JOSECOIN_VERSION = '0.4'
 
 JOSECOIN_HELP_TEXT = '''JoseCoin(%s) é a melhor moeda que o josé pode te oferecer!
@@ -101,20 +105,25 @@ def save(fname):
     #ledger_data(fname.replace('db', 'journal'), '%f;SAVE;%r\n' % (time.time(), data))
     return True, "save %s" % fname
 
-class JoseCoin:
+class JoseCoin(jcommon.Extension):
     def __init__(self, cl):
         self.client = cl
         self.current = None
-
-    @asyncio.coroutine
-    def say(self, msg):
-        yield from self.client.send_message(self.current.channel, msg)
+        jcommon.Extension.__init__(self, cl)
 
     @asyncio.coroutine
     def c_saldo(self, message, args):
-        print("JOSECOIN METHOD")
-        yield from self.say("!saldo vindo do josecoin.py")
+        args = message.content.split(' ')
 
-    @asyncio.coroutine
-    def recv(self, msg):
-        self.current = msg
+        id_check = None
+        if len(args) < 2:
+            id_check = message.author.id
+        else:
+            id_check = yield from jcommon.parse_id(args[1], message)
+
+        res = get(id_check)
+        if res[0]:
+            accdata = res[1]
+            yield from self.say('%s -> %.2f' % (accdata['name'], accdata['amount']))
+        else:
+            yield from self.say('erro encontrando conta(id: %s)' % (id_check))
