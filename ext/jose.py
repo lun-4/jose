@@ -199,3 +199,12 @@ class JoseBot:
     @asyncio.coroutine
     def recv(self, message):
         self.current = message
+
+    def load_ext(self, inst):
+        methods = (method for method in dir(inst) if callable(getattr(inst, method)))
+
+        for method in methods:
+            if method.startswith('c_'):
+                print("add %s" % method)
+                setattr(self, method, getattr(inst, method))
+        return True

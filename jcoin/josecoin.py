@@ -3,7 +3,7 @@ import time
 import asyncio
 import pickle
 
-JOSECOIN_VERSION = '0.3'
+JOSECOIN_VERSION = '0.4'
 
 JOSECOIN_HELP_TEXT = '''JoseCoin(%s) é a melhor moeda que o josé pode te oferecer!
 
@@ -100,3 +100,21 @@ def save(fname):
 
     #ledger_data(fname.replace('db', 'journal'), '%f;SAVE;%r\n' % (time.time(), data))
     return True, "save %s" % fname
+
+class JoseCoin:
+    def __init__(self, cl):
+        self.client = cl
+        self.current = None
+
+    @asyncio.coroutine
+    def say(self, msg):
+        yield from self.client.send_message(self.current.channel, msg)
+
+    @asyncio.coroutine
+    def c_saldo(self, message, args):
+        print("JOSECOIN METHOD")
+        yield from self.say("!saldo vindo do josecoin.py")
+
+    @asyncio.coroutine
+    def recv(self, msg):
+        self.current = msg

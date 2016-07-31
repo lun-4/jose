@@ -603,7 +603,11 @@ def josecoin_send(message):
                 yield from client.send_message(message.channel, "sua aposta tem que ser maior do que a última, que foi %.2fJC" % GAMBLING_LAST_BID)
                 return
 
-        res = jcoin.transfer(id_from, id_to, atleast, jcoin.LEDGER_PATH)
+        res = ''
+        if GAMBLING_MODE:
+            res = jcoin.transfer(id_from, id_to, atleast, jcoin.LEDGER_PATH)
+        else:
+            res = jcoin.transfer(id_from, id_to, amount, jcoin.LEDGER_PATH)
         yield from josecoin_save(message, False)
         if res[0]:
             yield from client.send_message(message.channel, res[1])
@@ -643,6 +647,10 @@ def josecoin_top10(message):
         'name': '',
         'amount': 0.0,
     }
+
+    if range_max >= 16:
+        yield from client.send_message(message.channel, "valores maiores do que 16 não válidos")
+        return
 
     for i in range(1,range_max):
         if len(jcdata) < 1:
@@ -968,6 +976,12 @@ def from_dict(f):
 for cmd in commands_start:
     setattr(jose, 'c_%s' % cmd[1:], from_dict(commands_start[cmd]))
 
+jcoin.load(jconfig.jcoin_path)
+jc = jcoin.JoseCoin(client)
+jose.load_ext(jc)
+
+jspeak.buildMapping(jspeak.wordlist('jose-data.txt'), 1)
+
 @client.event
 @asyncio.coroutine
 def on_message(message):
@@ -1040,6 +1054,7 @@ def on_message(message):
             # yield from jose.say("comando: %s" % method)
             # yield from jose.say(str(getattr(jose, method)))
             yield from jose.recv(message)
+            yield from jc.recv(message)
             if MAINTENANCE_MODE:
                 yield from show_maintenance(message)
                 return
@@ -1209,7 +1224,5 @@ def on_ready():
     print('id', client.user.id)
     print('='*25)
 
-jcoin.load(jconfig.jcoin_path)
-jspeak.buildMapping(jspeak.wordlist('jose-data.txt'), 1)
 client.run(jconfig.discord_token)
 print("jose: finish line")
