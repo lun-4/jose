@@ -7,7 +7,7 @@ import sys
 sys.path.append("..")
 import josecommon as jcommon
 
-JOSECOIN_VERSION = '0.4'
+JOSECOIN_VERSION = '0.4.1'
 
 JOSECOIN_HELP_TEXT = '''JoseCoin(%s) é a melhor moeda que o josé pode te oferecer!
 
@@ -21,7 +21,7 @@ Alguns comandos pedem JC$ em troca da sua funcionalidade(*comandos nsfw incluíd
 ''' % JOSECOIN_VERSION
 
 data = {}
-jose_id = '202587271679967232'
+jose_id = jcommon.JOSE_ID
 
 LEDGER_PATH = 'jcoin/josecoin-2.journal'
 
@@ -149,3 +149,49 @@ class JoseCoin(jcommon.Extension):
 
         jcoin.data[id_from]['amount'] = new_amount
         yield from self.say("conta <@%s>: %.2f" % (id_from, jcoin.data[id_from]['amount']))
+
+    @asyncio.coroutine
+    def c_top10(self, message, args):
+        jcdata = dict(jcoin.data) # copy
+
+        range_max = 11 # default 10 users
+        if len(args) > 1:
+            range_max = int(args[1]) + 1
+
+        res = 'Top %d pessoas que tem mais JC$\n' % (range_max - 1)
+        maior = {
+            'id': 0,
+            'name': '',
+            'amount': 0.0,
+        }
+
+        if range_max >= 16:
+            yield from self.say("LimitError: valores maiores do que 16 não válidos")
+            #raise jcommon.LimitError()
+            return
+
+        order = []
+
+        for i in range(1,range_max):
+            if len(jcdata) < 1:
+                break
+
+            for accid in jcdata:
+                acc = jcdata[accid]
+                name, amount = acc['name'], acc['amount']
+                if amount > maior['amount']:
+                    maior['id'] = accid
+                    maior['name'] = name
+                    maior['amount'] = amount
+
+            del jcdata[maior['id']]
+            order.append('%d. %s -> %.2f' % (i, maior['name'], maior['amount']))
+
+            # reset to next
+            maior = {
+                'id': 0,
+                'name': '',
+                'amount': 0.0,
+            }
+
+        yield from self.say('\n'.join(order))

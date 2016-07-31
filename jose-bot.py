@@ -567,20 +567,6 @@ def nsfw_porn(message):
             return
 
 @asyncio.coroutine
-def josecoin_write(message):
-    auth = yield from check_roles(MASTER_ROLE, message.author.roles)
-    if not auth:
-        yield from jose_debug(message, "PermissionError: sem permissão para alterar dados da JC")
-
-    args = message.content.split(' ')
-
-    id_from = yield from parse_id(args[1], message)
-    new_amount = float(args[2])
-
-    jcoin.data[id_from]['amount'] = new_amount
-    yield from client.send_message(message.channel, jcoin.data[id_from]['amount'])
-
-@asyncio.coroutine
 def josecoin_send(message):
     global GAMBLING_LAST_BID
     args = message.content.split(' ')
@@ -635,72 +621,8 @@ def josecoin_dbg(message):
     yield from client.send_message(message.channel, jcoin.data)
 
 @asyncio.coroutine
-def josecoin_top10(message):
-    args = message.content.split(' ')
-    jcdata = dict(jcoin.data)
-
-    range_max = 11
-    if len(args) > 1:
-        range_max = int(args[1]) + 1
-
-    res = 'Top %d pessoas que tem mais JC$\n' % (range_max - 1)
-    maior = {
-        'id': 0,
-        'name': '',
-        'amount': 0.0,
-    }
-
-    if range_max >= 16:
-        yield from client.send_message(message.channel, "valores maiores do que 16 não válidos")
-        return
-
-    for i in range(1,range_max):
-        if len(jcdata) < 1:
-            break
-
-        for accid in jcdata:
-            acc = jcdata[accid]
-            name, amount = acc['name'], acc['amount']
-            if amount > maior['amount']:
-                maior['id'] = accid
-                maior['name'] = name
-                maior['amount'] = amount
-
-        del jcdata[maior['id']]
-        res += '%d. %s -> %.2f\n' % (i, maior['name'], maior['amount'])
-
-        # reset to next
-        maior = {
-            'id': 0,
-            'name': '',
-            'amount': 0.0,
-        }
-
-    yield from client.send_message(message.channel, res)
-
-@asyncio.coroutine
 def show_jenv(message):
     yield from client.send_message(message.channel, "`%r`" % jose_env)
-
-@asyncio.coroutine
-def change_nickname(message):
-    global JOSE_NICK
-
-    auth = yield from check_roles(MASTER_ROLE, message.author.roles)
-    if not auth:
-        yield from jose_debug(message, "PermissionError: Não pode mudar o nick do josé.")
-        return
-
-    args = message.content.split(' ')
-    if len(args) < 2:
-        JOSE_NICK = None
-    JOSE_NICK = ' '.join(args[1:])
-
-    for server in client.servers:
-        m = server.get_member(jcoin.jose_id)
-        yield from client.change_nickname(m, JOSE_NICK)
-
-    return
 
 @asyncio.coroutine
 def demon(message):

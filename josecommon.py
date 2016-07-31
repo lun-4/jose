@@ -63,6 +63,8 @@ PRICE_TABLE = {
 ascii_to_wide = dict((i, chr(i + 0xfee0)) for i in range(0x21, 0x7f))
 ascii_to_wide.update({0x20: u'\u3000', 0x2D: u'\u2212'})  # space and minus
 
+JOSE_ID = '202587271679967232'
+
 client = None
 
 def set_client(cl):
@@ -300,10 +302,7 @@ def check_roles(correct, rolelist):
 
 @asyncio.coroutine
 def random_emoji(maxn):
-    res = ''
-    for i in range(maxn):
-        res += str(emoji.random_emoji())
-    return res
+    return ''.join((str(emoji.random_emoji()) for i in range(maxn)))
 
 atividade = [
     'http://i.imgur.com/lkZVh3K.jpg',
@@ -376,13 +375,13 @@ class Extension:
         yield from self.client.send_message(self.current.channel, msg)
 
     @asyncio.coroutine
+    def debug(self, msg):
+        yield from jose_debug(self.current, msg)
+
+    @asyncio.coroutine
     def recv(self, msg):
         self.current = msg
 
     @asyncio.coroutine
     def rolecheck(self, role):
         return role in self.current.author.roles
-
-    @asyncio.coroutine
-    def debug(self, msg):
-        yield from jose_debug(self.current, msg)

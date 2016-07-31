@@ -19,18 +19,10 @@ import josecommon as jcommon
 
 jose_debug = jcommon.jose_debug
 
-class JoseBot:
+class JoseBot(jcommon.Extension):
     def __init__(self, cl):
-        self.client = cl
-        self.current = None
-
-    @asyncio.coroutine
-    def say(self, msg):
-        yield from self.client.send_message(self.current.channel, msg)
-
-    @asyncio.coroutine
-    def debug(self, msg):
-        yield from jose_debug(self.current, msg)
+        self.nick = 'jose-bot'
+        jcommon.Extension.__init__(self, cl)
 
     @asyncio.coroutine
     def sec_auth(self, f):
@@ -245,6 +237,24 @@ class JoseBot:
         escolhas = (' '.join(args[1:])).split(';')
         choice = random.choice(escolhas)
         yield from self.say("Eu escolho %s" % choice)
+
+    @asyncio.coroutine
+    def c_nick(self, message, args):
+        auth = yield from jcommon.check_roles(jcommon.MASTER_ROLE, message.author.roles)
+        if not auth:
+            yield from self.debug("PermissionError: Não pode mudar o nick do josé.")
+            return
+
+        if len(args) < 2:
+            self.nick = 'jose-bot'
+        else:
+            self.nick = ' '.join(args[1:])
+
+        for server in self.client.servers:
+            m = server.get_member(jcommon.JOSE_ID)
+            yield from self.client.change_nickname(m, self.nick)
+
+        return
 
     @asyncio.coroutine
     def c_jbot(self, message, args):
