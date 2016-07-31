@@ -21,8 +21,10 @@ class JoseNSFW(jcommon.Extension):
 
         url = ''
         if search_term == ':latest':
+            yield from self.say('dbru_api: procurando nos posts mais recentes')
             url = '%s?limit=%s' % (baseurl, PORN_LIMIT)
         else:
+            yield from self.say('dbru_api: procurando por %r' % search_term)
             url = '%s?limit=%s&tags=%s' % (baseurl, PORN_LIMIT, search_term)
 
         future_stmt = loop.run_in_executor(None, requests.get, url)
@@ -30,12 +32,6 @@ class JoseNSFW(jcommon.Extension):
 
         tree = ElementTree.fromstring(r.content)
         root = tree
-
-        if search_term == ':latest':
-            yield from self.say('dbru_api: procurando nos posts mais recentes')
-        else:
-            yield from client.send_message(message.channel, 'procurando por %r' % search_term)
-
 
         try:
             post = random.choice(root)

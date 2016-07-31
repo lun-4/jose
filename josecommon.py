@@ -14,8 +14,8 @@ import randemoji as emoji
 from random import SystemRandom
 random = SystemRandom()
 
-JOSE_VERSION = '0.8.0-alpha4'
-JOSE_BUILD = 225
+JOSE_VERSION = '0.8.0-alpha5'
+JOSE_BUILD = 230
 
 #config
 chattiness = .25
