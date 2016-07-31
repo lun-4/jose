@@ -879,7 +879,6 @@ commands_start = {
     '!elogiar': show_elogio,
     '!cantar': show_cantada,
 
-    '!yt': search_youtube,
     '!setlmsg': set_lilmsg,
     '!version': show_version,
 

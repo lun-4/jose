@@ -6,8 +6,12 @@ import time
 import os
 from random import SystemRandom
 random = SystemRandom()
+import base64
 
 import requests
+import urllib.parse
+import urllib.request
+import re
 
 sys.path.append("..")
 import josecommon as jcommon
@@ -129,6 +133,7 @@ class JoseBot:
         encdata = yield from jcommon.str_xor(to_encrypt, jcommon.JCRYPT_KEY)
         a85data = base64.a85encode(bytes(encdata, 'UTF-8'))
         yield from self.say('resultado(enc): %s' % a85data.decode('UTF-8'))
+        return
 
     @asyncio.coroutine
     def c_dec(self, message, args):
@@ -137,10 +142,37 @@ class JoseBot:
         to_decrypt = base64.a85decode(to_decrypt).decode('UTF-8')
         plaintext = yield from jcommon.str_xor(to_decrypt, jcommon.JCRYPT_KEY)
         yield from self.say("resultado(dec): %s" % plaintext)
+        return
 
     @asyncio.coroutine
     def c_money(self, message, args):
         pass
+
+    @asyncio.coroutine
+    def c_yt(self, message, args):
+        search_term = ' '.join(args[1:])
+
+        loop = asyncio.get_event_loop()
+
+        print("!yt @ %s : %s" % (message.author.id, search_term))
+
+        query_string = urllib.parse.urlencode({"search_query" : search_term})
+
+        url = "http://www.youtube.com/results?" + query_string
+        future_search = loop.run_in_executor(None, urllib.request.urlopen, url)
+        html_content = yield from future_search
+        # html_content = urllib.request.urlopen("http://www.youtube.com/results?" + query_string)
+
+        future_re = loop.run_in_executor(None, re.findall, r'href=\"\/watch\?v=(.{11})', html_content.read().decode())
+        search_results = yield from future_re
+        # search_results = re.findall(r'href=\"\/watch\?v=(.{11})', html_content.read().decode())
+
+        if len(search_results) < 2:
+            yield from client.send_message(message.channel, "!yt: Nenhum resultado encontrado.")
+            return
+
+        yield from self.say("http://www.youtube.com/watch?v=" + search_results[0])
+
 
     @asyncio.coroutine
     def c_jbot(self, message, args):

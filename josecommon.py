@@ -16,8 +16,8 @@ random = SystemRandom()
 
 import jcoin.josecoin as jcoin
 
-JOSE_VERSION = '0.7.9'
-JOSE_BUILD = 210
+JOSE_VERSION = '0.8.0-alpha1'
+JOSE_BUILD = 213
 
 #config
 chattiness = .25
@@ -292,23 +292,6 @@ def show_top(message):
     yield from client.send_message(message.channel, "BALADINHA TOPPER %s %s" % (
         (":joy:" * random.randint(1,5)),
         (":ok_hand:" * random.randint(1,6))))
-
-@asyncio.coroutine
-def search_youtube(message):
-    d = message.content.split(' ')
-    search_term = ' '.join(d[1:])
-
-    print("!yt @ %s : %s" % (message.author.id, search_term))
-
-    query_string = urllib.parse.urlencode({"search_query" : search_term})
-    html_content = urllib.request.urlopen("http://www.youtube.com/results?" + query_string)
-    search_results = re.findall(r'href=\"\/watch\?v=(.{11})', html_content.read().decode())
-
-    if len(search_results) < 2:
-        yield from client.send_message(message.channel, "!yt: Nenhum resultado encontrado.")
-        return
-
-    yield from client.send_message(message.channel, "http://www.youtube.com/watch?v=" + search_results[0])
 
 @asyncio.coroutine
 def check_roles(correct, rolelist):
