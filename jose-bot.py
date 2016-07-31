@@ -763,8 +763,6 @@ commands_start = {
     '!pisca': make_pisca,
 
     '!causar': make_causo,
-    '!fullwidth': convert_fullwidth,
-    '!playing': change_playing,
     '!uptime': show_uptime,
 
     # DEAC '!pesquisa': make_pesquisa,
@@ -777,21 +775,16 @@ commands_start = {
 
     '!josetxt': show_josetxt,
     '!learn': learn_data,
-    '!escolha': make_escolha,
 
     '!josecoin': help_josecoin,
     '!save': josecoin_save,
     '!load': josecoin_load,
     # '!jcdebug': josecoin_dbg,
     '!jcdata': josecoin_dbg,
-    '!conta': josecoin_new,
     '!enviar': josecoin_send,
     # RMV '!saldo': josecoin_saldo,
-    '!top10': josecoin_top10,
-    '!write': josecoin_write,
     '!jenv': show_jenv,
 
-    '!nick': change_nickname,
     '!ping': pong,
     '!xuxa': demon,
     'axux!': demon,
