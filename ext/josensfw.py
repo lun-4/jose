@@ -9,7 +9,14 @@ import josecommon as jcommon
 import os
 import time
 import requests
+
+from random import SystemRandom
+random = SystemRandom()
+
 from xml.etree import ElementTree
+import jcoin.josecoin as jcoin
+
+PORN_LIMIT = 14
 
 class JoseNSFW(jcommon.Extension):
     def __init__(self, cl):
@@ -42,12 +49,32 @@ class JoseNSFW(jcommon.Extension):
             return
 
     @asyncio.coroutine
-    def json_api(self, post_endpoint, search_terms):
-        pass
+    def json_api(self, baseurl, search_term, where):
+        loop = asyncio.get_event_loop()
+
+        url = ''
+        if search_term == ':latest':
+            yield from self.say('json_api: procurando nos posts mais recentes')
+            url = '%s?limit=%s' % (baseurl, PORN_LIMIT)
+        else:
+            yield from self.say('json_api: procurando por %r' % search_term)
+            url = '%s?limit=%s&tags=%s' % (baseurl, PORN_LIMIT, search_term)
+
+        future_stmt = loop.run_in_executor(None, requests.get, url)
+        r = yield from future_stmt
+        r = r.json()
+
+        try:
+            post = random.choice(r)
+            yield from self.say('%s' % post[where])
+            return
+        except Exception as e:
+            yield from self.debug("json_api: py_error: %s" % str(e))
+            return
 
     @asyncio.coroutine
     def porn_routine(self):
-        res = yield from jcoin_control(message.author.id, PORN_PRICE)
+        res = yield from jcoin.jcoin_control(self.current.author.id, jcommon.PORN_PRICE)
         if not res[0]:
             yield from client.send_message(message.channel,
                 "PermError: %s" % res[1])
@@ -56,15 +83,22 @@ class JoseNSFW(jcommon.Extension):
 
     @asyncio.coroutine
     def c_hypno(self, message, args):
-        pass
-
-    @asyncio.coroutine
-    def c_e621(self, message, args):
-        pass
+        access = yield from self.porn_routine()
+        if access:
+            # ¯\_(ツ)_/¯
+            yield from self.danbooru_api('http://hypnohub.net/post/index.xml', ' '.join(args[1:]))
 
     @asyncio.coroutine
     def c_yandere(self, message, args):
-        pass
+        access = yield from self.porn_routine()
+        if access:
+            yield from self.danbooru_api('https://yande.re/post.xml', ' '.join(args[1:]))
+
+    @asyncio.coroutine
+    def c_e621(self, message, args):
+        access = yield from self.porn_routine()
+        if access:
+            yield from self.json_api('', ' '.join(args[1:]))
 
     @asyncio.coroutine
     def c_porn(self, message, args):

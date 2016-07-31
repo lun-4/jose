@@ -381,9 +381,6 @@ def speak_routine(channel, run=False):
             res = 'Parabéns %s' % res
         yield from client.send_message(channel, res)
 
-nsfw_hypnohub = make_xmlporn('http://hypnohub.net/post/index.xml')
-nsfw_yandere = make_xmlporn('https://yande.re/post.xml')
-
 @asyncio.coroutine
 def show_josetxt(message):
     output = subprocess.Popen(['wc', '-l', 'jose-data.txt'], stdout=subprocess.PIPE).communicate()[0]
@@ -415,47 +412,6 @@ def learn_data(message):
     feedback += "%d linhas, %d palavras e %d bytes foram inseridos\n" % (line_count, word_count, byte_count)
     yield from client.send_message(message.channel, feedback)
     return
-
-@asyncio.coroutine
-def nsfw_e621(message):
-    res = yield from jcoin_control(message.author.id, PORN_PRICE)
-    if not res[0]:
-        yield from client.send_message(message.channel,
-            "PermError: %s" % res[1])
-        return
-
-    args = message.content.split(' ')
-    search_term = ' '.join(args[1:])
-
-    loop = asyncio.get_event_loop()
-
-    if search_term == ':latest' or search_term == '' or search_term == ' ':
-        yield from client.send_message(message.channel, 'getting latest post in e621')
-        url = 'http://e621.net/post/index.json?limit=%s' % PORN_LIMIT
-        future_latest = loop.run_in_executor(None, requests.get, url)
-        r = yield from future_latest
-        r = r.json()
-        try:
-            post = random.choice(r)
-            yield from client.send_message(message.channel, '%s' % post['sample_url'])
-            return
-        except Exception as e:
-            yield from jose_debug(message, "erro em !e621: %s" % str(e))
-            return
-
-    else:
-        yield from client.send_message(message.channel, 'searching for %r in e621' % search_term)
-        url = 'https://e621.net/post/index.json?limit=%s&tags=%s' % (PORN_LIMIT, search_term)
-        future_stmt = loop.run_in_executor(None, requests.get, url)
-        r = yield from future_stmt
-        r = r.json()
-        try:
-            post = random.choice(r)
-            yield from client.send_message(message.channel, '%s' % post['sample_url'])
-            return
-        except Exception as e:
-            yield from jose_debug(message, "erro no !e621: provavelmente nada foi encontrado, seu merda. (%s)" % str(e))
-            return
 
 @asyncio.coroutine
 def nsfw_porn(message):
@@ -692,10 +648,10 @@ commands_start = {
     # DEAC '!pesquisa': make_pesquisa,
     # DEAC '!voto': make_voto,
 
-    '!hypno': nsfw_hypnohub,
-    '!e621': nsfw_e621,
-    '!yandere': nsfw_yandere,
-    '!porn': nsfw_porn,
+    # DEAC '!hypno': nsfw_hypnohub,
+    # DEAC '!e621': nsfw_e621,
+    # DEAC '!yandere': nsfw_yandere,
+    # DEAC '!porn': nsfw_porn,
 
     '!josetxt': show_josetxt,
     '!learn': learn_data,
@@ -861,6 +817,7 @@ def on_message(message):
             # yield from jose.say(str(getattr(jose, method)))
             yield from jose.recv(message)
             yield from jc.recv(message)
+            yield from jn.recv(message)
             if MAINTENANCE_MODE:
                 yield from show_maintenance(message)
                 return

@@ -105,6 +105,10 @@ def save(fname):
     #ledger_data(fname.replace('db', 'journal'), '%f;SAVE;%r\n' % (time.time(), data))
     return True, "save %s" % fname
 
+@asyncio.coroutine
+def jcoin_control(userid, amount):
+    return transfer(userid, jose_id, amount, LEDGER_PATH)
+
 class JoseCoin(jcommon.Extension):
     def __init__(self, cl):
         self.client = cl
