@@ -140,6 +140,7 @@ class JoseCoin(jcommon.Extension):
 
     @asyncio.coroutine
     def c_write(self, message, args):
+        global data
         auth = yield from self.rolecheck(jcommon.MASTER_ROLE)
         if not auth:
             yield from self.debug("PermissionError: sem permissão para alterar dados da JC")
@@ -147,12 +148,12 @@ class JoseCoin(jcommon.Extension):
         id_from = yield from jcommon.parse_id(args[1], message)
         new_amount = float(args[2])
 
-        jcoin.data[id_from]['amount'] = new_amount
-        yield from self.say("conta <@%s>: %.2f" % (id_from, jcoin.data[id_from]['amount']))
+        data[id_from]['amount'] = new_amount
+        yield from self.say("conta <@%s>: %.2f" % (id_from, data[id_from]['amount']))
 
     @asyncio.coroutine
     def c_top10(self, message, args):
-        jcdata = dict(jcoin.data) # copy
+        jcdata = dict(data) # copy
 
         range_max = 11 # default 10 users
         if len(args) > 1:
