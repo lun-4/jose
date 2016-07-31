@@ -146,7 +146,27 @@ class JoseBot:
 
     @asyncio.coroutine
     def c_money(self, message, args):
-        pass
+        amount = float(args[1])
+        currency_from = args[2]
+        currency_to = args[3]
+
+        loop = asyncio.get_event_loop()
+
+        baseurl = "http://api.fixer.io/latest?base={}".format(currency_from.upper())
+        future_get = loop.run_in_executor(None, requests.get, baseurl)
+        r = yield from future_get
+        data = r.json()
+
+        if 'error' in data:
+            yield from self.debug("!money: %s" % data['error'])
+            return
+
+        rate = data['rates'][currency_to]
+        res = amount * rate
+
+        yield from self.say('{} {} = {} {}'.format(
+            amount, currency_from, res, currency_to
+        ))
 
     @asyncio.coroutine
     def c_yt(self, message, args):
@@ -161,11 +181,9 @@ class JoseBot:
         url = "http://www.youtube.com/results?" + query_string
         future_search = loop.run_in_executor(None, urllib.request.urlopen, url)
         html_content = yield from future_search
-        # html_content = urllib.request.urlopen("http://www.youtube.com/results?" + query_string)
 
         future_re = loop.run_in_executor(None, re.findall, r'href=\"\/watch\?v=(.{11})', html_content.read().decode())
         search_results = yield from future_re
-        # search_results = re.findall(r'href=\"\/watch\?v=(.{11})', html_content.read().decode())
 
         if len(search_results) < 2:
             yield from client.send_message(message.channel, "!yt: Nenhum resultado encontrado.")
