@@ -12,6 +12,7 @@ import requests
 import urllib.parse
 import urllib.request
 import re
+import json
 
 sys.path.append("..")
 import josecommon as jcommon
@@ -191,6 +192,42 @@ class JoseBot:
 
         yield from self.say("http://www.youtube.com/watch?v=" + search_results[0])
 
+    @asyncio.coroutine
+    def c_sndc(self, message, args):
+        query = ' '.join(args[1:])
+        print("soundcloud -> %s" % query)
+
+        if len(query) < 3:
+            yield from self.say("preciso de mais coisas para pesquisar(length < 3)")
+            return
+
+        search_url = 'https://api.soundcloud.com/search?q=%s&facet=model&limit=10&offset=0&linked_partitioning=1&client_id='+jconfig.soundcloud_id
+
+        loop = asyncio.get_event_loop()
+        url = search_url % query
+
+        while url:
+            future_get = loop.run_in_executor(None, requests.get, url)
+            response = yield from future_get
+
+            if response.status_code != 200:
+                yield from self.debug("!sndc: error: status code != 200")
+                return
+
+            try:
+                doc = json.loads(response.text)
+            except Exception as e:
+                yield from jose_debug(message, "!sndc: py_err %s" % str(e))
+                return
+
+            for entity in doc['collection']:
+                if entity['kind'] == 'track':
+                    yield from self.say(entity['permalink_url'])
+                    return
+
+            yield from self.say("verifique sua pesquisa, porque nenhuma track foi encontrada.")
+            return
+
 
     @asyncio.coroutine
     def c_jbot(self, message, args):
@@ -200,11 +237,14 @@ class JoseBot:
     def recv(self, message):
         self.current = message
 
-    def load_ext(self, inst):
+    def load_ext(self, inst, n):
+        print("carregando módulo: %s" % n)
         methods = (method for method in dir(inst) if callable(getattr(inst, method)))
 
         for method in methods:
             if method.startswith('c_'):
                 print("add %s" % method)
                 setattr(self, method, getattr(inst, method))
+
+        print("módulo carregado: %s" % n)
         return True

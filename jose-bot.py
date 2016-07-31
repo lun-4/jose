@@ -713,41 +713,6 @@ def rand_emoji(message):
     yield from client.send_message(message.channel, "%s" % res)
 
 @asyncio.coroutine
-def search_soundcloud(message):
-    args = message.content.split(' ')
-    query = ' '.join(args[1:])
-    print("soundcloud -> %s" % query)
-
-    if len(query) < 3:
-        yield from client.send_message(message.channel, "preciso de mais coisas para pesquisar")
-        return
-
-    search_url = 'https://api.soundcloud.com/search?q=%s&facet=model&limit=10&offset=0&linked_partitioning=1&client_id='+jconfig.soundcloud_id
-
-    url = search_url % query
-
-    while url:
-        response = requests.get(url)
-        if response.status_code != 200:
-            yield from jose_debug(message, "erro no !sndc: status code != 200")
-            return
-        try:
-            doc = json.loads(response.text)
-        except Exception as e:
-            yield from jose_debug(message, "erro no !sndc: %s" % str(e))
-            return
-
-        for entity in doc['collection']:
-            if entity['kind'] == 'track':
-                yield from client.send_message(message.channel, entity['permalink_url'])
-                return
-
-        yield from client.send_message(message.channel, "verifique sua pesquisa, porque nenhuma track foi encontrada.")
-        return
-
-        url = doc.get('next_href')
-
-@asyncio.coroutine
 def main_status(message):
     global MAINTENANCE_MODE
     auth = yield from check_roles(MASTER_ROLE, message.author.roles)
@@ -914,7 +879,6 @@ commands_start = {
     'axux!': demon,
     '!emoji': rand_emoji,
 
-    '!sndc': search_soundcloud,
     '!jasm': make_func(jasm.JASM_HELP_TEXT),
     '!construção': main_status,
 
@@ -978,9 +942,11 @@ for cmd in commands_start:
 
 jcoin.load(jconfig.jcoin_path)
 jc = jcoin.JoseCoin(client)
-jose.load_ext(jc)
+jose.load_ext(jc, 'josecoin')
 
+print("carregando jspeak")
 jspeak.buildMapping(jspeak.wordlist('jose-data.txt'), 1)
+print("jspeak carregado")
 
 @client.event
 @asyncio.coroutine
@@ -1224,5 +1190,6 @@ def on_ready():
     print('id', client.user.id)
     print('='*25)
 
+print("rodando cliente")
 client.run(jconfig.discord_token)
 print("jose: finish line")
