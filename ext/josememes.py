@@ -12,12 +12,13 @@ import io
 MEME_HELP_TEXT = '''!meme: Adicione e mostre memes com o josé!
 *alias*: !m
 
-Existem 3 modos de usar o !meme, mostrar um meme e adicionar um meme e mostrar todos os memes:
+Subcomandos:
 `!meme add <trigger> <meme>` - toda vez que alguém mandar um `!meme <trigger>`, josé falará `<meme>`
 `!meme <trigger>` - josé falará o que estiver programado para falar de acordo com `<trigger>`
 `!meme list` - mostra todos os memes que estão escritos no josé
+`!meme rm <meme>` - remove um meme
 
-Memes não podem ser removidos(*ainda*), então tenha cuidado ao adicionar qualquer coisa NSFW.
+Tenha cuidado ao adicionar coisas NSFW.
 '''
 
 class JoseMemes(jcommon.Extension):
@@ -57,8 +58,10 @@ class JoseMemes(jcommon.Extension):
             yield from self.say(MEME_HELP_TEXT)
             return
         elif args[1] == 'add':
-            meme = args[2]
-            url = args[3]
+            args_s = ' '.join(args[2:])
+            args_sp = args_s.split(';')
+            meme = args_sp[0]
+            url = args_sp[1]
 
             if meme in self.memes:
                 yield from self.say("%s: meme já existe" % meme)
@@ -68,6 +71,15 @@ class JoseMemes(jcommon.Extension):
                 yield from self.save_memes()
                 yield from self.say("%s: meme adicionado!" % meme)
             return
+        elif args[1] == 'rm':
+            meme = ' '.join(args[2:])
+            if meme in self.memes:
+                del self.memes[meme]
+                yield from self.say("%s: meme removido" % meme)
+                return
+            else:
+                yield from self.say("%s: meme não encontrado" % meme)
+                return
         elif args[1] == 'save':
             yield from self.save_memes()
             return
@@ -77,7 +89,7 @@ class JoseMemes(jcommon.Extension):
         elif args[1] == 'list':
             yield from self.say("memes: %s" % ', '.join(self.memes.keys()))
         else:
-            meme = args[1]
+            meme = ' '.join(args[1:])
             if meme in self.memes:
                 yield from self.say(self.memes[meme])
             else:
