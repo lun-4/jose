@@ -29,7 +29,7 @@ class JoseNSFW(jcommon.Extension):
 
         url = ''
         if search_term == ':latest':
-            yield from self.say('dbru_api: procurando nos posts mais recentes')
+            yield from self.say('danbooru: procurando nos posts mais recentes')
             url = '%s?limit=%s' % (baseurl, PORN_LIMIT)
         else:
             yield from self.say('dbru_api: procurando por %r' % search_term)
@@ -46,7 +46,7 @@ class JoseNSFW(jcommon.Extension):
             yield from self.say('%s' % post.attrib['file_url'])
             return
         except Exception as e:
-            yield from self.debug("dbru_api: py_error: %s" % str(e))
+            yield from self.debug("danbooru: py_error: %s" % str(e))
             return
 
     @asyncio.coroutine

@@ -12,9 +12,10 @@ import io
 MEME_HELP_TEXT = '''!meme: Adicione e mostre memes com o josé!
 *alias*: !m
 
-Existem 2 modos de usar o !meme, mostrar um meme e adicionar um meme:
+Existem 3 modos de usar o !meme, mostrar um meme e adicionar um meme e mostrar todos os memes:
 `!meme add <trigger> <meme>` - toda vez que alguém mandar um `!meme <trigger>`, josé falará `<meme>`
 `!meme <trigger>` - josé falará o que estiver programado para falar de acordo com `<trigger>`
+`!meme list` - mostra todos os memes que estão escritos no josé
 
 Memes não podem ser removidos(*ainda*), então tenha cuidado ao adicionar qualquer coisa NSFW.
 '''
@@ -73,6 +74,8 @@ class JoseMemes(jcommon.Extension):
         elif args[1] == 'load':
             yield from self.load_memes()
             return
+        elif args[1] == 'list':
+            yield from self.say("memes: %s" % ', '.join(self.memes.keys()))
         else:
             meme = args[1]
             if meme in self.memes:
