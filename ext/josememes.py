@@ -8,7 +8,16 @@ import josecommon as jcommon
 
 import pickle
 import io
-# import requests
+
+MEME_HELP_TEXT = '''!meme: Adicione e mostre memes com o josé!
+*alias*: !m
+
+Existem 2 modos de usar o !meme, mostrar um meme e adicionar um meme:
+`!meme add <trigger> <meme>` - toda vez que alguém mandar um `!meme <trigger>`, josé falará `<meme>`
+`!meme <trigger>` - josé falará o que estiver programado para falar de acordo com `<trigger>`
+
+Memes não podem ser removidos(*ainda*), então tenha cuidado ao adicionar qualquer coisa NSFW.
+'''
 
 class JoseMemes(jcommon.Extension):
     def __init__(self, cl):
@@ -18,8 +27,6 @@ class JoseMemes(jcommon.Extension):
     @asyncio.coroutine
     def ext_load(self):
         yield from self.load_memes()
-
-    # '!meme add TRIGGERED http://i.imgur.com/PijcGEU.gif'
 
     @asyncio.coroutine
     def load_memes(self):
@@ -45,8 +52,9 @@ class JoseMemes(jcommon.Extension):
 
     @asyncio.coroutine
     def c_meme(self, message, args):
-        if len(args) < 1:
-            yield from self.say("")
+        if len(args) < 2:
+            yield from self.say(MEME_HELP_TEXT)
+            return
         elif args[1] == 'add':
             meme = args[2]
             url = args[3]
@@ -58,13 +66,21 @@ class JoseMemes(jcommon.Extension):
                 self.memes[meme] = url
                 yield from self.save_memes()
                 yield from self.say("%s: meme adicionado!" % meme)
+            return
         elif args[1] == 'save':
             yield from self.save_memes()
+            return
         elif args[1] == 'load':
             yield from self.load_memes()
+            return
         else:
             meme = args[1]
             if meme in self.memes:
                 yield from self.say(self.memes[meme])
             else:
                 yield from self.say("%s: meme não encontrado" % meme)
+            return
+
+    @asyncio.coroutine
+    def c_m(self, message, args):
+        yield from self.c_meme(message, args)
