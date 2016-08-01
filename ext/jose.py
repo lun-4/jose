@@ -292,10 +292,6 @@ class JoseBot(jcommon.Extension):
         else:
             module = importlib.import_module('..%s' % n, 'ext.%s' % n)
 
-        print(module)
-        print(dir(module))
-        #ext = __import__("ext")
-        #module = getattr(ext, n)
         inst = getattr(module, n_cl)(self.client)
         methods = (method for method in dir(inst) if callable(getattr(inst, method)))
 
@@ -318,9 +314,24 @@ class JoseBot(jcommon.Extension):
 
     @asyncio.coroutine
     def c_reload(self, message, args):
+        auth = yield from self.rolecheck(jcommon.MASTER_ROLE)
+        if not auth:
+            yield from self.say("PermError: permissão negada")
+            return
+
         n = args[1]
-        yield from self.say(str(self.modules))
         if n in self.modules:
             yield from self.load_ext(n, self.modules[n]['class'])
         else:
-            yield from self.say("%s: módulo não encontrado" % n)
+            yield from self.say("%s: módulo não encontrado/carregado" % n)
+
+    @asyncio.coroutine
+    def c_modules(self, message, args):
+        mod_gen = (key for key in self.modules)
+        mod_generator = []
+        for key in mod_gen:
+            if 'modules' in self.modules[key]:
+                mod_generator.append('ext:%s' % key)
+            else:
+                mod_generator.append('gext:%s' % key)
+        yield from self.say("módulos carregados: %s" % (" ".join(mod_generator)))
