@@ -8,7 +8,9 @@ import josecommon as jcommon
 
 import os
 import time
-import requests
+# import requests
+import aiohttp
+import json
 
 from random import SystemRandom
 random = SystemRandom()
@@ -34,10 +36,10 @@ class JoseNSFW(jcommon.Extension):
             yield from self.say('dbru_api: procurando por %r' % search_term)
             url = '%s?limit=%s&tags=%s' % (baseurl, PORN_LIMIT, search_term)
 
-        future_stmt = loop.run_in_executor(None, requests.get, url)
-        r = yield from future_stmt
+        r = yield from aiohttp.request('GET', url)
+        content = yield from r.text()
 
-        tree = ElementTree.fromstring(r.content)
+        tree = ElementTree.fromstring(content)
         root = tree
 
         try:
@@ -60,9 +62,9 @@ class JoseNSFW(jcommon.Extension):
             yield from self.say('json_api: procurando por %r' % search_term)
             url = '%s?limit=%s&tags=%s' % (baseurl, PORN_LIMIT, search_term)
 
-        future_stmt = loop.run_in_executor(None, requests.get, url)
-        r = yield from future_stmt
-        r = r.json()
+        r = yield from aiohttp.request('GET', url)
+        r = yield from r.text()
+        r = json.loads(r)
 
         try:
             post = random.choice(r)

@@ -1,10 +1,5 @@
 import discord
 import asyncio
-import urllib
-import re
-import requests
-import urllib.request
-import urllib.parse
 import time
 import base64
 from xml.etree import ElementTree
@@ -14,8 +9,8 @@ import randemoji as emoji
 from random import SystemRandom
 random = SystemRandom()
 
-JOSE_VERSION = '0.8.0-beta2'
-JOSE_BUILD = 252
+JOSE_VERSION = '0.8.0-beta3'
+JOSE_BUILD = 260
 
 #config
 chattiness = .25
