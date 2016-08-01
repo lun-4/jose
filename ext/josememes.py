@@ -91,7 +91,6 @@ class JoseMemes(jcommon.Extension):
         elif args[1] == 'list':
             yield from self.say("memes: %s" % ', '.join(self.memes.keys()))
         elif args[1] == 'get':
-            yield from self.say(str(args))
             meme = ' '.join(args[2:])
             if meme in self.memes:
                 yield from self.say(self.memes[meme])

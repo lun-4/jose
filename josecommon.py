@@ -370,7 +370,7 @@ class Extension:
     def __init__(self, cl):
         self.client = cl
         self.current = None
-        self.loop = asyncio.get_event_loop()
+        self.loop = cl.loop
 
     @asyncio.coroutine
     def say(self, msg):
@@ -388,3 +388,6 @@ class Extension:
     def rolecheck(self, correct_role):
         c = [role.name == correct_role for role in self.current.author.roles]
         return True in c
+
+    def noasync(self, func, args):
+        asyncio.async(func(*args), loop=self.loop)

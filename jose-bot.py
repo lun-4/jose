@@ -20,6 +20,7 @@ import time
 import subprocess
 
 import re
+import traceback
 
 from josecommon import *
 import josespeak as jspeak
@@ -793,12 +794,16 @@ def on_message(message):
                 jose_method = getattr(jose, method)
             except AttributeError:
                 return
-            yield from jose_method(message, args)
+
+            try:
+                yield from jose_method(message, args)
+            except RuntimeError:
+                yield from jose.say('jose: py_rt_err: %s' % repr(e))
             end = time.time()
             yield from jose.say("time: real %.4fs user %.4fs" % (end-st, 0.78131+end-st))
             return
         except Exception as e:
-            yield from jose.say("jose: pyerr: %s" % e)
+            yield from jose.say("jose: pyerr: ```%s```" % traceback.format_exc())
             # return
 
     if message.content in exact_commands:

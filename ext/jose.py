@@ -369,3 +369,26 @@ class JoseBot(jcommon.Extension):
             else:
                 mod_generator.append('gext:%s' % key)
         yield from self.say("módulos carregados: %s" % (" ".join(mod_generator)))
+
+    # !eval `yield from self.say("hello")`
+    # !eval `self.loop.run_until_complete(self.say("Hello"))`
+    # !eval `self.loop.run_until_complete(self.reboot())`
+    # !eval `self.says(str(self.modules))`
+    # !eval `self.loop.run_until_complete(self.say(discord.__version__))`
+    @asyncio.coroutine
+    def c_eval(self, message, args):
+        # eval expr
+        auth = self.rolecheck(jcommon.MASTER_ROLE)
+        if not auth:
+            yield from self.say("PermissionError: permissão negada")
+            return
+
+        eval_cmd = ' '.join(args[1:])
+        if eval_cmd[0] == '`' and eval_cmd[-1] == '`':
+            eval_cmd = eval_cmd[1:-1]
+        res = eval(eval_cmd)
+        yield from self.say("```%s``` -> `%s`" % (eval_cmd, res))
+
+    def says(self, msg):
+        # calls self.say but in an non-async way
+        asyncio.async(self.say(msg), loop=self.loop)
