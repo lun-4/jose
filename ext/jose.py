@@ -294,6 +294,10 @@ class JoseBot(jcommon.Extension):
             module = importlib.import_module('ext.%s' % n)
 
         inst = getattr(module, n_cl)(self.client)
+        try:
+            yield from inst.ext_load()
+        except:
+            print("%s doesn't have any ext_load method" % module)
         methods = (method for method in dir(inst) if callable(getattr(inst, method)))
 
         self.modules[n] = {'inst': inst, 'methods': [], 'class': n_cl, 'module': module}

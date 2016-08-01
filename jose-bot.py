@@ -748,9 +748,6 @@ def on_message(message):
     if message.author == client.user:
         return
 
-    # signal JoseMusic about the message etc
-    yield from jmusic.jm.recv(message)
-
     # log stuff
     bnr = '%s(%r) : %s : %r' % (message.channel, message.channel.is_private, message.author, message.content)
     print(bnr)

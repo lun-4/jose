@@ -105,3 +105,4 @@ jcoin/*.journal
 joseconfig.py
 
 *.profile
+ext/josememes.db
