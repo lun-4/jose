@@ -389,7 +389,7 @@ class Extension:
         c = [role.name == correct_role for role in self.current.author.roles]
         if not (True in c):
             raise je.PermissionError()
-        else
+        else:
             return True
 
     def noasync(self, func, args):
