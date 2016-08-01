@@ -5,7 +5,10 @@ import cProfile
 if not discord.opus.is_loaded():
     discord.opus.load_opus('opus')
 
-# import ext.josemusic as jmusic
+# setup logging
+import logging
+logging.basicConfig(level=logging.INFO)
+
 import ext.jose as jose_bot
 import ext.joseassembly as jasm
 

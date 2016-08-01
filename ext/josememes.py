@@ -13,7 +13,7 @@ MEME_HELP_TEXT = '''!meme: Adicione e mostre memes com o josé!
 *alias*: !m
 
 Subcomandos:
-`!meme add <trigger>;<meme>` - toda vez que alguém mandar um `!meme <trigger>`, josé falará `<meme>`
+`!meme add <trigger>;<meme>` - toda vez que alguém mandar um `!meme get <trigger>`, josé falará `<meme>`
 `!meme get <trigger>` - josé falará o que estiver programado para falar de acordo com `<trigger>`
 `!meme list` - mostra todos os memes que estão escritos no josé
 `!meme rm <meme>` - remove um meme
