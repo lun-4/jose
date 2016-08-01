@@ -730,7 +730,7 @@ def on_message(message):
             yield from client.send_message(message.channel, "<@%s> : cooldown destruído" % user_id)
 
     if message.author.id in jcoin.data:
-        if message.author.nick != None:
+        if hasattr(message.author, 'nick'):
             jcoin.data[message.author.id]['name'] = message.author.nick
         else:
             try:
