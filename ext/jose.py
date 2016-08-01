@@ -290,7 +290,8 @@ class JoseBot(jcommon.Extension):
         if n in self.modules: #already loaded
             module = importlib.reload(self.modules[n]['module'])
         else:
-            module = importlib.import_module('..%s' % n, 'ext.%s' % n)
+            # module = importlib.import_module('..%s' % n, 'ext.%s' % n)
+            module = importlib.import_module('ext.%s' % n)
 
         inst = getattr(module, n_cl)(self.client)
         methods = (method for method in dir(inst) if callable(getattr(inst, method)))

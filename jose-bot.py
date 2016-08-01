@@ -5,10 +5,9 @@ import cProfile
 if not discord.opus.is_loaded():
     discord.opus.load_opus('opus')
 
-import ext.josemusic as jmusic
+# import ext.josemusic as jmusic
 import ext.jose as jose_bot
 import ext.joseassembly as jasm
-import ext.josensfw as jnsfw
 
 from random import SystemRandom
 random = SystemRandom()
@@ -686,8 +685,8 @@ commands_match = {
 counter = 0
 
 jose = jose_bot.JoseBot(client)
-commands_start.update(jmusic.cmds_start)
-jmusic.jm.client = client
+#commands_start.update(jmusic.cmds_start)
+#jmusic.jm.client = client
 
 def from_dict(f):
     def a(m, args):
@@ -711,6 +710,8 @@ def load_module(n, n_cl):
     loop.run_until_complete(jose.load_ext(n, n_cl))
 
 load_module('josensfw', 'JoseNSFW')
+load_module('josememes', 'JoseMemes')
+load_module('josemusic', 'JoseMusic')
 
 print("carregando jspeak")
 jspeak.buildMapping(jspeak.wordlist('jose-data.txt'), 1)
