@@ -330,7 +330,7 @@ class JoseBot(jcommon.Extension):
         mod_gen = (key for key in self.modules)
         mod_generator = []
         for key in mod_gen:
-            if 'modules' in self.modules[key]:
+            if 'module' in self.modules[key]:
                 mod_generator.append('ext:%s' % key)
             else:
                 mod_generator.append('gext:%s' % key)
