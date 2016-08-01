@@ -7,6 +7,7 @@ import os
 from random import SystemRandom
 random = SystemRandom()
 import base64
+import subprocess
 
 import aiohttp
 import urllib.parse
@@ -257,6 +258,26 @@ class JoseBot(jcommon.Extension):
             yield from self.client.change_nickname(m, self.nick)
 
         return
+
+    @asyncio.coroutine
+    def c_distatus(self, m, a):
+        import subprocess
+
+        host = "discordapp.com"
+
+        ping = subprocess.Popen(
+            ["ping", "-c", "4", host],
+            stdout = subprocess.PIPE,
+            stderr = subprocess.PIPE
+        )
+
+        out, error = ping.communicate()
+        matcher = re.compile("rtt min/avg/max/mdev = (\d+.\d+)/(\d+.\d+)/(\d+.\d+)/(\d+.\d+)")
+        rtt = matcher.search(out.decode('utf-8')).groups()
+
+        fmt = 'ping to `%s` min %sms avg %sms max %sms mdev %sms'
+
+        yield from self.say(fmt % (host, rtt[0], rtt[1], rtt[2], rtt[3]))
 
     @asyncio.coroutine
     def c_jbot(self, message, args):

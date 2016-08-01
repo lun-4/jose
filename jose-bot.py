@@ -83,18 +83,6 @@ def show_aerotrem(message):
     yield from client.send_message(ch, aviao)
 
 @asyncio.coroutine
-def set_lilmsg(message):
-    global lil_message
-    d = message.content.split(' ')
-    lil_message = ' '.join(d[1:])
-
-    yield from client.send_message(message.channel, "lilmessage foi alterada para {}".format(lil_message))
-
-@asyncio.coroutine
-def show_lilmsg(message):
-    yield from client.send_message(message.channel, "lilmessage: {}".format(lil_message))
-
-@asyncio.coroutine
 def show_debug(message):
     res = ''
     for (index, debug_msg) in enumerate(debug_logs):
@@ -227,7 +215,17 @@ def jcoin_control(id_user, amnt):
 def show_uptime(message):
     global start_time
     sec = (time.time() - start_time)
-    yield from jose_debug(message, "uptime: %.2fmin" % (sec/60.0))
+    MINUTE  = 60
+    HOUR    = MINUTE * 60
+    DAY     = HOUR * 24
+
+    days    = int( sec / DAY )
+    hours   = int( ( sec % DAY ) / HOUR )
+    minutes = int( ( sec % HOUR ) / MINUTE )
+    seconds = int( sec % MINUTE )
+
+    fmt = "jose: uptime: %d dias, %d horas, %d minutos, %d segundos"
+    yield from jose_debug(message, fmt % (days, hours, minutes, seconds))
 
 @asyncio.coroutine
 def make_pesquisa(message):
