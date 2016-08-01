@@ -789,7 +789,11 @@ def on_message(message):
                 return
 
             # call c_ bullshit
-            yield from getattr(jose, method)(message, args)
+            try:
+                jose_method = getattr(jose, method)
+            except AttributeError:
+                return
+            yield from jose_method(message, args)
             end = time.time()
             yield from jose.say("time: real %.4fs user %.4fs" % (end-st, 0.78131+end-st))
             return

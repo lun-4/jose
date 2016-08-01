@@ -261,7 +261,10 @@ class JoseBot(jcommon.Extension):
 
     @asyncio.coroutine
     def c_distatus(self, m, a):
-        import subprocess
+        auth = yield from self.rolecheck(jcommon.MASTER_ROLE)
+        if not auth:
+            yield from self.say("PermissionError: permissão negada")
+            return
 
         host = "discordapp.com"
 
@@ -275,9 +278,16 @@ class JoseBot(jcommon.Extension):
         matcher = re.compile("rtt min/avg/max/mdev = (\d+.\d+)/(\d+.\d+)/(\d+.\d+)/(\d+.\d+)")
         rtt = matcher.search(out.decode('utf-8')).groups()
 
-        fmt = 'ping to `%s` min %sms avg %sms max %sms mdev %sms'
+        fmt = 'ping to `%s` min %sms avg %sms max %sms mdev %sms\n%s'
+        looks_like = ''
+        if float(rtt[1]) > 100:
+            looks_like = 'Parece que algo tá rodando ruim nos servidores, cheque http://status.discordapp.com'
+        elif float(rtt[2]) > 150:
+            looks_like = 'Alguma coisa deve ter ocorrido no meio dos pings, tente denovo'
+        else:
+            looks_like = 'Tudo bem... eu acho'
 
-        yield from self.say(fmt % (host, rtt[0], rtt[1], rtt[2], rtt[3]))
+        yield from self.say(fmt % (host, rtt[0], rtt[1], rtt[2], rtt[3], looks_like))
 
     @asyncio.coroutine
     def c_jbot(self, message, args):

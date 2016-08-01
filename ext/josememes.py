@@ -14,7 +14,7 @@ MEME_HELP_TEXT = '''!meme: Adicione e mostre memes com o josé!
 
 Subcomandos:
 `!meme add <trigger>;<meme>` - toda vez que alguém mandar um `!meme <trigger>`, josé falará `<meme>`
-`!meme <trigger>` - josé falará o que estiver programado para falar de acordo com `<trigger>`
+`!meme get <trigger>` - josé falará o que estiver programado para falar de acordo com `<trigger>`
 `!meme list` - mostra todos os memes que estão escritos no josé
 `!meme rm <meme>` - remove um meme
 
@@ -90,12 +90,16 @@ class JoseMemes(jcommon.Extension):
             return
         elif args[1] == 'list':
             yield from self.say("memes: %s" % ', '.join(self.memes.keys()))
-        else:
-            meme = ' '.join(args[1:])
+        elif args[1] == 'get':
+            yield from self.say(str(args))
+            meme = ' '.join(args[2:])
             if meme in self.memes:
                 yield from self.say(self.memes[meme])
             else:
                 yield from self.say("%s: meme não encontrado" % meme)
+            return
+        else:
+            yield from self.say("comando inválido: %s" % args[1])
             return
 
     @asyncio.coroutine
@@ -105,7 +109,7 @@ class JoseMemes(jcommon.Extension):
     @asyncio.coroutine
     def c_fullwidth(self, message, args):
         # discord by some stuff removed fullwidth char support
-        # dang.
+        # dayum.
         text = ' '.join(args[1:])
         yield from self.say(text.translate(self.WIDE_MAP))
 
