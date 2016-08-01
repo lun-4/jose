@@ -703,9 +703,21 @@ jc = jcoin.JoseCoin(client)
 josecoin_save = jc.josecoin_save
 josecoin_load = jc.josecoin_load
 
-jn = jnsfw.JoseNSFW(client)
-jose.load_ext(jc, 'josecoin')
-jose.load_ext(jn, 'jose-nsfw')
+# jn = jnsfw.JoseNSFW(client)
+jose.load_gext(jc, 'josecoin')
+# jose.load_ext(jn, 'jose-nsfw')
+
+def load_module(n, n_cl):
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(jose.load_ext(n, n_cl))
+
+load_module('josensfw', 'JoseNSFW')
+
+'''
+yield from jose.recv(message)
+yield from jc.recv(message)
+yield from jn.recv(message)
+'''
 
 print("carregando jspeak")
 jspeak.buildMapping(jspeak.wordlist('jose-data.txt'), 1)
@@ -782,15 +794,23 @@ def on_message(message):
             method = "c_%s" % command
             # yield from jose.say("comando: %s" % method)
             # yield from jose.say(str(getattr(jose, method)))
-            yield from jose.recv(message)
-            yield from jc.recv(message)
-            yield from jn.recv(message)
+            print(jose.modules)
+            yield from jose.recv(message) # default
+            for mod in jose.modules:
+                print(mod)
+                mod_obj = jose.modules[mod]
+                print(mod_obj)
+                print(mod_obj['class'])
+                yield from mod_obj['inst'].recv(message)
+
             if MAINTENANCE_MODE:
                 yield from show_maintenance(message)
                 return
+
+            # call c_ bullshit
             yield from getattr(jose, method)(message, args)
             end = time.time()
-            yield from jose.say("time: real %.4fs user %.4fs" % (end-st, 1.5+end-st))
+            yield from jose.say("time: real %.4fs user %.4fs" % (end-st, 0.78131+end-st))
             return
         except Exception as e:
             yield from jose.say("jose: pyerr: %s" % e)

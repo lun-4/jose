@@ -13,6 +13,7 @@ import urllib.parse
 import urllib.request
 import re
 import json
+import importlib
 
 sys.path.append("..")
 import josecommon as jcommon
@@ -23,6 +24,7 @@ jose_debug = jcommon.jose_debug
 class JoseBot(jcommon.Extension):
     def __init__(self, cl):
         self.nick = 'jose-bot'
+        self.modules = {}
         jcommon.Extension.__init__(self, cl)
 
     @asyncio.coroutine
@@ -265,14 +267,60 @@ class JoseBot(jcommon.Extension):
     def recv(self, message):
         self.current = message
 
-    def load_ext(self, inst, n):
+    def load_gext(self, inst, n):
         print("carregando módulo: %s" % n)
         methods = (method for method in dir(inst) if callable(getattr(inst, method)))
+
+        self.modules[n] = {'inst': inst, 'methods': [], 'class': ''}
 
         for method in methods:
             if method.startswith('c_'):
                 print("add %s" % method)
                 setattr(self, method, getattr(inst, method))
+                self.modules[n]['methods'].append(method)
 
         print("módulo carregado: %s" % n)
         return True
+
+    @asyncio.coroutine
+    def load_ext(self, n, n_cl):
+        loaded_success = False
+
+        module = None
+        if n in self.modules: #already loaded
+            module = importlib.reload(self.modules[n]['module'])
+        else:
+            module = importlib.import_module('..%s' % n, 'ext.%s' % n)
+
+        print(module)
+        print(dir(module))
+        #ext = __import__("ext")
+        #module = getattr(ext, n)
+        inst = getattr(module, n_cl)(self.client)
+        methods = (method for method in dir(inst) if callable(getattr(inst, method)))
+
+        self.modules[n] = {'inst': inst, 'methods': [], 'class': n_cl, 'module': module}
+
+        for method in methods:
+            if method.startswith('c_'):
+                print("add %s" % method)
+                setattr(self, method, getattr(inst, method))
+                self.modules[n]['methods'].append(method)
+                loaded_success = True
+
+        if self.current is not None:
+            if loaded_success:
+                yield from self.say(":ok_hand:")
+            else:
+                yield from self.say(":poop:")
+        else:
+            print("load_ext: carregado %s" % n)
+
+    @asyncio.coroutine
+    def c_reload(self, message, args):
+        n = args[1]
+        yield from self.say(str(self.modules))
+        if n in self.modules:
+            yield from self.load_ext(n, self.modules[n]['class'])
+        else:
+            yield from self.say("%s: módulo não encontrado" % n)
