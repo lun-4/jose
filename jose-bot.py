@@ -13,16 +13,12 @@ from random import SystemRandom
 random = SystemRandom()
 
 import asyncio
-import requests
 import sys
 import os
 import ast
 import time
 import subprocess
-import json
 
-import urllib.request
-import urllib.parse
 import re
 
 from josecommon import *

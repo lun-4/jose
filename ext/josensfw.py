@@ -8,7 +8,6 @@ import josecommon as jcommon
 
 import os
 import time
-# import requests
 import aiohttp
 import json
 

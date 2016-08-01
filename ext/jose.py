@@ -8,7 +8,7 @@ from random import SystemRandom
 random = SystemRandom()
 import base64
 
-import requests
+import aiohttp
 import urllib.parse
 import urllib.request
 import re
@@ -17,6 +17,7 @@ import importlib
 
 sys.path.append("..")
 import josecommon as jcommon
+import joseconfig as jconfig
 import jcoin.josecoin as jcoin
 
 jose_debug = jcommon.jose_debug
@@ -79,10 +80,10 @@ class JoseBot(jcommon.Extension):
         loop = asyncio.get_event_loop()
 
         url = "http://xkcd.com/info.0.json"
-        future_stmt = loop.run_in_executor(None, requests.get, url)
-        r = yield from future_stmt
+        r = yield from aiohttp.request('GET', url)
+        content = yield from r.text()
 
-        info_latest = info = r.json()
+        info_latest = info = json.loads(content)
         info = None
         try:
             if not n:
@@ -92,14 +93,15 @@ class JoseBot(jcommon.Extension):
                 rn_xkcd = random.randint(0, info_latest['num'])
 
                 url = "http://xkcd.com/{0}/info.0.json".format(rn_xkcd)
-                future_stmt = loop.run_in_executor(None, requests.get, url)
-                r = yield from future_stmt
-                info = r.json()
+                r = yield from aiohttp.request('GET', url)
+                content = yield from r.text()
+
+                info = json.loads(content)
             else:
                 url = "http://xkcd.com/{0}/info.0.json".format(n)
-                future_stmt = loop.run_in_executor(None, requests.get, url)
-                r = yield from future_stmt
-                info = r.json()
+                r = yield from aiohttp.request('GET', url)
+                content = yield from r.text()
+                info = json.loads(content)
             yield from self.say('xkcd número %s : %s' % (n, info['img']))
 
         except Exception as e:
@@ -149,9 +151,9 @@ class JoseBot(jcommon.Extension):
         loop = asyncio.get_event_loop()
 
         baseurl = "http://api.fixer.io/latest?base={}".format(currency_from.upper())
-        future_get = loop.run_in_executor(None, requests.get, baseurl)
-        r = yield from future_get
-        data = r.json()
+        r = yield from aiohttp.request('GET', url)
+        content = yield from r.text()
+        data = json.loads(content)
 
         if 'error' in data:
             yield from self.debug("!money: %s" % data['error'])
@@ -197,20 +199,17 @@ class JoseBot(jcommon.Extension):
             return
 
         search_url = 'https://api.soundcloud.com/search?q=%s&facet=model&limit=10&offset=0&linked_partitioning=1&client_id='+jconfig.soundcloud_id
-
-        loop = asyncio.get_event_loop()
-        url = search_url % query
+        url = search_url % urllib.parse.quote(query)
 
         while url:
-            future_get = loop.run_in_executor(None, requests.get, url)
-            response = yield from future_get
+            response = yield from aiohttp.request('GET', url)
 
-            if response.status_code != 200:
-                yield from self.debug("!sndc: error: status code != 200")
+            if response.status != 200:
+                yield from self.debug("!sndc: error: status code != 200(st = %d)" % response.status)
                 return
 
             try:
-                doc = json.loads(response.text)
+                doc = yield from response.json()
             except Exception as e:
                 yield from jose_debug(message, "!sndc: py_err %s" % str(e))
                 return
@@ -290,7 +289,6 @@ class JoseBot(jcommon.Extension):
         if n in self.modules: #already loaded
             module = importlib.reload(self.modules[n]['module'])
         else:
-            # module = importlib.import_module('..%s' % n, 'ext.%s' % n)
             module = importlib.import_module('ext.%s' % n)
 
         inst = getattr(module, n_cl)(self.client)

@@ -9,8 +9,8 @@ import randemoji as emoji
 from random import SystemRandom
 random = SystemRandom()
 
-JOSE_VERSION = '0.8.0-beta3'
-JOSE_BUILD = 260
+JOSE_VERSION = '0.8.0-beta4'
+JOSE_BUILD = 270
 
 #config
 chattiness = .25
@@ -370,6 +370,7 @@ class Extension:
     def __init__(self, cl):
         self.client = cl
         self.current = None
+        self.loop = asyncio.get_event_loop()
 
     @asyncio.coroutine
     def say(self, msg):
