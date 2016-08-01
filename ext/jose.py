@@ -152,7 +152,7 @@ class JoseBot(jcommon.Extension):
 
         loop = asyncio.get_event_loop()
 
-        baseurl = "http://api.fixer.io/latest?base={}".format(currency_from.upper())
+        url = "http://api.fixer.io/latest?base={}".format(currency_from.upper())
         r = yield from aiohttp.request('GET', url)
         content = yield from r.text()
         data = json.loads(content)

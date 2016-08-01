@@ -9,8 +9,10 @@ import randemoji as emoji
 from random import SystemRandom
 random = SystemRandom()
 
+import joseerror as je
+
 JOSE_VERSION = '0.8.0-beta5'
-JOSE_BUILD = 286
+JOSE_BUILD = 289
 
 #config
 chattiness = .25

@@ -12,6 +12,8 @@ import os
 import time
 import aiohttp
 import json
+import urllib.parse
+import traceback
 
 from random import SystemRandom
 random = SystemRandom()
@@ -107,3 +109,18 @@ class JoseNSFW(jcommon.Extension):
         access = yield from self.porn_routine()
         if access:
             yield from self.json_api('http://api.porn.com/videos/find.json', ' '.join(args[1:]), 'url')
+
+    @asyncio.coroutine
+    def c_urban(self, message, args):
+        term = ' '.join(args[1:])
+
+        url = 'http://api.urbandictionary.com/v0/define?term=%s' % urllib.parse.quote(term)
+        resp = yield from aiohttp.request('GET', url)
+        content = yield from resp.text()
+        r = json.loads(content)
+
+        try:
+            yield from self.say(r['list'][0]['definition'])
+        except Exception as e:
+            yield from self.debug('```%s```'%traceback.format_exc())
+        return
