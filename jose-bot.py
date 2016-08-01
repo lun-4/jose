@@ -785,13 +785,9 @@ def on_message(message):
             method = "c_%s" % command
             # yield from jose.say("comando: %s" % method)
             # yield from jose.say(str(getattr(jose, method)))
-            print(jose.modules)
             yield from jose.recv(message) # default
             for mod in jose.modules:
-                print(mod)
                 mod_obj = jose.modules[mod]
-                print(mod_obj)
-                print(mod_obj['class'])
                 yield from mod_obj['inst'].recv(message)
 
             if MAINTENANCE_MODE:

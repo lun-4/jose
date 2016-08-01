@@ -15,7 +15,7 @@ from random import SystemRandom
 random = SystemRandom()
 
 JOSE_VERSION = '0.8.0-beta2'
-JOSE_BUILD = 251
+JOSE_BUILD = 252
 
 #config
 chattiness = .25
