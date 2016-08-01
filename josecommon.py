@@ -10,7 +10,7 @@ from random import SystemRandom
 random = SystemRandom()
 
 JOSE_VERSION = '0.8.0-beta5'
-JOSE_BUILD = 283
+JOSE_BUILD = 285
 
 #config
 chattiness = .25
@@ -387,7 +387,10 @@ class Extension:
     @asyncio.coroutine
     def rolecheck(self, correct_role):
         c = [role.name == correct_role for role in self.current.author.roles]
-        return True in c
+        if not (True in c):
+            raise je.PermissionError()
+        else
+            return True
 
     def noasync(self, func, args):
         asyncio.async(func(*args), loop=self.loop)

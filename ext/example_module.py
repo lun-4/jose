@@ -5,6 +5,7 @@ import asyncio
 import sys
 sys.path.append("..")
 import josecommon as jcommon
+import joseerror as je
 
 class JoseExtension(jcommon.Extension):
     def __init__(self, cl):

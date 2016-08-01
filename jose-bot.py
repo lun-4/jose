@@ -29,6 +29,7 @@ from josecommon import *
 import josespeak as jspeak
 import jcoin.josecoin as jcoin
 import joseconfig as jconfig
+import joseerror as je
 
 start_time = time.time()
 
@@ -800,6 +801,8 @@ def on_message(message):
 
             try:
                 yield from jose_method(message, args)
+            except je.PermissionError:
+                yield from jose.say("permissão ¯\_(ツ)_/¯ 💠 ¯\_(ツ)_/¯ negada")
             except RuntimeError:
                 yield from jose.say('jose: py_rt_err: %s' % repr(e))
             end = time.time()

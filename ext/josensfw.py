@@ -5,6 +5,8 @@ import asyncio
 import sys
 sys.path.append("..")
 import josecommon as jcommon
+import jcoin.josecoin as jcoin
+import joseerror as je
 
 import os
 import time
@@ -15,7 +17,6 @@ from random import SystemRandom
 random = SystemRandom()
 
 from xml.etree import ElementTree
-import jcoin.josecoin as jcoin
 
 PORN_LIMIT = 14
 

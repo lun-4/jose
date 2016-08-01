@@ -18,6 +18,7 @@ import importlib
 
 sys.path.append("..")
 import josecommon as jcommon
+import joseerror as je
 import joseconfig as jconfig
 import jcoin.josecoin as jcoin
 
@@ -378,10 +379,7 @@ class JoseBot(jcommon.Extension):
     @asyncio.coroutine
     def c_eval(self, message, args):
         # eval expr
-        auth = self.rolecheck(jcommon.MASTER_ROLE)
-        if not auth:
-            yield from self.say("PermissionError: permissão negada")
-            return
+        yield from self.rolecheck(jcommon.MASTER_ROLE)
 
         eval_cmd = ' '.join(args[1:])
         if eval_cmd[0] == '`' and eval_cmd[-1] == '`':
