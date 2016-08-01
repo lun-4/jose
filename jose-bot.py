@@ -806,7 +806,10 @@ def on_message(message):
             except RuntimeError:
                 yield from jose.say('jose: py_rt_err: %s' % repr(e))
             end = time.time()
-            yield from jose.say("time: real %.4fs user %.4fs" % (end-st, 0.78131+end-st))
+            delta = end-st
+            if delta > 10:
+                yield from jose.say("merda, a API tá demorando demais pra fazer as coisas, socorram-me")
+            yield from jose.say("time: real %.4fs user %.4fs" % (delta, delta+(delta/4)))
             return
         except Exception as e:
             yield from jose.say("jose: pyerr: ```%s```" % traceback.format_exc())

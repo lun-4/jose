@@ -270,7 +270,7 @@ class JoseBot(jcommon.Extension):
         host = "discordapp.com"
 
         ping = subprocess.Popen(
-            ["ping", "-c", "4", host],
+            ["ping", "-c", "6", host],
             stdout = subprocess.PIPE,
             stderr = subprocess.PIPE
         )
