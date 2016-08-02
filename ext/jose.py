@@ -386,7 +386,7 @@ class JoseBot(jcommon.Extension):
         seconds = int(sec % MINUTE)
 
         fmt = "uptime: %d dias, %d horas, %d minutos, %d segundos"
-        await jose.debug(fmt % (days, hours, minutes, seconds))
+        await self.debug(fmt % (days, hours, minutes, seconds))
 
     async def c_jbot(self, message, args):
         await self.say("Olá do módulo jose.py")
