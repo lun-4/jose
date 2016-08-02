@@ -276,6 +276,12 @@ class JoseBot(jcommon.Extension):
         await self.say("José v%s b%d py:%s discord.py:%s" % (jcommon.JOSE_VERSION,
             jcommon.JOSE_BUILD, pyver, discord.__version__))
 
+    async def c_jose_add(self, message, args):
+        await self.say("José pode ser adicionado para outro servidor usando este link:\n```%s```" % jcommon.OAUTH_URL)
+
+    async def c_fale(self, message, args):
+        await speak_routine(message, True)
+
     async def c_jbot(self, message, args):
         await self.say("Olá do módulo jose.py")
 

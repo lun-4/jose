@@ -11,6 +11,8 @@ class JoseExtension(jcommon.Extension):
     def __init__(self, cl):
         jcommon.Extension.__init__(self, cl)
 
-    @asyncio.coroutine
-    def c_command(self, message, args):
+    async def ext_load(self):
+        pass
+
+    async def c_command(self, message, args):
         pass

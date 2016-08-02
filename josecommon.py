@@ -12,13 +12,17 @@ random = SystemRandom()
 import joseerror as je
 
 JOSE_VERSION = '0.8.0'
-JOSE_BUILD = 290
+JOSE_BUILD = 292
 
-#config
+APP_CLIENT_ID = 'ID DO JOSE AQUI'
+OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=103988231' % APP_CLIENT_ID
+
+#configuration things
 chattiness = .25
 MASTER_ROLE = 'mestra'
 LEARN_ROLE = 'cult'
 JOSE_ANIMATION_LIMIT = 1 # 2 animações simultaneamente
+ADMIN_IDS = ['162819866682851329']
 
 #just for 0.6.6.6 and 6.6.6
 DEMON_MODE = False
@@ -89,6 +93,8 @@ $guess - jogo de adivinhar o numero aleatório
 !learn <texto> - josé aprende textos!
 !ping - pong
 !sndc termos - pesquisa no SoundCloud
+!meme - meme!
+!fale - forçar o josé a falar alguma coisa
 '''
 
 JOSE_TECH_HTEXT = '''Comandos relacionados a coisas *TECNOLÓGICAS*
@@ -208,7 +214,6 @@ def jose_debug(message, dbg_msg, flag=True):
     yield from debug_log('%s : %s' % (time.strftime("%d-%m-%Y %H:%M:%S"), dbg_msg))
     if flag:
         yield from client.send_message(message.channel, "jdebug: {}".format(dbg_msg))
-
 
 cantadas = [
     'ô lá em casa',
@@ -396,3 +401,6 @@ class Extension:
 
     def noasync(self, func, args):
         asyncio.async(func(*args), loop=self.loop)
+
+    def is_owner(self):
+        return self.current.id in ADMIN_IDS

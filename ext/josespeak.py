@@ -1,47 +1,32 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
+
+import discord
+import asyncio
+import sys
+sys.path.append("..")
+import josecommon as jcommon
+import joseerror as je
 
 import re
 import random
 import sys
 
-# These mappings can get fairly large -- they're stored globally to
-# save copying time.
-
-# (tuple of words) -> {dict: word -> number of times the word appears following the tuple}
-# Example entry:
-#    ('eyes', 'turned') => {'to': 2.0, 'from': 1.0}
-# Used briefly while first constructing the normalized mapping
 tempMapping = {}
-
-# (tuple of words) -> {dict: word -> *normalized* number of times the word appears following the tuple}
-# Example entry:
-#    ('eyes', 'turned') => {'to': 0.66666666, 'from': 0.33333333}
 mapping = {}
-
-# Contains the set of words that can start sentences
 starts = []
 
-# We want to be able to compare words independent of their capitalization.
 def fixCaps(word):
-    # Ex: "FOO" -> "foo"
-    if word.isupper() and word != "I":
+    if word.isupper() and (word != "I" or word != "Eu"):
         word = word.lower()
-        # Ex: "LaTeX" => "Latex"
     elif word [0].isupper():
         word = word.lower().capitalize()
-        # Ex: "wOOt" -> "woot"
     else:
         word = word.lower()
     return word
 
-# Tuples can be hashed; lists can't.  We need hashable values for dict keys.
-# This looks like a hack (and it is, a little) but in practice it doesn't
-# affect processing time too negatively.
 def toHashKey(lst):
     return tuple(lst)
 
-# Returns the contents of the file, split into a list of words and
-# (some) punctuation.
 def wordlist(filename):
     f = open(filename, 'r')
     wordlist = [fixCaps(w) for w in re.findall(r"[\w']+|[.,!?;]", f.read())]
@@ -103,7 +88,7 @@ def next(prevList):
             retval = k
     return retval
 
-def genSentence(markovLength, word_limit):
+async def genSentence(markovLength, word_limit):
     # Start with a random "starting word"
     curr = random.choice(starts)
     sent = curr.capitalize()
@@ -124,15 +109,21 @@ def genSentence(markovLength, word_limit):
         word_count += 1
     return sent
 
-def main():
-    if len(sys.argv) < 2:
-        sys.stderr.write('Usage: ' + sys.argv [0] + ' text_source [chain_length=1]\n')
-        sys.exit(1)
+class JoseSpeak(jcommon.Extension):
+    def __init__(self, cl):
+        jcommon.Extension.__init__(self, cl)
 
-    filename = sys.argv[1]
-    markovLength = 1
-    if len (sys.argv) == 3:
-        markovLength = int(sys.argv [2])
+    async def ext_load(self):
+        buildMapping(wordlist('jose-data.txt'), 1)
 
-    buildMapping(wordlist(filename), markovLength)
-    print(genSentence(markovLength))
+    async def speak_routine(self, ch, run=False):
+        if (random.random() < jcommon.chattiness) or run:
+            res = await genSentence(1, 100)
+            if jcommon.DEMON_MODE:
+                res = res[::-1]
+            elif jcommon.PARABENS_MODE:
+                res = 'Parabéns %s' % res
+            await self.say(res)
+
+    async def c_falar(self, message, args):
+        await self.speak_routine(message.channel, True)

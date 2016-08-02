@@ -26,7 +26,7 @@ import re
 import traceback
 
 from josecommon import *
-import josespeak as jspeak
+#import josespeak as jspeak
 import jcoin.josecoin as jcoin
 import joseconfig as jconfig
 import joseerror as je
@@ -370,16 +370,6 @@ def add_sentence(content, author):
         print("ignoring(len(sd.strip) < 1)")
 
 @asyncio.coroutine
-def speak_routine(channel, run=False):
-    if (random.random() < chattiness) or run:
-        res = jspeak.genSentence(1, 100)
-        if DEMON_MODE:
-            res = res[::-1]
-        elif PARABENS_MODE:
-            res = 'Parabéns %s' % res
-        yield from client.send_message(channel, res)
-
-@asyncio.coroutine
 def show_josetxt(message):
     output = subprocess.Popen(['wc', '-l', 'jose-data.txt'], stdout=subprocess.PIPE).communicate()[0]
     yield from client.send_message(message.channel, output)
@@ -711,10 +701,11 @@ def load_module(n, n_cl):
 load_module('josensfw', 'JoseNSFW')
 load_module('josememes', 'JoseMemes')
 load_module('josemusic', 'JoseMusic')
+load_module('josespeak', 'JoseSpeak')
 
-print("carregando jspeak")
-jspeak.buildMapping(jspeak.wordlist('jose-data.txt'), 1)
-print("jspeak carregado")
+#print("carregando jspeak")
+#jspeak.buildMapping(jspeak.wordlist('jose-data.txt'), 1)
+#print("jspeak carregado")
 
 @client.event
 @asyncio.coroutine
@@ -808,11 +799,11 @@ def on_message(message):
             end = time.time()
             delta = end-st
             if delta > 10:
-                yield from jose.say("merda, a API tá demorando demais pra fazer as coisas, socorram-me")
-            yield from jose.say("time: real %.4fs user %.4fs" % (delta, delta+(delta/4)))
+                yield from jose.say("Alguma coisa está demorando demais para responder(delta=%.4fs)..." % delta)
+            # yield from jose.say("time: real %.4fs user %.4fs" % (delta, delta+(delta/4)))
             return
         except Exception as e:
-            yield from jose.say("jose: pyerr: ```%s```" % traceback.format_exc())
+            yield from jose.say("jose: py_err: ```%s```" % traceback.format_exc())
             # return
 
     if message.content in exact_commands:
@@ -913,7 +904,7 @@ def on_message(message):
         return
 
     elif "<@202587271679967232>" in message.content: #mention
-        yield from speak_routine(message.channel, True)
+        pass
 
     elif random.random() < jc_probabiblity:
         if not message.channel.is_private:
@@ -953,7 +944,6 @@ def on_message(message):
         else:
             yield from jose_debug(message, 'erro conseguindo JC$ para %s(canal %r) porquê você está em um canal privado.' % (message.author.id, message.channel))
 
-        yield from speak_routine(message.channel)
         yield from gorila_routine(message.channel)
 
 @client.event
