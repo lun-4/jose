@@ -57,15 +57,23 @@ class JoseBot(jcommon.Extension):
 
         module = None
         if n in self.modules: #already loaded
+            try:
+                await self.modules[n]['inst'].ext_unload()
+            except Exception as e:
+                print("%s : %s" % (n, repr(e)))
+
+            # reimport
             module = importlib.reload(self.modules[n]['module'])
         else:
             module = importlib.import_module('ext.%s' % n)
 
+        # instantiate from module
         inst = getattr(module, n_cl)(self.client)
         try:
+            # try to load it
             await inst.ext_load()
-        except:
-            print("%s doesn't have any ext_load method" % module)
+        except Exception as e:
+            print("%s : %s" % (n, repr(e)))
         methods = (method for method in dir(inst) if callable(getattr(inst, method)))
 
         self.modules[n] = {'inst': inst, 'methods': [], 'class': n_cl, 'module': module}
