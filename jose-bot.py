@@ -55,13 +55,15 @@ if PARABENS_MODE:
 
 # !pesquisa 1 Qual o melhor mensageiro:discord,skype,teamspeak,raidcall
 
+#TODO: port this to new interfact idk
 def make_something(fmt, dict_messages):
-    async def func(message):
+    @asyncio.coroutine
+    def func(message):
         d = message.content.split(' ')
         user_use = d[1]
 
         new_message = random.choice(dict_messages)
-        await client.send_message(message.channel, fmt.format(user_use, new_message))
+        yield from client.send_message(message.channel, fmt.format(user_use, new_message))
 
     return func
 
@@ -69,10 +71,11 @@ show_xingar = make_something('{}, {}', xingamentos)
 show_elogio = make_something('{}, {}', elogios)
 show_cantada = make_something('Ei {}, {}', cantadas)
 
-async def show_aerotrem(message):
+@asyncio.coroutine
+def show_aerotrem(message):
     ch = discord.Object(id='206590341317394434')
     aviao = random.choice(aviaos)
-    await client.send_message(ch, aviao)
+    yield from client.send_message(ch, aviao)
 
 @asyncio.coroutine
 def new_debug(message):
@@ -122,17 +125,18 @@ def josescript_eval(message):
 
 animation_counter = 0
 
-async def make_pisca(message):
+@asyncio.coroutine
+def make_pisca(message):
     global animation_counter
     if animation_counter > JOSE_ANIMATION_LIMIT:
-        await jose.debug("LimitError: espere até alguma animação terminar")
+        yield from jose.debug("LimitError: espere até alguma animação terminar")
         raise je.LimitError()
 
     animation_counter += 1
 
     args = message.content.split(' ')
     animate_data = ' '.join(args[1:])
-    animate_msg = await client.send_message(message.channel, animate_data)
+    animate_msg = yield from client.send_message(message.channel, animate_data)
 
     for i in range(10):
         if i%2 == 0:
@@ -140,7 +144,7 @@ async def make_pisca(message):
         else:
             animate_banner = '%s' % animate
 
-        await client.edit_message(animate_msg, animate_banner)
+        yield from client.edit_message(animate_msg, animate_banner)
         time.sleep(1)
 
     animation_counter -= 1
@@ -192,21 +196,6 @@ def jcoin_control(id_user, amnt):
     returns True if user can access
     '''
     return jcoin.transfer(id_user, jcoin.jose_id, amnt, jcoin.LEDGER_PATH)
-
-async def show_uptime(message):
-    global start_time
-    sec = (time.time() - start_time)
-    MINUTE  = 60
-    HOUR    = MINUTE * 60
-    DAY     = HOUR * 24
-
-    days    = int( sec / DAY )
-    hours   = int( ( sec % DAY ) / HOUR )
-    minutes = int( ( sec % HOUR ) / MINUTE )
-    seconds = int( sec % MINUTE )
-
-    fmt = "jose: uptime: %d dias, %d horas, %d minutos, %d segundos"
-    await jose.debug(fmt % (days, hours, minutes, seconds))
 
 @asyncio.coroutine
 def make_pesquisa(message):
@@ -575,7 +564,7 @@ commands_start = {
     '!pisca': make_pisca,
 
     '!causar': make_causo,
-    '!uptime': show_uptime,
+    # MOV(new protocol)'!uptime': show_uptime,
 
     # (need to work on the polling system)
     # (   OR  USE  FUCKING   STRAWPOLL   )

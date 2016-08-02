@@ -34,6 +34,7 @@ class JoseBot(jcommon.Extension):
             'spamcl': {},
             'apostas': {},
         }
+        self.start_time = time.time()
         jcommon.Extension.__init__(self, cl)
 
     def load_gext(self, inst, n):
@@ -372,6 +373,20 @@ class JoseBot(jcommon.Extension):
 
     async def c_fale(self, message, args):
         await speak_routine(message, True)
+
+    async def c_uptime(self, message, args):
+        sec = (time.time() - self.start_time)
+        MINUTE  = 60
+        HOUR    = MINUTE * 60
+        DAY     = HOUR * 24
+
+        days    = int(sec / DAY)
+        hours   = int((sec % DAY) / HOUR)
+        minutes = int((sec % HOUR) / MINUTE)
+        seconds = int(sec % MINUTE)
+
+        fmt = "uptime: %d dias, %d horas, %d minutos, %d segundos"
+        await jose.debug(fmt % (days, hours, minutes, seconds))
 
     async def c_jbot(self, message, args):
         await self.say("Olá do módulo jose.py")
