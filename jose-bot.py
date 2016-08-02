@@ -599,7 +599,7 @@ commands_start = {
     '!xingar': show_xingar,
     '!elogiar': show_elogio,
     '!cantar': show_cantada,
-    '!version': show_version,
+    # '!version': show_version,
 
     '!log': show_debug,
     '!dbgmsg': new_debug,

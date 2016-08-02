@@ -11,7 +11,7 @@ random = SystemRandom()
 
 import joseerror as je
 
-JOSE_VERSION = '0.8.0-beta6'
+JOSE_VERSION = '0.8.0'
 JOSE_BUILD = 290
 
 #config

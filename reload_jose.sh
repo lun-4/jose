@@ -1,1 +1,1 @@
-python3 jose-bot.py
+py3.5 jose-bot.py
