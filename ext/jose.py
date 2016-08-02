@@ -30,6 +30,91 @@ class JoseBot(jcommon.Extension):
         self.modules = {}
         jcommon.Extension.__init__(self, cl)
 
+    def load_gext(self, inst, n):
+        print("carregando módulo: %s" % n)
+        methods = (method for method in dir(inst) if callable(getattr(inst, method)))
+
+        self.modules[n] = {'inst': inst, 'methods': [], 'class': ''}
+
+        for method in methods:
+            if method.startswith('c_'):
+                print("add %s" % method)
+                setattr(self, method, getattr(inst, method))
+                self.modules[n]['methods'].append(method)
+
+        print("módulo carregado: %s" % n)
+        return True
+
+    async def load_ext(self, n, n_cl):
+        loaded_success = False
+
+        module = None
+        if n in self.modules: #already loaded
+            module = importlib.reload(self.modules[n]['module'])
+        else:
+            module = importlib.import_module('ext.%s' % n)
+
+        inst = getattr(module, n_cl)(self.client)
+        try:
+            await inst.ext_load()
+        except:
+            print("%s doesn't have any ext_load method" % module)
+        methods = (method for method in dir(inst) if callable(getattr(inst, method)))
+
+        self.modules[n] = {'inst': inst, 'methods': [], 'class': n_cl, 'module': module}
+
+        for method in methods:
+            if method.startswith('c_'):
+                print("add %s" % method)
+                setattr(self, method, getattr(inst, method))
+                self.modules[n]['methods'].append(method)
+                loaded_success = True
+
+        if self.current is not None:
+            if loaded_success:
+                await self.say(":ok_hand:")
+            else:
+                await self.say(":poop:")
+        else:
+            print("load_ext: carregado %s" % n)
+
+    async def c_reload(self, message, args):
+        auth = await self.rolecheck(jcommon.MASTER_ROLE)
+        if not auth:
+            await self.say("PermError: permissão negada")
+            return
+
+        n = args[1]
+        if n in self.modules:
+            await self.load_ext(n, self.modules[n]['class'])
+        else:
+            await self.say("%s: módulo não encontrado/carregado" % n)
+
+    async def c_modules(self, message, args):
+        mod_gen = (key for key in self.modules)
+        mod_generator = []
+        for key in mod_gen:
+            if 'module' in self.modules[key]:
+                # normally loaded ext, can use !reload on it
+                mod_generator.append('ext:%s' % key)
+            else:
+                # externally loaded ext, can reload
+                mod_generator.append('gext:%s' % key)
+        await self.say("módulos carregados: %s" % (" ".join(mod_generator)))
+
+    def says(self, msg):
+        # calls self.say but in an non-async way
+        asyncio.async(self.say(msg), loop=self.loop)
+
+    async def c_help(self, message, args):
+        await self.say(jcommon.JOSE_HELP_TEXT, channel=message.author)
+
+    async def c_htgeral(self, message, args):
+        await self.say(jcommon.JOSE_GENERAL_HTEXT, channel=message.author)
+
+    async def c_httech(self, message, args):
+        await self.say(jcommon.JOSE_TECH_HTEXT, channel=message.author)
+
     async def sec_auth(self, f):
         auth = await jcommon.check_roles(jcommon.MASTER_ROLE, self.current.author.roles)
         if auth:
@@ -285,79 +370,6 @@ class JoseBot(jcommon.Extension):
     async def c_jbot(self, message, args):
         await self.say("Olá do módulo jose.py")
 
-    async def recv(self, message):
-        self.current = message
-
-    def load_gext(self, inst, n):
-        print("carregando módulo: %s" % n)
-        methods = (method for method in dir(inst) if callable(getattr(inst, method)))
-
-        self.modules[n] = {'inst': inst, 'methods': [], 'class': ''}
-
-        for method in methods:
-            if method.startswith('c_'):
-                print("add %s" % method)
-                setattr(self, method, getattr(inst, method))
-                self.modules[n]['methods'].append(method)
-
-        print("módulo carregado: %s" % n)
-        return True
-
-    async def load_ext(self, n, n_cl):
-        loaded_success = False
-
-        module = None
-        if n in self.modules: #already loaded
-            module = importlib.reload(self.modules[n]['module'])
-        else:
-            module = importlib.import_module('ext.%s' % n)
-
-        inst = getattr(module, n_cl)(self.client)
-        try:
-            await inst.ext_load()
-        except:
-            print("%s doesn't have any ext_load method" % module)
-        methods = (method for method in dir(inst) if callable(getattr(inst, method)))
-
-        self.modules[n] = {'inst': inst, 'methods': [], 'class': n_cl, 'module': module}
-
-        for method in methods:
-            if method.startswith('c_'):
-                print("add %s" % method)
-                setattr(self, method, getattr(inst, method))
-                self.modules[n]['methods'].append(method)
-                loaded_success = True
-
-        if self.current is not None:
-            if loaded_success:
-                await self.say(":ok_hand:")
-            else:
-                await self.say(":poop:")
-        else:
-            print("load_ext: carregado %s" % n)
-
-    async def c_reload(self, message, args):
-        auth = await self.rolecheck(jcommon.MASTER_ROLE)
-        if not auth:
-            await self.say("PermError: permissão negada")
-            return
-
-        n = args[1]
-        if n in self.modules:
-            await self.load_ext(n, self.modules[n]['class'])
-        else:
-            await self.say("%s: módulo não encontrado/carregado" % n)
-
-    async def c_modules(self, message, args):
-        mod_gen = (key for key in self.modules)
-        mod_generator = []
-        for key in mod_gen:
-            if 'module' in self.modules[key]:
-                mod_generator.append('ext:%s' % key)
-            else:
-                mod_generator.append('gext:%s' % key)
-        await self.say("módulos carregados: %s" % (" ".join(mod_generator)))
-
     # !eval `await self.say("hello")`
     # !eval `self.loop.run_until_complete(self.say("Hello"))`
     # !eval `self.loop.run_until_complete(self.reboot())`
@@ -372,7 +384,3 @@ class JoseBot(jcommon.Extension):
             eval_cmd = eval_cmd[1:-1]
         res = eval(eval_cmd)
         await self.say("```%s``` -> `%s`" % (eval_cmd, res))
-
-    def says(self, msg):
-        # calls self.say but in an non-async way
-        asyncio.async(self.say(msg), loop=self.loop)

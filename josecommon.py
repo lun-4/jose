@@ -380,8 +380,10 @@ class Extension:
         self.loop = cl.loop
 
     @asyncio.coroutine
-    def say(self, msg):
-        yield from self.client.send_message(self.current.channel, msg)
+    def say(self, msg, channel=None):
+        if channel is None:
+            channel = self.current.channel
+        yield from self.client.send_message(channel, msg)
 
     @asyncio.coroutine
     def debug(self, msg, flag=True):

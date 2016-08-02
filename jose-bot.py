@@ -1,32 +1,29 @@
 # -*- coding: utf-8 -*-
-import discord
-import cProfile
-
-if not discord.opus.is_loaded():
-    discord.opus.load_opus('opus')
-
-# setup logging
-import logging
-logging.basicConfig(level=logging.INFO)
-
-import ext.jose as jose_bot
-import ext.joseassembly as jasm
-
-from random import SystemRandom
-random = SystemRandom()
-
 import asyncio
 import sys
 import os
 import ast
 import time
 import subprocess
-
 import re
 import traceback
+from random import SystemRandom
+random = SystemRandom()
 
+# setup logging
+import logging
+logging.basicConfig(level=logging.INFO)
+
+import cProfile
+
+import discord
+
+if not discord.opus.is_loaded():
+    discord.opus.load_opus('opus')
+
+import ext.jose as jose_bot
+import ext.joseassembly as jasm
 from josecommon import *
-#import josespeak as jspeak
 import jcoin.josecoin as jcoin
 import joseconfig as jconfig
 import joseerror as je
@@ -574,16 +571,17 @@ def show_price(message):
     yield from client.send_message(message.channel, res)
     return
 
+'''
+    RMV : removed(or marked to remove)
+    DEAC : deactivated until better solution
+    MOV : moved to new protocol/anything else
+'''
+
 exact_commands = {
     'jose': show_help,
-    '!help': show_help,
+    # DEAC '!help': show_help,
     'melhor bot': show_shit,
 }
-
-'''
-    RMV : removed
-    DEAC : deactivated until better solution
-'''
 
 commands_start = {
     '!xingar': show_xingar,
@@ -591,7 +589,7 @@ commands_start = {
     '!cantar': show_cantada,
     # '!version': show_version,
 
-    '!log': show_debug,
+    # DEAC(too fucking long) '!log': show_debug,
     '!dbgmsg': new_debug,
 
     # DEAC '!animate': make_animation,
@@ -600,13 +598,10 @@ commands_start = {
     '!causar': make_causo,
     '!uptime': show_uptime,
 
+    # (need to work on the polling system)
+    # (   OR  USE  FUCKING   STRAWPOLL   )
     # DEAC '!pesquisa': make_pesquisa,
     # DEAC '!voto': make_voto,
-
-    # DEAC '!hypno': nsfw_hypnohub,
-    # DEAC '!e621': nsfw_e621,
-    # DEAC '!yandere': nsfw_yandere,
-    # DEAC '!porn': nsfw_porn,
 
     '!josetxt': show_josetxt,
     '!learn': learn_data,
@@ -615,10 +610,10 @@ commands_start = {
     '!save': josecoin_save,
     '!load': josecoin_load,
     # '!jcdebug': josecoin_dbg,
-    '!jcdata': josecoin_dbg,
+    # RMV '!jcdata': josecoin_dbg,
     '!enviar': josecoin_send,
     # RMV '!saldo': josecoin_saldo,
-    '!jenv': show_jenv,
+    # RMV '!jenv': show_jenv,
 
     '!ping': pong,
     '!xuxa': demon,
@@ -636,18 +631,15 @@ commands_start = {
     '!airport': show_aerotrem,
 
     '!awoo': make_func("https://images-2.discordapp.net/.eJwVyEEOwiAQAMC_8ABgEdi2nzGEIsW0LmHXeDD-vfUyh_mq99jVojaRzosxa-NMY9UsNFItuhLVvaTeWGc6TBJJeTvKS9g4e3M--BmiB8QJcLoqRnAWg50RA4TgTPoQ3f-0Ryusn72q3wkG3CWg.CTrgww5nr8mw_Fkm0BcEsEGV8t0.jpg"),
-    '!Parabéns': make_func("http://puu.sh/qcSLD/f82b7f48c3.png"),
-    '!vtnc': make_func("vai toma no cu 2"),
-    '!sigabem': make_func("SIGA BEM CAMINHONEIRO"),
+    # MOV MEME'!Parabéns': make_func("http://puu.sh/qcSLD/f82b7f48c3.png"),
+    # DEAC '!vtnc': make_func("vai toma no cu 2"),
+    # MOV MEME '!sigabem': make_func("SIGA BEM CAMINHONEIRO"),
 
     '!price': show_price,
-    '!htgeral': make_func(JOSE_GENERAL_HTEXT),
-    '!htech': make_func(JOSE_TECH_HTEXT),
 }
 
 commands_match = {
     'baladinha top': show_top,
-    'BALADINHA TOP': show_top,
 
     'que tampa': show_tampa,
 
@@ -658,8 +650,8 @@ commands_match = {
     'emule': show_emule,
     'vinheta': show_vinheta,
 
-    "se fude jose": show_vtnc,
-    "jose se fude": show_vtnc,
+    # RMV "se fude jose": show_vtnc,
+    # RMV "jose se fude": show_vtnc,
     "vtnc jose": show_vtnc,
     'que rodeio': rodei_teu_cu,
     'anal giratorio': show_agira,
