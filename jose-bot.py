@@ -723,6 +723,7 @@ def on_message(message):
 
             try:
                 yield from jose_method(message, args)
+
             except je.PermissionError:
                 yield from jose.say("permissão ¯\_(ツ)_/¯ 💠 ¯\_(ツ)_/¯ negada")
             except RuntimeError:

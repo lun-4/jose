@@ -397,6 +397,15 @@ class Extension:
         else:
             return True
 
+    async def brolecheck(self, correct_role):
+        try:
+            return self.rolecheck(correct_role)
+        except je.PermissionError:
+            return False
+
+    def codeblock(self, lang, string):
+        return "```%s\n%s```" % (lang, string)
+
     def noasync(self, func, args):
         asyncio.async(func(*args), loop=self.loop)
 
