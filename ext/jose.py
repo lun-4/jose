@@ -352,7 +352,7 @@ class JoseBot(jcommon.Extension):
         matcher = re.compile("rtt min/avg/max/mdev = (\d+.\d+)/(\d+.\d+)/(\d+.\d+)/(\d+.\d+)")
         rtt = matcher.search(out.decode('utf-8')).groups()
 
-        fmt = 'ping to `%s` min %sms avg %sms max %sms mdev %sms\n%s'
+        fmt = 'resultados de ping para `%s` min %sms avg %sms max %sms mdev %sms\n%s'
         looks_like = ''
         if float(rtt[1]) > 100:
             looks_like = 'Parece que algo tá rodando ruim nos servidores, cheque http://status.discordapp.com'

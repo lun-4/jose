@@ -683,12 +683,15 @@ def on_message(message):
 
     if message.author.id in jcoin.data:
         if hasattr(message.author, 'nick'):
-            jcoin.data[message.author.id]['name'] = message.author.nick
+            if message.author.nick is not None:
+                jcoin.data[message.author.id]['name'] = message.author.nick
+            else:
+                jcoin.data[message.author.id]['name'] = str(message.author)
         else:
             try:
                 jcoin.data[message.author.id]['name'] = message.author.name
             except Exception as e:
-                yield from jose_debug(message, "nc: pyerr: %s" % e)
+                yield from jose_debug(message, "aid.jc: pyerr: ```%s```" % traceback.format_exc())
 
     # we do not want the bot to reply to itself
     if message.author == client.user:
@@ -708,7 +711,7 @@ def on_message(message):
             yield from jose_debug(message, "Parabéns %s" % initmsg)
         else:
             yield from jose_debug(message, initmsg)
-        yield from josecoin_load(message)
+        yield from josecoin_load(message, False)
         return
 
     counter += 1
@@ -729,8 +732,7 @@ def on_message(message):
         args = message.content.split(' ')
         try:
             method = "c_%s" % command
-            # yield from jose.say("comando: %s" % method)
-            # yield from jose.say(str(getattr(jose, method)))
+
             yield from jose.recv(message) # default
             for mod in jose.modules:
                 mod_obj = jose.modules[mod]
@@ -752,6 +754,8 @@ def on_message(message):
                 yield from jose.say("permissão ¯\_(ツ)_/¯ 💠 ¯\_(ツ)_/¯ negada")
             except RuntimeError:
                 yield from jose.say('jose: py_rt_err: %s' % repr(e))
+            except je.LimitError:
+                pass
             end = time.time()
             delta = end-st
             if delta > 10:
@@ -903,10 +907,9 @@ def on_message(message):
         yield from gorila_routine(message.channel)
 
 @client.event
-@asyncio.coroutine
-def on_ready():
+async def on_ready():
     print("="*25)
-    print('josé pronto:')
+    print('josé ready:')
     print('name', client.user.name)
     print('id', client.user.id)
     print('='*25)

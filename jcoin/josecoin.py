@@ -7,7 +7,7 @@ import sys
 sys.path.append("..")
 import josecommon as jcommon
 
-JOSECOIN_VERSION = '0.4.1'
+JOSECOIN_VERSION = '0.4.2'
 
 JOSECOIN_HELP_TEXT = '''JoseCoin(%s) é a melhor moeda que o josé pode te oferecer!
 
@@ -113,66 +113,64 @@ class JoseCoin(jcommon.Extension):
     def __init__(self, cl):
         self.client = cl
         self.current = None
+        self.top10_flag = False
         jcommon.Extension.__init__(self, cl)
 
-    @asyncio.coroutine
-    def josecoin_save(self, message, dbg_flag=True):
+    async def josecoin_save(self, message, dbg_flag=True):
         self.current = message
-        yield from self.debug("saving josecoin data", dbg_flag)
+        await self.debug("saving josecoin data", dbg_flag)
         res = save('jcoin/josecoin.db')
         if not res[0]:
-            yield from self.debug('error: %r' % res)
+            await self.debug('error: %r' % res)
 
-    @asyncio.coroutine
-    def josecoin_load(self, message, dbg_flag=True):
+    async def josecoin_load(self, message, dbg_flag=True):
         self.current = message
-        yield from self.debug("loading josecoin data", dbg_flag)
+        await self.debug("loading josecoin data", dbg_flag)
         res = load('jcoin/josecoin.db')
         if not res[0]:
-            yield from self.debug('error: %r' % res)
+            await self.debug('error: %r' % res)
 
-    @asyncio.coroutine
-    def c_saldo(self, message, args):
+    async def c_saldo(self, message, args):
         args = message.content.split(' ')
 
         id_check = None
         if len(args) < 2:
             id_check = message.author.id
         else:
-            id_check = yield from jcommon.parse_id(args[1], message)
+            id_check = await jcommon.parse_id(args[1], message)
 
         res = get(id_check)
         if res[0]:
             accdata = res[1]
-            yield from self.say('%s -> %.2f' % (accdata['name'], accdata['amount']))
+            await self.say('%s -> %.2f' % (accdata['name'], accdata['amount']))
         else:
-            yield from self.say('erro encontrando conta(id: %s)' % (id_check))
+            await self.say('erro encontrando conta(id: %s)' % (id_check))
 
-    @asyncio.coroutine
-    def c_conta(self, message, args):
+    async def c_conta(self, message, args):
         print("new jcoin account %s" % message.author.id)
 
         res = new_acc(message.author.id, str(message.author))
         if res[0]:
-            yield from self.say(res[1])
+            await self.say(res[1])
         else:
-            yield from self.say('jc_error: %s' % res[1])
+            await self.say('jc_error: %s' % res[1])
 
-    @asyncio.coroutine
-    def c_write(self, message, args):
+    async def c_write(self, message, args):
         global data
-        auth = yield from self.rolecheck(jcommon.MASTER_ROLE)
+        auth = await self.rolecheck(jcommon.MASTER_ROLE)
         if not auth:
-            yield from self.debug("PermissionError: sem permissão para alterar dados da JC")
+            await self.debug("PermissionError: sem permissão para alterar dados da JC")
 
-        id_from = yield from jcommon.parse_id(args[1], message)
+        id_from = await jcommon.parse_id(args[1], message)
         new_amount = float(args[2])
 
         data[id_from]['amount'] = new_amount
-        yield from self.say("conta <@%s>: %.2f" % (id_from, data[id_from]['amount']))
+        await self.say("conta <@%s>: %.2f" % (id_from, data[id_from]['amount']))
 
-    @asyncio.coroutine
-    def c_top10(self, message, args):
+    async def c_top10(self, message, args):
+        if self.top10_flag:
+            raise je.LimitError()
+        self.top10_flag = True
         jcdata = dict(data) # copy
 
         range_max = 11 # default 10 users
@@ -187,7 +185,7 @@ class JoseCoin(jcommon.Extension):
         }
 
         if range_max >= 16:
-            yield from self.say("LimitError: valores maiores do que 16 não válidos")
+            await self.say("LimitError: valores maiores do que 16 não válidos")
             #raise jcommon.LimitError()
             return
 
@@ -215,4 +213,5 @@ class JoseCoin(jcommon.Extension):
                 'amount': 0.0,
             }
 
-        yield from self.say('\n'.join(order))
+        await self.say('\n'.join(order))
+        self.top10_flag = False
