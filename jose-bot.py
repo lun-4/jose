@@ -642,7 +642,6 @@ def on_message(message):
     global jose
     global started
     global counter
-    global debug_channel
 
     if message.content == '!construção': #override maintenance mode
         yield from main_status(message)
@@ -673,7 +672,6 @@ def on_message(message):
     # log stuff
     bnr = '%s(%r) : %s : %r' % (message.channel, message.channel.is_private, message.author, message.content)
     print(bnr)
-    yield from client.send_message(debug_channel, bnr)
 
     if not started:
         started = True
@@ -852,7 +850,7 @@ def on_message(message):
                     # set timeout of user
                     if not message.author.id in jose_env['spamcl']:
                         jose_env['spamcl'][message.author.id] = time.time() + 300
-                        yield from client.send_message(message.channel, 'spam de @%s! cooldown de 5 minutos foi aplicado!' % message.author)
+                        # yield from client.send_message(message.channel, 'spam de @%s! cooldown de 5 minutos foi aplicado!' % message.author)
                         return
                     else:
                         return
@@ -876,7 +874,8 @@ def on_message(message):
                 else:
                     yield from jose_debug(message, 'jc_error: %s' % res[1])
         else:
-            yield from jose_debug(message, 'erro conseguindo JC$ para %s(canal %r) porquê você está em um canal privado.' % (message.author.id, message.channel))
+            #yield from jose_debug(message, 'erro conseguindo JC$ para %s(canal %r) porquê você está em um canal privado.' % (message.author.id, message.channel))
+            return
 
         yield from gorila_routine(message.channel)
 
