@@ -11,8 +11,8 @@ random = SystemRandom()
 
 import joseerror as je
 
-JOSE_VERSION = '0.8.0'
-JOSE_BUILD = 292
+JOSE_VERSION = '0.8.1'
+JOSE_BUILD = 300
 
 APP_CLIENT_ID = 'ID DO JOSE AQUI'
 OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=103988231' % APP_CLIENT_ID
@@ -379,22 +379,18 @@ class Extension:
         self.current = None
         self.loop = cl.loop
 
-    @asyncio.coroutine
-    def say(self, msg, channel=None):
+    async def say(self, msg, channel=None):
         if channel is None:
             channel = self.current.channel
-        yield from self.client.send_message(channel, msg)
+        await self.client.send_message(channel, msg)
 
-    @asyncio.coroutine
-    def debug(self, msg, flag=True):
-        yield from jose_debug(self.current, msg, flag)
+    async def debug(self, msg, flag=True):
+        await jose_debug(self.current, msg, flag)
 
-    @asyncio.coroutine
-    def recv(self, msg):
+    async def recv(self, msg):
         self.current = msg
 
-    @asyncio.coroutine
-    def rolecheck(self, correct_role):
+    async def rolecheck(self, correct_role):
         c = [role.name == correct_role for role in self.current.author.roles]
         if not (True in c):
             raise je.PermissionError()

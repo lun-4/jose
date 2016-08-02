@@ -28,6 +28,12 @@ class JoseBot(jcommon.Extension):
     def __init__(self, cl):
         self.nick = 'jose-bot'
         self.modules = {}
+        self.env = {
+            'survey': {},
+            'spam': {},
+            'spamcl': {},
+            'apostas': {},
+        }
         jcommon.Extension.__init__(self, cl)
 
     def load_gext(self, inst, n):

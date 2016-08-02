@@ -7,19 +7,12 @@ import time
 import subprocess
 import re
 import traceback
+import logging
 from random import SystemRandom
+import cProfile
 random = SystemRandom()
 
-# setup logging
-import logging
-logging.basicConfig(level=logging.INFO)
-
-import cProfile
-
 import discord
-
-if not discord.opus.is_loaded():
-    discord.opus.load_opus('opus')
 
 import ext.jose as jose_bot
 import ext.joseassembly as jasm
@@ -28,27 +21,26 @@ import jcoin.josecoin as jcoin
 import joseconfig as jconfig
 import joseerror as je
 
+logging.basicConfig(level=logging.INFO)
+
+if not discord.opus.is_loaded():
+    discord.opus.load_opus('opus')
+
 start_time = time.time()
 
 #default stuff
 client = discord.Client()
-set_client(client)
+set_client(client) # to jcommon
 
-JOSE_NICK = 'jose-bot'
-lil_message = ''
-msmsg = ''
+# initialize jose instance
+jose = jose_bot.JoseBot(client)
+
 started = False
-bank = None
 GAMBLING_LAST_BID = 0.0
 
 #enviroment things
 josescript_env = {}
-jose_env = {
-    'survey': {},
-    'spam': {},
-    'spamcl': {},
-    'apostas': {},
-}
+jose_env = jose.env
 survey_id = 0
 jasm_env = {}
 
@@ -64,13 +56,12 @@ if PARABENS_MODE:
 # !pesquisa 1 Qual o melhor mensageiro:discord,skype,teamspeak,raidcall
 
 def make_something(fmt, dict_messages):
-    @asyncio.coroutine
-    def func(message):
+    async def func(message):
         d = message.content.split(' ')
         user_use = d[1]
 
         new_message = random.choice(dict_messages)
-        yield from client.send_message(message.channel, fmt.format(user_use, new_message))
+        await client.send_message(message.channel, fmt.format(user_use, new_message))
 
     return func
 
@@ -78,18 +69,10 @@ show_xingar = make_something('{}, {}', xingamentos)
 show_elogio = make_something('{}, {}', elogios)
 show_cantada = make_something('Ei {}, {}', cantadas)
 
-@asyncio.coroutine
-def show_aerotrem(message):
+async def show_aerotrem(message):
     ch = discord.Object(id='206590341317394434')
     aviao = random.choice(aviaos)
-    yield from client.send_message(ch, aviao)
-
-@asyncio.coroutine
-def show_debug(message):
-    res = ''
-    for (index, debug_msg) in enumerate(debug_logs):
-        res += "log[{}]: {}\n".format(index, debug_msg)
-    yield from client.send_message(message.channel, res)
+    await client.send_message(ch, aviao)
 
 @asyncio.coroutine
 def new_debug(message):
@@ -139,29 +122,26 @@ def josescript_eval(message):
 
 animation_counter = 0
 
-@asyncio.coroutine
-def make_pisca(message):
+async def make_pisca(message):
     global animation_counter
     if animation_counter > JOSE_ANIMATION_LIMIT:
-        yield from jose_debug(message, "FilaError: espere até alguma animação terminar")
-        return
+        await jose.debug("LimitError: espere até alguma animação terminar")
+        raise je.LimitError()
 
     animation_counter += 1
 
     args = message.content.split(' ')
-    animate = ' '.join(args[1:])
+    animate_data = ' '.join(args[1:])
+    animate_msg = await client.send_message(message.channel, animate_data)
 
-    animate_banner = animate
-    animate_msg = yield from client.send_message(message.channel, animate_banner)
-
-    for i in range(20):
+    for i in range(10):
         if i%2 == 0:
             animate_banner = '**%s**' % animate
         else:
             animate_banner = '%s' % animate
 
-        yield from client.edit_message(animate_msg, animate_banner)
-        time.sleep(.5)
+        await client.edit_message(animate_msg, animate_banner)
+        time.sleep(1)
 
     animation_counter -= 1
 
@@ -213,8 +193,7 @@ def jcoin_control(id_user, amnt):
     '''
     return jcoin.transfer(id_user, jcoin.jose_id, amnt, jcoin.LEDGER_PATH)
 
-@asyncio.coroutine
-def show_uptime(message):
+async def show_uptime(message):
     global start_time
     sec = (time.time() - start_time)
     MINUTE  = 60
@@ -227,7 +206,7 @@ def show_uptime(message):
     seconds = int( sec % MINUTE )
 
     fmt = "jose: uptime: %d dias, %d horas, %d minutos, %d segundos"
-    yield from jose_debug(message, fmt % (days, hours, minutes, seconds))
+    await jose.debug(fmt % (days, hours, minutes, seconds))
 
 @asyncio.coroutine
 def make_pesquisa(message):
@@ -664,10 +643,6 @@ commands_match = {
 }
 
 counter = 0
-
-jose = jose_bot.JoseBot(client)
-#commands_start.update(jmusic.cmds_start)
-#jmusic.jm.client = client
 
 def from_dict(f):
     def a(m, args):

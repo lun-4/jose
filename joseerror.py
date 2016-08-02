@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
 
 class PermissionError(Exception):
-	pass
+    pass
+
+class LimitError(Exception):
+    pass
