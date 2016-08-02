@@ -12,7 +12,7 @@ random = SystemRandom()
 import joseerror as je
 
 JOSE_VERSION = '0.8.2'
-JOSE_BUILD = 313
+JOSE_BUILD = 315
 
 APP_CLIENT_ID = 'ID DO JOSE AQUI'
 OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=103988231' % APP_CLIENT_ID
@@ -34,7 +34,7 @@ GAMBLING_MODE = False
 
 JOSE_SPAM_TRIGGER = 4
 PIRU_ACTIVITY = .008
-jc_probabiblity = .03
+jc_probabiblity = .07
 JC_REWARDS = [1, 1.2, 2, 2.5, 3.14, 5, 5.1, 6.28, 7.4]
 
 PORN_LIMIT = 14
@@ -51,7 +51,7 @@ BASE_PRICE = 3 * ((len(JC_REWARDS) * (JC_REWARDS[len(JC_REWARDS)-1] * jc_probabi
 
 PORN_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / PORN_MEMBERS)
 LEARN_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / LEARN_MEMBERS)
-LEARN_PRICE -= 12
+# LEARN_PRICE -= 12
 
 OP_TAX_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / TOTAL)
 

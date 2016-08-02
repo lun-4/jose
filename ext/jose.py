@@ -228,7 +228,11 @@ class JoseBot(jcommon.Extension):
     async def c_dec(self, message, args):
         to_decrypt = ' '.join(args[1:])
         to_decrypt = to_decrypt.encode('UTF-8')
-        to_decrypt = base64.a85decode(to_decrypt).decode('UTF-8')
+        try:
+            to_decrypt = base64.a85decode(to_decrypt).decode('UTF-8')
+        except Exception as e:
+            await self.say("dec: erro tentando desencodar a mensagem(%r)" % e)
+            return
         plaintext = await jcommon.str_xor(to_decrypt, jcommon.JCRYPT_KEY)
         await self.say("resultado(dec): %s" % plaintext)
         return
