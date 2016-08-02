@@ -607,8 +607,8 @@ commands_match = {
 counter = 0
 
 def from_dict(f):
-    def a(m, args):
-        yield from f(m)
+    async def a(m, args):
+        await f(m)
     return a
 
 for cmd in commands_start:

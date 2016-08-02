@@ -11,8 +11,8 @@ random = SystemRandom()
 
 import joseerror as je
 
-JOSE_VERSION = '0.8.1'
-JOSE_BUILD = 300
+JOSE_VERSION = '0.8.2'
+JOSE_BUILD = 310
 
 APP_CLIENT_ID = 'ID DO JOSE AQUI'
 OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=103988231' % APP_CLIENT_ID
@@ -399,7 +399,7 @@ class Extension:
 
     async def brolecheck(self, correct_role):
         try:
-            return self.rolecheck(correct_role)
+            return (await self.rolecheck(correct_role))
         except je.PermissionError:
             return False
 
