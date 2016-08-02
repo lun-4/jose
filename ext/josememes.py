@@ -28,36 +28,31 @@ class JoseMemes(jcommon.Extension):
         self.WIDE_MAP[0x20] = 0x3000
         jcommon.Extension.__init__(self, cl)
 
-    @asyncio.coroutine
-    def ext_load(self):
-        yield from self.load_memes()
+    async def ext_load(self):
+        await self.load_memes()
 
-    @asyncio.coroutine
-    def load_memes(self):
+    async def load_memes(self):
         try:
             self.memes = pickle.load(open('ext/josememes.db', 'rb'))
         except Exception as e:
             if self.current is not None:
-                yield from self.debug("load_memes: erro carregando josememes.db(%s)" % e)
+                await self.debug("load_memes: erro carregando josememes.db(%s)" % e)
             else:
                 print('load_memes: erro: %s' % e)
             self.memes = {}
 
-    @asyncio.coroutine
-    def save_memes(self):
+    async def save_memes(self):
         try:
             pickle.dump(self.memes, open("ext/josememes.db", 'wb'))
         except Exception as e:
-            yield from self.debug("save_memes: pyerr: %s" % e)
+            await self.debug("save_memes: pyerr: %s" % e)
 
-    @asyncio.coroutine
-    def c_aprovado(self, message, args):
-        yield from self.say('http://gaveta.com.br/images/Aprovacao-Sean-Anthony.png')
+    async def c_aprovado(self, message, args):
+        await self.say('http://gaveta.com.br/images/Aprovacao-Sean-Anthony.png')
 
-    @asyncio.coroutine
-    def c_meme(self, message, args):
+    async def c_meme(self, message, args):
         if len(args) < 2:
-            yield from self.say(MEME_HELP_TEXT)
+            await self.say(MEME_HELP_TEXT)
             return
         elif args[1] == 'add':
             args_s = ' '.join(args[2:])
@@ -66,52 +61,49 @@ class JoseMemes(jcommon.Extension):
             url = args_sp[1]
 
             if meme in self.memes:
-                yield from self.say("%s: meme já existe" % meme)
+                await self.say("%s: meme já existe" % meme)
                 return
             else:
                 self.memes[meme] = url
-                yield from self.save_memes()
-                yield from self.say("%s: meme adicionado!" % meme)
+                await self.save_memes()
+                await self.say("%s: meme adicionado!" % meme)
             return
         elif args[1] == 'rm':
             meme = ' '.join(args[2:])
             if meme in self.memes:
                 del self.memes[meme]
-                yield from self.say("%s: meme removido" % meme)
+                await self.say("%s: meme removido" % meme)
                 return
             else:
-                yield from self.say("%s: meme não encontrado" % meme)
+                await self.say("%s: meme não encontrado" % meme)
                 return
         elif args[1] == 'save':
-            yield from self.save_memes()
+            await self.save_memes()
             return
         elif args[1] == 'load':
-            yield from self.load_memes()
+            await self.load_memes()
             return
         elif args[1] == 'list':
-            yield from self.say("memes: %s" % ', '.join(self.memes.keys()))
+            await self.say("memes: %s" % ', '.join(self.memes.keys()))
         elif args[1] == 'get':
             meme = ' '.join(args[2:])
             if meme in self.memes:
-                yield from self.say(self.memes[meme])
+                await self.say(self.memes[meme])
             else:
-                yield from self.say("%s: meme não encontrado" % meme)
+                await self.say("%s: meme não encontrado" % meme)
             return
         else:
-            yield from self.say("comando inválido: %s" % args[1])
+            await self.say("comando inválido: %s" % args[1])
             return
 
-    @asyncio.coroutine
-    def c_m(self, message, args):
-        yield from self.c_meme(message, args)
+    async def c_m(self, message, args):
+        await self.c_meme(message, args)
 
-    @asyncio.coroutine
-    def c_fullwidth(self, message, args):
+    async def c_fullwidth(self, message, args):
         # discord by some stuff removed fullwidth char support
         # dayum.
         text = ' '.join(args[1:])
-        yield from self.say(text.translate(self.WIDE_MAP))
+        await self.say(text.translate(self.WIDE_MAP))
 
-    @asyncio.coroutine
-    def c_fw(self, message, args):
-        yield from self.c_fullwidth(message, args)
+    async def c_fw(self, message, args):
+        await self.c_fullwidth(message, args)
