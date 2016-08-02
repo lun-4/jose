@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 
-import discord
 import asyncio
 import sys
+from random import SystemRandom
+random = SystemRandom()
+import pickle
+
+import discord
+
 sys.path.append("..")
 import josecommon as jcommon
-
-import pickle
-import io
 
 MEME_HELP_TEXT = '''!meme: Adicione e mostre memes com o josé!
 *alias*: !m
@@ -107,3 +109,7 @@ class JoseMemes(jcommon.Extension):
 
     async def c_fw(self, message, args):
         await self.c_fullwidth(message, args)
+
+    async def c_emoji(self, message, args):
+        res = await jcommon.random_emoji(random.randint(1,5))
+        await jose.say(res)

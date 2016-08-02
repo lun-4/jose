@@ -55,15 +55,13 @@ if PARABENS_MODE:
 
 # !pesquisa 1 Qual o melhor mensageiro:discord,skype,teamspeak,raidcall
 
-#TODO: port this to new interfact idk
 def make_something(fmt, dict_messages):
-    @asyncio.coroutine
-    def func(message):
+    async def func(message):
         d = message.content.split(' ')
         user_use = d[1]
 
         new_message = random.choice(dict_messages)
-        yield from client.send_message(message.channel, fmt.format(user_use, new_message))
+        await jose.say(fmt.format(user_use, new_message))
 
     return func
 
@@ -71,18 +69,16 @@ show_xingar = make_something('{}, {}', xingamentos)
 show_elogio = make_something('{}, {}', elogios)
 show_cantada = make_something('Ei {}, {}', cantadas)
 
-@asyncio.coroutine
-def show_aerotrem(message):
+async def show_aerotrem(message):
     ch = discord.Object(id='206590341317394434')
     aviao = random.choice(aviaos)
-    yield from client.send_message(ch, aviao)
+    await client.send_message(ch, aviao)
 
-@asyncio.coroutine
-def new_debug(message):
+async def new_debug(message):
     args = message.content.split(' ')
     dbg = ' '.join(args[1:])
 
-    yield from jose_debug(message, dbg)
+    await jose_debug(message, dbg)
 
 @asyncio.coroutine
 def josescript_eval(message):
@@ -125,18 +121,17 @@ def josescript_eval(message):
 
 animation_counter = 0
 
-@asyncio.coroutine
-def make_pisca(message):
+async def make_pisca(message):
     global animation_counter
     if animation_counter > JOSE_ANIMATION_LIMIT:
-        yield from jose.debug("LimitError: espere até alguma animação terminar")
+        await jose.debug("LimitError: espere até alguma animação terminar")
         raise je.LimitError()
 
     animation_counter += 1
 
     args = message.content.split(' ')
     animate_data = ' '.join(args[1:])
-    animate_msg = yield from client.send_message(message.channel, animate_data)
+    animate_msg = await client.send_message(message.channel, animate_data)
 
     for i in range(10):
         if i%2 == 0:
@@ -144,7 +139,7 @@ def make_pisca(message):
         else:
             animate_banner = '%s' % animate
 
-        yield from client.edit_message(animate_msg, animate_banner)
+        await client.edit_message(animate_msg, animate_banner)
         time.sleep(1)
 
     animation_counter -= 1
@@ -176,15 +171,14 @@ causos = [
     '{} inventou de fumar com {} e deu merda',
 ]
 
-@asyncio.coroutine
-def make_causo(message):
+async def make_causo(message):
     args = message.content.split(' ')
     x = args[1]
     y = args[2]
 
     causo = random.choice(causos)
 
-    yield from client.send_message(message.channel, causo.format(x, y))
+    await jose.say(causo.format(x, y))
 
 help_josecoin = make_func(jcoin.JOSECOIN_HELP_TEXT)
 josecoin_save = lambda x,y: None
@@ -334,28 +328,26 @@ def add_sentence(content, author):
     else:
         print("ignoring(len(sd.strip) < 1)")
 
-@asyncio.coroutine
-def show_josetxt(message):
+async def show_josetxt(message):
     output = subprocess.Popen(['wc', '-l', 'jose-data.txt'], stdout=subprocess.PIPE).communicate()[0]
-    yield from client.send_message(message.channel, output)
+    await jose.say(output)
 
-@asyncio.coroutine
-def learn_data(message):
-    res = yield from jcoin_control(message.author.id, LEARN_PRICE)
+async def learn_data(message):
+    res = await jcoin_control(message.author.id, LEARN_PRICE)
     if not res[0]:
-        yield from client.send_message(message.channel,
+        await client.send_message(message.channel,
             "PermError: %s" % res[1])
-        return
+        raise je.PermissionError()
 
-    auth = yield from check_roles(LEARN_ROLE, message.author.roles)
+    auth = await check_roles(LEARN_ROLE, message.author.roles)
     if not auth:
-        yield from client.send_message(message.channel,
+        await client.send_message(message.channel,
             "JCError: usuário não autorizado a usar o !learn")
-        return
+        raise je.PermissionError()
 
     args = message.content.split(' ')
     data_to_learn = ' '.join(args[1:])
-    yield from add_sentence(data_to_learn, message.author)
+    await add_sentence(data_to_learn, message.author)
     feedback = 'texto inserido no jose-data.txt!\n'
 
     # quick'n'easy solution
@@ -363,11 +355,10 @@ def learn_data(message):
     word_count = data_to_learn.count(' ')
     byte_count = len(data_to_learn)
     feedback += "%d linhas, %d palavras e %d bytes foram inseridos\n" % (line_count, word_count, byte_count)
-    yield from client.send_message(message.channel, feedback)
+    await jose.say(feedback)
     return
 
-@asyncio.coroutine
-def josecoin_send(message):
+async def josecoin_send(message):
     global GAMBLING_LAST_BID
     args = message.content.split(' ')
 
@@ -376,7 +367,7 @@ def josecoin_send(message):
         amount = float(args[2])
 
         id_from = message.author.id
-        id_to = yield from parse_id(id_to, message)
+        id_to = await parse_id(id_to, message)
 
         fee_amount = amount * (GAMBLING_FEE/100.)
         atleast = (amount + fee_amount)
@@ -384,11 +375,11 @@ def josecoin_send(message):
         if GAMBLING_MODE:
             a = jcoin.get(id_from)[1]
             if a['amount'] <= atleast:
-                yield from client.send_message(message.channel, "sua conta não possui fundos suficientes para apostar(%.2fJC são necessários, você tem %.2fJC, faltam %.2fJC)" % (atleast, a['amount'], atleast - a['amount']))
+                await client.send_message(message.channel, "sua conta não possui fundos suficientes para apostar(%.2fJC são necessários, você tem %.2fJC, faltam %.2fJC)" % (atleast, a['amount'], atleast - a['amount']))
                 return
 
             if amount < GAMBLING_LAST_BID:
-                yield from client.send_message(message.channel, "sua aposta tem que ser maior do que a última, que foi %.2fJC" % GAMBLING_LAST_BID)
+                await client.send_message(message.channel, "sua aposta tem que ser maior do que a última, que foi %.2fJC" % GAMBLING_LAST_BID)
                 return
 
         res = ''
@@ -396,9 +387,9 @@ def josecoin_send(message):
             res = jcoin.transfer(id_from, id_to, atleast, jcoin.LEDGER_PATH)
         else:
             res = jcoin.transfer(id_from, id_to, amount, jcoin.LEDGER_PATH)
-        yield from josecoin_save(message, False)
+        await josecoin_save(message, False)
         if res[0]:
-            yield from client.send_message(message.channel, res[1])
+            await client.send_message(message.channel, res[1])
             if GAMBLING_MODE:
                 if id_to == jcoin.jose_id:
                     # use jenv
@@ -408,65 +399,50 @@ def josecoin_send(message):
                     jose_env['apostas'][id_from] += amount
                     val = jose_env['apostas'][id_from]
                     GAMBLING_LAST_BID = amount
-                    yield from client.send_message(message.channel, "jc_aposta: aposta total de %.2f de <@%s>" % (val, id_from))
+                    await client.send_message(message.channel, "jc_aposta: aposta total de %.2f de <@%s>" % (val, id_from))
             return
         else:
-            yield from client.send_message(message.channel, 'erro em jc: %s' % res[1])
+            await client.send_message(message.channel, 'erro em jc: %s' % res[1])
     except Exception as e:
-        yield from jose_debug(message, "py_error: %s" % str(e))
+        await jose_debug(message, "py_error: %s" % str(e))
 
 
-@asyncio.coroutine
-def josecoin_dbg(message):
-    yield from client.send_message(message.channel, jcoin.data)
+async def show_jenv(message):
+    await client.send_message(message.channel, "`%r`" % jose_env)
 
-@asyncio.coroutine
-def show_jenv(message):
-    yield from client.send_message(message.channel, "`%r`" % jose_env)
-
-@asyncio.coroutine
-def demon(message):
+async def demon(message):
     if DEMON_MODE:
-        yield from client.send_message(message.channel, random.choice(demon_videos))
+        await jose.say(random.choice(demon_videos))
     else:
-        yield from client.send_message(message.channel, "espere até que o modo demônio seja sumonado em momentos específicos.")
+        await jose.say("espere até que o modo demônio seja sumonado em momentos específicos.")
 
-@asyncio.coroutine
-def rand_emoji(message):
-    res = yield from random_emoji(random.randint(1,5))
-    yield from client.send_message(message.channel, "%s" % res)
-
-@asyncio.coroutine
-def main_status(message):
+async def main_status(message):
     global MAINTENANCE_MODE
-    auth = yield from check_roles(MASTER_ROLE, message.author.roles)
+    auth = await check_roles(MASTER_ROLE, message.author.roles)
     if auth:
         MAINTENANCE_MODE = not MAINTENANCE_MODE
-        yield from jose_debug(message, "Modo de construção: %s" % (MAINTENANCE_MODE))
+        await jose_debug(message, "Modo de construção: %s" % (MAINTENANCE_MODE))
     else:
-        yield from jose_debug(message, "PermError: Não permitido alterar o status do jose")
+        await jose_debug(message, "PermError: Não permitido alterar o status do jose")
 
-@asyncio.coroutine
-def show_maintenance(message):
-    yield from client.send_message(message.channel, "==JOSÉ EM CONSTRUÇÃO, AGUARDE==\nhttps://umasofe.files.wordpress.com/2012/11/placa.jpg")
+async def show_maintenance(message):
+    await client.send_message(message.channel, "==JOSÉ EM CONSTRUÇÃO, AGUARDE==\nhttps://umasofe.files.wordpress.com/2012/11/placa.jpg")
 
-@asyncio.coroutine
-def init_aposta(message):
+async def init_aposta(message):
     global GAMBLING_MODE
     if message.channel.is_private:
-        yield from client.send_message(message.channel, "Nenhum canal privado é autorizado a iniciar apostas")
+        await jose.say("Nenhum canal privado é autorizado a iniciar o modo de aposta")
         return
 
     if not GAMBLING_MODE:
         GAMBLING_MODE = True
-        yield from client.send_message(message.channel, "Modo aposta ativado, mandem seus JC$!")
+        await jose.say("Modo aposta ativado, mandem seus JC$!")
         return
     else:
-        yield from client.send_message(message.channel, "Modo aposta já foi ativado.")
+        await jose.say("Modo aposta já foi ativado.")
         return
 
-@asyncio.coroutine
-def aposta_start(message):
+async def aposta_start(message):
     global GAMBLING_MODE
     global GAMBLING_LAST_BID
     PORCENTAGEM_GANHADOR = 76.54
@@ -477,7 +453,7 @@ def aposta_start(message):
 
     K = list(jose_env['apostas'].keys())
     if len(K) < 2:
-        yield from client.send_message(message.channel, "Nenhuma aposta com mais de 1 jogador foi feita, modo aposta desativado.")
+        await client.send_message(message.channel, "Nenhuma aposta com mais de 1 jogador foi feita, modo aposta desativado.")
         GAMBLING_MODE = False
         return
     winner = random.choice(K)
@@ -493,8 +469,8 @@ def aposta_start(message):
     if res[0]:
         report += "<@%s> ganhou %.2fJC nessa aposta por ser o ganhador!\n" % (winner, P)
     else:
-        yield from jose_debug(message, "erro no jc_aposta->jcoin: %s" % res[1])
-        yield from jose_debug(message, "aposta abortada.")
+        await jose_debug(message, "erro no jc_aposta->jcoin: %s" % res[1])
+        await jose_debug(message, "aposta abortada.")
         return
 
     del jose_env['apostas'][winner]
@@ -505,11 +481,11 @@ def aposta_start(message):
         if res[0]:
             report += "<@%s> ganhou %.2fJC nessa aposta!\n" % (apostador, p)
         else:
-            yield from jose_debug(message, "erro no jc_aposta->jcoin: %s" % res[1])
-            yield from jose_debug(message, "aposta abortada.")
+            await jose_debug(message, "erro no jc_aposta->jcoin: %s" % res[1])
+            await jose_debug(message, "aposta abortada.")
             return
 
-    yield from client.send_message(message.channel, "%s\nModo aposta desativado!\nhttp://i.imgur.com/huUlJhR.jpg" % (report))
+    await client.send_message(message.channel, "%s\nModo aposta desativado!\nhttp://i.imgur.com/huUlJhR.jpg" % (report))
 
     # clear everything
     jose_env['apostas'] = {}
@@ -517,26 +493,24 @@ def aposta_start(message):
     GAMBLING_LAST_BID = 0.0
     return
 
-@asyncio.coroutine
-def aposta_report(message):
+async def aposta_report(message):
     res = ''
     total = 0.0
     for apostador in jose_env['apostas']:
         res += '<@%s> apostou %.2fJC\n' % (apostador, jose_env['apostas'][apostador])
         total += jose_env['apostas'][apostador]
     res += 'Total apostado: %.2fJC' % (total)
-    yield from client.send_message(message.channel, res)
+    await client.send_message(message.channel, res)
     return
 
-@asyncio.coroutine
-def show_price(message):
+async def show_price(message):
     res = ''
 
     for k in PRICE_TABLE:
         d = PRICE_TABLE[k]
         res += "categoria %r: %s > %.2f\n" % (k, d[0], d[1])
 
-    yield from client.send_message(message.channel, res)
+    await client.send_message(message.channel, res)
     return
 
 '''
@@ -586,7 +560,6 @@ commands_start = {
     '!ping': pong,
     '!xuxa': demon,
     'axux!': demon,
-    '!emoji': rand_emoji,
 
     '!jasm': make_func(jasm.JASM_HELP_TEXT),
     '!construção': main_status,
