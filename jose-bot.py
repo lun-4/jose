@@ -140,7 +140,7 @@ async def make_pisca(message):
             animate_banner = '%s' % animate
 
         await client.edit_message(animate_msg, animate_banner)
-        time.sleep(1)
+        await asyncio.sleep(1)
 
     animation_counter -= 1
 
