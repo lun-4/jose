@@ -112,7 +112,7 @@ class JoseNSFW(jcommon.Extension):
         r = json.loads(content)
 
         try:
-            await self.say(self.codeblock('%s:\n%s' % (term, r['list'][0]['definition'])))
+            await self.say(self.codeblock('', '%s:\n%s' % (term, r['list'][0]['definition'])))
         except Exception as e:
             await self.debug('```%s```'%traceback.format_exc())
         return

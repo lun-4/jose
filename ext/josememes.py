@@ -123,6 +123,21 @@ class JoseMemes(jcommon.Extension):
                 raise IOError("banco de dados não carregado corretamente")
 
             return
+
+        elif args[1] == 'saveload':
+            done = await self.save_memes()
+            if done:
+                await self.say("jmemes: banco de dados salvo")
+            else:
+                raise IOError("banco de dados não salvo corretamente")
+
+            done = await self.load_memes()
+            if done:
+                await self.say("jmemes: banco de dados carregado")
+            else:
+                raise IOError("banco de dados não carregado corretamente")
+
+            return
         elif args[1] == 'list':
             await self.say("memes: %s" % ', '.join(self.memes.keys()))
         elif args[1] == 'get':
@@ -137,10 +152,10 @@ class JoseMemes(jcommon.Extension):
         elif args[1] == 'search':
             term = ' '.join(args[2:])
             probables = [key for key in self.memes if term in key]
-            if len(probables) > 1:
+            if len(probables) > 0:
                 await self.say("Resultados: %s" % ', '.join(probables))
             else:
-                await self.say("Nenhum resultado encontrado")
+                await self.say("%r: Nenhum resultado encontrado" % term)
         else:
             await self.say("comando inválido: %s" % args[1])
             return
