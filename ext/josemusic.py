@@ -113,10 +113,7 @@ class JoseMusic(jcommon.Extension):
         await self.say("%s" % res)
 
     async def c_minit(self, msg, args):
-        auth = await check_roles(MUSIC_ROLE, msg.author.roles)
-        if not auth:
-            await self.say("jm_PermissionError: usuário não autorizado")
-            return
+        auth = await self.rolecheck(MUSIC_ROLE)
 
         if self.init_flag:
             await self.say("JMusic já conectado")
@@ -128,10 +125,7 @@ class JoseMusic(jcommon.Extension):
         self.init_flag = True
 
     async def c_play(self, message, args):
-        auth = await check_roles(MUSIC_ROLE, message.author.roles)
-        if not auth:
-            await self.say("jm_PermissionError: usuário não autorizado")
-            return
+        auth = await self.rolecheck(MUSIC_ROLE)
 
         if not self.init_flag:
             await self.say("JMusic não foi iniciado")
@@ -143,24 +137,19 @@ class JoseMusic(jcommon.Extension):
             'quiet': True,
         }
 
-        try:
-            args = message.content.split(' ')
-            song = ' '.join(args[1:])
-            player = await state.voice.create_ytdl_player(song, ytdl_options=opts, after=state.toggle_next)
-        except Exception as e:
-            await self.say("jm_err: pyerr: `%s`" % e)
-        else:
-            player.volume = 0.6
-            entry = Entry(message, player)
-            await self.say('Colocado na fila: %s' % entry)
-            state.songlist.append(entry)
-            await state.songs.put(entry)
+        args = message.content.split(' ')
+        song = ' '.join(args[1:])
+        player = await state.voice.create_ytdl_player(song, ytdl_options=opts, after=state.toggle_next)
+
+
+        player.volume = 0.6
+        entry = Entry(message, player)
+        await self.say('Colocado na fila: %s' % entry)
+        state.songlist.append(entry)
+        await state.songs.put(entry)
 
     async def c_pause(self, message, args):
-        auth = await check_roles(MUSIC_ROLE, message.author.roles)
-        if not auth:
-            await self.say("jm_PermissionError: usuário não autorizado")
-            return
+        auth = await self.rolecheck(MUSIC_ROLE)
 
         if self.state.is_playing():
             player = self.state.current.player
@@ -177,10 +166,7 @@ class JoseMusic(jcommon.Extension):
             player.resume()
 
     async def c_queue(self, message, args):
-        auth = await check_roles(MUSIC_ROLE, message.author.roles)
-        if not auth:
-            await self.say("jm_PermissionError: usuário não autorizado")
-            return
+        auth = await self.rolecheck(MUSIC_ROLE)
         res = 'Lista de sons: \n'
         for song in self.state.songlist:
             res += ' * %s\n' % song
@@ -196,10 +182,7 @@ class JoseMusic(jcommon.Extension):
             await self.say("Loop não iniciado")
 
     async def c_stop(self, message, args):
-        auth = await check_roles(MUSIC_ROLE, message.author.roles)
-        if not auth:
-            await self.say("jm_PermissionError: usuário não autorizado")
-            return
+        auth = await self.rolecheck(MUSIC_ROLE)
         state = self.state
 
         if state.is_playing():
@@ -214,10 +197,7 @@ class JoseMusic(jcommon.Extension):
             await self.say("c_stop: pyerr: %s" % e)
 
     async def c_zelao(self, message, args):
-        auth = await check_roles(MUSIC_ROLE, message.author.roles)
-        if not auth:
-            await self.say("jm_PermissionError: usuário não autorizado")
-            return
+        auth = await self.rolecheck(MUSIC_ROLE)
         if not self.loop_started:
             self.loop_started = True
             await self.state.player_task()
