@@ -72,7 +72,7 @@ def transfer(id_from, id_to, amnt, file_name):
     except Exception as e:
         return False, str(e)
 
-    print('acf', acc_from, 'act', acc_to, 'amount', amnt)
+    print('from', acc_from, 'to', acc_to, 'amount', amnt)
     if not (acc_from['amount'] >= amnt):
         return False, "conta não possui fundos suficientes para a transação"
 
@@ -189,6 +189,8 @@ class JoseCoin(jcommon.Extension):
             await self.say("LimitError: valores maiores do que 16 não válidos")
             #raise jcommon.LimitError()
             return
+
+        print("top10 query")
 
         order = []
 

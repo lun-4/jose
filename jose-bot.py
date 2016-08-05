@@ -443,6 +443,7 @@ async def init_aposta(message):
         return
 
 async def aposta_start(message):
+    # TODO: FIX OTHERWORLDLY BUG
     global GAMBLING_MODE
     global GAMBLING_LAST_BID
     PORCENTAGEM_GANHADOR = 76.54
