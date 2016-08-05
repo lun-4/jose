@@ -464,6 +464,9 @@ async def aposta_start(message):
     P = (M * PORCENTAGEM_GANHADOR)
     p = (M * PORCENTAGEM_OUTROS) / apostadores
 
+    if jcoin.data[jcoin.jose_id]['amount'] < M:
+        await jose.debug("aposta->jcoin: **JOSÉ NÃO POSSUI FUNDOS SUFICIENTES PARA A APOSTA**")
+
     report = ''
 
     res = jcoin.transfer(jcoin.jose_id, winner, P, jcoin.LEDGER_PATH)
@@ -482,8 +485,7 @@ async def aposta_start(message):
         if res[0]:
             report += "<@%s> ganhou %.2fJC nessa aposta!\n" % (apostador, p)
         else:
-            await jose_debug(message, "erro no jc_aposta->jcoin: %s" % res[1])
-            await jose_debug(message, "aposta abortada.")
+            await jose.debug("jc_aposta->jcoin: %s" % res[1])
             return
 
     await client.send_message(message.channel, "%s\nModo aposta desativado!\nhttp://i.imgur.com/huUlJhR.jpg" % (report))
