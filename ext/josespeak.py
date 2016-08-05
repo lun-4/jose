@@ -127,3 +127,11 @@ class JoseSpeak(jcommon.Extension):
 
     async def c_falar(self, message, args):
         await self.speak_routine(message.channel, True)
+
+    async def c_josetxt(message):
+        '''!josetxt
+
+        Mostra a quantidade de linhas, palavras e bytes no jose-data.txt
+        '''
+        output = subprocess.Popen(['wc', 'jose-data.txt'], stdout=subprocess.PIPE).communicate()[0]
+        await jose.say(output)

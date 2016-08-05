@@ -24,7 +24,7 @@ Alguns comandos pedem JC$ em troca da sua funcionalidade(*comandos nsfw incluíd
 data = {}
 jose_id = jcommon.JOSE_ID
 
-LEDGER_PATH = 'jcoin/josecoin-2.journal'
+LEDGER_PATH = 'jcoin/josecoin-3.journal'
 
 def ledger_data(fpath, data):
     with open(fpath, 'a') as f:
@@ -91,7 +91,7 @@ def load(fname):
     except Exception as e:
         return False, str(e)
 
-    # data[jose_id] = empty_acc('jose-bot', 50000)
+    data[jose_id] = empty_acc('jose-bot', 1000000)
     #ledger_data(fname.replace('db', 'journal'), '%f;LOAD;%r\n' % (time.time(), data))
     return True, "load %s" % fname
 

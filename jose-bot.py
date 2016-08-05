@@ -328,10 +328,6 @@ def add_sentence(content, author):
     else:
         print("ignoring(len(sd.strip) < 1)")
 
-async def show_josetxt(message):
-    output = subprocess.Popen(['wc', '-l', 'jose-data.txt'], stdout=subprocess.PIPE).communicate()[0]
-    await jose.say(output)
-
 async def learn_data(message):
     res = await jcoin_control(message.author.id, LEARN_PRICE)
     if not res[0]:
@@ -541,24 +537,19 @@ commands_start = {
     '!pisca': make_pisca,
 
     '!causar': make_causo,
-    # MOV(new protocol)'!uptime': show_uptime,
 
     # (need to work on the polling system)
     # (   OR  USE  FUCKING   STRAWPOLL   )
     # DEAC '!pesquisa': make_pesquisa,
     # DEAC '!voto': make_voto,
 
-    '!josetxt': show_josetxt,
     '!learn': learn_data,
 
     '!josecoin': help_josecoin,
     '!save': josecoin_save,
     '!load': josecoin_load,
     # '!jcdebug': josecoin_dbg,
-    # RMV '!jcdata': josecoin_dbg,
     '!enviar': josecoin_send,
-    # RMV '!saldo': josecoin_saldo,
-    # RMV '!jenv': show_jenv,
 
     '!ping': pong,
     '!xuxa': demon,
