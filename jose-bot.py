@@ -711,21 +711,23 @@ def on_message(message):
 
         if command == 'help':
             # load helptext
+            help_helptext = """`!help` - achar ajuda para outros comandos
+            `!help comando` - procura algum texto de ajuda para o comando dado
+            """
             if args[1] == 'help':
-                await jose.say("""`!help` - achar ajuda para outros comandos
-                `!help comando` - procura algum texto de ajuda para o comando dado""")
+                yield from jose.say(help_helptext)
                 return
 
             try:
                 jose_method = getattr(jose, args[1])
             except AttributeError:
-                await self.say("%s: não encontrado" % command)
+                yield from self.say("%s: não encontrado" % command)
                 return
 
             try:
-                await jose.say(jose_method.__doc__)
+                yield from jose.say(jose_method.__doc__)
             except Exception as e:
-                await jose.say(repr(e))
+                yield from jose.say(repr(e))
             return
 
         try:
