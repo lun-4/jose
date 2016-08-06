@@ -67,6 +67,8 @@ class JoseMemes(jcommon.Extension):
         `!meme list` - mostra todos os memes que estão escritos no josé
         `!meme search <termo>` - procura o banco de dados de memes por um meme específico
         `!meme rm <meme>` - remove um meme
+        `!meme rename <nome antigo>;<nome novo>` - altera o `<trigger>` de um meme
+        `!meme owner <meme>` - mostra quem "criou" o `<meme>`
 
         Tenha cuidado ao adicionar coisas NSFW.
         '''
@@ -185,7 +187,7 @@ class JoseMemes(jcommon.Extension):
         elif args[1] == 'owner':
             meme = ' '.join(args[2:])
             if meme in self.memes:
-                u = discord.User(id=self.memes[meme]['owner'])
+                u = discord.utils.get(message.server.members, id=self.memes[meme]['owner'])
                 await self.say("%s foi criado por %s" % (meme, u))
             else:
                 await self.say("%s: meme não encontrado" % meme)
