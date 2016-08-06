@@ -158,7 +158,7 @@ GAMBLING_HELP_TEXT = '''O que é: Função que permite dois (ou mais) usuários 
 Como funciona:
 -Primeiro, ativar o "modo aposta" do jose-bot com o comando: !aposta (qualquer um pode começar uma aposta)
 -jose-bot printa a mensagem "Modo aposta ativado. Joguem suas granas!" ou algo do tipo
--Enquanto o "modo aposta" estiver ativado, qualquer um que !enviar josecoins para o jose-bot entra na aposta, o jose-bot grava o nome da pessoa
+-Enquanto o "modo aposta" estiver ativado, qualquer um que !ap josecoins para o jose-bot entra na aposta, o jose-bot grava o nome da pessoa
 temporariamente como se fosse um "acesso a memória RAM"
 -As apostas são cumulativas, ou seja, se uma mesma pessoa !enviar 20 e depois !enviar 40, é como se ela apostasse 60 josecoins de uma vez
 -Quando todos tiverem feito suas apostas, inserir o comando !rolar (ou outro nome sla), o que fará com que o jose-bot sorteie aleatoriamente uma pessoa com base na fórmula: n = 1/x (x sendo o número de pessoas que entraram na aposta)
@@ -169,9 +169,9 @@ Exemplo:
 Número de apostadores = 3 (pessoas A, B e C, respectivamente)
 Inserindo o comando ---> !aposta
 jose-bot printa: "Modo aposta ativado. Joguem suas granas!"
-A pessoa A aposta 50 josecoins ---> !enviar @ZELAO 50
-A pessoa B aposta 30 josecoins ---> !enviar @ZELAO 30
-A pessoa C aposta 20 josecoins ---> !enviar @ZELAO 20
+A pessoa A aposta 50 josecoins ---> !ap 50
+A pessoa B aposta 30 josecoins ---> !ap 30
+A pessoa C aposta 20 josecoins ---> !ap 20
 "Rolando o dado" ---> !rolar
 
 Cálculo do prêmio:
@@ -189,7 +189,7 @@ Desses 23.46 josecoins, as pessoas A e C vão receber, cada uma, 11.73 josecoins
 
 GAMBLING_HELP_TEXT_SMALL = '''Aposta for Dummies:
 !aposta - inicia modo de aposta do jose
-!enviar <mention pro jose> <quantidade> - aposta propiamente dita
+!ap <quantidade> - aposta propiamente dita
 !rolar - quando você já está pronto pra ver quem é o ganhador
 '''
 

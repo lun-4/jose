@@ -17,12 +17,12 @@ class JoseGambling(jcommon.Extension):
         jcommon.Extension.__init__(self, cl)
         self.last_bid = 0.0
         self.gambling_mode = False
-        self.env = {}
+        self.gambling_env = {}
 
     async def ext_load(self):
         self.last_bid = 0.0
         self.gambling_mode = False
-        self.env = {}
+        self.gambling_env = {}
 
     async def c_aposta(self, message, args):
         '''`!aposta` - inicia o modo aposta se ainda não foi ativado'''
@@ -74,15 +74,15 @@ class JoseGambling(jcommon.Extension):
         await jcoin.raw_save()
         if res[0]:
             await self.say(res[1])
-            if id_to == jcoin.jose_id:
-                # use jenv
-                if not id_from in self.env:
-                    self.env[id_from] = 0
-                    self.env[id_from] += amount
-                val = self.env[id_from]
-                self.last_bid = amount
-                await self.say("jc_aposta: aposta *total* de %.2f de <@%s>" % (val, id_from))
-            return
+            # use jenv
+            if not id_from in self.gambling_env:
+                self.gambling_env[id_from] = 0
+
+            self.gambling_env[id_from] += amount
+            val = self.gambling_env[id_from]
+
+            self.last_bid = amount
+            await self.say("jc_aposta: aposta *total* de %.2f de <@%s>" % (val, id_from))
         else:
             await self.say('jc->error: %s' % res[1])
 
@@ -95,15 +95,15 @@ class JoseGambling(jcommon.Extension):
         PORCENTAGEM_GANHADOR /= 100
         PORCENTAGEM_OUTROS /= 100
 
-        K = list(self.env.keys())
+        K = list(self.gambling_env.keys())
         if len(K) < 2:
             await self.say("Nenhuma aposta com mais de 1 jogador foi feita, modo aposta desativado.")
             self.gambling_mode = False
             return
         winner = random.choice(K)
 
-        M = sum(self.env.values()) # total
-        apostadores = len(self.env)-1 # remove one because of the winner
+        M = sum(self.gambling_env.values()) # total
+        apostadores = len(self.gambling_env)-1 # remove one because of the winner
         P = (M * PORCENTAGEM_GANHADOR)
         p = (M * PORCENTAGEM_OUTROS) / apostadores
 
@@ -119,10 +119,10 @@ class JoseGambling(jcommon.Extension):
             await self.debug("jc_gambling->jc: %s\naposta abortada" % res[1])
             return
 
-        del self.env[winner]
+        del self.gambling_env[winner]
 
         # going well...
-        for apostador in self.env:
+        for apostador in self.gambling_env:
             res = jcoin.transfer(jcoin.jose_id, apostador, p, jcoin.LEDGER_PATH)
             if res[0]:
                 report += "<@%s> ganhou %.2fJC nessa aposta!\n" % (apostador, p)
@@ -133,7 +133,7 @@ class JoseGambling(jcommon.Extension):
         await self.say("%s\nModo aposta desativado!\nhttp://i.imgur.com/huUlJhR.jpg" % (report))
 
         # clear everything
-        self.env = {}
+        self.gambling_env = {}
         self.gambling_mode = False
         self.last_bid = 0.0
         return
@@ -142,9 +142,9 @@ class JoseGambling(jcommon.Extension):
         '''`!areport` - relatório da aposta'''
         res = ''
         total = 0.0
-        for apostador in self.env:
-            res += '<@%s> apostou %.2fJC\n' % (apostador, self.env[apostador])
-            total += self.env[apostador]
+        for apostador in self.gambling_env:
+            res += '<@%s> apostou %.2fJC\n' % (apostador, self.gambling_env[apostador])
+            total += self.gambling_env[apostador]
         res += 'Total apostado: %.2fJC' % (total)
 
         await self.say(res)

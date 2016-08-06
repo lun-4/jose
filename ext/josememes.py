@@ -125,6 +125,7 @@ class JoseMemes(jcommon.Extension):
             return
 
         elif args[1] == 'saveload':
+            print('saveload')
             done = await self.save_memes()
             if done:
                 await self.say("jmemes: banco de dados salvo")
