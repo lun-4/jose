@@ -371,7 +371,11 @@ async def josecoin_send(message):
         return
 
     id_to = args[1]
-    amount = float(args[2])
+    try:
+        amount = float(args[2])
+    except ValueError:
+        await jose.say("ValueError: erro parseando o valor")
+        return
 
     id_from = message.author.id
     id_to = await parse_id(id_to, message)
@@ -382,11 +386,11 @@ async def josecoin_send(message):
     if GAMBLING_MODE:
         a = jcoin.get(id_from)[1]
         if amount < GAMBLING_LAST_BID:
-            await client.send_message(message.channel, "sua aposta tem que ser maior do que a última, que foi %.2fJC" % GAMBLING_LAST_BID)
+            await jose.say("sua aposta tem que ser maior do que a última, que foi %.2fJC" % GAMBLING_LAST_BID)
             return
 
         if a['amount'] <= atleast:
-            await client.send_message(message.channel, "sua conta não possui fundos suficientes para apostar(%.2fJC são necessários, você tem %.2fJC, faltam %.2fJC)" % (atleast, a['amount'], atleast - a['amount']))
+            await jose.say("sua conta não possui fundos suficientes para apostar(%.2fJC são necessários, você tem %.2fJC, faltam %.2fJC)" % (atleast, a['amount'], atleast - a['amount']))
             return
 
     res = ''
