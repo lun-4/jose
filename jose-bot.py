@@ -724,6 +724,8 @@ def on_message(message):
                     return
                 else:
                     cmd_ht = args[1]
+            except:
+                pass
 
             try:
                 jose_method = getattr(jose, cmd_ht)
