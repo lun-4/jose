@@ -70,7 +70,6 @@ class JoseGambling(jcommon.Extension):
             await self.say("sua conta não possui fundos suficientes para apostar(%.2fJC são necessários, você tem %.2fJC, faltam %.2fJC)" % (atleast, a['amount'], atleast - a['amount']))
             return
 
-        res = ''
         res = jcoin.transfer(id_from, id_to, atleast, jcoin.LEDGER_PATH)
         await jcoin.raw_save()
         if res[0]:
