@@ -12,7 +12,7 @@ random = SystemRandom()
 import joseerror as je
 
 JOSE_VERSION = '0.8.4'
-JOSE_BUILD = 321
+JOSE_BUILD = 322
 
 APP_CLIENT_ID = 'ID DO JOSE AQUI'
 OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=103988231' % APP_CLIENT_ID
