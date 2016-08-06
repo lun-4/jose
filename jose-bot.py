@@ -711,15 +711,22 @@ def on_message(message):
 
         if command == 'help':
             # load helptext
+            yield from jose.recv(message) # default
+
             help_helptext = """`!help` - achar ajuda para outros comandos
             `!help comando` - procura algum texto de ajuda para o comando dado
             """
-            if args[1] == 'help':
-                yield from jose.say(help_helptext)
-                return
+
+            cmd_ht = 'help'
+            try:
+                if args[1] == 'help':
+                    yield from jose.say(help_helptext)
+                    return
+                else:
+                    cmd_ht = args[1]
 
             try:
-                jose_method = getattr(jose, args[1])
+                jose_method = getattr(jose, cmd_ht)
             except AttributeError:
                 yield from self.say("%s: não encontrado" % command)
                 return
