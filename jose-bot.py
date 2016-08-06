@@ -355,52 +355,60 @@ async def learn_data(message):
     return
 
 async def josecoin_send(message):
+    """`!enviar` - envie josecoins pra galera!
+
+    Sintaxe:
+    `!enviar @mention quantidade` - envia `quantidade` JCoins para `@mention`
+
+    Exemplo:
+    `!enviar @jose-bot 20` - envia 20JCoins para o @jose-bot
+    """
     global GAMBLING_LAST_BID
     args = message.content.split(' ')
 
-    try:
-        id_to = args[1]
-        amount = float(args[2])
+    if len(args) != 3:
+        await jose.say(josecoin_send.__doc__)
+        return
 
-        id_from = message.author.id
-        id_to = await parse_id(id_to, message)
+    id_to = args[1]
+    amount = float(args[2])
 
-        fee_amount = amount * (GAMBLING_FEE/100.)
-        atleast = (amount + fee_amount)
+    id_from = message.author.id
+    id_to = await parse_id(id_to, message)
 
-        if GAMBLING_MODE:
-            a = jcoin.get(id_from)[1]
-            if a['amount'] <= atleast:
-                await client.send_message(message.channel, "sua conta não possui fundos suficientes para apostar(%.2fJC são necessários, você tem %.2fJC, faltam %.2fJC)" % (atleast, a['amount'], atleast - a['amount']))
-                return
+    fee_amount = amount * (GAMBLING_FEE/100.)
+    atleast = (amount + fee_amount)
 
-            if amount < GAMBLING_LAST_BID:
-                await client.send_message(message.channel, "sua aposta tem que ser maior do que a última, que foi %.2fJC" % GAMBLING_LAST_BID)
-                return
-
-        res = ''
-        if GAMBLING_MODE:
-            res = jcoin.transfer(id_from, id_to, atleast, jcoin.LEDGER_PATH)
-        else:
-            res = jcoin.transfer(id_from, id_to, amount, jcoin.LEDGER_PATH)
-        await josecoin_save(message, False)
-        if res[0]:
-            await client.send_message(message.channel, res[1])
-            if GAMBLING_MODE:
-                if id_to == jcoin.jose_id:
-                    # use jenv
-                    if not id_from in jose_env['apostas']:
-                        jose_env['apostas'][id_from] = 0
-
-                    jose_env['apostas'][id_from] += amount
-                    val = jose_env['apostas'][id_from]
-                    GAMBLING_LAST_BID = amount
-                    await client.send_message(message.channel, "jc_aposta: aposta total de %.2f de <@%s>" % (val, id_from))
+    if GAMBLING_MODE:
+        a = jcoin.get(id_from)[1]
+        if amount < GAMBLING_LAST_BID:
+            await client.send_message(message.channel, "sua aposta tem que ser maior do que a última, que foi %.2fJC" % GAMBLING_LAST_BID)
             return
-        else:
-            await client.send_message(message.channel, 'erro em jc: %s' % res[1])
-    except Exception as e:
-        await jose_debug(message, "py_error: %s" % str(e))
+
+        if a['amount'] <= atleast:
+            await client.send_message(message.channel, "sua conta não possui fundos suficientes para apostar(%.2fJC são necessários, você tem %.2fJC, faltam %.2fJC)" % (atleast, a['amount'], atleast - a['amount']))
+            return
+
+    res = ''
+    if GAMBLING_MODE:
+        res = jcoin.transfer(id_from, id_to, atleast, jcoin.LEDGER_PATH)
+    else:
+        res = jcoin.transfer(id_from, id_to, amount, jcoin.LEDGER_PATH)
+    await josecoin_save(message, False)
+    if res[0]:
+        await jose.say(res[1])
+        if GAMBLING_MODE:
+            if id_to == jcoin.jose_id:
+                # use jenv
+                if not id_from in jose_env['apostas']:
+                    jose_env['apostas'][id_from] = 0
+                    jose_env['apostas'][id_from] += amount
+                val = jose_env['apostas'][id_from]
+                GAMBLING_LAST_BID = amount
+                await client.send_message(message.channel, "jc_aposta: aposta total de %.2f de <@%s>" % (val, id_from))
+        return
+    else:
+        await client.send_message(message.channel, 'erro em jc: %s' % res[1])
 
 
 async def show_jenv(message):
@@ -844,7 +852,7 @@ def on_message(message):
                     # set timeout of user
                     if not message.author.id in jose_env['spamcl']:
                         jose_env['spamcl'][message.author.id] = time.time() + 300
-                        # yield from client.send_message(message.channel, 'spam de @%s! cooldown de 5 minutos foi aplicado!' % message.author)
+                        yield from client.send_message(message.channel, '@%s recebe cooldown de 5 minutos!' % message.author)
                         return
                     else:
                         return
