@@ -728,9 +728,12 @@ def on_message(message):
                 pass
 
             try:
-                jose_method = getattr(jose, cmd_ht)
-            except AttributeError:
-                yield from self.say("%s: não encontrado" % command)
+                if cmd_ht == 'help':
+                    yield from jose.say(help_helptext)
+                    return
+                jose_method = getattr(jose, 'c_%s' % cmd_ht)
+            except Exception as e:
+                yield from jose.say("%s: %r" % (command, e))
                 return
 
             try:
