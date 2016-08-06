@@ -12,19 +12,6 @@ sys.path.append("..")
 import josecommon as jcommon
 import joseerror as je
 
-MEME_HELP_TEXT = '''!meme: Adicione e mostre memes com o josé!
-*alias*: !m
-
-Subcomandos:
-`!meme add <trigger>;<meme>` - toda vez que alguém mandar um `!meme get <trigger>`, josé falará `<meme>`
-`!meme get <trigger>` - josé falará o que estiver programado para falar de acordo com `<trigger>`
-`!meme list` - mostra todos os memes que estão escritos no josé
-`!meme search <termo>` - procura o banco de dados de memes por um meme específico
-`!meme rm <meme>` - remove um meme
-
-Tenha cuidado ao adicionar coisas NSFW.
-'''
-
 class JoseMemes(jcommon.Extension):
     def __init__(self, cl):
         self.memes = {}
@@ -67,11 +54,24 @@ class JoseMemes(jcommon.Extension):
             return False
 
     async def c_aprovado(self, message, args):
+        '''`!aprovado` - O Melhor Sean Anthony®'''
         await self.say('http://gaveta.com.br/images/Aprovacao-Sean-Anthony.png')
 
     async def c_meme(self, message, args):
+        '''!meme: Adicione e mostre memes com o josé!
+        *alias*: !m
+
+        Subcomandos:
+        `!meme add <trigger>;<meme>` - toda vez que alguém mandar um `!meme get <trigger>`, josé falará `<meme>`
+        `!meme get <trigger>` - josé falará o que estiver programado para falar de acordo com `<trigger>`
+        `!meme list` - mostra todos os memes que estão escritos no josé
+        `!meme search <termo>` - procura o banco de dados de memes por um meme específico
+        `!meme rm <meme>` - remove um meme
+
+        Tenha cuidado ao adicionar coisas NSFW.
+        '''
         if len(args) < 2:
-            await self.say(MEME_HELP_TEXT)
+            await self.say(self.c_meme.__doc__)
             return
         elif args[1] == 'add':
             args_s = ' '.join(args[2:])
@@ -161,9 +161,11 @@ class JoseMemes(jcommon.Extension):
             return
 
     async def c_m(self, message, args):
+        '''`!m` - alias para `!meme`'''
         await self.c_meme(message, args)
 
     async def c_fullwidth(self, message, args):
+        '''`!fullwidth texto` - converte texto para fullwidth'''
         # looks like discord made fullwidth suppoert available again :D
         text = ' '.join(args[1:])
         await self.say(text.translate(self.WIDE_MAP))
@@ -172,5 +174,6 @@ class JoseMemes(jcommon.Extension):
         await self.c_fullwidth(message, args)
 
     async def c_emoji(self, message, args):
+        '''`!emoji` - gera de 1 a 5 emojis aleatórios'''
         res = await jcommon.random_emoji(random.randint(1,5))
         await jose.say(res)

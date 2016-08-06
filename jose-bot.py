@@ -707,8 +707,28 @@ def on_message(message):
         if k == -1:
             command = message.content[1:]
         args = message.content.split(' ')
+        method = "c_%s" % command
+
+        if command == 'help':
+            # load helptext
+            if args[1] == 'help':
+                await jose.say("""`!help` - achar ajuda para outros comandos
+                `!help comando` - procura algum texto de ajuda para o comando dado""")
+                return
+
+            try:
+                jose_method = getattr(jose, args[1])
+            except AttributeError:
+                await self.say("%s: não encontrado" % command)
+                return
+
+            try:
+                await jose.say(jose_method.__doc__)
+            except Exception as e:
+                await jose.say(repr(e))
+            return
+
         try:
-            method = "c_%s" % command
 
             yield from jose.recv(message) # default
             for mod in jose.modules:
