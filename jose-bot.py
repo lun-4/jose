@@ -131,7 +131,7 @@ async def make_pisca(message):
 
     args = message.content.split(' ')
     animate_data = ' '.join(args[1:])
-    animate_msg = await client.send_message(message.channel, animate_data)
+    animate_msg = await jose.say(animate_data)
 
     for i in range(10):
         if i%2 == 0:
@@ -157,7 +157,7 @@ def make_animation(message):
     animate = ' '.join(args[1:])
 
     animate_banner = ' '*(20) + animate + ' '*(10)
-    animate_msg = yield from client.send_message(message.channel, animate_banner)
+    animate_msg = yield from jose.say(animate_banner)
 
     for i in range(20):
         animate_banner = ' '*(10-i) + animate + ' '*(10+i)
@@ -355,7 +355,7 @@ async def learn_data(message):
     return
 
 async def show_jenv(message):
-    await client.send_message(message.channel, "`%r`" % jose_env)
+    await jose.say("`%r`" % jose_env)
 
 async def demon(message):
     if DEMON_MODE:
@@ -373,7 +373,7 @@ async def main_status(message):
         await jose_debug(message, "PermError: Não permitido alterar o status do jose")
 
 async def show_maintenance(message):
-    await client.send_message(message.channel, "==JOSÉ EM CONSTRUÇÃO, AGUARDE==\nhttps://umasofe.files.wordpress.com/2012/11/placa.jpg")
+    await jose.say("==JOSÉ EM CONSTRUÇÃO, AGUARDE==\nhttps://umasofe.files.wordpress.com/2012/11/placa.jpg")
 
 async def show_price(message):
     res = ''
@@ -382,7 +382,7 @@ async def show_price(message):
         d = PRICE_TABLE[k]
         res += "categoria %r: %s > %.2f\n" % (k, d[0], d[1])
 
-    await client.send_message(message.channel, res)
+    await jose.say(res)
     return
 
 '''
@@ -435,9 +435,6 @@ commands_start = {
     '!airport': show_aerotrem,
 
     '!awoo': make_func("https://images-2.discordapp.net/.eJwVyEEOwiAQAMC_8ABgEdi2nzGEIsW0LmHXeDD-vfUyh_mq99jVojaRzosxa-NMY9UsNFItuhLVvaTeWGc6TBJJeTvKS9g4e3M--BmiB8QJcLoqRnAWg50RA4TgTPoQ3f-0Ryusn72q3wkG3CWg.CTrgww5nr8mw_Fkm0BcEsEGV8t0.jpg"),
-    # MOV MEME'!Parabéns': make_func("http://puu.sh/qcSLD/f82b7f48c3.png"),
-    # DEAC '!vtnc': make_func("vai toma no cu 2"),
-    # MOV MEME '!sigabem': make_func("SIGA BEM CAMINHONEIRO"),
 
     '!price': show_price,
 }
@@ -515,7 +512,7 @@ def on_message(message):
         if time.time() > jose_env['spamcl'][user_id]:
             del jose_env['spamcl'][user_id]
             del jose_env['spam'][user_id]
-            yield from client.send_message(message.channel, "<@%s> : cooldown destruído" % user_id)
+            yield from jose.say("<@%s> : cooldown destruído" % user_id)
 
     if message.author.id in jcoin.data:
         if hasattr(message.author, 'nick'):
@@ -654,7 +651,7 @@ def on_message(message):
             return
 
     if message.content.startswith('$guess'):
-        yield from client.send_message(message.channel, 'Me fale um número de 0 a 10, imundo.')
+        yield from jose.say('Me fale um número de 0 a 10, imundo.')
 
         def guess_check(m):
             return m.content.isdigit()
@@ -663,26 +660,26 @@ def on_message(message):
         answer = random.randint(1, 10)
         if guess is None:
             fmt = 'Demorou demais, era {}.'
-            yield from client.send_message(message.channel, fmt.format(answer))
+            yield from jose.say(fmt.format(answer))
             return
         if int(guess.content) == answer:
-            yield from client.send_message(message.channel, 'Acertô miseravi!')
+            yield from jose.say('Acertô miseravi!')
         else:
-            yield from client.send_message(message.channel, 'Errou filho da puta, era {}.'.format(answer))
+            yield from jose.say('Errou filho da puta, era {}.'.format(answer))
         return
 
     elif message.content.startswith('$repl'):
-        yield from client.send_message(message.channel, 'Fale um comando python(15 segundos de timeout)')
+        yield from jose.say('Fale um comando python(15 segundos de timeout)')
 
         data = yield from client.wait_for_message(timeout=15.0, author=message.author)
 
         if data is None:
-            yield from client.send_message(message.channel, 'demorou demais')
+            yield from jose.say('demorou demais')
             return
 
         try:
             res = ast.literal_eval(str(data.content))
-            yield from client.send_message(message.channel, 'eval: %r' % res)
+            yield from jose.say('eval: %r' % res)
         except:
             yield from jose_debug(message, "erro dando eval na expressão dada")
         return
@@ -691,23 +688,23 @@ def on_message(message):
         if MAINTENANCE_MODE:
             yield from show_maintenance(message)
             return
-        yield from client.send_message(message.channel, 'Bem vindo ao REPL do JoseScript!\nPara sair, digite "exit"')
+        yield from jose.say('Bem vindo ao REPL do JoseScript!\nPara sair, digite "exit"')
 
         while True:
             data = yield from client.wait_for_message(author=message.author)
             if data.content == 'exit':
-                yield from client.send_message(message.channel, 'saindo do REPL')
+                yield from jose.say('saindo do REPL')
                 break
             else:
                 yield from josescript_eval(data)
-                # yield from client.send_message(message.channel, 'eval: %s' % )
+                # yield from jose.say('eval: %s' % )
         return
 
     elif message.content.startswith('$jasm'):
         if MAINTENANCE_MODE:
             yield from show_maintenance(message)
             return
-        yield from client.send_message(message.channel, 'Bem vindo ao REPL do JoseAssembly!\nPara sair, digite "exit"')
+        yield from jose.say('Bem vindo ao REPL do JoseAssembly!\nPara sair, digite "exit"')
 
         if not (message.author.id in jasm_env):
             jasm_env[message.author.id] = jasm.empty_env()
@@ -717,20 +714,20 @@ def on_message(message):
         while True:
             data = yield from client.wait_for_message(author=message.author)
             if data.content == 'exit':
-                yield from client.send_message(message.channel, 'saindo do REPL')
+                yield from jose.say('saindo do REPL')
                 break
             else:
                 insts = yield from jasm.parse(data.content)
                 res = yield from jasm.execute(insts, pointer)
                 if res[0] == True:
                     if len(res[2]) < 1:
-                        yield from client.send_message(message.channel, "**debug: nenhum resultado**")
+                        yield from jose.say("**debug: nenhum resultado**")
                     else:
-                        yield from client.send_message(message.channel, res[2])
+                        yield from jose.say(res[2])
                 else:
                     yield from jose_debug(message, "jasm error: %s" % res[2])
                 pointer = res[1]
-                # yield from client.send_message(message.channel, 'eval: %s' % )
+                # yield from jose.say('eval: %s' % )
         return
 
     elif "<@202587271679967232>" in message.content: #mention
@@ -748,7 +745,7 @@ def on_message(message):
                     # set timeout of user
                     if not message.author.id in jose_env['spamcl']:
                         jose_env['spamcl'][message.author.id] = time.time() + 300
-                        yield from client.send_message(message.channel, '@%s recebe cooldown de 5 minutos!' % message.author)
+                        yield from jose.say('@%s recebe cooldown de 5 minutos!' % message.author)
                         return
                     else:
                         return
@@ -763,12 +760,12 @@ def on_message(message):
                 yield from josecoin_save(message, False)
                 if res[0]:
                     acc_to = jcoin.get(author_id)[1]
-                    # yield from client.send_message(message.channel, res[1])
+                    # yield from jose.say(res[1])
                     emoji_res = yield from random_emoji(3)
                     if PARABENS_MODE:
-                        yield from client.send_message(message.channel, "Parabéns")
+                        yield from jose.say("Parabéns")
                     else:
-                        yield from client.send_message(message.channel, '%s %.2fJC > %s' % (emoji_res, amount, acc_to['name']))
+                        yield from jose.say('%s %.2fJC > %s' % (emoji_res, amount, acc_to['name']))
                 else:
                     yield from jose_debug(message, 'jc_error: %s' % res[1])
         else:

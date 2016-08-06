@@ -60,7 +60,7 @@ class VoiceState:
         if self.is_playing():
             try:
                 self.current.player.stop()
-                self.songlist.pop()
+                #self.songlist.pop()
             except Exception as e:
                 await self.say('pyerr: %s' % e)
         else:
