@@ -384,8 +384,15 @@ class JoseBot(jcommon.Extension):
     async def c_jose_add(self, message, args):
         await self.say("José pode ser adicionado para outro servidor usando este link:\n```%s```" % jcommon.OAUTH_URL)
 
-    async def c_fale(self, message, args):
-        await speak_routine(message, True)
+    async def c_clist(self, message, args):
+        modname = args[1]
+        module = self.modules[modname]
+
+        res = ''
+        for m in module['methods']:
+            res += '!%s ' % m[2:]
+
+        await self.say(res)
 
     async def c_uptime(self, message, args):
         '''def get_bot_uptime(self):

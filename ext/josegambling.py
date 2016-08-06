@@ -148,3 +148,7 @@ class JoseGambling(jcommon.Extension):
         res += 'Total apostado: %.2fJC' % (total)
 
         await self.say(res)
+
+    async def c_acheck(self, message, args):
+        '''`!acheck` - mostra se o modo aposta tá ligado ou não'''
+        await self.say("Modo aposta: %s" % ["desligado", "ligado"][self.gambling_mode])
