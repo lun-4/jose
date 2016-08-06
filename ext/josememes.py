@@ -182,6 +182,15 @@ class JoseMemes(jcommon.Extension):
             await self.say("%s foi renomeado para %s!" % (oldname, newname))
             return
 
+        elif args[1] == 'owner':
+            meme = ' '.join(args[2:])
+            if meme in self.memes:
+                u = discord.User(id=self.memes[meme]['owner'])
+                await self.say("%s foi criado por %s" % (meme, u))
+            else:
+                await self.say("%s: meme não encontrado" % meme)
+            return
+
         else:
             await self.say("comando inválido: %s" % args[1])
             return
