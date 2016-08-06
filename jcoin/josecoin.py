@@ -168,6 +168,30 @@ class JoseCoin(jcommon.Extension):
         data[id_from]['amount'] = new_amount
         await self.say("conta <@%s>: %.2f" % (id_from, data[id_from]['amount']))
 
+    async def c_enviar(self, message, args):
+        '''`!enviar @mention quantidade` - envia JCoins para uma conta'''
+
+        if len(args) != 3:
+            await self.say(self.c_enviar.__doc__)
+            return
+
+        id_to = args[1]
+        try:
+            amount = float(args[2])
+        except ValueError:
+            await self.say("ValueError: erro parseando o valor")
+            return
+
+        id_from = message.author.id
+        id_to = await jcommon.parse_id(id_to, message)
+
+        res = jcoin.transfer(id_from, id_to, amount, jcoin.LEDGER_PATH)
+        await self.josecoin_save(message, False)
+        if res[0]:
+            await self.say(res[1])
+        else:
+            await client.send_message(message.channel, 'erro em jc: %s' % res[1])
+
     async def c_top10(self, message, args):
         if self.top10_flag:
             raise je.LimitError()

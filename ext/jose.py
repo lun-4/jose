@@ -32,7 +32,7 @@ class JoseBot(jcommon.Extension):
             'survey': {},
             'spam': {},
             'spamcl': {},
-            'apostas': {},
+            # 'apostas': {},
         }
         self.start_time = time.time()
         jcommon.Extension.__init__(self, cl)
@@ -364,7 +364,7 @@ class JoseBot(jcommon.Extension):
         matcher = re.compile("rtt min/avg/max/mdev = (\d+.\d+)/(\d+.\d+)/(\d+.\d+)/(\d+.\d+)")
         rtt = matcher.search(out.decode('utf-8')).groups()
 
-        fmt = 'resultados de ping para `%s` min %sms avg %sms max %sms mdev %sms\n%s'
+        fmt = 'resultados de ping para `%s` min `%sms` avg `%sms` max `%sms` mdev `%sms`\n%s'
         looks_like = ''
         if float(rtt[1]) > 100:
             looks_like = 'Parece que algo tá rodando ruim nos servidores, cheque http://status.discordapp.com'
@@ -376,8 +376,9 @@ class JoseBot(jcommon.Extension):
         await self.say(fmt % (host, rtt[0], rtt[1], rtt[2], rtt[3], looks_like))
 
     async def c_version(self, message, args):
+        '''`!version` - mostra a versão do jose'''
         pyver = '%d.%d.%d' % (sys.version_info[:3])
-        await self.say("José v%s b%d py:%s discord.py:%s" % (jcommon.JOSE_VERSION,
+        await self.say("`José v%s b%d py:%s discord.py:%s`" % (jcommon.JOSE_VERSION,
             jcommon.JOSE_BUILD, pyver, discord.__version__))
 
     async def c_jose_add(self, message, args):
@@ -387,6 +388,10 @@ class JoseBot(jcommon.Extension):
         await speak_routine(message, True)
 
     async def c_uptime(self, message, args):
+        '''def get_bot_uptime(self):
+            delta = datetime.datetime.utcnow() - self.bot.uptime
+            print(delta)
+        '''
         sec = (time.time() - self.start_time)
         MINUTE  = 60
         HOUR    = MINUTE * 60

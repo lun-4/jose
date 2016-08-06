@@ -9,7 +9,7 @@ import joseerror as je
 
 import re
 import random
-import sys
+import subprocess
 
 tempMapping = {}
 mapping = {}
@@ -126,12 +126,11 @@ class JoseSpeak(jcommon.Extension):
             await self.say(res)
 
     async def c_falar(self, message, args):
+        """`!falar` - josé fala"""
         await self.speak_routine(message.channel, True)
 
-    async def c_josetxt(message):
-        '''!josetxt
-
-        Mostra a quantidade de linhas, palavras e bytes no jose-data.txt
+    async def c_josetxt(self, message, args):
+        '''`!josetxt` - Mostra a quantidade de linhas, palavras e bytes no jose-data.txt
         '''
         output = subprocess.Popen(['wc', 'jose-data.txt'], stdout=subprocess.PIPE).communicate()[0]
-        await jose.say(output)
+        await self.say(output)

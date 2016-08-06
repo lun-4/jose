@@ -436,84 +436,6 @@ async def main_status(message):
 async def show_maintenance(message):
     await client.send_message(message.channel, "==JOSÉ EM CONSTRUÇÃO, AGUARDE==\nhttps://umasofe.files.wordpress.com/2012/11/placa.jpg")
 
-async def init_aposta(message):
-    global GAMBLING_MODE
-    if message.channel.is_private:
-        await jose.say("Nenhum canal privado é autorizado a iniciar o modo de aposta")
-        return
-
-    if not GAMBLING_MODE:
-        GAMBLING_MODE = True
-        await jose.say("Modo aposta ativado, mandem seus JC$!")
-        return
-    else:
-        await jose.say("Modo aposta já foi ativado.")
-        return
-
-async def aposta_start(message):
-    # TODO: FIX OTHERWORLDLY BUG
-    global GAMBLING_MODE
-    global GAMBLING_LAST_BID
-    PORCENTAGEM_GANHADOR = 76.54
-    PORCENTAGEM_OUTROS = 100 - PORCENTAGEM_GANHADOR
-
-    PORCENTAGEM_GANHADOR /= 100
-    PORCENTAGEM_OUTROS /= 100
-
-    K = list(jose_env['apostas'].keys())
-    if len(K) < 2:
-        await client.send_message(message.channel, "Nenhuma aposta com mais de 1 jogador foi feita, modo aposta desativado.")
-        GAMBLING_MODE = False
-        return
-    winner = random.choice(K)
-
-    M = sum(jose_env['apostas'].values()) # total
-    apostadores = len(jose_env['apostas'])-1 # remove one because of the winner
-    P = (M * PORCENTAGEM_GANHADOR)
-    p = (M * PORCENTAGEM_OUTROS) / apostadores
-
-    if jcoin.data[jcoin.jose_id]['amount'] < M:
-        await jose.debug("aposta->jcoin: **JOSÉ NÃO POSSUI FUNDOS SUFICIENTES PARA A APOSTA**")
-
-    report = ''
-
-    res = jcoin.transfer(jcoin.jose_id, winner, P, jcoin.LEDGER_PATH)
-    if res[0]:
-        report += "<@%s> ganhou %.2fJC nessa aposta por ser o ganhador!\n" % (winner, P)
-    else:
-        await jose_debug(message, "erro no jc_aposta->jcoin: %s" % res[1])
-        await jose_debug(message, "aposta abortada.")
-        return
-
-    del jose_env['apostas'][winner]
-
-    # going well...
-    for apostador in jose_env['apostas']:
-        res = jcoin.transfer(jcoin.jose_id, apostador, p, jcoin.LEDGER_PATH)
-        if res[0]:
-            report += "<@%s> ganhou %.2fJC nessa aposta!\n" % (apostador, p)
-        else:
-            await jose.debug("jc_aposta->jcoin: %s" % res[1])
-            return
-
-    await client.send_message(message.channel, "%s\nModo aposta desativado!\nhttp://i.imgur.com/huUlJhR.jpg" % (report))
-
-    # clear everything
-    jose_env['apostas'] = {}
-    GAMBLING_MODE = False
-    GAMBLING_LAST_BID = 0.0
-    return
-
-async def aposta_report(message):
-    res = ''
-    total = 0.0
-    for apostador in jose_env['apostas']:
-        res += '<@%s> apostou %.2fJC\n' % (apostador, jose_env['apostas'][apostador])
-        total += jose_env['apostas'][apostador]
-    res += 'Total apostado: %.2fJC' % (total)
-    await client.send_message(message.channel, res)
-    return
-
 async def show_price(message):
     res = ''
 
@@ -637,6 +559,7 @@ load_module('josensfw', 'JoseNSFW')
 load_module('josememes', 'JoseMemes')
 load_module('josemusic', 'JoseMusic')
 load_module('josespeak', 'JoseSpeak')
+load_module('josegambling', 'JoseGambling')
 
 #print("carregando jspeak")
 #jspeak.buildMapping(jspeak.wordlist('jose-data.txt'), 1)
