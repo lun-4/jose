@@ -157,6 +157,31 @@ class JoseMemes(jcommon.Extension):
                 await self.say("Resultados: %s" % ', '.join(probables))
             else:
                 await self.say("%r: Nenhum resultado encontrado" % term)
+        elif args[1] == 'rename':
+            args_s = ' '.join(args[2:])
+            args_sp = args_s.split(';')
+            oldname = args_sp[0]
+            newname = args_sp[1]
+
+            if not oldname in self.memes:
+                await self.say("%s: meme não encontrado" % oldname)
+                return
+
+            # swapping
+            old_meme = self.memes[oldname]
+
+            if old_meme['owner'] != message.author.id:
+                raise je.PermissionError()
+
+            self.memes[newname] = {
+                'owner': message.author.id,
+                'data': old_meme['data'],
+            }
+
+            del self.memes[oldname]
+            await self.say("%s foi renomeado para %s!" % (oldname, newname))
+            return
+
         else:
             await self.say("comando inválido: %s" % args[1])
             return
