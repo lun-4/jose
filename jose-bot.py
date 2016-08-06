@@ -354,67 +354,6 @@ async def learn_data(message):
     await jose.say(feedback)
     return
 
-async def josecoin_send(message):
-    """`!enviar` - envie josecoins pra galera!
-
-    Sintaxe:
-    `!enviar @mention quantidade` - envia `quantidade` JCoins para `@mention`
-
-    Exemplo:
-    `!enviar @jose-bot 20` - envia 20JCoins para o @jose-bot
-    """
-    global GAMBLING_LAST_BID
-    args = message.content.split(' ')
-
-    if len(args) != 3:
-        await jose.say(josecoin_send.__doc__)
-        return
-
-    id_to = args[1]
-    try:
-        amount = float(args[2])
-    except ValueError:
-        await jose.say("ValueError: erro parseando o valor")
-        return
-
-    id_from = message.author.id
-    id_to = await parse_id(id_to, message)
-
-    fee_amount = amount * (GAMBLING_FEE/100.)
-    atleast = (amount + fee_amount)
-
-    if GAMBLING_MODE:
-        a = jcoin.get(id_from)[1]
-        if amount < GAMBLING_LAST_BID:
-            await jose.say("sua aposta tem que ser maior do que a última, que foi %.2fJC" % GAMBLING_LAST_BID)
-            return
-
-        if a['amount'] <= atleast:
-            await jose.say("sua conta não possui fundos suficientes para apostar(%.2fJC são necessários, você tem %.2fJC, faltam %.2fJC)" % (atleast, a['amount'], atleast - a['amount']))
-            return
-
-    res = ''
-    if GAMBLING_MODE:
-        res = jcoin.transfer(id_from, id_to, atleast, jcoin.LEDGER_PATH)
-    else:
-        res = jcoin.transfer(id_from, id_to, amount, jcoin.LEDGER_PATH)
-    await josecoin_save(message, False)
-    if res[0]:
-        await jose.say(res[1])
-        if GAMBLING_MODE:
-            if id_to == jcoin.jose_id:
-                # use jenv
-                if not id_from in jose_env['apostas']:
-                    jose_env['apostas'][id_from] = 0
-                    jose_env['apostas'][id_from] += amount
-                val = jose_env['apostas'][id_from]
-                GAMBLING_LAST_BID = amount
-                await client.send_message(message.channel, "jc_aposta: aposta total de %.2f de <@%s>" % (val, id_from))
-        return
-    else:
-        await client.send_message(message.channel, 'erro em jc: %s' % res[1])
-
-
 async def show_jenv(message):
     await client.send_message(message.channel, "`%r`" % jose_env)
 
@@ -483,7 +422,6 @@ commands_start = {
     '!save': josecoin_save,
     '!load': josecoin_load,
     # '!jcdebug': josecoin_dbg,
-    '!enviar': josecoin_send,
 
     '!ping': pong,
     '!xuxa': demon,
@@ -492,11 +430,8 @@ commands_start = {
     '!jasm': make_func(jasm.JASM_HELP_TEXT),
     '!construção': main_status,
 
-    '!aposta': init_aposta,
-    '!rolar': aposta_start,
     '!ahelp': show_gambling_full,
     '!adummy': show_gambling,
-    '!areport': aposta_report,
     '!airport': show_aerotrem,
 
     '!awoo': make_func("https://images-2.discordapp.net/.eJwVyEEOwiAQAMC_8ABgEdi2nzGEIsW0LmHXeDD-vfUyh_mq99jVojaRzosxa-NMY9UsNFItuhLVvaTeWGc6TBJJeTvKS9g4e3M--BmiB8QJcLoqRnAWg50RA4TgTPoQ3f-0Ryusn72q3wkG3CWg.CTrgww5nr8mw_Fkm0BcEsEGV8t0.jpg"),

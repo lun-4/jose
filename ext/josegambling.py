@@ -46,39 +46,41 @@ class JoseGambling(jcommon.Extension):
             await self.say(self.c_ap.__doc__)
             return
 
-        id_to = args[1]
+        if not self.gambling_mode:
+            await self.say("Modo aposta não foi acionado")
+            return
+
+        id_from = message.author.id
+        id_to = jcoin.jose_id
         try:
-            amount = float(args[2])
+            amount = float(args[1])
         except ValueError:
             await self.say("ValueError: erro parseando o valor")
             return
 
-        id_from = message.author.id
-        id_to = await parse_id(id_to, message)
-
         fee_amount = amount * (jcommon.GAMBLING_FEE/100.)
         atleast = (amount + fee_amount)
 
-        a = jcoin.get(id_from)[1]
         if amount < self.last_bid:
             await self.say("sua aposta tem que ser maior do que a última, que foi %.2fJC" % self.last_bid)
             return
 
+        a = jcoin.get(id_from)[1]
         if a['amount'] <= atleast:
             await self.say("sua conta não possui fundos suficientes para apostar(%.2fJC são necessários, você tem %.2fJC, faltam %.2fJC)" % (atleast, a['amount'], atleast - a['amount']))
             return
 
         res = ''
         res = jcoin.transfer(id_from, id_to, atleast, jcoin.LEDGER_PATH)
-        await josecoin_save(message, False)
+        await jcoin.raw_save()
         if res[0]:
             await self.say(res[1])
             if id_to == jcoin.jose_id:
                 # use jenv
-                if not id_from in jose_env['apostas']:
-                    jose_env['apostas'][id_from] = 0
-                    jose_env['apostas'][id_from] += amount
-                val = jose_env['apostas'][id_from]
+                if not id_from in self.env:
+                    self.env[id_from] = 0
+                    self.env[id_from] += amount
+                val = self.env[id_from]
                 self.last_bid = amount
                 await self.say("jc_aposta: aposta *total* de %.2f de <@%s>" % (val, id_from))
             return

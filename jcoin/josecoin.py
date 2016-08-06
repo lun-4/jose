@@ -110,12 +110,14 @@ def save(fname):
 def jcoin_control(userid, amount):
     return transfer(userid, jose_id, amount, LEDGER_PATH)
 
+async def raw_save():
+    res = save('jcoin/josecoin.db')
+    return res
+
 class JoseCoin(jcommon.Extension):
     def __init__(self, cl):
-        self.client = cl
-        self.current = None
-        self.top10_flag = False
         jcommon.Extension.__init__(self, cl)
+        self.top10_flag = False
 
     async def josecoin_save(self, message, dbg_flag=True):
         self.current = message
@@ -132,6 +134,7 @@ class JoseCoin(jcommon.Extension):
             await self.debug('error: %r' % res)
 
     async def c_saldo(self, message, args):
+        '''`!saldo [@mention]` - mostra o saldo seu ou de outra pessoa'''
         args = message.content.split(' ')
 
         id_check = None
@@ -145,7 +148,7 @@ class JoseCoin(jcommon.Extension):
             accdata = res[1]
             await self.say('%s -> %.2f' % (accdata['name'], accdata['amount']))
         else:
-            await self.say('erro encontrando conta(id: %s)' % (id_check))
+            await self.say('conta não encontrada(`id:%s`)' % (id_check))
 
     async def c_conta(self, message, args):
         print("new jcoin account %s" % message.author.id)
@@ -154,9 +157,10 @@ class JoseCoin(jcommon.Extension):
         if res[0]:
             await self.say(res[1])
         else:
-            await self.say('jc_error: %s' % res[1])
+            await self.say('jc->err: %s' % res[1])
 
     async def c_write(self, message, args):
+        '''`!write @mention new_amount` - sobrescreve o saldo de uma conta'''
         global data
         auth = await self.rolecheck(jcommon.MASTER_ROLE)
         if not auth:
@@ -185,12 +189,12 @@ class JoseCoin(jcommon.Extension):
         id_from = message.author.id
         id_to = await jcommon.parse_id(id_to, message)
 
-        res = jcoin.transfer(id_from, id_to, amount, jcoin.LEDGER_PATH)
+        res = transfer(id_from, id_to, amount, LEDGER_PATH)
         await self.josecoin_save(message, False)
         if res[0]:
             await self.say(res[1])
         else:
-            await client.send_message(message.channel, 'erro em jc: %s' % res[1])
+            await self.say('erro em jc: %s' % res[1])
 
     async def c_top10(self, message, args):
         if self.top10_flag:
