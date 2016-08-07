@@ -480,7 +480,6 @@ jc = jcoin.JoseCoin(client)
 josecoin_save = jc.josecoin_save
 josecoin_load = jc.josecoin_load
 
-# jn = jnsfw.JoseNSFW(client)
 jose.load_gext(jc, 'josecoin')
 
 def load_module(n, n_cl):
@@ -492,10 +491,6 @@ load_module('josememes', 'JoseMemes')
 load_module('josemusic', 'JoseMusic')
 load_module('josespeak', 'JoseSpeak')
 load_module('josegambling', 'JoseGambling')
-
-#print("carregando jspeak")
-#jspeak.buildMapping(jspeak.wordlist('jose-data.txt'), 1)
-#print("jspeak carregado")
 
 @client.event
 @asyncio.coroutine
