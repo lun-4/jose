@@ -135,11 +135,11 @@ async def make_pisca(message):
 
     for i in range(10):
         if i%2 == 0:
-            animate_banner = '**%s**' % animate
+            animate_banner = '**%s**' % animate_data
         else:
-            animate_banner = '%s' % animate
+            animate_banner = '%s' % animate_data
 
-        await client.edit_message(animate_msg, animate_banner)
+        await client.edit_message(animate_msg, animate_data)
         await asyncio.sleep(1)
 
     animation_counter -= 1

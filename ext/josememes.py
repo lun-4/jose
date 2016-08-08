@@ -208,9 +208,10 @@ class JoseMemes(jcommon.Extension):
         await self.say(text.translate(self.WIDE_MAP))
 
     async def c_fw(self, message, args):
+        '''`!fw` - alias para `!fullwidth`'''
         await self.c_fullwidth(message, args)
 
     async def c_emoji(self, message, args):
         '''`!emoji` - gera de 1 a 5 emojis aleatórios'''
         res = await jcommon.random_emoji(random.randint(1,5))
-        await jose.say(res)
+        await self.say(res)

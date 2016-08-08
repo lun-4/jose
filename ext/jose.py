@@ -347,6 +347,7 @@ class JoseBot(jcommon.Extension):
         return
 
     async def c_distatus(self, m, a):
+        '''`!distatus` - mostra alguns dados para mostrar se o Discord está funcionando corretamente'''
         auth = await self.rolecheck(jcommon.MASTER_ROLE)
         if not auth:
             await self.say("PermissionError: permissão negada")
