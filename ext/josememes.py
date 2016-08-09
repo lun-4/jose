@@ -100,6 +100,7 @@ class JoseMemes(jcommon.Extension):
 
                 if (message.author.id == meme_data['owner']) or is_admin:
                     del self.memes[meme]
+                    await self.save_memes()
                     await self.say("%s: meme removido" % meme)
                     return
                 else:
@@ -182,6 +183,7 @@ class JoseMemes(jcommon.Extension):
 
             del self.memes[oldname]
             await self.say("%s foi renomeado para %s!" % (oldname, newname))
+            await self.save_memes()
             return
 
         elif args[1] == 'owner':
