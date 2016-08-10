@@ -547,6 +547,11 @@ def on_message(message):
         counter = 0
 
     st = time.time()
+    yield from jose.recv(message) # default
+    for mod in jose.modules:
+        mod_obj = jose.modules[mod]
+        yield from mod_obj['inst'].recv(message)
+
     # get command and push it to jose
     if message.content[0] == '!':
         #parse command
@@ -593,12 +598,6 @@ def on_message(message):
             return
 
         try:
-
-            yield from jose.recv(message) # default
-            for mod in jose.modules:
-                mod_obj = jose.modules[mod]
-                yield from mod_obj['inst'].recv(message)
-
             if MAINTENANCE_MODE:
                 yield from show_maintenance(message)
                 return
