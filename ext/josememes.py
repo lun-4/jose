@@ -64,11 +64,11 @@ class JoseMemes(jcommon.Extension):
         Subcomandos:
         `!meme add <trigger>;<meme>` - toda vez que alguém mandar um `!meme get <trigger>`, josé falará `<meme>`
         `!meme get <trigger>` - josé falará o que estiver programado para falar de acordo com `<trigger>`
-        `!meme list` - mostra todos os memes que estão escritos no josé
         `!meme search <termo>` - procura o banco de dados de memes por um meme específico
         `!meme rm <meme>` - remove um meme
         `!meme rename <nome antigo>;<nome novo>` - altera o `<trigger>` de um meme
         `!meme owner <meme>` - mostra quem "criou" o `<meme>`
+        `!meme count` - mostra a quantidade de memes
 
         Tenha cuidado ao adicionar coisas NSFW.
         '''
@@ -142,8 +142,8 @@ class JoseMemes(jcommon.Extension):
                 raise IOError("banco de dados não carregado corretamente")
 
             return
-        elif args[1] == 'list':
-            await self.say("memes: %s" % ', '.join(self.memes.keys()))
+        #elif args[1] == 'list':
+        #    await self.say("memes: %s" % ', '.join(self.memes.keys()))
         elif args[1] == 'get':
             meme = ' '.join(args[2:])
             if meme in self.memes:
@@ -194,6 +194,9 @@ class JoseMemes(jcommon.Extension):
             else:
                 await self.say("%s: meme não encontrado" % meme)
             return
+
+        elif args[1] == 'count':
+            await self.say("quantidade de memes: %s" % len(self.memes))
 
         else:
             await self.say("comando inválido: %s" % args[1])
