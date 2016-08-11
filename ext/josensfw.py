@@ -51,9 +51,7 @@ class JoseNSFW(jcommon.Extension):
             await self.debug("danbooru: py_error: %s" % str(e))
             return
 
-    async def json_api(self, baseurl, search_term, where):
-        loop = asyncio.get_event_loop()
-
+    async def json_api(self, baseurl, search_term, where, rspec=False, debug_flag=False):
         url = ''
         if search_term == ':latest':
             await self.say('json_api: procurando nos posts mais recentes')
@@ -67,11 +65,15 @@ class JoseNSFW(jcommon.Extension):
         r = json.loads(r)
 
         try:
-            post = random.choice(r)
+            post = None
+            if rspec:
+                post = random.choice(r[rspec])
+            else:
+                post = random.choice(r)
             await self.say('%s' % post[where])
             return
         except Exception as e:
-            await self.debug("json_api: py_error: %s" % str(e))
+            await self.debug("json_api: py_error: %r" % e)
             return
 
     async def porn_routine(self):
@@ -101,7 +103,7 @@ class JoseNSFW(jcommon.Extension):
     async def c_porn(self, message, args):
         access = await self.porn_routine()
         if access:
-            await self.json_api('http://api.porn.com/videos/find.json', ' '.join(args[1:]), 'url')
+            await self.json_api('http://api.porn.com/videos/find.json', ' '.join(args[1:]), 'url', 'result')
 
     async def c_urban(self, message, args):
         term = ' '.join(args[1:])
