@@ -509,6 +509,9 @@ def on_message(message):
             del jose_env['spam'][user_id]
             yield from jose.say("<@%s> : cooldown destruído" % user_id)
 
+    if jose.command_lock:
+        return
+
     if message.author.id in jcoin.data:
         if hasattr(message.author, 'nick'):
             if message.author.nick is not None:

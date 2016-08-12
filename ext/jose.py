@@ -26,6 +26,7 @@ jose_debug = jcommon.jose_debug
 
 class JoseBot(jcommon.Extension):
     def __init__(self, cl):
+        jcommon.Extension.__init__(self, cl)
         self.nick = 'jose-bot'
         self.modules = {}
         self.env = {
@@ -35,7 +36,7 @@ class JoseBot(jcommon.Extension):
             # 'apostas': {},
         }
         self.start_time = time.time()
-        jcommon.Extension.__init__(self, cl)
+        self.command_lock = False
 
     def load_gext(self, inst, n):
         print("carregando módulo: %s" % n)
@@ -134,7 +135,9 @@ class JoseBot(jcommon.Extension):
         auth = await jcommon.check_roles(jcommon.MASTER_ROLE, self.current.author.roles)
         if auth:
             await self.debug("auth: autorizado")
+            self.command_lock = True
             await f()
+            self.command_lock = False
         else:
             await self.debug("PermError: sem permissão")
 
