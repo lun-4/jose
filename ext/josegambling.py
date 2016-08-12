@@ -152,3 +152,13 @@ class JoseGambling(jcommon.Extension):
     async def c_acheck(self, message, args):
         '''`!acheck` - mostra se o modo aposta tá ligado ou não'''
         await self.say("Modo aposta: %s" % ["desligado", "ligado"][self.gambling_mode])
+
+    async def c_flip(self, message, args):
+        '''`!flip` - joga uma moeda(49%, 49% 2%)'''
+        p = random.random()
+        if p < 0.49:
+            await self.say('http://i.imgur.com/GtTQvaM.jpg') # cara
+        elif 0.49 < p < 0.98:
+            await self.say("http://i.imgur.com/oPc1siM.jpg") # coroa
+        else:
+            await self.say("http://i.imgur.com/u4Gem8A.png") # empate
