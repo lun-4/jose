@@ -101,18 +101,23 @@ class JoseGames(jcommon.Extension):
     def __init__(self, cl):
         jcommon.Extension.__init__(self, cl)
         self.db = {}
+        self.encounters = {}
+        self.load_flag = False
 
     async def ext_load(self):
         try:
+            self.load_flag = True
             self.db = pickle.load(open('ext/d-go.db', 'rb'))
-            self.encounters = {}
+            self.load_flag = False
             return True, ''
         except Exception as e:
             return False, repr(e)
 
     async def ext_unload(self):
         try:
+            self.load_flag = True
             pickle.dump(self.db, open('ext/d-go.db', 'wb'))
+            self.load_flag = False
             return True, ''
         except Exception as e:
             return False, repr(e)
@@ -133,7 +138,7 @@ class JoseGames(jcommon.Extension):
                 [1, Item(2)], # 1 Incense
                 [10, Item(3)], # 10 Berry
             ],
-            'dinv': {},
+            'dinv': [],
         }
         await self.say("conta criada para <@%s>!" % message.author.id)
 
@@ -155,18 +160,29 @@ class JoseGames(jcommon.Extension):
 
     async def c_dgostat(self, message, args):
         '''`!dgostat` - mostra os status do seu personagem'''
+        if not message.author.id in self.db:
+            await self.say("Conta não existe.")
+            return
+
         player_data = self.db[message.author.id]
 
         res = ''
         res += '%s\n' % message.author
         res += 'Inventário:\n'
         for el in player_data['inv']:
-            res += '\t\t%d %s\n' % (el[0], str(el[1]))
+            res += '\t%d %s\n' % (el[0], str(el[1]))
+
+        res += 'Deuses:\n'
+        for deus in sorted(player_data['dinv'], key=lambda x: x.combat_power):
+            res += '\t\t%s\n' % (deus)
 
         res = '```%s```' % res
         await self.say(res)
 
     async def make_encounter_front(self, message):
+        if self.load_flag:
+            return
+
         if message.author.id not in self.db:
             return
 
@@ -182,6 +198,7 @@ class JoseGames(jcommon.Extension):
             return
 
         self.current = message
+        self.current.channel = dgo_channel
         self.encounters[message.author.id] = deus
 
         encounter_message = ''
@@ -205,10 +222,10 @@ class JoseGames(jcommon.Extension):
                 await self.say("Capturando...")
                 player['inv'][0][0] -= 1
 
-                await asyncio.sleep(3)
+                await asyncio.sleep(2)
                 gotit = await self.catch(deus)
                 if gotit:
-                    await self.say("Parabéns")
+                    await self.say("Parabéns, você conseguiu um %s" % deus)
                     player['dinv'].append(deus)
                     del self.encounters[message.author.id]
                     break
@@ -226,6 +243,7 @@ class JoseGames(jcommon.Extension):
                     await self.say("Doce dado!")
             elif cmd.content.startswith('fugir'):
                 del self.encounters[message.author.id]
+                await self.say("cagao")
                 break
             else:
                 await self.say("Comando não encontrado('capturar', 'doce' ou 'fugir' são válidos)")
@@ -233,6 +251,7 @@ class JoseGames(jcommon.Extension):
         done = await self.ext_unload()
         if not done[0]:
             await self.say("py_err: %s" % done[1])
+        self.current = message # reset channel hacking
 
     async def catch(self, deus):
         return random.random() < deus.calc_catch()
