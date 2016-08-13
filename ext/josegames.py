@@ -96,14 +96,14 @@ class JoseGames(jcommon.Extension):
 
     async def ext_load(self):
         try:
-            self.db = pickle.load(open('d-go.db', 'rb'))
-            return True
+            self.db = pickle.load(open('ext/d-go.db', 'rb'))
+            return True, ''
         except Exception as e:
             return False, repr(e)
 
     async def ext_unload(self):
         try:
-            pickle.dump(self.db, open('d-go.db', 'wb'))
+            pickle.dump(self.db, open('ext/d-go.db', 'wb'))
             return True
         except Exception as e:
             return False, repr(e)

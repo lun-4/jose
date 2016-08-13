@@ -59,7 +59,10 @@ class JoseBot(jcommon.Extension):
         module = None
         if n in self.modules: #already loaded
             try:
-                await self.modules[n]['inst'].ext_unload()
+                ok = await self.modules[n]['inst'].ext_unload()
+                if not ok[0]:
+                    print("Error happened[ext_unload, %s]: %s" % (n, ok[1]))
+                    sys.exit(0)
             except Exception as e:
                 print("%s : %s" % (n, repr(e)))
 
@@ -72,7 +75,10 @@ class JoseBot(jcommon.Extension):
         inst = getattr(module, n_cl)(self.client)
         try:
             # try to load it
-            await inst.ext_load()
+            ok = await inst.ext_load()
+            if not ok[0]:
+                print("Error happened[ext_load, %s]: %s" % (n, ok[1]))
+                sys.exit(0)
         except Exception as e:
             print("%s : %s" % (n, repr(e)))
         methods = (method for method in dir(inst) if callable(getattr(inst, method)))
