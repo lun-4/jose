@@ -65,14 +65,18 @@ async def calc_iv(cp, pr):
                 del el
     return normal_random.choice(c)
 
+async def create_deusmon(did):
+    d = Deusmon(did)
+    d.iv = await calc_iv(d.combat_power, d.data[1])
+    return d
+
 class Deusmon:
     def __init__(self, did):
         self.id = did
-        data = dgo_data[did]
+        self.data = dgo_data[did]
         self.name = data[0]
 
-        self.combat_power = random.randint(data[2][0], data[2][1])
-        self.iv = await calc_iv(self.combat_power, data[1])
+        self.combat_power = random.randint(self.data[2][0], self.data[2][1])
 
 def make_encounter():
     did = 0
@@ -81,8 +85,10 @@ def make_encounter():
         did = random.choice(RARE_DEUSES)
     elif p < COMMON_PROB:
         did = random.choice(COMMON_DEUSES)
-    d = Deusmon(random.randint())
+    else:
+        return None
 
+    d = Deusmon(random.randint())
     return d
 
 class JoseGames(jcommon.Extension):

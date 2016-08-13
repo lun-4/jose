@@ -539,7 +539,7 @@ def on_message(message):
         if DEMON_MODE:
             initmsg = initmsg[::-1]
         elif PARABENS_MODE:
-            initmsg = "Parabéns %s" % initmsg)
+            initmsg = "Parabéns %s" % initmsg
 
         yield from jose_debug(message, initmsg)
         yield from josecoin_load(message, False)
