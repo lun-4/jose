@@ -14,5 +14,8 @@ class JoseExtension(jcommon.Extension):
     async def ext_load(self):
         pass
 
+    async def ext_unload(self):
+        pass
+
     async def c_command(self, message, args):
         pass

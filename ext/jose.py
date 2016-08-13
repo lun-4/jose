@@ -167,15 +167,26 @@ class JoseBot(jcommon.Extension):
         sys.exit(0)
 
     async def c_exit(self, message, args):
+        '''`!exit` - desliga o josé'''
         await self.sec_auth(self.turnoff)
 
+    async def c_shutdown(self, message, args):
+        '''`!shutdown` - alias para `!exit`'''
+        await self.c_exit(message, args)
+
     async def c_reboot(self, message, args):
+        '''`!reboot` - reinicia o josé'''
         await self.sec_auth(self.reboot)
 
     async def c_update(self, message, args):
+        '''`!update` - atualiza o josé'''
         await self.sec_auth(self.update)
 
     async def c_xkcd(self, message, args):
+        '''`!xkcd` - procura tirinhas do XKCD
+        `!xkcd` - mostra a tirinha mais recente
+        `!xkcd [num]` - mostra a tirinha de número `num`
+        '''
         n = False
         if len(args) > 1:
             n = args[1]
@@ -211,6 +222,7 @@ class JoseBot(jcommon.Extension):
             await self.debug("xkcd: pyerr: %s" % str(e))
 
     async def c_rand(self, message, args):
+        '''`!rand min max` - gera um número aleatório no intervalo [min, max]'''
         n_min, n_max = 0,0
         try:
             n_min = int(args[1])
@@ -247,6 +259,7 @@ class JoseBot(jcommon.Extension):
         return
 
     async def c_money(self, message, args):
+        '''`!money qt from to` - converte dinheiro'''
         amount = float(args[1])
         currency_from = args[2]
         currency_to = args[3]
@@ -270,6 +283,7 @@ class JoseBot(jcommon.Extension):
         ))
 
     async def c_yt(self, message, args):
+        '''`!yt [termo 1] [termo 2]...` - procura no youtube'''
         search_term = ' '.join(args[1:])
 
         loop = asyncio.get_event_loop()
@@ -292,6 +306,7 @@ class JoseBot(jcommon.Extension):
         await self.say("http://www.youtube.com/watch?v=" + search_results[0])
 
     async def c_sndc(self, message, args):
+        '''`!sndc [termo 1] [termo 2]...` - procura no soundcloud'''
         query = ' '.join(args[1:])
         print("soundcloud -> %s" % query)
 
@@ -323,7 +338,8 @@ class JoseBot(jcommon.Extension):
             await self.say("verifique sua pesquisa, porque nenhuma track foi encontrada.")
             return
 
-    async def c_playing(self, message, args):
+    async def c_pstatus(self, message, args):
+        '''`!pstatus` - muda o status do josé'''
         playing_name = ' '.join(args[1:])
         g = discord.Game(name=playing_name, url=playing_name, type='game')
         await self.client.change_status(g)
