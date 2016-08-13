@@ -373,7 +373,7 @@ async def main_status(message):
         await jose_debug(message, "PermError: Não permitido alterar o status do jose")
 
 async def show_maintenance(message):
-    await jose.say("==JOSÉ EM CONSTRUÇÃO, AGUARDE==\nhttps://umasofe.files.wordpress.com/2012/11/placa.jpg")
+    await jose.say("**JOSÉ EM CONSTRUÇÃO, AGUARDE**\nhttps://umasofe.files.wordpress.com/2012/11/placa.jpg")
 
 async def show_price(message):
     res = ''
@@ -647,7 +647,7 @@ def on_message(message):
             yield from func(message)
             return
 
-    if message.content.startswith('$guess'):
+    '''if message.content.startswith('$guess'):
         yield from jose.say('Me fale um número de 0 a 10, imundo.')
 
         def guess_check(m):
@@ -663,9 +663,9 @@ def on_message(message):
             yield from jose.say('Acertô miseravi!')
         else:
             yield from jose.say('Errou filho da puta, era {}.'.format(answer))
-        return
+        return'''
 
-    elif message.content.startswith('$repl'):
+    '''if message.content.startswith('$repl'):
         yield from jose.say('Fale um comando python(15 segundos de timeout)')
 
         data = yield from client.wait_for_message(timeout=15.0, author=message.author)
@@ -679,9 +679,9 @@ def on_message(message):
             yield from jose.say('eval: %r' % res)
         except:
             yield from jose_debug(message, "erro dando eval na expressão dada")
-        return
+        return'''
 
-    elif message.content.startswith('$josescript'):
+    if message.content.startswith('$josescript'):
         if MAINTENANCE_MODE:
             yield from show_maintenance(message)
             return
@@ -726,9 +726,6 @@ def on_message(message):
                 pointer = res[1]
                 # yield from jose.say('eval: %s' % )
         return
-
-    elif "<@202587271679967232>" in message.content: #mention
-        pass
 
     elif random.random() < jc_probabiblity:
         if not message.channel.is_private:
