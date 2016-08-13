@@ -190,7 +190,7 @@ class JoseGames(jcommon.Extension):
             if time.time() > self.cooldowns[message.author.id]:
                 del self.cooldowns[message.author.id]
             else:
-                await self.say("Cooldown ainda não terminado(%.2fs)" % (self.cooldowns[message.author.id]) - time.time())
+                await self.say("Cooldown ainda não terminado(%.2fs)" % (self.cooldowns[message.author.id] - time.time()))
                 return
 
         res = 'Itens ganhos:\n'
