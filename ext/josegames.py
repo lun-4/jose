@@ -209,8 +209,7 @@ class JoseGames(jcommon.Extension):
                 gotit = await self.catch(deus)
                 if gotit:
                     await self.say("Parabéns")
-                    # etc botar o deus no inventorio
-                    player['inv'].append(deus)
+                    player['dinv'].append(deus)
                     del self.encounters[message.author.id]
                     break
 
