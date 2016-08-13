@@ -18,10 +18,18 @@ class JoseGames(jcommon.Extension):
         self.db = {}
 
     async def ext_load(self):
-        self.db = pickle.load(open('d-go.db', 'rb'))
+        try:
+            self.db = pickle.load(open('d-go.db', 'rb'))
+            return True
+        except Exception as e:
+            return False, repr(e)
 
     async def ext_unload(self):
-        pickle.dump(self.db, open('d-go.db', 'wb'))
+        try:
+            pickle.dump(self.db, open('d-go.db', 'wb'))
+            return True
+        except Exception as e:
+            return False, repr(e)
 
     async def c_dgoinit(self, message, args):
         '''`!dgoinit` - inicia uma conta no Deusesmon GO'''
@@ -32,7 +40,23 @@ class JoseGames(jcommon.Extension):
             'inv': {},
             'dinv': {},
         }
-        await self.say("<@%s> conta criada!" % message.author.id)
+        await self.say("conta criada para <@%s>!" % message.author.id)
+
+    async def c_dgosave(self, message, args):
+        done = await self.ext_unload()
+        if done:
+            await self.say("salvo.")
+        elif not done[0]:
+            await self.say("py_err: %s" % done[1])
+        return
+
+    async def c_dgoload(self, message, args):
+        done = await self.ext_load()
+        if done:
+            await self.say("carregado.")
+        elif not done[0]:
+            await self.say("py_err: %s" % done[1])
+        return
 
     async def c_dgostat(self, message, args):
         '''`!dgostat` - mostra os status do seu personagem'''
