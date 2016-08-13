@@ -75,8 +75,10 @@ class Deusmon:
         self.data = dgo_data[did]
         self.name = data[0]
         self.combat_power = random.randint(self.data[2][0], self.data[2][1])
+    def __str__(self):
+        return '%s CP %d' % (self.name, self.combat_power)
 
-def make_encounter():
+async def make_encounter():
     did = 0
     p = random.random()
     if p < RARE_PROB:
@@ -97,6 +99,7 @@ class JoseGames(jcommon.Extension):
     async def ext_load(self):
         try:
             self.db = pickle.load(open('ext/d-go.db', 'rb'))
+            self.encounters = {}
             return True, ''
         except Exception as e:
             return False, repr(e)
@@ -152,3 +155,28 @@ class JoseGames(jcommon.Extension):
 
         res = '```%s```' % res
         await self.say(res)
+
+    async def make_encounter_front(self, message):
+        dgo_channel = discord.utils.get(message.server.channels, name='deusesmongo')
+        if dgo_channel is None:
+            return
+
+        deus = await make_encounter()
+        if deus is None:
+            return
+
+        self.current = message
+        self.encounters[message.author.id] = deus
+
+        encounter_message = ''
+        encounter_message += 'Deus encontrado!\n'
+        encounter_message += '%s' % str(deus)
+        await self.say(encounter_message)
+
+    async def c_encontro(self, message, args):
+        if message.author.id not in self.encounters:
+            await self.say("Nenhum deus encontrado")
+
+        deus = self.encounters[message.author.id]
+        await self.say("<@%s> encontra %s" % (message.author.id, deus))
+        del self.encounters[message.author.id]

@@ -728,6 +728,9 @@ def on_message(message):
                 # yield from jose.say('eval: %s' % )
         return
 
+    elif random.random() < DGO_PROB:
+        yield from jose.modules['josegames']['inst'].make_encounter_front(message)
+
     elif random.random() < jc_probabiblity:
         if not message.channel.is_private:
             if not message.author.id in jose_env['spam']:
@@ -767,7 +770,7 @@ def on_message(message):
             #yield from jose_debug(message, 'erro conseguindo JC$ para %s(canal %r) porquê você está em um canal privado.' % (message.author.id, message.channel))
             return
 
-        yield from gorila_routine(message.channel)
+    yield from gorila_routine(message.channel)
 
 @client.event
 async def on_ready():
