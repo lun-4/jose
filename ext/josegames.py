@@ -239,13 +239,13 @@ class JoseGames(jcommon.Extension):
             player = self.db[message.author.id]
             cmd = await self.client.wait_for_message(timeout=30.0, author=message.author, channel=dgo_channel)
             if cmd is None:
-                await self.say("Fugiu(timeout).")
+                await self.say("%s: Deus fugiu(timeout)." % message.author)
                 del self.encounters[message.author.id]
                 break
             elif cmd.content.startswith('capturar'):
                 # catch it
                 if player['inv'][0][0] < 1:
-                    await self.say("Não possui nenhuma Hóstia disponível")
+                    await self.say("%s: Não possui nenhuma Hóstia disponível" % message.author)
                     break
 
                 await self.say("Capturando...")
@@ -254,25 +254,25 @@ class JoseGames(jcommon.Extension):
                 await asyncio.sleep(2)
                 gotit = await self.catch(deus)
                 if gotit:
-                    await self.say("Parabéns, você conseguiu um %s" % deus)
+                    await self.say("%s: Parabéns, você conseguiu um %s" % (message.author, deus))
                     player['dinv'].append(deus)
                     del self.encounters[message.author.id]
                     break
 
-                await self.say("Não conseguiu")
+                await self.say("%s: Não conseguiu" % message.author)
             elif cmd.content.startswith('doce'):
                 # send a candy
                 if player['inv'][3][0] < 1:
-                    await self.say("Não possui nenhum Doce disponível")
+                    await self.say("%s: Não possui nenhum Doce disponível" % message.author)
                     break
 
                 player['inv'][3][0] -= 1
                 gotit = await deus.process_candy()
                 if gotit:
-                    await self.say("Doce dado!")
+                    await self.say("%s: Doce dado!" % message.author)
             elif cmd.content.startswith('fugir'):
                 del self.encounters[message.author.id]
-                await self.say("cagao")
+                await self.say("%s é cagao" % message.author)
                 break
             else:
                 await self.say("Comando não encontrado('capturar', 'doce' ou 'fugir' são válidos)")
