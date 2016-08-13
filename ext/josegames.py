@@ -113,7 +113,7 @@ class JoseGames(jcommon.Extension):
     async def ext_unload(self):
         try:
             pickle.dump(self.db, open('ext/d-go.db', 'wb'))
-            return True
+            return True, ''
         except Exception as e:
             return False, repr(e)
 
