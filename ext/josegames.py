@@ -58,12 +58,11 @@ async def calc_iv(cp, pr):
     # calculate [ATK, DEF, STA]
     base = cp * (pr * (cp / 3))
     normal_random.seed(base)
-    c = list(combinations(range(15),3))
-    for el in c:
-        for n in c:
-            if n < 6:
-                del el
-    return normal_random.choice(c)
+    comb = list(combinations(range(15),3))
+    for i, (a, b, c) in enumerate(comb):
+        if (a < 6) or (b < 6) or (c < 6):
+            del comb[i]
+    return normal_random.choice(comb)
 
 async def create_deusmon(did):
     d = Deusmon(did)
@@ -75,7 +74,6 @@ class Deusmon:
         self.id = did
         self.data = dgo_data[did]
         self.name = data[0]
-
         self.combat_power = random.randint(self.data[2][0], self.data[2][1])
 
 def make_encounter():
