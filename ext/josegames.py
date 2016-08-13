@@ -59,18 +59,10 @@ class Item(object):
 
 async def calc_iv(cp, pr):
     # calculate [ATK, DEF, STA]
+    comb = [(a, b, c) for a, b, c in combinations(range(15),3) if (a > 4) and (b > 4) and (c > 4)]
     base = cp * (pr * (cp / 3))
     normal_random.seed(base)
-    comb = list(combinations(range(15),3))
-    for i, (a, b, c) in enumerate(comb):
-        if (a < 6) or (b < 6) or (c < 6):
-            del comb[i]
     return normal_random.choice(comb)
-
-async def create_deusmon(did):
-    d = Deusmon(did)
-    d.iv = await calc_iv(d.combat_power, d.data[1])
-    return d
 
 class Deusmon:
     def __init__(self, did):
@@ -88,6 +80,11 @@ class Deusmon:
         self.candies += 1
         return self.candies
 
+async def create_deusmon(did):
+    d = Deusmon(did)
+    d.iv = await calc_iv(d.combat_power, d.calc_catch())
+    return d
+
 async def make_encounter():
     did = 0
     p = random.random()
@@ -98,7 +95,8 @@ async def make_encounter():
     else:
         did = random.choice(COMMON_DEUSES)
 
-    return Deusmon(did)
+    d = await create_deusmon(did)
+    return d
 
 class JoseGames(jcommon.Extension):
     def __init__(self, cl):
@@ -178,7 +176,7 @@ class JoseGames(jcommon.Extension):
 
         res += 'Deuses:\n'
         for deus in sorted(player_data['dinv'], key=lambda x: -x.combat_power):
-            res += '\t\t%s\n' % (deus)
+            res += '\t\t%s IV: %s\n' % (deus, str(deus.iv))
 
         res = '```%s```' % res
         await self.say(res)
@@ -206,6 +204,9 @@ class JoseGames(jcommon.Extension):
 
         # faz cooldown
         self.cooldowns[message.author.id] = time.time() + 300
+
+    async def c_dgotrigger(self, message, args):
+        await self.make_encounter_front(message)
 
     async def make_encounter_front(self, message):
         if self.load_flag:
