@@ -537,11 +537,11 @@ def on_message(message):
         started = True
         initmsg = "josé v%s b%d iniciou em %s" % (JOSE_VERSION, JOSE_BUILD, message.channel)
         if DEMON_MODE:
-            yield from jose_debug(message, initmsg[::-1])
+            initmsg = initmsg[::-1]
         elif PARABENS_MODE:
-            yield from jose_debug(message, "Parabéns %s" % initmsg)
-        else:
-            yield from jose_debug(message, initmsg)
+            initmsg = "Parabéns %s" % initmsg)
+
+        yield from jose_debug(message, initmsg)
         yield from josecoin_load(message, False)
         return
 
