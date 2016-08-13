@@ -177,7 +177,7 @@ class JoseGames(jcommon.Extension):
             res += '\t%d %s\n' % (el[0], str(el[1]))
 
         res += 'Deuses:\n'
-        for deus in sorted(player_data['dinv'], key=lambda x: x.combat_power):
+        for deus in sorted(player_data['dinv'], key=lambda x: -x.combat_power):
             res += '\t\t%s\n' % (deus)
 
         res = '```%s```' % res
