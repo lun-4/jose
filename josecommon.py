@@ -19,7 +19,7 @@ OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&perm
 
 #configuration things
 chattiness = .25
-DGO_PROB = .05
+DGO_PROB = .005
 MASTER_ROLE = 'mestra'
 LEARN_ROLE = 'cult'
 JOSE_ANIMATION_LIMIT = 1 # 2 animações simultaneamente
