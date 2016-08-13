@@ -12,14 +12,14 @@ random = SystemRandom()
 import joseerror as je
 
 JOSE_VERSION = '0.8.6'
-JOSE_BUILD = 350
+JOSE_BUILD = 352
 
 APP_CLIENT_ID = 'ID DO JOSE AQUI'
 OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=103988231' % APP_CLIENT_ID
 
 #configuration things
 chattiness = .25
-DGO_PROB = 0.1
+DGO_PROB = .2
 MASTER_ROLE = 'mestra'
 LEARN_ROLE = 'cult'
 JOSE_ANIMATION_LIMIT = 1 # 2 animações simultaneamente
