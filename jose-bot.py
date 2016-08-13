@@ -728,11 +728,11 @@ def on_message(message):
                 # yield from jose.say('eval: %s' % )
         return
 
-    elif random.random() < DGO_PROB:
-        try:
-            yield from jose.modules['josegames']['inst'].make_encounter_front(message)
-        except Exception as e:
-            yield from jose.say("dgo: pyerr: ```%s```" % traceback.format_exc())
+    #elif random.random() < DGO_PROB:
+    #    try:
+    #        yield from jose.modules['josegames']['inst'].make_encounter_front(message)
+    #    except Exception as e:
+    #        yield from jose.say("dgo: pyerr: ```%s```" % traceback.format_exc())
 
     elif random.random() < jc_probabiblity:
         if not message.channel.is_private:

@@ -7,6 +7,7 @@ sys.path.append("..")
 import josecommon as jcommon
 import joseerror as je
 
+import time
 import pickle
 from random import SystemRandom
 random = SystemRandom()
@@ -178,6 +179,22 @@ class JoseGames(jcommon.Extension):
 
         res = '```%s```' % res
         await self.say(res)
+
+    async def c_dstop(self, message, args):
+        '''`!dstop` - te leva a uma DeusStop(cooldown de 5min)'''
+        if message.author.id in self.cooldowns:
+            # check time
+            if time.time() > self.cooldowns[message.author.id]:
+                del self.cooldowns[message.author.id]
+            else:
+                await self.say("Cooldown ainda não terminado(%.2fs)" % self.cooldowns[message.author.id])
+                return
+
+        for i in range(random.randint(3,6)):
+            pass
+
+        # faz cooldown
+        self.cooldowns[message.author.id] = time.time() + 300
 
     async def make_encounter_front(self, message):
         if self.load_flag:
