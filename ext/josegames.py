@@ -35,10 +35,10 @@ dgo_data = {
 }
 
 items = {
-    0: "Hóstias",
-    1: "Poção",
-    2: "Incenso",
-    3: "Doces",
+    0: ("Hóstias",  0.8),
+    1: ("Poção",    0.1),
+    2: ("Incenso",  0.01),
+    3: ("Doces",    0.28),
 }
 
 RARE_PROB = 0.01
@@ -50,7 +50,9 @@ COMMON_DEUSES = list(range(5,9+1))
 class Item(object):
     def __init__(self, itemid):
         self.id = itemid
-        self.name = items[itemid]
+        item = items[itemid]
+        self.name = item[0]
+        self.prob = item[1]
     def __str__(self):
         return self.name
 
@@ -104,6 +106,7 @@ class JoseGames(jcommon.Extension):
         self.db = {}
         self.encounters = {}
         self.load_flag = False
+        self.cooldowns = {}
 
     async def ext_load(self):
         try:
@@ -187,11 +190,19 @@ class JoseGames(jcommon.Extension):
             if time.time() > self.cooldowns[message.author.id]:
                 del self.cooldowns[message.author.id]
             else:
-                await self.say("Cooldown ainda não terminado(%.2fs)" % self.cooldowns[message.author.id])
+                await self.say("Cooldown ainda não terminado(%.2fs)" % (self.cooldowns[message.author.id]) - time.time())
                 return
 
-        for i in range(random.randint(3,6)):
-            pass
+        res = 'Itens ganhos:\n'
+        player = self.db[message.author.id]
+        for item_id in items:
+            item = items[item_id]
+            if random.random() < item[1]:
+                quantity = random.randint(0,5)
+                player['inv'][item_id][0] += quantity
+                res += ' * %d %s\n' % (quantity, item[0])
+
+        await self.say("```%s```" % res)
 
         # faz cooldown
         self.cooldowns[message.author.id] = time.time() + 300
