@@ -12,7 +12,7 @@ class Deusmon:
         self.id = did
         self.name = dgo_names[did]
 
-class JoseExtension(jcommon.Extension):
+class JoseGames(jcommon.Extension):
     def __init__(self, cl):
         jcommon.Extension.__init__(self, cl)
         self.db = {}

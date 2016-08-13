@@ -491,6 +491,7 @@ load_module('josememes', 'JoseMemes')
 load_module('josemusic', 'JoseMusic')
 load_module('josespeak', 'JoseSpeak')
 load_module('josegambling', 'JoseGambling')
+load_module('josegames', 'JoseGames')
 
 @client.event
 @asyncio.coroutine
