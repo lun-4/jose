@@ -167,7 +167,7 @@ class JoseMusic(jcommon.Extension):
 
     async def c_queue(self, message, args):
         auth = await self.rolecheck(MUSIC_ROLE)
-        res = 'Lista de sons: \n'
+        res = 'jm: Lista de sons: \n'
         for song in self.state.songlist:
             res += ' * %s\n' % song
         await self.say(res)
@@ -175,11 +175,11 @@ class JoseMusic(jcommon.Extension):
     async def c_playing(self, message, args):
         if self.loop_started:
             if self.state.is_playing():
-                await self.say('Música sendo tocada: %s\n' % self.state.current)
+                await self.say('jm: Música sendo tocada: %s\n' % self.state.current)
             else:
-                await self.say("Nenhuma música sendo tocada")
+                await self.say("jm: Nenhuma música sendo tocada")
         else:
-            await self.say("Loop não iniciado")
+            await self.say("jm: Loop não iniciado")
 
     async def c_stop(self, message, args):
         auth = await self.rolecheck(MUSIC_ROLE)
@@ -207,7 +207,7 @@ class JoseMusic(jcommon.Extension):
 
     async def c_skip(self, message, args):
         if not self.state.is_playing():
-            await self.say('Nenhuma música sendo tocada para pular')
+            await self.say('jm: Nenhuma música sendo tocada para pular')
             return
 
         voter = message.author
