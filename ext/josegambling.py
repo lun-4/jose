@@ -10,7 +10,8 @@ import josecommon as jcommon
 import joseerror as je
 import jcoin.josecoin as jcoin
 
-import random
+from random import SystemRandom
+random = SystemRandom()
 
 class JoseGambling(jcommon.Extension):
     def __init__(self, cl):
