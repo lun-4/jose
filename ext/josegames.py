@@ -51,10 +51,11 @@ dgo_data = {
 }
 
 items = {
-    0: ("Hóstias",  0.8),
-    1: ("Poção",    0.1),
-    2: ("Incenso",  0.01),
-    3: ("Doces",    0.28),
+    0: ("Hóstias",  0.8),  # 80%
+    1: ("Poção",    0.1),  # 10%
+    2: ("Incenso",  0.01), # 1%
+    3: ("Doces",    0.28), # 28%
+    4: ("Lure",     0.05), # 5%
 }
 
 RARE_PROB = 0.01
@@ -147,7 +148,6 @@ class JoseGames(jcommon.Extension):
             return
 
         self.db[message.author.id] = {
-            'coin': 0,
             'xp': 0,
             'level': 1,
             'inv': [
@@ -155,6 +155,7 @@ class JoseGames(jcommon.Extension):
                 [5, Item(1)], # 5 Potions
                 [1, Item(2)], # 1 Incense
                 [10, Item(3)], # 10 Berry
+                [1, Item(4)], # 1 Lure
             ],
             'dinv': [],
         }
@@ -226,6 +227,20 @@ class JoseGames(jcommon.Extension):
 
     async def c_htdgo(self, message, args):
         await self.say(DEUSESMON_GO_HT)
+
+    async def c_dgolure(self, message, args):
+        if message.author.id not in self.db:
+            await self.say("Conta não existe")
+            return
+
+        lures = self.db[message.author.id]['inv'][4]
+        if lures[0] < 1:
+            await self.say("Nenhuma Lure disponível")
+            return
+
+        lures[0] -= 1
+        jcommon.DGO_PROB += 0.03 # 3% until reboot
+        await self.say("Lure aplicado, probabilidade agora é de %.2f%%" % (jcommon.DGO_PROB * 100))
 
     async def make_encounter_front(self, message):
         if self.load_flag:
