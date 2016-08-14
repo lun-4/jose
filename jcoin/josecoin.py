@@ -196,10 +196,14 @@ class JoseCoin(jcommon.Extension):
         else:
             await self.say('erro em jc: %s' % res[1])
 
+    async def c_topunflip(self, message, args):
+        self.top10_flag = not self.top10_flag
+
     async def c_top10(self, message, args):
         if self.top10_flag:
             raise je.LimitError()
         self.top10_flag = True
+        print("top10 query")
         jcdata = dict(data) # copy
 
         range_max = 11 # default 10 users
@@ -217,8 +221,6 @@ class JoseCoin(jcommon.Extension):
             await self.say("LimitError: valores maiores do que 16 não válidos")
             #raise jcommon.LimitError()
             return
-
-        print("top10 query")
 
         order = []
 
@@ -245,4 +247,5 @@ class JoseCoin(jcommon.Extension):
             }
 
         await self.say('\n'.join(order))
+        print("top10 unflag")
         self.top10_flag = False
