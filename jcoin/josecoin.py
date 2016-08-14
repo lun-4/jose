@@ -60,6 +60,9 @@ def transfer(id_from, id_to, amnt, file_name):
     if amnt < 0:
         return False, "valores menores do que zero não são permitidos"
 
+    if amnt == 0:
+        return False, "não é permitido enviar zero"
+
     if not (id_from in data):
         return False, 'conta para extrair fundos não existe'
 

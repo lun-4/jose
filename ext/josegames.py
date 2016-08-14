@@ -107,9 +107,9 @@ class Deusmon:
             self.prob = COMMON_PROB
             self.cat = 1
     def __str__(self):
-        return '%s CP %d [prob: %.2f%%, cat: %d]' % (self.name, self.combat_power, self.prob*100, self.cat)
+        return '%s CP%4d [p: %.2f%% ct: %d]' % (self.name, self.combat_power, self.prob*100, self.cat)
     def calc_catch(self):
-        return (self.base - (0.02 * (self.combat_power % 10))) + (0.1 * self.candies)
+        return (self.base - (0.02 * (self.combat_power % 11))) + (0.11 * self.candies)
     async def process_candy(self):
         self.candies += 1
         return self.candies
@@ -269,6 +269,9 @@ class JoseGames(jcommon.Extension):
         lures[0] -= 1
         jcommon.DGO_PROB += 0.03 # 3% until reboot
         await self.say("Lure aplicado, probabilidade agora é de %.2f%%" % (jcommon.DGO_PROB * 100))
+
+    async def c_dgoprob(self, message, args):
+        await self.say("%.2f%%" % (jcommon.DGO_PROB * 100))
 
     async def make_encounter_front(self, message):
         if self.load_flag:

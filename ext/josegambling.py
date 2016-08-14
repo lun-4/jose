@@ -54,7 +54,7 @@ class JoseGambling(jcommon.Extension):
         id_from = message.author.id
         id_to = jcoin.jose_id
         try:
-            amount = float(args[1])
+            amount = round(float(args[1]), 3)
         except ValueError:
             await self.say("ValueError: erro parseando o valor")
             return
