@@ -17,6 +17,22 @@ from itertools import combinations
 
 NORMAL_CP = 50
 
+DEUSESMON_GO_HT = '''Deusesmon GO - The Gueime
+
+Toda mensagem enviada tem 1% de chance de aparecer um Deus, o josé te
+enviará uma mention no canal #deusesmongo e você terá 3 comandos para enviar,
+com um timeout de 30 segundos entre cada comando(o comando será identificado
+somente se for seu e somente no canal, ou seja, mensagens em qualquer outro
+canal serão ignoradas)
+
+Os comandos são "capturar", "doce" e "fugir"
+`capturar` - utilizará uma Hóstia(PokéBola) para capturar o Deus que está na sua frente
+`doce` - utilizará um Doce do seu inventário para aumentar suas chances de capturar o Deus
+`fugir` - seu cagão.
+
+Até agora é só isso mesmo, beijos <3
+'''
+
 '''
     bad CP => 100
     good CP => 600+
@@ -207,6 +223,9 @@ class JoseGames(jcommon.Extension):
 
     async def c_dgotrigger(self, message, args):
         await self.make_encounter_front(message)
+
+    async def c_htdgo(self, message, args):
+        await self.say(DEUSESMON_GO_HT)
 
     async def make_encounter_front(self, message):
         if self.load_flag:
