@@ -9,6 +9,7 @@ import joseerror as je
 
 import time
 import pickle
+import math
 from random import SystemRandom
 random = SystemRandom()
 
@@ -16,6 +17,8 @@ import random as normal_random
 from itertools import combinations
 
 NORMAL_CP = 50
+CAPTURE_XP = 20
+STOP_XP = 5
 
 DEUSESMON_GO_HT = '''Deusesmon GO - The Gueime
 
@@ -46,16 +49,16 @@ dgo_data = {
     5: ['Apolo',    (NORMAL_CP      , 500)],
     6: ['Hélio',    (NORMAL_CP      , 500)],
     7: ['Hércules', (NORMAL_CP      , 500)],
-    8: ['Dionísio', (NORMAL_CP - 200, 500)],
+    8: ['Dionísio', (NORMAL_CP      , 500)],
     9: ['Hades',    (NORMAL_CP      , 400)],
 }
 
 items = {
-    0: ("Hóstias",  0.8),  # 80%
-    1: ("Poção",    0.1),  # 10%
-    2: ("Incenso",  0.01), # 1%
-    3: ("Doces",    0.28), # 28%
-    4: ("Lure",     0.05), # 5%
+    0: ("Hóstias",  0.95),  # 95%
+    1: ("Poção",    0.10),  # 10%
+    2: ("Incenso",  0.01),  # 1%
+    3: ("Doces",    0.28),  # 28%
+    4: ("Lure",     0.05),  # 5%
 }
 
 RARE_PROB = 0.01
@@ -81,6 +84,12 @@ async def calc_iv(cp, pr):
     normal_random.seed(base)
     return normal_random.choice(comb)
 
+async def calc_lvl(xp):
+    return (1./4.) * math.sqrt(xp)
+
+async def calc_ivnum(iv):
+    return round((iv[0] + iv[1] + iv[2]) / 45 * 100)
+
 class Deusmon:
     def __init__(self, did):
         self.id = did
@@ -89,8 +98,16 @@ class Deusmon:
         self.combat_power = random.randint(self.data[1][0], self.data[1][1])
         self.candies = 0
         self.base = 0.4
+        self.prob, self.cat = 100,1
+
+        if did in RARE_DEUSES:
+            self.prob = RARE_PROB
+            self.cat = 0
+        elif did in COMMON_DEUSES:
+            self.prob = COMMON_PROB
+            self.cat = 1
     def __str__(self):
-        return '%s CP %d' % (self.name, self.combat_power)
+        return '%s CP %d [prob: %.2f%%, cat: %d]' % (self.name, self.combat_power, self.prob*100, self.cat)
     def calc_catch(self):
         return (self.base - (0.02 * (self.combat_power % 10))) + (0.1 * self.candies)
     async def process_candy(self):
@@ -100,6 +117,7 @@ class Deusmon:
 async def create_deusmon(did):
     d = Deusmon(did)
     d.iv = await calc_iv(d.combat_power, d.calc_catch())
+    d.iv_num = await calc_ivnum(d.iv)
     return d
 
 async def make_encounter():
@@ -184,22 +202,27 @@ class JoseGames(jcommon.Extension):
             return
 
         player_data = self.db[message.author.id]
+        lvl = await calc_lvl(player_data['xp'])
 
         res = ''
-        res += '%s\n' % message.author
+        res += '%s XP:%d LVL:%d\n' % (message.author, player_data['xp'], int(lvl))
         res += 'Inventário:\n'
         for el in player_data['inv']:
             res += '\t%d %s\n' % (el[0], str(el[1]))
 
         res += 'Deuses:\n'
         for deus in sorted(player_data['dinv'], key=lambda x: -x.combat_power):
-            res += '\t\t%s IV: %s\n' % (deus, str(deus.iv))
+            res += '\t\t%s IV: %s, %.2f%%\n' % (deus, str(deus.iv), deus.iv_num)
 
         res = '```%s```' % res
         await self.say(res)
 
     async def c_dstop(self, message, args):
         '''`!dstop` - te leva a uma DeusStop(cooldown de 5min)'''
+        if message.author.id not in self.db:
+            await self.say("Conta não existe")
+            return
+
         if message.author.id in self.cooldowns:
             # check time
             if time.time() > self.cooldowns[message.author.id]:
@@ -213,14 +236,19 @@ class JoseGames(jcommon.Extension):
         for item_id in items:
             item = items[item_id]
             if random.random() < item[1]:
-                quantity = random.randint(0,5)
+                quantity = random.randint(1,5)
                 player['inv'][item_id][0] += quantity
                 res += ' * %d %s\n' % (quantity, item[0])
 
         await self.say("```%s```" % res)
 
         # faz cooldown
+        player['xp'] += STOP_XP
         self.cooldowns[message.author.id] = time.time() + 300
+
+        done = await self.ext_unload()
+        if not done[0]:
+            await self.say("py_err: %s" % done[1])
 
     async def c_dgotrigger(self, message, args):
         await self.make_encounter_front(message)
@@ -288,7 +316,8 @@ class JoseGames(jcommon.Extension):
                 await asyncio.sleep(2)
                 gotit = await self.catch(deus)
                 if gotit:
-                    await self.say("%s: Parabéns, você conseguiu um %s" % (message.author, deus))
+                    await self.say("%s: Parabéns, você conseguiu um %s IV:%s" % (message.author, deus, str(deus.iv)))
+                    player['xp'] += CAPTURE_XP
                     player['dinv'].append(deus)
                     del self.encounters[message.author.id]
                     break
