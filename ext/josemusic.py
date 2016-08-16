@@ -43,7 +43,7 @@ class VoiceState:
         self.play_next_song = asyncio.Event()
         self.songs = asyncio.Queue()
         self.skip_votes = set() # a set of user_ids that voted
-        self.player_task()
+        self.player = jm.client.loop.create_task(self.player_task())
 
     def is_playing(self):
         if self.voice is None or self.current is None:
@@ -117,6 +117,11 @@ class JoseMusic(jcommon.Extension):
 
         if self.init_flag:
             await self.say("JMusic já conectado")
+            return
+
+        self.voice_channel = discord.utils.get(msg.server.channels, name='funk')
+        if self.voice_channel is None:
+            await self.say("Canal de voz #funk não existe")
             return
 
         voice = await self.client.join_voice_channel(self.voice_channel)

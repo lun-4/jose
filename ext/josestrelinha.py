@@ -79,4 +79,7 @@ class JoseStrelinha(jcommon.Extension):
             await self.say("#estrelinha não existe")
             return
 
+        message_to_like = args[1]
+        db = self.stars.get(message.server.id, {})
+
         return
