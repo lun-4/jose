@@ -228,7 +228,7 @@ class JoseGames(jcommon.Extension):
             if time.time() > self.cooldowns[message.author.id]:
                 del self.cooldowns[message.author.id]
             else:
-                await self.say("Cooldown ainda não terminado(%.2fs)" % (self.cooldowns[message.author.id] - time.time()))
+                await self.say("kk perae *zucao*(%.2fs)" % (self.cooldowns[message.author.id] - time.time()))
                 return
 
         res = 'Itens ganhos:\n'
@@ -314,9 +314,11 @@ class JoseGames(jcommon.Extension):
                     break
 
                 await self.say("Capturando...")
+                #await self.mode(0) #secure mode
                 player['inv'][0][0] -= 1
 
                 await asyncio.sleep(2)
+                #await self.mode(1) #normal mode
                 gotit = await self.catch(deus)
                 if gotit:
                     await self.say("%s: Parabéns, você conseguiu um %s IV:%s" % (message.author, deus, str(deus.iv)))

@@ -492,6 +492,7 @@ load_module('josemusic', 'JoseMusic')
 load_module('josespeak', 'JoseSpeak')
 load_module('josegambling', 'JoseGambling')
 load_module('josegames', 'JoseGames')
+load_module('josestrelinha', "JoseStrelinha")
 
 @client.event
 @asyncio.coroutine
