@@ -552,10 +552,7 @@ def on_message(message):
         counter = 0
 
     st = time.time()
-    yield from jose.recv(message) # default
-    for mod in jose.modules:
-        mod_obj = jose.modules[mod]
-        yield from mod_obj['inst'].recv(message)
+    yield from jose.mod_recv(message)
 
     # get command and push it to jose
     if message.content[0] == '!':
@@ -613,6 +610,8 @@ def on_message(message):
             except AttributeError:
                 return
 
+            # but first, repeat the recv steps
+            yield from jose.mod_recv(message)
             try:
                 yield from jose_method(message, args)
 

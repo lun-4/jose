@@ -100,6 +100,11 @@ class JoseBot(jcommon.Extension):
         else:
             print("load_ext: carregado %s" % n)
 
+    async def mod_recv(self, message):
+        await self.recv(message)
+        for module in self.modules.items():
+            await module['inst'].recv(message)
+
     async def c_reload(self, message, args):
         auth = await self.rolecheck(jcommon.MASTER_ROLE)
         if not auth:
