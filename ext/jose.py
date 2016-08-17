@@ -102,7 +102,7 @@ class JoseBot(jcommon.Extension):
 
     async def mod_recv(self, message):
         await self.recv(message)
-        for module in self.modules.items():
+        for module in list(self.modules.values()):
             await module['inst'].recv(message)
 
     async def c_reload(self, message, args):
