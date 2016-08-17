@@ -78,7 +78,7 @@ class VoiceState:
             except Exception as e:
                 await self.jm.say('pyerr: %s' % e)
 
-            await self.jm.say('ZELAO® tocando: %s' % str(self.current))
+            await self.jm.say('ZELAO® tocando: %s' % str(self.current), channel=self.jm.chcur)
             self.current.player.start()
             await self.play_next_song.wait()
 
@@ -91,6 +91,7 @@ class JoseMusic(jcommon.Extension):
         self.c_message = ''
         self.player = None
         self.state = None
+        self.chcur = None
 
         # flags
         self.init_flag = False
@@ -127,6 +128,7 @@ class JoseMusic(jcommon.Extension):
         voice = await self.client.join_voice_channel(self.voice_channel)
         state = self.get_voice_state()
         state.voice = voice
+        self.chcur = msg.channel
         self.init_flag = True
 
     async def c_play(self, message, args):
