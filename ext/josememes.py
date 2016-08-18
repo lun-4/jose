@@ -216,7 +216,7 @@ class JoseMemes(jcommon.Extension):
             copy = dict(self.memes)
             i = 1
             for key in sorted(self.memes, key=lambda key: -self.memes[key]['uses']):
-                if i > 3: break
+                if i > 7: break
                 stat += '%d lugar: %s com %d usos\n' % (i, \
                     key, self.memes[key]['uses'])
                 i += 1
