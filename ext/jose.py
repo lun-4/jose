@@ -133,7 +133,7 @@ class JoseBot(jcommon.Extension):
         # calls self.say but in an non-async way
         asyncio.async(self.say(msg), loop=self.loop)
 
-    async def c_help(self, message, args):
+    async def c_htjose(self, message, args):
         await self.say(jcommon.JOSE_HELP_TEXT, channel=message.author)
 
     async def c_htgeral(self, message, args):

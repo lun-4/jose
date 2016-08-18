@@ -156,13 +156,10 @@ class JoseMemes(jcommon.Extension):
             else:
                 await self.say("%s: meme não encontrado" % meme)
             return
-        elif args[1] == 'all':
-            await self.say(self.codeblock('python', self.memes))
         elif args[1] == 'cnv': # debug purposes
             for key in self.memes:
                 meme = self.memes[key]
                 if 'uses' not in meme:
-                    print("uses not in meme")
                     meme['uses'] = 0
             await self.say("done.")
         elif args[1] == 'search':

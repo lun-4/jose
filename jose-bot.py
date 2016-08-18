@@ -494,12 +494,19 @@ load_module('josegambling', 'JoseGambling')
 load_module('josegames', 'JoseGames')
 load_module('josestrelinha', "JoseStrelinha")
 
+help_helptext = """
+`!help` - achar ajuda para outros comandos
+`!help comando` - procura algum texto de ajuda para o comando dado
+Exemplos: `!help help`, `!help pstatus`, `!help ap`
+"""
+
 @client.event
 @asyncio.coroutine
 def on_message(message):
     global jose
     global started
     global counter
+    global help_helptext
 
     if message.content == '!construção': #override maintenance mode
         yield from main_status(message)
@@ -569,10 +576,6 @@ def on_message(message):
         if command == 'help':
             # load helptext
             yield from jose.recv(message) # default
-
-            help_helptext = """`!help` - achar ajuda para outros comandos
-            `!help comando` - procura algum texto de ajuda para o comando dado
-            """
 
             cmd_ht = 'help'
             try:

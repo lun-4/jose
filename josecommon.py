@@ -12,7 +12,7 @@ random = SystemRandom()
 import joseerror as je
 
 JOSE_VERSION = '0.8.8'
-JOSE_BUILD = 374
+JOSE_BUILD = 375
 
 APP_CLIENT_ID = 'ID DO JOSE AQUI'
 OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=103988231' % APP_CLIENT_ID
@@ -81,21 +81,21 @@ JOSE_PORN_HTEXT = '''Pornô(Tudo tem preço de %.2fJC):
 
 JOSE_GENERAL_HTEXT = '''
 jose - mostra essa ajuda
-$guess - jogo de adivinhar o numero aleatório
+~~$guess - jogo de adivinhar o numero aleatório~~
 !xkcd [number|rand] - mostra ou o xkcd de número tal ou o mais recente se nenhum é dado
 !yt pesquisa - pesquisar no youtube e mostrar o primeiro resultado
 !pisca mensagem - PISCA A MENSAGEM(entre normal e negrito)
-!animate mensagem - anima a mensagem(wip)
+~~!animate mensagem - anima a mensagem(wip)~~
 !money amount from to - conversão entre moedas
 !version - mostra a versão do jose-bot
-!playing jogo - muda o jogo que o josé está jogando
+!pstatus jogo - muda o jogo que o josé está jogando
 !fullwidth mensagem - converte texto para fullwidth
 !escolha escolha1;escolha2;escolha3... - José escolhe por você!
 !learn <texto> - josé aprende textos!
 !ping - pong
 !sndc termos - pesquisa no SoundCloud
 !meme - meme!
-!fale - forçar o josé a falar alguma coisa
+!falar - forçar o josé a falar alguma coisa
 '''
 
 JOSE_TECH_HTEXT = '''Comandos relacionados a coisas *TECNOLÓGICAS*
