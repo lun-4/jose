@@ -69,6 +69,8 @@ class JoseMemes(jcommon.Extension):
         `!meme rename <nome antigo>;<nome novo>` - altera o `<trigger>` de um meme
         `!meme owner <meme>` - mostra quem "criou" o `<meme>`
         `!meme count` - mostra a quantidade de memes
+        `!meme stat` - estatísticas sobre o uso dos memes
+        `!meme istat <meme>` - estatísticas sobre o uso de um meme específico
 
         Tenha cuidado ao adicionar coisas NSFW.
         '''
@@ -88,6 +90,7 @@ class JoseMemes(jcommon.Extension):
                 self.memes[meme] = {
                     'owner': message.author.id,
                     'data': url,
+                    'uses': 0,
                 }
                 await self.save_memes()
                 await self.say("%s: meme adicionado!" % meme)
@@ -147,12 +150,21 @@ class JoseMemes(jcommon.Extension):
         elif args[1] == 'get':
             meme = ' '.join(args[2:])
             if meme in self.memes:
+                self.memes[meme]['uses'] += 1
                 await self.say(self.memes[meme]['data'])
+                await self.save_memes()
             else:
                 await self.say("%s: meme não encontrado" % meme)
             return
         elif args[1] == 'all':
             await self.say(self.codeblock('python', self.memes))
+        elif args[1] == 'cnv': # debug purposes
+            for key in self.memes:
+                meme = self.memes[key]
+                if 'uses' not in meme:
+                    print("uses not in meme")
+                    meme['uses'] = 0
+            await self.say("done.")
         elif args[1] == 'search':
             term = ' '.join(args[2:])
             probables = [key for key in self.memes if term in key]
@@ -197,6 +209,26 @@ class JoseMemes(jcommon.Extension):
 
         elif args[1] == 'count':
             await self.say("quantidade de memes: %s" % len(self.memes))
+
+        elif args[1] == 'stat':
+            stat = ''
+
+            copy = dict(self.memes)
+            i = 1
+            for key in sorted(self.memes, key=lambda key: -self.memes[key]['uses']):
+                if i > 3: break
+                stat += '%d lugar: %s com %d usos\n' % (i, \
+                    key, self.memes[key]['uses'])
+                i += 1
+            await self.say(self.codeblock('', stat))
+
+        elif args[1] == 'istat':
+            meme = ' '.join(args[2:])
+            if meme in self.memes:
+                await self.say(self.codeblock('', 'usos: %d' % self.memes[meme]['uses']))
+            else:
+                await self.say("%s: meme não encontrado" % meme)
+            return
 
         else:
             await self.say("comando inválido: %s" % args[1])
