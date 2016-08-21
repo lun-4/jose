@@ -559,7 +559,6 @@ def on_message(message):
         counter = 0
 
     st = time.time()
-    yield from jose.mod_recv(message)
 
     # get command and push it to jose
     if message.content[0] == '!':

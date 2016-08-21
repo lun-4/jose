@@ -164,7 +164,8 @@ class JoseMemes(jcommon.Extension):
             await self.say("done.")
         elif args[1] == 'search':
             term = ' '.join(args[2:])
-            probables = [key for key in self.memes if term in key]
+            term = term.lower()
+            probables = [key for key in self.memes if term in key.lower()]
             if len(probables) > 0:
                 await self.say("Resultados: %s" % ', '.join(probables))
             else:
