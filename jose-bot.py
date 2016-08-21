@@ -493,6 +493,7 @@ load_module('josespeak', 'JoseSpeak')
 load_module('josegambling', 'JoseGambling')
 load_module('josegames', 'JoseGames')
 load_module('josestrelinha', "JoseStrelinha")
+load_module('josedatamosh', 'JoseDatamosh')
 
 help_helptext = """
 `!help` - achar ajuda para outros comandos
@@ -559,6 +560,8 @@ def on_message(message):
         counter = 0
 
     st = time.time()
+
+    yield from jose.recv(message) # at least
 
     # get command and push it to jose
     if message.content[0] == '!':
