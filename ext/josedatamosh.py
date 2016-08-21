@@ -20,6 +20,6 @@ class JoseDatamosh(jcommon.Extension):
 
     async def c_datamosh(self, message, args):
         '''
-        `!datamosh <url>` - *Datamoshing.* (somente JPG por um momento)
+        `!datamosh <url>` - *Datamoshing.*
         '''
         return
