@@ -11,9 +11,12 @@ import joseerror as je
 import time
 import datetime
 import traceback
+import pickle
 
 STARBOARD_HELPTEXT = '''
 O Starboard do josé permite aos usuários darem like nas mensagens, sem precisar de Pin ou algo do tipo.
+É necessário ativar o Developer Mode do Discord para poder fazer isso, vá em Settings > Appearance > Developer Mode
+
 `!like <message ID>` - manda aquele laik :top:
 '''
 
@@ -104,6 +107,9 @@ class JoseStrelinha(jcommon.Extension):
         `!like <id da mensagem>` - manda um like numa mensagem
         `!like quem <id da mensagem>` - fala quem fez tal mensagem
         '''
+        await self.say("EU AINDA NAO FUNCIONO FDP")
+        return
+
         star_channel = discord.utils.get(message.server.channels, name='estrelinha')
         if star_channel is None:
             await self.say("#estrelinha não existe")
@@ -130,8 +136,8 @@ class JoseStrelinha(jcommon.Extension):
             return
 
         stars = db.get(message, [None, []])
-        starrers = stars[1]
-        if starrer.id in starrers:
+        print(stars)
+        if starrer.id in stars[1]:
             await self.say("Você já deu like nesta mensagem")
             return
 
@@ -148,7 +154,7 @@ class JoseStrelinha(jcommon.Extension):
             await self.say(':busstop: Esta mensagem tem mais de 7 dias.')
             return
 
-        to_send = await self.make_message(msg, len(starrers) + 1)
+        to_send = await self.make_message(msg, len(stars[1]) + 1)
         if len(to_send) > 2000:
             await self.say(':busstop: Mensagem muito grande.')
             return
@@ -158,24 +164,17 @@ class JoseStrelinha(jcommon.Extension):
         except:
             pass
 
-        starrers.append(starrer.id)
+        stars[1].append(starrer.id)
         db[message] = stars
 
-        # freshly starred
         if stars[0] is None:
             sent = await self.client.send_message(star_channel, to_send)
             stars[0] = sent.id
-
             db[message] = stars
-            self.stars[message.server.id] = db
-            await self.save_stars()
-            return
+        else:
+            bot_msg = await self.client.get_message(starboard, stars[0])
+            await self.bot.edit_message(bot_msg, to_send)
 
-        bot_msg = await self.client.get_message(starboard, stars[0])
-
-        await self.bot.edit_message(bot_msg, to_send)
         self.stars[message.server.id] = db
-
         await self.save_stars()
-
         return
