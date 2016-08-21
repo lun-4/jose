@@ -13,6 +13,7 @@ import traceback
 
 STARBOARD_HELPTEXT = '''
 O Starboard do josé permite aos usuários darem like nas mensagens, sem precisar de Pin ou algo do tipo.
+`!like <message ID>` - laik :top:
 '''
 
 class JoseStrelinha(jcommon.Extension):
@@ -79,7 +80,39 @@ class JoseStrelinha(jcommon.Extension):
             await self.say("#estrelinha não existe")
             return
 
-        message_to_like = args[1]
-        db = self.stars.get(message.server.id, {})
+        command = args[1]
+        msg_id = ''
+        if command.isdigit():
+            msg_id = command
+            command = 'like'
+        else:
+            try:
+                msg_id = args[2]
+            except:
+                await self.say("Erro parseando comando")
+                return
 
+        db = self.stars.get(message.server.id, {})
+        starrer = message.author
+
+        msg = await self.get_message(ctx.message.channel, msg_id)
+        if msg is None:
+            await self.bot.say(':question: Mensagem não encontrada')
+            return
+
+        starrers = db.get(message, [])
+        if starrer.id in starrers:
+            await self.say("Você já deu like nesta mensagem")
+            return
+
+        if starrer.id == msg.author.id:
+            await self.say("Não pode dar like na sua própria mensagem")
+            return
+
+        if msg.channel.id == star_channel.id:
+            await self.say(':busstop: Você não pode dar like nas mensagens da #estrelinha')
+            return
+
+        # self.stars[message.server.id] = db
+        await self.save_stars()
         return
