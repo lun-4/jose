@@ -9,7 +9,8 @@ sys.path.append("..")
 
 from PIL import Image
 import os
-from random import randint
+from random import SystemRandom
+randint = SystemRandom().randint
 
 import josecommon as jcommon
 import joseerror as je
@@ -28,6 +29,18 @@ class JoseDatamosh(jcommon.Extension):
         '''
         `!datamosh <url>` - *Datamoshing.*
         '''
+
+        iterations = 10
+        if len(args) > 2:
+            try:
+                iterations = int(args[2])
+            except Exception as e:
+                await self.say("Erro parseando argumentos(%r)." % e)
+                return
+
+        if iterations > 129:
+            await self.say("*engracadinho*")
+            return
 
         data = io.BytesIO()
         with aiohttp.ClientSession() as session:
@@ -60,7 +73,6 @@ class JoseDatamosh(jcommon.Extension):
         block_start = 100
         block_end = len(source_image.getvalue()) - 400
         replacements = randint(1, 30)
-        iterations = 10
 
         source_image.close()
 
