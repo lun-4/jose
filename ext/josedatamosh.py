@@ -28,6 +28,8 @@ class JoseDatamosh(jcommon.Extension):
     async def c_datamosh(self, message, args):
         '''
         `!datamosh <url>` - *Datamoshing.*
+        Formatos recomendados(*testados*): JPG, PNG
+        Formatos NÃO recomendados: BMP, GIF
         '''
 
         iterations = 10
