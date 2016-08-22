@@ -13,11 +13,13 @@ from random import SystemRandom
 randint = SystemRandom().randint
 
 import josecommon as jcommon
+import jauxiliar as jaux
 import joseerror as je
 
-class JoseDatamosh(jcommon.Extension):
+class JoseDatamosh(jcommon.Extension, jaux.Auxiliar):
     def __init__(self, cl):
         jcommon.Extension.__init__(self, cl)
+        jaux.Auxiliar.__init__(self, cl)
 
     async def ext_load(self):
         return
@@ -28,9 +30,20 @@ class JoseDatamosh(jcommon.Extension):
     async def c_datamosh(self, message, args):
         '''
         `!datamosh <url>` - *Datamoshing.*
+        ```
+        Resultados do !datamosh:
+         * ou o resultado é imcompreensível
+         * ou o resultado é legalzinho
+         * ou não tem visualização(o datamosh quebrou o arquivo)
+        ```
         Formatos recomendados(*testados*): JPG, PNG
         Formatos NÃO recomendados: BMP, GIF
         '''
+
+        auth = await self.jc_control(message.author.id, 3)
+        if not auth:
+            await self.say("jc.auth: não autorizado")
+            return
 
         iterations = 10
         if len(args) > 2:
