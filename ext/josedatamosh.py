@@ -29,15 +29,16 @@ class JoseDatamosh(jcommon.Extension, jaux.Auxiliar):
 
     async def c_datamosh(self, message, args):
         '''
-        `!datamosh <url>` - *Datamoshing.*
+        `!datamosh <url> [iterations]` - *Datamoshing.*
         ```
-        Resultados do !datamosh:
-         * ou o resultado é imcompreensível
-         * ou o resultado é legalzinho
-         * ou não tem visualização(o datamosh quebrou o arquivo)
+Formatos recomendados(*testados*): JPG, PNG
+Formatos NÃO recomendados: BMP, GIF
+
+Resultados de fotos jogadas ao !datamosh:
+ * ou o resultado é imcompreensível
+ * ou o resultado é legalzinho
+ * ou não tem visualização(o datamosh quebrou o arquivo)
         ```
-        Formatos recomendados(*testados*): JPG, PNG
-        Formatos NÃO recomendados: BMP, GIF
         '''
 
         auth = await self.jc_control(message.author.id, 3)
