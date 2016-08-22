@@ -734,6 +734,8 @@ def on_message(message):
         return
 
     elif random.random() < DGO_PROB:
+        # make DGO recieve the message
+        yield from jose.modules['josegames']['inst'].recv(message)
         try:
             yield from jose.modules['josegames']['inst'].make_encounter_front(message)
         except Exception as e:
