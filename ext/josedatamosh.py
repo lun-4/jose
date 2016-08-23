@@ -71,51 +71,64 @@ Resultados de fotos jogadas ao !datamosh:
 
         source_image = io.BytesIO(data.getvalue())
         try:
-            Image.open(data)
-        except:
-            await self.say("Erro abrindo imagem com o Pillow")
+            img = Image.open(data)
+        except Exception as e:
+            await self.say("Erro abrindo imagem com o Pillow(%r)" % e)
             return
 
-        # read the image, copy into a buffer for manipulation
-        output_image = io.BytesIO()
-        for chunk in read_chunks(source_image):
-            output_image.write(chunk)
+        if img.format in ['JPEG', 'JPEG 2000']:
+            # read the image, copy into a buffer for manipulation
+            width, height = img.size
 
-        # herald the destroyer
-        iters = 0
-        steps = 0
-        block_start = 100
-        block_end = len(source_image.getvalue()) - 400
-        replacements = randint(1, 30)
+            if width >= 1280 or height >= 720:
+                await self.say("Resolução muito grande(>720p)")
+                return
 
-        source_image.close()
+            output_image = io.BytesIO()
+            for chunk in read_chunks(source_image):
+                output_image.write(chunk)
 
-        while iters <= iterations:
-            while steps <= replacements:
-                pos_a = randint(block_start, block_end)
-                pos_b = randint(block_start, block_end)
+            # herald the destroyer
+            iters = 0
+            steps = 0
+            block_start = 100
+            block_end = len(source_image.getvalue()) - 400
+            replacements = randint(1, 30)
 
-                output_image.seek(pos_a)
-                content_from_pos_a = output_image.read(1)
-                output_image.seek(0)
+            source_image.close()
 
-                output_image.seek(pos_b)
-                content_from_pos_b = output_image.read(1)
-                output_image.seek(0)
+            while iters <= iterations:
+                while steps <= replacements:
+                    pos_a = randint(block_start, block_end)
+                    pos_b = randint(block_start, block_end)
 
-                # overwrite A with B
-                output_image.seek(pos_a)
-                output_image.write(content_from_pos_b)
-                output_image.seek(0)
+                    output_image.seek(pos_a)
+                    content_from_pos_a = output_image.read(1)
+                    output_image.seek(0)
 
-                # overwrite B with A
-                output_image.seek(pos_b)
-                output_image.write(content_from_pos_a)
-                output_image.seek(0)
+                    output_image.seek(pos_b)
+                    content_from_pos_b = output_image.read(1)
+                    output_image.seek(0)
 
-                steps += 1
-            iters += 1
+                    # overwrite A with B
+                    output_image.seek(pos_a)
+                    output_image.write(content_from_pos_b)
+                    output_image.seek(0)
 
-        await self.client.send_file(message.channel, output_image, filename='datamosh.jpg', content='*Datamoshed*')
+                    # overwrite B with A
+                    output_image.seek(pos_b)
+                    output_image.write(content_from_pos_a)
+                    output_image.seek(0)
 
-        output_image.close()
+                    steps += 1
+                iters += 1
+
+            await self.client.send_file(message.channel, output_image, filename='datamosh.jpg', content='*Datamoshed*')
+
+            output_image.close()
+        elif img.format in ['PNG']:
+            await self.say("*não tenho algoritmo pra PNG*\n*espera porra*\n é sério porra")
+        elif img.format in ['GIF']:
+            await self.say("*o sr esta de brincando comigo NAO VAI TE GIF NO DATAMOSH* é muito caro em relação a processamento NAO")
+        else:
+            await self.say("Formato desconhecido(%s)" % img.format)
