@@ -358,9 +358,6 @@ class JoseBot(jcommon.Extension):
 
     async def c_nick(self, message, args):
         await self.is_admin(message.author.id)
-        if not auth:
-            await self.debug("PermissionError: Não pode mudar o nick do josé.")
-            return
 
         if len(args) < 2:
             self.nick = 'jose-bot'
@@ -376,9 +373,6 @@ class JoseBot(jcommon.Extension):
     async def c_distatus(self, m, a):
         '''`!distatus` - mostra alguns dados para mostrar se o Discord está funcionando corretamente'''
         await self.is_admin(message.author.id)
-        if not auth:
-            await self.say("PermissionError: permissão negada")
-            return
 
         host = "discordapp.com"
 
