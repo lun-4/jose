@@ -140,7 +140,7 @@ class JoseBot(jcommon.Extension):
         await self.say(jcommon.JOSE_TECH_HTEXT, channel=message.author)
 
     async def sec_auth(self, f):
-        await self.is_admin(message.author.id)
+        auth = await self.is_admin(self.current.author.id)
         if auth:
             await self.debug("auth: autorizado")
             self.command_lock = True
