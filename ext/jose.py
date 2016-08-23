@@ -106,10 +106,7 @@ class JoseBot(jcommon.Extension):
             await module['inst'].recv(message)
 
     async def c_reload(self, message, args):
-        auth = await self.rolecheck(jcommon.MASTER_ROLE)
-        if not auth:
-            await self.say("PermError: permissão negada")
-            return
+        await self.is_admin(message.author.id)
 
         n = args[1]
         if n in self.modules:
@@ -143,7 +140,7 @@ class JoseBot(jcommon.Extension):
         await self.say(jcommon.JOSE_TECH_HTEXT, channel=message.author)
 
     async def sec_auth(self, f):
-        auth = await jcommon.check_roles(jcommon.MASTER_ROLE, self.current.author.roles)
+        await self.is_admin(message.author.id)
         if auth:
             await self.debug("auth: autorizado")
             self.command_lock = True
@@ -360,7 +357,7 @@ class JoseBot(jcommon.Extension):
         await self.say("Eu escolho %s" % choice)
 
     async def c_nick(self, message, args):
-        auth = await jcommon.check_roles(jcommon.MASTER_ROLE, message.author.roles)
+        await self.is_admin(message.author.id)
         if not auth:
             await self.debug("PermissionError: Não pode mudar o nick do josé.")
             return
@@ -378,7 +375,7 @@ class JoseBot(jcommon.Extension):
 
     async def c_distatus(self, m, a):
         '''`!distatus` - mostra alguns dados para mostrar se o Discord está funcionando corretamente'''
-        auth = await self.rolecheck(jcommon.MASTER_ROLE)
+        await self.is_admin(message.author.id)
         if not auth:
             await self.say("PermissionError: permissão negada")
             return
@@ -426,9 +423,8 @@ class JoseBot(jcommon.Extension):
         await self.say(res)
 
     async def c_uptime(self, message, args):
-        '''def get_bot_uptime(self):
-            delta = datetime.datetime.utcnow() - self.bot.uptime
-            print(delta)
+        '''
+        `!uptime` - mostra o uptime do josé
         '''
         sec = (time.time() - self.start_time)
         MINUTE  = 60
@@ -453,7 +449,7 @@ class JoseBot(jcommon.Extension):
     # !eval `self.loop.run_until_complete(self.say(discord.__version__))`
     async def c_eval(self, message, args):
         # eval expr
-        await self.rolecheck(jcommon.MASTER_ROLE)
+        await self.is_admin(message.author.id)
 
         eval_cmd = ' '.join(args[1:])
         if eval_cmd[0] == '`' and eval_cmd[-1] == '`':
