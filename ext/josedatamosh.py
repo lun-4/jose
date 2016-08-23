@@ -12,13 +12,11 @@ import os
 from random import SystemRandom
 randint = SystemRandom().randint
 
-import josecommon as jcommon
 import jauxiliar as jaux
 import joseerror as je
 
-class JoseDatamosh(jcommon.Extension, jaux.Auxiliar):
+class JoseDatamosh(jaux.Auxiliar):
     def __init__(self, cl):
-        jcommon.Extension.__init__(self, cl)
         jaux.Auxiliar.__init__(self, cl)
 
     async def ext_load(self):

@@ -4,12 +4,12 @@ import discord
 import asyncio
 import sys
 sys.path.append("..")
-import josecommon as jcommon
+import jauxiliar as jaux
 import joseerror as je
 
-class JoseExtension(jcommon.Extension):
+class JoseExtension(jaux.Auxiliar):
     def __init__(self, cl):
-        jcommon.Extension.__init__(self, cl)
+        jaux.Auxiliar.__init__(self, cl)
 
     async def ext_load(self):
         pass
