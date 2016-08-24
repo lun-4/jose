@@ -119,8 +119,10 @@ async def raw_save():
 
 class JoseCoin(jcommon.Extension):
     def __init__(self, cl):
+        global data
         jcommon.Extension.__init__(self, cl)
         self.top10_flag = False
+        self.data = data
 
     async def josecoin_save(self, message, dbg_flag=True):
         self.current = message
@@ -198,6 +200,23 @@ class JoseCoin(jcommon.Extension):
             await self.say(res[1])
         else:
             await self.say('erro em jc: %s' % res[1])
+
+    async def c_saldebug(self, message, args):
+        '''`!saldebug @mention` - saldo de alguém(com debug)'''
+        args = message.content.split(' ')
+
+        id_check = None
+        if len(args) < 2:
+            id_check = message.author.id
+        else:
+            id_check = await jcommon.parse_id(args[1], message)
+
+        res = get(id_check)
+        if res[0]:
+            accdata = res[1]
+            await self.say('%s -> %f' % (accdata['name'], accdata['amount']))
+        else:
+            await self.say('conta não encontrada(`id:%s`)' % (id_check))
 
     async def c_topunflip(self, message, args):
         self.top10_flag = not self.top10_flag
