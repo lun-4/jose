@@ -8,7 +8,10 @@ sys.path.append("..")
 import josecommon as jcommon
 import joseerror as je
 
-JOSECOIN_VERSION = '0.4.2'
+JOSECOIN_VERSION = '0.5'
+
+from decimal import *
+getcontext().prec = 3
 
 JOSECOIN_HELP_TEXT = '''JoseCoin(%s) é a melhor moeda que o josé pode te oferecer!
 
@@ -24,7 +27,7 @@ Alguns comandos pedem JC$ em troca da sua funcionalidade(*comandos nsfw incluíd
 data = {}
 jose_id = jcommon.JOSE_ID
 
-LEDGER_PATH = 'jcoin/josecoin-3.journal'
+LEDGER_PATH = 'jcoin/josecoin-4.journal'
 
 def ledger_data(fpath, data):
     with open(fpath, 'a') as f:
@@ -37,7 +40,10 @@ def empty_acc(name, amnt):
         'name': name
     }
 
-def new_acc(id_acc, name, init_amnt=25.0):
+def new_acc(id_acc, name, init_amnt=None):
+    if init_amnt is None:
+        init_amnt = Decimal('25')
+
     if id_acc in data:
         return False, 'conta já existe'
 
@@ -55,7 +61,7 @@ def gen():
         yield (acc_id, acc['name'], acc['amount'])
 
 def transfer(id_from, id_to, amnt, file_name):
-    amnt = float(amnt)
+    amnt = Decimal(str(amnt))
 
     if amnt < 0:
         return False, "valores menores do que zero não são permitidos"
@@ -82,9 +88,9 @@ def transfer(id_from, id_to, amnt, file_name):
     acc_to['amount'] += amnt
     acc_from['amount'] -= amnt
 
-    ledger_data(file_name, "%f;TR;%s;%s;%f\n" % (time.time(), id_from, id_to, amnt))
+    ledger_data(file_name, "%f;TR;%s;%s;%s\n" % (time.time(), id_from, id_to, amnt))
 
-    return True, "%.2f foram enviados de %s para %s" % (amnt, acc_from['name'], acc_to['name'])
+    return True, "%s foram enviados de %s para %s" % (amnt, acc_from['name'], acc_to['name'])
 
 def load(fname):
     global data
@@ -94,7 +100,7 @@ def load(fname):
     except Exception as e:
         return False, str(e)
 
-    # data[jose_id] = empty_acc('jose-bot', 1000000)
+    # data[jose_id] = empty_acc('jose-bot', Decimal('1000000'))
     #ledger_data(fname.replace('db', 'journal'), '%f;LOAD;%r\n' % (time.time(), data))
     return True, "load %s" % fname
 
@@ -167,15 +173,13 @@ class JoseCoin(jcommon.Extension):
     async def c_write(self, message, args):
         '''`!write @mention new_amount` - sobrescreve o saldo de uma conta'''
         global data
-        auth = await self.rolecheck(jcommon.MASTER_ROLE)
-        if not auth:
-            await self.debug("PermissionError: sem permissão para alterar dados da JC")
+        await self.rolecheck(jcommon.MASTER_ROLE)
 
         id_from = await jcommon.parse_id(args[1], message)
-        new_amount = float(args[2])
+        new_amount = Decimal(args[2])
 
         data[id_from]['amount'] = new_amount
-        await self.say("conta <@%s>: %.2f" % (id_from, data[id_from]['amount']))
+        await self.say("<@%s> tem %.2fJC agora" % (id_from, data[id_from]['amount']))
 
     async def c_enviar(self, message, args):
         '''`!enviar @mention quantidade` - envia JCoins para uma conta'''
@@ -186,9 +190,12 @@ class JoseCoin(jcommon.Extension):
 
         id_to = args[1]
         try:
-            amount = float(args[2])
+            amount = Decimal(args[2])
         except ValueError:
             await self.say("ValueError: erro parseando o valor")
+            return
+        except Exception as e:
+            await self.say("Exception: `%r`" % e)
             return
 
         id_from = message.author.id
@@ -199,7 +206,7 @@ class JoseCoin(jcommon.Extension):
         if res[0]:
             await self.say(res[1])
         else:
-            await self.say('erro em jc: %s' % res[1])
+            await self.say('jc_err: `%s`' % res[1])
 
     async def c_saldebug(self, message, args):
         '''`!saldebug @mention` - saldo de alguém(com debug)'''
