@@ -494,6 +494,7 @@ load_module('josegambling', 'JoseGambling')
 load_module('josegames', 'JoseGames')
 load_module('josestrelinha', "JoseStrelinha")
 load_module('josedatamosh', 'JoseDatamosh')
+load_module('joseibc', 'JoseIBC')
 
 help_helptext = """
 `!help` - achar ajuda para outros comandos
