@@ -112,6 +112,9 @@ class JoseNSFW(jcommon.Extension):
         r = json.loads(content)
 
         try:
+            if len(r['list']) < 1:
+                await self.say("*não tem definição grátis*")
+                return
             await self.say(self.codeblock('', '%s:\n%s' % (term, r['list'][0]['definition'])))
         except Exception as e:
             await self.debug('```%s```'%traceback.format_exc())
