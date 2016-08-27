@@ -37,6 +37,7 @@ class JoseBot(jcommon.Extension):
         }
         self.start_time = time.time()
         self.command_lock = False
+        self.queue = []
 
     def load_gext(self, inst, n):
         print("carregando módulo: %s" % n)
@@ -104,6 +105,21 @@ class JoseBot(jcommon.Extension):
         await self.recv(message)
         for module in list(self.modules.values()):
             await module['inst'].recv(message)
+
+    '''async def default_recv(self, message):
+        await self.recv(message)
+        for module in list(self.modules.values()):
+            await module['inst'].recv(message)
+
+    async def mod_recv(self, message):
+        if self.current is None:
+            await self.default_recv(message)
+        else:
+            self.queue.append(message)
+
+    async def unlock(self):
+        new_msg = self.queue.pop()
+        await self.default_recv(new_msg)'''
 
     async def c_reload(self, message, args):
         await self.is_admin(message.author.id)

@@ -631,6 +631,9 @@ def on_message(message):
             delta = end-st
             if delta > 10:
                 yield from jose.say("Alguma coisa está demorando demais para responder(delta=%.4fs)..." % delta)
+
+            # yield from jose.unlock()
+
             # yield from jose.say("time: real %.4fs user %.4fs" % (delta, delta+(delta/4)))
             return
         except Exception as e:
