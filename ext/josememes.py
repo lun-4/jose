@@ -251,7 +251,7 @@ class JoseMemes(jcommon.Extension):
         await self.c_fullwidth(message, args)
 
     async def c_emoji(self, message, args):
-        '''`!emoji [emojis]` - gera de 1 a 5 emojis aleatórios(ou `emojis` se falado(máx. 512))'''
+        '''`!emoji [qt]` - gera de 1 a 5(ou `qt`(máx. 512)) emojis aleatórios'''
         res = ''
         if len(args) < 2:
             res = await jcommon.random_emoji(random.randint(1,5))
