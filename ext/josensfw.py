@@ -27,8 +27,6 @@ class JoseNSFW(jcommon.Extension):
         jcommon.Extension.__init__(self, cl)
 
     async def danbooru_api(self, baseurl, search_term):
-        loop = asyncio.get_event_loop()
-
         url = ''
         if search_term == ':latest':
             await self.say('danbooru: procurando nos posts mais recentes')
