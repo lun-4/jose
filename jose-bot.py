@@ -627,6 +627,7 @@ def on_message(message):
                 yield from jose.say('jose: py_rt_err: %s' % repr(e))
             except je.LimitError:
                 pass
+
             end = time.time()
             delta = end-st
             if delta > 10:

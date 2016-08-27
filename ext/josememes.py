@@ -12,6 +12,9 @@ sys.path.append("..")
 import josecommon as jcommon
 import joseerror as je
 
+import itertools
+import collections
+
 class JoseMemes(jcommon.Extension):
     def __init__(self, cl):
         self.memes = {}
@@ -74,14 +77,20 @@ class JoseMemes(jcommon.Extension):
 
         Tenha cuidado ao adicionar coisas NSFW.
         '''
+        command = args[1]
+
         if len(args) < 2:
             await self.say(self.c_meme.__doc__)
             return
-        elif args[1] == 'add':
+        elif command == 'add':
             args_s = ' '.join(args[2:])
             args_sp = args_s.split(';')
             meme = args_sp[0]
             url = args_sp[1]
+
+            if len(meme) > 96:
+                await self.say("*não tem meme grátis*")
+                return
 
             if meme in self.memes:
                 await self.say("%s: meme já existe" % meme)
@@ -95,7 +104,7 @@ class JoseMemes(jcommon.Extension):
                 await self.save_memes()
                 await self.say("%s: meme adicionado!" % meme)
             return
-        elif args[1] == 'rm':
+        elif command == 'rm':
             meme = ' '.join(args[2:])
             if meme in self.memes:
                 meme_data = self.memes[meme]
@@ -113,7 +122,7 @@ class JoseMemes(jcommon.Extension):
             else:
                 await self.say("%s: meme não encontrado" % meme)
                 return
-        elif args[1] == 'save':
+        elif command == 'save':
             done = await self.save_memes()
             if done:
                 await self.say("jmemes: banco de dados salvo")
@@ -121,7 +130,7 @@ class JoseMemes(jcommon.Extension):
                 raise IOError("banco de dados não salvo corretamente")
 
             return
-        elif args[1] == 'load':
+        elif command == 'load':
             done = await self.load_memes()
             if done:
                 await self.say("jmemes: banco de dados carregado")
@@ -130,7 +139,7 @@ class JoseMemes(jcommon.Extension):
 
             return
 
-        elif args[1] == 'saveload':
+        elif command == 'saveload':
             print('saveload')
             done = await self.save_memes()
             if done:
@@ -145,9 +154,9 @@ class JoseMemes(jcommon.Extension):
                 raise IOError("banco de dados não carregado corretamente")
 
             return
-        #elif args[1] == 'list':
+        #elif command == 'list':
         #    await self.say("memes: %s" % ', '.join(self.memes.keys()))
-        elif args[1] == 'get':
+        elif command == 'get':
             meme = ' '.join(args[2:])
             if meme in self.memes:
                 self.memes[meme]['uses'] += 1
@@ -156,13 +165,13 @@ class JoseMemes(jcommon.Extension):
             else:
                 await self.say("%s: meme não encontrado" % meme)
             return
-        elif args[1] == 'cnv': # debug purposes
+        elif command == 'cnv': # debug purposes
             for key in self.memes:
                 meme = self.memes[key]
                 if 'uses' not in meme:
                     meme['uses'] = 0
             await self.say("done.")
-        elif args[1] == 'search':
+        elif command == 'search':
             term = ' '.join(args[2:])
             term = term.lower()
             probables = [key for key in self.memes if term in key.lower()]
@@ -170,7 +179,7 @@ class JoseMemes(jcommon.Extension):
                 await self.say("Resultados: %s" % ', '.join(probables))
             else:
                 await self.say("%r: Nenhum resultado encontrado" % term)
-        elif args[1] == 'rename':
+        elif command == 'rename':
             args_s = ' '.join(args[2:])
             args_sp = args_s.split(';')
             oldname = args_sp[0]
@@ -196,7 +205,7 @@ class JoseMemes(jcommon.Extension):
             await self.save_memes()
             return
 
-        elif args[1] == 'owner':
+        elif command == 'owner':
             meme = ' '.join(args[2:])
             if meme in self.memes:
                 u = discord.utils.get(message.server.members, id=self.memes[meme]['owner'])
@@ -205,10 +214,10 @@ class JoseMemes(jcommon.Extension):
                 await self.say("%s: meme não encontrado" % meme)
             return
 
-        elif args[1] == 'count':
+        elif command == 'count':
             await self.say("quantidade de memes: %s" % len(self.memes))
 
-        elif args[1] == 'stat':
+        elif command == 'stat':
             stat = ''
 
             copy = dict(self.memes)
@@ -224,7 +233,7 @@ class JoseMemes(jcommon.Extension):
                 i += 1
             await self.say(self.codeblock('', stat))
 
-        elif args[1] == 'istat':
+        elif command == 'istat':
             meme = ' '.join(args[2:])
             if meme in self.memes:
                 await self.say(self.codeblock('', 'usos: %d' % self.memes[meme]['uses']))
@@ -232,9 +241,33 @@ class JoseMemes(jcommon.Extension):
                 await self.say("%s: meme não encontrado" % meme)
             return
 
-        else:
-            await self.say("comando inválido: %s" % args[1])
+        elif command == 'page':
+            page = args[2]
+
+            try:
+                page = int(page)
+            except Exception as e:
+                await self.say("jmemes: %r" % e)
+
+            min_it = 80 * (page - 1)
+            max_it = 80 + (80 * page)
+
+            report = ', '.join(list(self.memes[min_it:max_it]))
+            await self.say(report)
+
+        elif command == 'check':
+            for key in self.memes:
+                meme = self.memes[key]
+                if 'uses' not in meme:
+                    await self.say("INCONSISTENCY(uses): %s" % key)
+                    self.memes[key].update({"uses": 0})
+            await self.say("done.")
             return
+
+        else:
+            await self.say("comando inválido: %s" % command)
+
+        return
 
     async def c_m(self, message, args):
         '''`!m` - alias para `!meme`'''
