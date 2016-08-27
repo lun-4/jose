@@ -249,10 +249,13 @@ class JoseMemes(jcommon.Extension):
             except Exception as e:
                 await self.say("jmemes: %r" % e)
 
-            min_it = 80 * (page - 1)
-            max_it = 80 + (80 * page)
+            min_it = 50 * (page - 1)
+            max_it = 50 + (50 * page)
 
-            report = ', '.join(list(self.memes[min_it:max_it]))
+            x = sorted(self.memes.keys())
+            x_slice = x[min_it:max_it]
+
+            report = ', '.join(x_slice)
             await self.say(report)
 
         elif command == 'check':
