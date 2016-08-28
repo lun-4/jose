@@ -80,7 +80,7 @@ Resultados de fotos jogadas ao !datamosh:
             # read the image, copy into a buffer for manipulation
             width, height = img.size
 
-            if width >= 1280 or height >= 720:
+            if width > 1280 or height > 720:
                 await self.say("Resolução muito grande(>720p)")
                 return
 
