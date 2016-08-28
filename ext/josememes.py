@@ -74,6 +74,7 @@ class JoseMemes(jcommon.Extension):
         `!meme count` - mostra a quantidade de memes
         `!meme stat` - estatísticas sobre o uso dos memes
         `!meme istat <meme>` - estatísticas sobre o uso de um meme específico
+        `!meme page <página>` - mostra a página tal de todos os memes disponíveis
 
         Tenha cuidado ao adicionar coisas NSFW.
         '''
@@ -254,6 +255,10 @@ class JoseMemes(jcommon.Extension):
 
             x = sorted(self.memes.keys())
             x_slice = x[min_it:max_it]
+
+            if len(x_slice) < 1:
+                await self.say("*nao tem meme gratis*")
+                return
 
             report = ', '.join(x_slice)
             await self.say(report)
