@@ -27,7 +27,7 @@ class JoseDatamosh(jaux.Auxiliar):
 
     async def c_datamosh(self, message, args):
         '''
-        `!datamosh <url> [iterations]` - *Datamoshing.*
+        `!datamosh <url> [iterations]` - *Datamoshing.* (3JC/datamosh)
         ```
 Formatos recomendados(*testados*): JPG, PNG
 Formatos NÃO recomendados: BMP, GIF
