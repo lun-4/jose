@@ -61,7 +61,8 @@ class JoseMemes(jcommon.Extension):
         await self.say('http://gaveta.com.br/images/Aprovacao-Sean-Anthony.png')
 
     async def c_meme(self, message, args):
-        '''!meme: Adicione e mostre memes com o josé!
+        '''
+        !meme: Adicione e mostre memes com o josé!
         *alias*: !m
 
         Subcomandos:
@@ -79,12 +80,13 @@ class JoseMemes(jcommon.Extension):
 
         Tenha cuidado ao adicionar coisas NSFW.
         '''
-        command = args[1]
 
         if len(args) < 2:
             await self.say(self.c_meme.__doc__)
             return
-        elif command == 'add':
+
+        command = args[1]
+        if command == 'add':
             args_s = ' '.join(args[2:])
             args_sp = args_s.split(';')
             meme = args_sp[0]
