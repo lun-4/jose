@@ -797,7 +797,10 @@ async def command_loop():
     while True:
         if cmd_queue.length > 0:
             msg = await cmd_queue.pop()
-            await one_message(msg)
+            if len(msg.content) > 0:
+                await one_message(msg)
+            else:
+                print("empty message")
         else:
             await asyncio.sleep(0)
 
