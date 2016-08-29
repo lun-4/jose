@@ -502,9 +502,15 @@ help_helptext = """
 Exemplos: `!help help`, `!help pstatus`, `!help ap`
 """
 
+cmd_queue = CommandQueue()
+
 @client.event
+async def on_message(message):
+    global cmd_queue
+    await cmd_queue.push(message)
+
 @asyncio.coroutine
-def on_message(message):
+def one_message(message):
     global jose
     global started
     global counter
@@ -787,6 +793,14 @@ def on_message(message):
 
     yield from gorila_routine(message.channel)
 
+async def command_loop():
+    while True:
+        if cmd_queue.length > 0:
+            msg = await cmd_queue.pop()
+            await one_message(msg)
+        else:
+            await asyncio.sleep(0)
+
 @client.event
 async def on_ready():
     print("="*25)
@@ -795,6 +809,23 @@ async def on_ready():
     print('id', client.user.id)
     print('='*25)
 
-print("rodando cliente")
-client.run(jconfig.discord_token)
+
+async def main_task():
+    global client
+
+    print("start")
+    await client.start(jconfig.discord_token)
+
+loop = asyncio.get_event_loop()
+try:
+    print("iniciando loop de processamento")
+    asyncio.ensure_future(command_loop())
+
+    print("main_task")
+    loop.run_until_complete(main_task())
+except:
+    loop.run_until_complete(client.logout())
+finally:
+    loop.close()
+
 print("jose: finish line")

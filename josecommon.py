@@ -414,3 +414,19 @@ class Extension:
 
     def is_owner(self):
         return self.current.id in ADMIN_IDS
+
+class CommandQueue:
+    def __init__(self):
+        self.queue = []
+        self.length = 0
+
+    async def push(self, message):
+        self.length += 1
+        self.queue.append(message)
+
+    async def pop(self):
+        if self.length < 1:
+            while not (self.length > 0):
+                pass
+        self.length -= 1
+        return self.queue.pop()
