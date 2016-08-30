@@ -802,7 +802,7 @@ async def command_loop():
             else:
                 print("empty message")
         else:
-            await asyncio.sleep(0)
+            await asyncio.sleep(0.001)
 
 @client.event
 async def on_ready():
