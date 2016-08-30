@@ -225,10 +225,17 @@ class JoseMemes(jcommon.Extension):
             stat = ''
 
             copy = dict(self.memes)
+
+            inconsistency = False
             i = 1
             for k in copy:
                 if 'uses' not in copy[k]:
                     await self.say('INCONSISTENCY: %s' % k)
+                    inconsistency = True
+
+            if inconsistency:
+                await self.say("INCONSISTENCY entries detected.")
+                return
 
             for key in sorted(copy, key=lambda key: -copy[key]['uses']):
                 if i > 10: break
@@ -253,8 +260,9 @@ class JoseMemes(jcommon.Extension):
             except Exception as e:
                 await self.say("jmemes: %r" % e)
 
-            min_it = 50 * (page - 1)
-            max_it = 50 + (50 * page)
+            PER_PAGE = 50
+            min_it = PER_PAGE * (page - 1)
+            max_it = PER_PAGE * page
 
             x = sorted(self.memes.keys())
             x_slice = x[min_it:max_it]
