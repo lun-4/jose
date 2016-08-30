@@ -267,11 +267,22 @@ class JoseMemes(jcommon.Extension):
             await self.say(report)
 
         elif command == 'check':
+            await self.say("checking INCONSISTENCY data")
             for key in self.memes:
                 meme = self.memes[key]
                 if 'uses' not in meme:
                     await self.say("INCONSISTENCY(uses): %s" % key)
                     self.memes[key].update({"uses": 0})
+
+            await self.say("checking duplicates")
+            new_memes = {}
+            for k in self.memes:
+                v = self.memes[k]
+                if k not in new_memes:
+                    new_memes[k] = v
+                else:
+                    await self.say("DUPLICATE: %s" % k)
+
             await self.say("done.")
             return
 
