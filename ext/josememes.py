@@ -282,14 +282,17 @@ class JoseMemes(jcommon.Extension):
                     await self.say("INCONSISTENCY(uses): %s" % key)
                     self.memes[key].update({"uses": 0})
 
-            await self.say("checking duplicates")
+            await self.say("checking duplicates(by value)")
             new_memes = {}
             for k in self.memes:
                 v = self.memes[k]
-                if k not in new_memes:
-                    new_memes[k] = v
-                else:
-                    await self.say("DUPLICATE: %s" % k)
+                if v['data'] not in new_memes:
+                    new_memes[v['data']] = []
+                new_memes[v['data']].append(k)
+
+            for v in new_memes:
+                if len(new_memes[v]) > 1:
+                    await self.say("DUPLICATE(s): ```%s```\n" % (new_memes[v]))
 
             await self.say("done.")
             return
