@@ -106,7 +106,7 @@ class JoseMemes(jcommon.Extension):
 
             for pat in self.patterns:
                 if re.search(pat, url):
-                    await self.say("Detectado um link do facebook, tratando ela...")
+                    await self.say("Detectado um link do facebook, tratando...")
 
                     with aiohttp.ClientSession() as session:
                         data = io.BytesIO()
@@ -197,7 +197,7 @@ class JoseMemes(jcommon.Extension):
                 meme = self.memes[key]
                 url = meme['data']
                 if re.search('fbcdn.net', url):
-                    await self.say("Detectado um link do facebook, tratando ela...")
+                    await self.say("Detectado um link do facebook, tratando...")
 
                     with aiohttp.ClientSession() as session:
                         data = io.BytesIO()
