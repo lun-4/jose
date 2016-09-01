@@ -23,6 +23,7 @@ class JoseMemes(jcommon.Extension):
         self.memes = {}
         self.WIDE_MAP = dict((i, i + 0xFEE0) for i in range(0x21, 0x7F))
         self.WIDE_MAP[0x20] = 0x3000
+        self.patterns = ['fbcdn.net', 'akamaihd.net']
         jcommon.Extension.__init__(self, cl)
 
     async def ext_load(self):
@@ -103,22 +104,24 @@ class JoseMemes(jcommon.Extension):
                 await self.say("%s: meme já existe" % meme)
                 return
 
-            if re.search('fbcdn.net', url):
-                await self.say("Detectado um link do facebook, tratando ela...")
+            for pat in self.patterns:
+                if re.search(pat, url):
+                    await self.say("Detectado um link do facebook, tratando ela...")
 
-                with aiohttp.ClientSession() as session:
-                    data = io.BytesIO()
+                    with aiohttp.ClientSession() as session:
+                        data = io.BytesIO()
 
-                    async with session.get(url) as resp:
-                        data_read = await resp.read()
-                        data.write(data_read)
+                        async with session.get(url) as resp:
+                            data_read = await resp.read()
+                            data.write(data_read)
 
-                    clone = io.BytesIO(data.getvalue())
-                    msg = await self.client.send_file(message.channel, clone, filename='%s.jpg' % meme, content='*tratado*')
-                    data.close()
-                    clone.close()
+                        clone = io.BytesIO(data.getvalue())
+                        msg = await self.client.send_file(message.channel, clone, filename='%s.jpg' % meme, content='*tratado*')
+                        data.close()
+                        clone.close()
 
-                    url = msg.attachments[0]['url']
+                        url = msg.attachments[0]['url']
+                        break
 
             self.memes[meme] = {
                 'owner': message.author.id,
@@ -192,8 +195,24 @@ class JoseMemes(jcommon.Extension):
         elif command == 'cnv': # debug purposes
             for key in self.memes:
                 meme = self.memes[key]
-                if 'uses' not in meme:
-                    meme['uses'] = 0
+                url = meme['data']
+                if re.search('fbcdn.net', url):
+                    await self.say("Detectado um link do facebook, tratando ela...")
+
+                    with aiohttp.ClientSession() as session:
+                        data = io.BytesIO()
+
+                        async with session.get(url) as resp:
+                            data_read = await resp.read()
+                            data.write(data_read)
+
+                        clone = io.BytesIO(data.getvalue())
+                        msg = await self.client.send_file(message.channel, clone, filename='%s.jpg' % key, content='*tratado*')
+                        data.close()
+                        clone.close()
+
+                        url = msg.attachments[0]['url']
+                meme['data'] = url
             await self.say("done.")
         elif command == 'search':
             term = ' '.join(args[2:])
