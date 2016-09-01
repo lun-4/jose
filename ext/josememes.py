@@ -14,6 +14,9 @@ import joseerror as je
 
 import itertools
 import collections
+import re
+import io
+import aiohttp
 
 class JoseMemes(jcommon.Extension):
     def __init__(self, cl):
@@ -99,14 +102,31 @@ class JoseMemes(jcommon.Extension):
             if meme in self.memes:
                 await self.say("%s: meme já existe" % meme)
                 return
-            else:
-                self.memes[meme] = {
-                    'owner': message.author.id,
-                    'data': url,
-                    'uses': 0,
-                }
-                await self.save_memes()
-                await self.say("%s: meme adicionado!" % meme)
+
+            if re.search('fbcdn.net', url):
+                await self.say("Detectado um link do facebook, tratando ela...")
+
+                with aiohttp.ClientSession() as session:
+                    data = io.BytesIO()
+
+                    async with session.get(url) as resp:
+                        data_read = await resp.read()
+                        data.write(data_read)
+
+                    clone = io.BytesIO(data.getvalue())
+                    msg = await self.client.send_file(message.channel, clone, filename='%s.jpg' % meme, content='*tratado*')
+                    data.close()
+                    clone.close()
+
+                    url = msg.attachments[0]['url']
+
+            self.memes[meme] = {
+                'owner': message.author.id,
+                'data': url,
+                'uses': 0,
+            }
+            await self.save_memes()
+            await self.say("%s: meme adicionado!" % meme)
             return
         elif command == 'rm':
             meme = ' '.join(args[2:])
@@ -205,7 +225,7 @@ class JoseMemes(jcommon.Extension):
             }
 
             del self.memes[oldname]
-            await self.say("%s foi renomeado para %s!" % (oldname, newname))
+            await self.say("`%s` foi renomeado para `%s`!" % (oldname, newname))
             await self.save_memes()
             return
 
