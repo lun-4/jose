@@ -18,6 +18,18 @@ import re
 import io
 import aiohttp
 
+MEMES_TECH_HELP = '''
+Então você teve problemas usando `!m stat` ou `!m get` ou alguma merda assim?
+Siga esses passos:
+    1) Rode um `!m check` no josé
+        O `!m check` irá checar meme por meme e ver se ele faz sentido, tipo ter um
+        número de usos, se não, ele irá corrigir automaticamente
+
+        Outra coisa que o `!m check` faz é procurar por duplicatas, ou seja, 2 memes que
+        vão pro mesmo resultado, ele te mostra quem tem duplicata e você remove manualmente
+    2) Se o problema persiste, fale com lunão.
+'''
+
 class JoseMemes(jcommon.Extension):
     def __init__(self, cl):
         self.memes = {}
@@ -64,9 +76,13 @@ class JoseMemes(jcommon.Extension):
         '''`!aprovado` - O Melhor Sean Anthony®'''
         await self.say('http://gaveta.com.br/images/Aprovacao-Sean-Anthony.png')
 
+    async def c_htmpr(self, message, args):
+        await self.say(MEMES_TECH_HELP)
+
     async def c_meme(self, message, args):
         '''
         !meme: Adicione e mostre memes com o josé!
+        use `!htmpr` para descobrir problemas técnicos.
         *alias*: !m
 
         Subcomandos:
@@ -81,6 +97,7 @@ class JoseMemes(jcommon.Extension):
         `!meme istat <meme>` - estatísticas sobre o uso de um meme específico
         `!meme page <página>` - mostra a página tal de todos os memes disponíveis
         `!meme see @user` - mostra todos os memes que a @pessoa fez
+        `!meme check` - checa o banco de dados de memes
 
         Tenha cuidado ao adicionar coisas NSFW.
         '''
