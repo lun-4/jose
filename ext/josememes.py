@@ -82,7 +82,7 @@ class JoseMemes(jcommon.Extension):
     async def c_meme(self, message, args):
         '''
         !meme: Adicione e mostre memes com o josé!
-        use `!htmpr` para descobrir problemas técnicos.
+        **RECOMENDADO**: use `!htmpr` para descobrir problemas técnicos.
         *alias*: !m
 
         Subcomandos:
@@ -95,7 +95,7 @@ class JoseMemes(jcommon.Extension):
         `!meme count` - mostra a quantidade de memes
         `!meme stat` - estatísticas sobre o uso dos memes
         `!meme istat <meme>` - estatísticas sobre o uso de um meme específico
-        `!meme page <página>` - mostra a página tal de todos os memes disponíveis
+        `!meme page <página>` - mostra a página tal de todos os memes disponíveis(inicia de 1, não do 0)
         `!meme see @user` - mostra todos os memes que a @pessoa fez
         `!meme check` - checa o banco de dados de memes
 
@@ -237,6 +237,10 @@ class JoseMemes(jcommon.Extension):
         elif command == 'search':
             term = ' '.join(args[2:])
             term = term.lower()
+            if term.strip() == '':
+                await self.say("Pesquisas vazias não são permitidas")
+                return
+
             probables = [key for key in self.memes if term in key.lower()]
             if len(probables) > 0:
                 await self.say("Resultados: %s" % ', '.join(probables))
@@ -312,12 +316,19 @@ class JoseMemes(jcommon.Extension):
             return
 
         elif command == 'page':
+            if len(args) < 3:
+                await self.say("SyntaxError: `!m page <page>`")
+                return
             page = args[2]
 
             try:
                 page = int(page)
             except Exception as e:
                 await self.say("jmemes: %r" % e)
+
+            if page < 0:
+                await self.say("EI EI EI EI CALMAI CUZAO")
+                return
 
             PER_PAGE = 50
             min_it = PER_PAGE * (page - 1)
