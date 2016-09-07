@@ -41,6 +41,8 @@ Até agora é só isso mesmo, beijos <3
     good CP => 600+
 '''
 
+# Xangô, Ogum, Omolu, Oxalá, Iemanjá, Iansã, Exú, Oxóssi
+
 dgo_data = {
     1: ['Deus',     (NORMAL_CP      , 600)],
     2: ['Belzebu',  (NORMAL_CP      , 500)],
