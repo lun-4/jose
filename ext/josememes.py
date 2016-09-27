@@ -96,7 +96,7 @@ class JoseMemes(jcommon.Extension):
         `!meme stat` - estatísticas sobre o uso dos memes
         `!meme istat <meme>` - estatísticas sobre o uso de um meme específico
         `!meme page <página>` - mostra a página tal de todos os memes disponíveis(inicia de 1, não do 0)
-        `!meme see @user` - mostra todos os memes que a @pessoa fez
+        `!meme see @user <página>` - mostra todos os memes que a @pessoa fez(`página` inicia de 0, não de 1)
         `!meme check` - checa o banco de dados de memes
 
         Tenha cuidado ao adicionar coisas NSFW.
@@ -369,6 +369,10 @@ class JoseMemes(jcommon.Extension):
 
         elif command == 'see':
             owner = args[2]
+            try:
+                page = int(args[3])
+            except:
+                page = 0
 
             owner_id = await jcommon.parse_id(owner, message)
 
@@ -377,7 +381,9 @@ class JoseMemes(jcommon.Extension):
                 await self.say("*nao tem owner gratis*")
                 return
 
-            report = '''Quantidade: %d,\nMemes: %s''' % (len(from_owner), ', '.join(from_owner))
+            corte = from_owner[page*50:(page+1)*50]
+            res = len(from_owner), len(corte), ', '.join(corte)
+            report = '''Quantidade: %d[%d],\nMemes: %s''' % (res)
             await self.say(report)
 
         else:
