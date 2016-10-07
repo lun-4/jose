@@ -386,6 +386,10 @@ class JoseMemes(jcommon.Extension):
             report = '''Quantidade: %d[%d],\nMemes: %s''' % (res)
             await self.say(report)
 
+        elif command == 'rand':
+            key = random.choice(list(self.memes.keys()))
+            await self.say('%s: %s' % (key, self.memes[key]['data']))
+
         else:
             await self.say("comando inválido: %s" % command)
 
