@@ -386,7 +386,7 @@ class JoseBot(jcommon.Extension):
 
         return
 
-    async def c_distatus(self, m, a):
+    async def c_distatus(self, message, args):
         '''`!distatus` - mostra alguns dados para mostrar se o Discord está funcionando corretamente'''
         await self.is_admin(message.author.id)
 
@@ -448,9 +448,6 @@ class JoseBot(jcommon.Extension):
 
         fmt = "uptime: %d dias, %d horas, %d minutos, %d segundos"
         await self.debug(fmt % (days, hours, minutes, seconds))
-
-    async def c_jbot(self, message, args):
-        await self.say("Olá do módulo jose.py")
 
     # !eval `await self.say("hello")`
     # !eval `self.loop.run_until_complete(self.say("Hello"))`
