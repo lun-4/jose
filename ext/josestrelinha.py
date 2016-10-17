@@ -107,8 +107,6 @@ class JoseStrelinha(jcommon.Extension):
         `!like <id da mensagem>` - manda um like numa mensagem
         `!like quem <id da mensagem>` - fala quem fez tal mensagem
         '''
-        await self.say("EU AINDA NAO FUNCIONO FDP")
-        return
 
         star_channel = discord.utils.get(message.server.channels, name='estrelinha')
         if star_channel is None:
@@ -135,7 +133,8 @@ class JoseStrelinha(jcommon.Extension):
             await self.bot.say(':question: Mensagem não encontrada')
             return
 
-        stars = db.get(message, [None, []])
+        stars = db.get(msg_id, [None, []])
+        print(db)
         print(stars)
         if starrer.id in stars[1]:
             await self.say("Você já deu like nesta mensagem")
@@ -165,15 +164,15 @@ class JoseStrelinha(jcommon.Extension):
             pass
 
         stars[1].append(starrer.id)
-        db[message] = stars
+        db[msg_id] = stars
 
         if stars[0] is None:
             sent = await self.client.send_message(star_channel, to_send)
             stars[0] = sent.id
-            db[message] = stars
+            db[msg_id] = stars
         else:
-            bot_msg = await self.client.get_message(starboard, stars[0])
-            await self.bot.edit_message(bot_msg, to_send)
+            bot_msg = await self.client.get_message(star_channel, stars[0])
+            await self.client.edit_message(bot_msg, to_send)
 
         self.stars[message.server.id] = db
         await self.save_stars()
