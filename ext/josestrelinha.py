@@ -63,7 +63,7 @@ class JoseStrelinha(jcommon.Extension):
         star_channel = discord.utils.get(message.server.channels, name='estrelinha')
         if star_channel is None:
             await self.say("Criando canal #estrelinha...")
-            self.client.create_channel(message.server, "estrelinha")
+            await self.client.create_channel(message.server, "estrelinha")
             await self.say("Administre as permissões.")
         else:
             await self.say("#estrelinha já existe")
