@@ -106,21 +106,6 @@ class JoseBot(jcommon.Extension):
         for module in list(self.modules.values()):
             await module['inst'].recv(message)
 
-    '''async def default_recv(self, message):
-        await self.recv(message)
-        for module in list(self.modules.values()):
-            await module['inst'].recv(message)
-
-    async def mod_recv(self, message):
-        if self.current is None:
-            await self.default_recv(message)
-        else:
-            self.queue.append(message)
-
-    async def unlock(self):
-        new_msg = self.queue.pop()
-        await self.default_recv(new_msg)'''
-
     async def c_reload(self, message, args):
         await self.is_admin(message.author.id)
 
@@ -423,6 +408,7 @@ class JoseBot(jcommon.Extension):
         await self.say("José pode ser adicionado para outro servidor usando este link:\n```%s```" % jcommon.OAUTH_URL)
 
     async def c_clist(self, message, args):
+        '''`!clist module` - mostra todos os comandos de tal módulo'''
         modname = args[1]
         module = self.modules[modname]
 
@@ -461,5 +447,6 @@ class JoseBot(jcommon.Extension):
         eval_cmd = ' '.join(args[1:])
         if eval_cmd[0] == '`' and eval_cmd[-1] == '`':
             eval_cmd = eval_cmd[1:-1]
+
         res = eval(eval_cmd)
         await self.say("```%s``` -> `%s`" % (eval_cmd, res))
