@@ -113,6 +113,10 @@ class JoseStrelinha(jcommon.Extension):
             await self.say("#estrelinha não existe")
             return
 
+        if len(args) < 2:
+            await self.say("`!help like`, seu cuzao")
+            return
+
         command = args[1]
         msg_id = ''
         if command.isdigit():
