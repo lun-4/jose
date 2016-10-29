@@ -13,6 +13,7 @@ Instruções(Linux):
 $ git clone https://github.com/lkmnds/jose.git
 $ cd jose
 $ nano joseconfig.py
+$ pip install discord.py youtube_dl Pillow
 ```
 
 `joseconfig.py` de exemplo:
