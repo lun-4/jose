@@ -1,13 +1,7 @@
 
- * Modularize code
-
  * POSSIBILITY: Making music lives on JMusic
 	* Problem 1: Jose crashes! what to do?
 	* Problem 2: Internet doesn't handle multiple connections
 	* Problem 3: large files! what to do with them?
 
  * INTDT: Lottery
-
- * D.GO:
-    * Integrate with JCoin
-    * Battles...?
