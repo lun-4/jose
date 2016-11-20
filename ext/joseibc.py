@@ -9,6 +9,17 @@ import joseerror as je
 
 import json
 
+async def syscall_pong(ibc, args):
+    await ibc.say("pong")
+
+async def syscall_say(ibc, args):
+    await ibc.say(' '.join(args))
+
+syscall_functions = {
+    0: syscall_pong,
+    1: syscall_say,
+}
+
 class JoseIBC(jaux.Auxiliar):
     def __init__(self, cl):
         jaux.Auxiliar.__init__(self, cl)
@@ -29,16 +40,14 @@ class JoseIBC(jaux.Auxiliar):
         try:
             json_data = json.loads(json_to_parse)
         except Exception as e:
-            await self.say("syscall->pyerr: `%r`" % e)
+            await self.say("syscall->json.loads: `%r`" % e)
             return
 
         try:
             syscall_number = json_data['callnumber']
         except Exception as e:
-            await self.say("syscall->pyerr: `%r`" % e)
+            await self.say("syscall->json_data.callnumber: `%r`" % e)
             return
 
-        if syscall_number == 0:
-            await self.say("pong")
-
+        await syscall_functions[syscall_number](self, json_data['arguments'])
         return
