@@ -98,6 +98,8 @@ class JoseMemes(jcommon.Extension):
         `!meme page <página>` - mostra a página tal de todos os memes disponíveis(inicia de 1, não do 0)
         `!meme see @user <página>` - mostra todos os memes que a @pessoa fez(`página` inicia de 0, não de 1)
         `!meme check` - checa o banco de dados de memes
+        `!meme rand` - meme aleatório
+        `!meme searchc <termos>` - procura o DB de meme qual o valor do meme que bate com os termos
 
         Tenha cuidado ao adicionar coisas NSFW.
         '''
@@ -389,6 +391,21 @@ class JoseMemes(jcommon.Extension):
         elif command == 'rand':
             key = random.choice(list(self.memes.keys()))
             await self.say('%s: %s' % (key, self.memes[key]['data']))
+
+        elif command == 'searchc':
+            terms = ' '.join(args[2:])
+            terms = terms.lower()
+            if terms.strip() == '':
+                await self.say("Pesquisas vazias não são permitidas")
+                return
+
+            probables = [key for key in self.memes if terms in self.memes[key]['data'].lower()]
+            if len(probables) <= 70:
+                await self.say("Resultados: %s" % ', '.join(probables))
+            elif len(probables) > 70:
+                await self.say("PORRA EH MUITO RESULTADO NAO AGUENTO[%d resultados]" % len(probables))
+            else:
+                await self.say("%r: Nenhum resultado encontrado" % terms)
 
         else:
             await self.say("comando inválido: %s" % command)
