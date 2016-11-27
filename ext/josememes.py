@@ -30,6 +30,17 @@ Siga esses passos:
     2) Se o problema persiste, fale com lunão.
 '''
 
+BLACK_MIRROR_MESSAGES = [
+    'http://s2.glbimg.com/beSMsXdBIPHqeQxdWi-nM31wNXs=/s.glbimg.com/jo/eg/f/original/2016/11/18/fdsaff.jpg',
+    'http://s2.glbimg.com/N8LLtE22ZW2pFjlhzQWBdzvfn9E=/s.glbimg.com/jo/eg/f/original/2016/11/18/fsdfdsf.jpg',
+    'http://s2.glbimg.com/p8eze6X7iY-mNFa5iGUHFQNEhgY=/s.glbimg.com/jo/eg/f/original/2016/11/18/fdsafsad.jpg',
+    'https://pbs.twimg.com/media/CxeUjl6WEAAvO0E.jpg',
+    'https://pbs.twimg.com/media/CwrpR_fXEAA5uan.jpg',
+    'https://pbs.twimg.com/media/Cxf57rfXEAAUHQV.jpg',
+    'https://pbs.twimg.com/media/Cxlx2sMW8AA37qh.jpg',
+    'https://pbs.twimg.com/media/CxkgKCZXgAAlkO2.jpg',
+]
+
 class JoseMemes(jcommon.Extension):
     def __init__(self, cl):
         self.memes = {}
@@ -441,3 +452,7 @@ class JoseMemes(jcommon.Extension):
                 return
             res = await jcommon.random_emoji(int(args[1]))
         await self.say(res)
+
+    async def c_blackmirror(self, message, args):
+        mensagem_muito_blackmirror = random.choice(BLACK_MIRROR_MESSAGES)
+        await self.say(mensagem_muito_blackmirror)
