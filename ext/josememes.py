@@ -454,5 +454,6 @@ class JoseMemes(jcommon.Extension):
         await self.say(res)
 
     async def c_blackmirror(self, message, args):
+        '''`!blackmirror` - COISAS MUITO BLACK MIRROR, MEU'''
         mensagem_muito_blackmirror = random.choice(BLACK_MIRROR_MESSAGES)
         await self.say(mensagem_muito_blackmirror)
