@@ -8,8 +8,6 @@ import josecommon as jcommon
 import jcoin.josecoin as jcoin
 import joseerror as je
 
-import os
-import time
 import aiohttp
 import json
 import urllib.parse
@@ -18,7 +16,7 @@ import traceback
 from random import SystemRandom
 random = SystemRandom()
 
-from xml.etree import ElementTree
+# from xml.etree import ElementTree
 
 PORN_LIMIT = 14
 
@@ -87,11 +85,10 @@ class JoseNSFW(jcommon.Extension):
                     return
 
                 random_post_url = '%s?id=%s' % (show_url, random_id)
-                random_post = await self.get_json(random_post_url)
-                await self.say(random_post[post_key])
+                post = await self.get_json(random_post_url)
             else:
                 post = random.choice(r)
-            await self.say('%s' % post[post_key])
+            await self.say('ID: %d, URL: %s' % (post['id'], post[post_key]))
             return
         except Exception as e:
             await self.debug("json_api: py_error: %r" % e)
