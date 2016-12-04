@@ -26,14 +26,18 @@ class JoseNSFW(jcommon.Extension):
     def __init__(self, cl):
         jcommon.Extension.__init__(self, cl)
 
-    async def danbooru_api(self, baseurl, search_term):
+    '''async def danbooru_api(self, index_url, search_term):
         url = ''
         if search_term == ':latest':
-            await self.say('danbooru: procurando nos posts mais recentes')
-            url = '%s?limit=%s' % (baseurl, PORN_LIMIT)
+            await self.say('dbru_api: procurando nos posts mais recentes')
+            url = '%s?limit=%s' % (index_url, PORN_LIMIT)
+        elif search_term == ':random':
+            await self.say('json_api: procurando um ID aleatório')
+            random_flag = True
+            url = '%s?limit=%s' % (index_url, 1)
         else:
             await self.say('dbru_api: procurando por %r' % search_term)
-            url = '%s?limit=%s&tags=%s' % (baseurl, PORN_LIMIT, search_term)
+            url = '%s?limit=%s&tags=%s' % (index_url, PORN_LIMIT, search_term)
 
         r = await aiohttp.request('GET', url)
         content = await r.text()
@@ -47,28 +51,47 @@ class JoseNSFW(jcommon.Extension):
             return
         except Exception as e:
             await self.debug("danbooru: py_error: %s" % str(e))
-            return
+            return'''
 
-    async def json_api(self, baseurl, search_term, where, rspec=False, debug_flag=False):
-        url = ''
-        if search_term == ':latest':
-            await self.say('json_api: procurando nos posts mais recentes')
-            url = '%s?limit=%s' % (baseurl, PORN_LIMIT)
-        else:
-            await self.say('json_api: procurando por %r' % search_term)
-            url = '%s?limit=%s&tags=%s' % (baseurl, PORN_LIMIT, search_term)
-
+    async def get_json(self, url):
         r = await aiohttp.request('GET', url)
         r = await r.text()
         r = json.loads(r)
+        return r
+
+    async def json_api(self, index_url, show_url, search_term, post_key, rspec=False, debug_flag=False):
+        url = ''
+        random_flag = False
+        if search_term == ':latest':
+            await self.say('json_api: procurando nos posts mais recentes')
+            url = '%s?limit=%s' % (index_url, PORN_LIMIT)
+        elif search_term == ':random':
+            await self.say('json_api: procurando um ID aleatório')
+            random_flag = True
+            url = '%s?limit=%s' % (index_url, 1)
+        else:
+            await self.say('json_api: procurando por `%r`' % search_term)
+            url = '%s?limit=%s&tags=%s' % (index_url, PORN_LIMIT, search_term)
+
+        r = await self.get_json(url)
 
         try:
             post = None
             if rspec:
                 post = random.choice(r[rspec])
+            elif random_flag:
+                most_recent_id = r[0]['id']
+                random_id = random.randint(1, most_recent_id)
+                if not show_url:
+                    await self.say("json_api: API não suporta posts individuais")
+                    return
+
+                random_post_url = '%s?id=%s' % (show_url, random_id)
+                random_post = await self.get_json(random_post_url)
+                await self.say(random_post[post_key])
             else:
                 post = random.choice(r)
-            await self.say('%s' % post[where])
+            await self.say('%s' % post[post_key])
             return
         except Exception as e:
             await self.debug("json_api: py_error: %r" % e)
@@ -86,22 +109,26 @@ class JoseNSFW(jcommon.Extension):
         access = await self.porn_routine()
         if access:
             # ¯\_(ツ)_/¯
-            await self.danbooru_api('http://hypnohub.net/post/index.xml', ' '.join(args[1:]))
+            await self.json_api('http://hypnohub.net/post/index.json', '',
+                ' '.join(args[1:]), 'file_url')
 
     async def c_yandere(self, message, args):
         access = await self.porn_routine()
         if access:
-            await self.danbooru_api('https://yande.re/post.xml', ' '.join(args[1:]))
+            await self.json_api('https://yande.re/post.json', '',
+                ' '.join(args[1:]), 'file_url')
 
     async def c_e621(self, message, args):
         access = await self.porn_routine()
         if access:
-            await self.json_api('https://e621.net/post/index.json', ' '.join(args[1:]), 'file_url')
+            await self.json_api('https://e621.net/post/index.json', 'https://e621.net/post/show.json',
+                ' '.join(args[1:]), 'file_url')
 
     async def c_porn(self, message, args):
         access = await self.porn_routine()
         if access:
-            await self.json_api('http://api.porn.com/videos/find.json', ' '.join(args[1:]), 'url', 'result')
+            await self.json_api('http://api.porn.com/videos/find.json', '',
+                ' '.join(args[1:]), 'url', 'result')
 
     async def c_urban(self, message, args):
         term = ' '.join(args[1:])
