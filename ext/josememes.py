@@ -461,13 +461,17 @@ class JoseMemes(jcommon.Extension):
         await self.say(mensagem_muito_blackmirror)
 
     async def wikimedia_api(self, params):
+        using_query = False
         wiki_searchterm = ' '.join(params['args'][1:])
         wiki_methodname = params['name']
 
-        WIKI_API_ENDPOINT = params['endpoint']
-        WIKI_API_SEARCHPARAMS = params['searchparams']
+        wiki_api_endpoint = params['endpoint']
+        wiki_api_params = params['searchparams']
+        if 'queryparams' in params:
+            wiki_api_params = params['queryparams']
+            using_query = True
 
-        wiki_api_url = '%s%s%s' % (WIKI_API_ENDPOINT, WIKI_API_SEARCHPARAMS,
+        wiki_api_url = '%s%s%s' % (wiki_api_endpoint, wiki_api_params,
             urllib.parse.quote(wiki_searchterm))
 
         print("requesting %s" % wiki_api_url)
@@ -480,41 +484,62 @@ class JoseMemes(jcommon.Extension):
         response_text = await response.text()
         wiki_json = json.loads(response_text)
 
-        w_suggestions = wiki_json[1]
-        w_suggestions_text = wiki_json[2]
-        w_wiki_urls = wiki_json[3]
-
-        if len(w_suggestions) < 1:
-            await self.say("sem resultados")
+        if using_query:
+            print("using query method")
+            w_search_data = wiki_json['query']['search']
+            w_all = ''
+            for result in w_search_data[:6]:
+                w_snippet = result['snippet']
+                w_snippet = w_snippet.replace('<span class=\"searchmatch\">', '')
+                w_snippet = w_snippet.replace('</span>', '')
+                w_all += '\t%s: %s...\n' % (result['title'], w_snippet[:120])
+            await self.say(self.codeblock(w_all, ''))
             return
+        else:
+            w_suggestions = wiki_json[1]
+            w_suggestions_text = wiki_json[2]
+            w_wiki_urls = wiki_json[3]
 
-        search_paragaph = w_suggestions_text[0]
+            if len(w_suggestions) < 1:
+                await self.say("sem resultados")
+                return
 
-        if len(w_suggestions) > 1:
-            search_paragaph = 'Múltiplos resultados: %s' % ', '.join(w_suggestions)
+            print(w_suggestions_text)
+            search_paragaph = w_suggestions_text[0]
 
-        if len(search_paragaph) >= 500:
-            search_paragaph = search_paragaph[:500] + '...'
+            if len(w_suggestions) > 1:
+                search_paragaph = 'Múltiplos resultados: %s' % ', '.join(w_suggestions)
 
-        await self.say(
-        """`%s:%s` =
+            if len(search_paragaph) >= 500:
+                search_paragaph = search_paragaph[:500] + '...'
+
+            print('debug: wiki request finished')
+            await self.say(
+            """`%s:%s` =
 ```
     %s
     [ URL0: %s ]
 ```
-        """ % (wiki_methodname, wiki_searchterm, search_paragaph, w_wiki_urls[0]))
-        return
+            """ % (wiki_methodname, wiki_searchterm, search_paragaph, w_wiki_urls[0]))
+            return
 
     async def c_wiki(self, message, args):
         '''`!wiki [terms]` - procurar na WIKIPEDIA!!!'''
-        await self.wikimedia_api(
-            {
-                'name': 'en.wikipedia',
-                'args': args,
-                'endpoint': 'https://en.wikipedia.org/w/api.php',
-                'searchparams': '?format=json&action=opensearch&search='
-            }
-        )
+        wikipedia_params = {
+            'name': 'en.wikipedia',
+            'args': args,
+            'endpoint': 'https://en.wikipedia.org/w/api.php',
+            'searchparams': '?format=json&action=opensearch&search=',
+            'queryparams': '?format=json&action=query&list=search&utf8=&srsearch='
+        }
+
+        if ':query' in args:
+            args[args.index(':query')] = ''
+            wikipedia_params['searchparams'] = ''
+            await self.wikimedia_api(wikipedia_params)
+        else:
+            del wikipedia_params['queryparams']
+            await self.wikimedia_api(wikipedia_params)
 
     async def c_deswiki(self, message, args):
         '''`!deswiki [terms]` - procurar na DESCICLOPEDIA!!!'''
@@ -523,6 +548,7 @@ class JoseMemes(jcommon.Extension):
                 'name': 'desciclopedia',
                 'args': args,
                 'endpoint': 'http://desciclopedia.org/api.php',
-                'searchparams': '?format=json&action=opensearch&search='
+                'searchparams': '?format=json&action=opensearch&search=',
+                #'queryparams': '?format=json&action=query&list=search&srsearch='
             }
         )
