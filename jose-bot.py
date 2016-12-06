@@ -744,14 +744,6 @@ def one_message(message):
                 # yield from jose.say('eval: %s' % )
         return
 
-    elif random.random() < DGO_PROB:
-        # make DGO recieve the message
-        yield from jose.modules['josegames']['inst'].recv(message)
-        try:
-            yield from jose.modules['josegames']['inst'].make_encounter_front(message)
-        except Exception as e:
-            yield from jose.say("dgo: pyerr: ```%s```" % traceback.format_exc())
-
     elif random.random() < jc_probabiblity:
         if not message.channel.is_private:
             if not message.author.id in jose_env['spam']:

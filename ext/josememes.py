@@ -17,6 +17,8 @@ import collections
 import re
 import io
 import aiohttp
+import urllib
+import json
 
 MEMES_TECH_HELP = '''
 Então você teve problemas usando `!m stat` ou `!m get` ou alguma merda assim?
@@ -457,3 +459,42 @@ class JoseMemes(jcommon.Extension):
         '''`!blackmirror` - COISAS MUITO BLACK MIRROR, MEU'''
         mensagem_muito_blackmirror = random.choice(BLACK_MIRROR_MESSAGES)
         await self.say(mensagem_muito_blackmirror)
+
+    async def c_wiki(self, message, args):
+        '''`!wiki [terms]` - procurar na WIKIPEDIA!!!'''
+        wiki_searchterm = ' '.join(args[1:])
+
+        WIKI_API_ENDPOINT = 'https://en.wikipedia.org/w/api.php'
+        WIKI_API_SEARCHPARAMS = '?format=json&action=opensearch&search='
+
+        wiki_api_url = '%s%s%s' % (WIKI_API_ENDPOINT, WIKI_API_SEARCHPARAMS,
+            urllib.parse.quote(wiki_searchterm))
+
+        print("requesting %s" % wiki_api_url)
+        response = await aiohttp.request('GET', wiki_api_url)
+        response_text = await response.text()
+        wiki_json = json.loads(response_text)
+
+        if len(wiki_json[2]) < 1:
+            await self.say("sem resultados")
+            return
+
+        search_paragaph = wiki_json[2][0]
+        if len(search_paragaph) >= 500:
+            search_paragaph = search_paragaph[:500] + '...'
+
+        multiple_res = ''
+        if len(wiki_json[2]) > 1:
+            multiple_res = '!!! { MULTIPLE RESULTS } !!!'
+
+        search_wiki_url = wiki_json[3][0]
+
+        await self.say(
+        """`en.wikipedia:%s` =
+```
+    %s
+    %s
+    [ %s ]
+```
+        """ % (wiki_searchterm, search_paragaph, multiple_res, search_wiki_url))
+        return

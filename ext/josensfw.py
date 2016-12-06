@@ -57,7 +57,7 @@ class JoseNSFW(jcommon.Extension):
         r = json.loads(r)
         return r
 
-    async def json_api(self, index_url, show_url, search_term, post_key, rspec=False, debug_flag=False):
+    async def json_api(self, index_url, show_url, search_term, post_key, rspec=False, hypnohub_flag=False):
         url = ''
         random_flag = False
         if search_term == ':latest':
@@ -88,7 +88,12 @@ class JoseNSFW(jcommon.Extension):
                 post = await self.get_json(random_post_url)
             else:
                 post = random.choice(r)
-            await self.say('ID: %d, URL: %s' % (post['id'], post[post_key]))
+
+            post_url = post[post_key]
+            if hypnohub_flag:
+                post_url = post_url.replace('//', '/')
+                post_url = 'http:/%s' % post_url
+            await self.say('ID: %d, URL: %s' % (post['id'], post_url))
             return
         except Exception as e:
             await self.debug("json_api: py_error: %r" % e)
@@ -107,7 +112,7 @@ class JoseNSFW(jcommon.Extension):
         if access:
             # ¯\_(ツ)_/¯
             await self.json_api('http://hypnohub.net/post/index.json', '',
-                ' '.join(args[1:]), 'file_url')
+                ' '.join(args[1:]), 'file_url', None, True)
 
     async def c_yandere(self, message, args):
         access = await self.porn_routine()
