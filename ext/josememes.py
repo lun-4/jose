@@ -460,41 +460,69 @@ class JoseMemes(jcommon.Extension):
         mensagem_muito_blackmirror = random.choice(BLACK_MIRROR_MESSAGES)
         await self.say(mensagem_muito_blackmirror)
 
-    async def c_wiki(self, message, args):
-        '''`!wiki [terms]` - procurar na WIKIPEDIA!!!'''
-        wiki_searchterm = ' '.join(args[1:])
+    async def wikimedia_api(self, params):
+        wiki_searchterm = ' '.join(params['args'][1:])
+        wiki_methodname = params['name']
 
-        WIKI_API_ENDPOINT = 'https://en.wikipedia.org/w/api.php'
-        WIKI_API_SEARCHPARAMS = '?format=json&action=opensearch&search='
+        WIKI_API_ENDPOINT = params['endpoint']
+        WIKI_API_SEARCHPARAMS = params['searchparams']
 
         wiki_api_url = '%s%s%s' % (WIKI_API_ENDPOINT, WIKI_API_SEARCHPARAMS,
             urllib.parse.quote(wiki_searchterm))
 
         print("requesting %s" % wiki_api_url)
-        response = await aiohttp.request('GET', wiki_api_url)
+        try:
+            response = await asyncio.wait_for(aiohttp.request('GET', wiki_api_url), 8)
+        except asyncio.TimeoutError:
+            await self.say("`[wiki:%s] Timeout reached`" % wiki_methodname)
+            return
+
         response_text = await response.text()
         wiki_json = json.loads(response_text)
 
-        if len(wiki_json[2]) < 1:
+        w_suggestions = wiki_json[1]
+        w_suggestions_text = wiki_json[2]
+        w_wiki_urls = wiki_json[3]
+
+        if len(w_suggestions) < 1:
             await self.say("sem resultados")
             return
 
-        search_paragaph = wiki_json[2][0]
+        search_paragaph = w_suggestions_text[0]
+
+        if len(w_suggestions) > 1:
+            search_paragaph = 'Múltiplos resultados: %s' % ', '.join(w_suggestions)
+
         if len(search_paragaph) >= 500:
             search_paragaph = search_paragaph[:500] + '...'
 
-        multiple_res = ''
-        if len(wiki_json[2]) > 1:
-            multiple_res = '!!! { MULTIPLE RESULTS } !!!'
-
-        search_wiki_url = wiki_json[3][0]
-
         await self.say(
-        """`en.wikipedia:%s` =
+        """`%s:%s` =
 ```
     %s
-    %s
-    [ %s ]
+    [ URL0: %s ]
 ```
-        """ % (wiki_searchterm, search_paragaph, multiple_res, search_wiki_url))
+        """ % (wiki_methodname, wiki_searchterm, search_paragaph, w_wiki_urls[0]))
         return
+
+    async def c_wiki(self, message, args):
+        '''`!wiki [terms]` - procurar na WIKIPEDIA!!!'''
+        await self.wikimedia_api(
+            {
+                'name': 'en.wikipedia',
+                'args': args,
+                'endpoint': 'https://en.wikipedia.org/w/api.php',
+                'searchparams': '?format=json&action=opensearch&search='
+            }
+        )
+
+    async def c_deswiki(self, message, args):
+        '''`!deswiki [terms]` - procurar na DESCICLOPEDIA!!!'''
+        await self.wikimedia_api(
+            {
+                'name': 'desciclopedia',
+                'args': args,
+                'endpoint': 'http://desciclopedia.org/api.php',
+                'searchparams': '?format=json&action=opensearch&search='
+            }
+        )
