@@ -61,43 +61,41 @@ class JoseNSFW(jcommon.Extension):
         url = ''
         random_flag = False
         if search_term == ':latest':
-            await self.say('json_api: procurando nos posts mais recentes')
+            await self.say('`[nsfw.json] procurando nos posts mais recentes`')
             url = '%s?limit=%s' % (index_url, PORN_LIMIT)
         elif search_term == ':random':
-            await self.say('json_api: procurando um ID aleatório')
+            await self.say('`[nsfw.json] procurando um ID aleatório`')
             random_flag = True
             url = '%s?limit=%s' % (index_url, 1)
         else:
-            await self.say('json_api: procurando por `%r`' % search_term)
+            await self.say('`[nsfw.json] procurando por %r`' % search_term)
             url = '%s?limit=%s&tags=%s' % (index_url, PORN_LIMIT, search_term)
 
         r = await self.get_json(url)
 
-        try:
-            post = None
-            if rspec:
-                post = random.choice(r[rspec])
-            elif random_flag:
-                most_recent_id = r[0]['id']
-                random_id = random.randint(1, most_recent_id)
-                if not show_url:
-                    await self.say("json_api: API não suporta posts individuais")
-                    return
+        post = None
+        if rspec:
+            post = random.choice(r[rspec])
+        elif random_flag:
+            most_recent_id = r[0]['id']
+            random_id = random.randint(1, most_recent_id)
+            if not show_url:
+                await self.say("`[nsfw.json] API não suporta posts individuais`")
+                return
+            random_post_url = '%s?id=%s' % (show_url, random_id)
+            post = await self.get_json(random_post_url)
+        else:
+            if len(r) < 1:
+                await self.say("`[nsfw.json] Nenhum resultado encontrado.`")
+                return
+            post = random.choice(r)
 
-                random_post_url = '%s?id=%s' % (show_url, random_id)
-                post = await self.get_json(random_post_url)
-            else:
-                post = random.choice(r)
-
-            post_url = post[post_key]
-            if hypnohub_flag:
-                post_url = post_url.replace('//', '/')
-                post_url = 'http:/%s' % post_url
-            await self.say('ID: %d, URL: %s' % (post['id'], post_url))
-            return
-        except Exception as e:
-            await self.debug("json_api: py_error: %r" % e)
-            return
+        post_url = post[post_key]
+        if hypnohub_flag:
+            post_url = post_url.replace('//', '/')
+            post_url = 'http:/%s' % post_url
+        await self.say('ID: %d, URL: %s' % (post['id'], post_url))
+        return
 
     async def porn_routine(self):
         res = await jcoin.jcoin_control(self.current.author.id, jcommon.PORN_PRICE)
