@@ -85,7 +85,6 @@ class VoiceState:
 class JoseMusic(jcommon.Extension):
     def __init__(self, cl):
         jcommon.Extension.__init__(self, cl)
-        self.voice_channel = discord.Object(id='208768258818441219') # funk
 
         # stuff
         self.c_message = ''
@@ -108,7 +107,7 @@ class JoseMusic(jcommon.Extension):
         res += 'JMusic iniciado: %s\n' % self.init_flag
         if self.init_flag and self.state:
             ispl = self.state.is_playing()
-            res += 'tocando música? %s\n' % ispl
+            res += '`state.isplaying = %r`\n' % ispl
             if ispl:
                 res += 'Música sendo tocada: %s\n' % self.state.current
         await self.say("%s" % res)

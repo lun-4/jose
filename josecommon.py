@@ -196,15 +196,13 @@ GAMBLING_HELP_TEXT_SMALL = '''Aposta for Dummies:
 
 debug_logs = []
 
-@asyncio.coroutine
-def debug_log(string):
+async def debug_log(string):
     print(string)
     today_str = time.strftime("%d-%m-%Y")
     with open("logs/jose_debug-%s.log" % today_str, 'a') as f:
         f.write(string+'\n')
 
-@asyncio.coroutine
-def jose_debug(message, dbg_msg, flag=True):
+async def jose_debug(message, dbg_msg, flag=True):
     message_banner = '%s[%s]: %r' % (message.author, message.channel, message.content)
     dbg_msg = '%s -> %s' % (message_banner, str(dbg_msg))
     debug_logs.append(dbg_msg)
@@ -277,26 +275,21 @@ aviaos = [
     'http://i.imgur.com/AIbjvX7.jpg',
 ]
 
-@asyncio.coroutine
-def show_help(message):
+async def show_help(message):
     yield from client.send_message(message.author, JOSE_HELP_TEXT)
 
-@asyncio.coroutine
-def show_gambling_full(message):
+async def show_gambling_full(message):
     yield from client.send_message(message.author, GAMBLING_HELP_TEXT)
 
-@asyncio.coroutine
-def show_gambling(message):
+async def show_gambling(message):
     yield from client.send_message(message.author, GAMBLING_HELP_TEXT_SMALL)
 
-@asyncio.coroutine
-def show_top(message):
+async def show_top(message):
     yield from client.send_message(message.channel, "BALADINHA TOPPER %s %s" % (
         (":joy:" * random.randint(1,5)),
         (":ok_hand:" * random.randint(1,6))))
 
-@asyncio.coroutine
-def check_roles(correct, rolelist):
+async def check_roles(correct, rolelist):
     #for role in rolelist:
     #    if role.name == correct:
     #        return True
@@ -305,16 +298,14 @@ def check_roles(correct, rolelist):
     c = [role.name == correct for role in rolelist]
     return True in c
 
-@asyncio.coroutine
-def random_emoji(maxn):
+async def random_emoji(maxn):
     return ''.join((str(emoji.random_emoji()) for i in range(maxn)))
 
 atividade = [
     'http://i.imgur.com/lkZVh3K.jpg',
 ]
 
-@asyncio.coroutine
-def gorila_routine(ch):
+async def gorila_routine(ch):
     if random.random() < PIRU_ACTIVITY:
         yield from client.send_message(ch, random.choice(atividade))
 
@@ -344,8 +335,7 @@ show_casa = make_func("https://thumbs.dreamstime.com/z/locais-de-trabalho-em-um-
 meme_ratelimit = make_func("http://i.imgur.com/P6bDtR9.gif")
 meme_dank_memes = make_func("http://i.imgur.com/Fzk4jfl.png")
 
-@asyncio.coroutine
-def str_xor(s,t):
+async def str_xor(s,t):
     return "".join(chr(ord(a)^ord(b)) for a,b in zip(s,t))
 
 JCRYPT_KEY = 'vcefodaparabensfrozen2meuovomeuovinhoayylmaogordoquaseexploderindo'
@@ -355,8 +345,7 @@ class Context:
         self.rtime = time.time()
         self.message = message
 
-@asyncio.coroutine
-def parse_id(data, message):
+async def parse_id(data, message):
     '''
     <@196461455569059840>
     <@!162819866682851329>
