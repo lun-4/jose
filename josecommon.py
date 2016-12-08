@@ -133,14 +133,8 @@ Administradores(role "mestra"):
 %s
 
 Developers:
-!log - mostrar todos os logs do josé
-!dbgmsg - mandar uma mensagem de debug ao jose
 !uptime - mostra o uptime do jose
 !josetxt - mostra quantas mensagens o José tem na memória dele(data.txt)
-
-Pesquisa:
-!pesquisa tipo nome:op1,op2,op3... - cria uma pesquisa
-!voto comando id voto - vota em uma pesquisa
 
 (não inclui comandos que o josé responde dependendo das mensagens)
 (nem como funciona a JoseCoin, use !josecoin pra isso)

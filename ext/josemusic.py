@@ -13,14 +13,6 @@ MUSIC_ROLE = 'music'
 if not discord.opus.is_loaded():
     discord.opus.load_opus('opus')
 
-@asyncio.coroutine
-def check_roles(correct, rolelist):
-    for role in rolelist:
-        if role.name == correct:
-            return True
-    return False
-
-
 class Entry:
     def __init__(self, m, pl):
         self.requester = m.author
@@ -155,24 +147,21 @@ class JoseMusic(jcommon.Extension):
         await state.songs.put(entry)
 
     async def c_pause(self, message, args):
-        auth = await self.rolecheck(MUSIC_ROLE)
+        await self.rolecheck(MUSIC_ROLE)
 
         if self.state.is_playing():
             player = self.state.current.player
             player.pause()
 
     async def c_resume(self, message, args):
-        auth = await check_roles(MUSIC_ROLE, message.author.roles)
-        if not auth:
-            await self.say("jm_PermissionError: usuário não autorizado")
-            return
+        await self.rolecheck(MUSIC_ROLE)
 
         if self.state.is_playing():
             player = self.state.current.player
             player.resume()
 
     async def c_queue(self, message, args):
-        auth = await self.rolecheck(MUSIC_ROLE)
+        await self.rolecheck(MUSIC_ROLE)
         res = 'jm: Lista de sons: \n'
         for song in self.state.songlist:
             res += ' * %s\n' % song
@@ -188,7 +177,7 @@ class JoseMusic(jcommon.Extension):
             await self.say("jm: Loop não iniciado")
 
     async def c_stop(self, message, args):
-        auth = await self.rolecheck(MUSIC_ROLE)
+        await self.rolecheck(MUSIC_ROLE)
         state = self.state
 
         if state.is_playing():
@@ -203,7 +192,7 @@ class JoseMusic(jcommon.Extension):
             await self.say("c_stop: pyerr: %s" % e)
 
     async def c_zelao(self, message, args):
-        auth = await self.rolecheck(MUSIC_ROLE)
+        await self.rolecheck(MUSIC_ROLE)
         if not self.loop_started:
             self.loop_started = True
             await self.state.player_task()
@@ -234,20 +223,3 @@ class JoseMusic(jcommon.Extension):
                 await self.say('Voto adicionado, já existem [{}/3]'.format(total_votes))
         else:
             await self.say('Você já votou.')
-
-'''cmds_start = {
-    '!mstat': jm.c_status,
-    '!minit': jm.c_init,
-
-    '!play': jm.c_play,
-    '!queue': jm.c_queue,
-    '!zelao': jm.c_zelao,
-
-    '!pause': jm.c_pause,
-    '!resume': jm.c_resume,
-    '!stop': jm.c_stop,
-
-    '!skip': jm.c_skip,
-    '!playing': jm.c_playing,
-}
-'''
