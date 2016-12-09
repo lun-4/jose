@@ -200,9 +200,9 @@ async def jose_debug(message, dbg_msg, flag=True):
     message_banner = '%s[%s]: %r' % (message.author, message.channel, message.content)
     dbg_msg = '%s -> %s' % (message_banner, str(dbg_msg))
     debug_logs.append(dbg_msg)
-    yield from debug_log('%s : %s' % (time.strftime("%d-%m-%Y %H:%M:%S"), dbg_msg))
+    await debug_log('%s : %s' % (time.strftime("%d-%m-%Y %H:%M:%S"), dbg_msg))
     if flag:
-        yield from client.send_message(message.channel, "jdebug: {}".format(dbg_msg))
+        await client.send_message(message.channel, "jdebug: {}".format(dbg_msg))
 
 cantadas = [
     'ô lá em casa',
@@ -270,16 +270,16 @@ aviaos = [
 ]
 
 async def show_help(message):
-    yield from client.send_message(message.author, JOSE_HELP_TEXT)
+    await client.send_message(message.author, JOSE_HELP_TEXT)
 
 async def show_gambling_full(message):
-    yield from client.send_message(message.author, GAMBLING_HELP_TEXT)
+    await client.send_message(message.author, GAMBLING_HELP_TEXT)
 
 async def show_gambling(message):
-    yield from client.send_message(message.author, GAMBLING_HELP_TEXT_SMALL)
+    await client.send_message(message.author, GAMBLING_HELP_TEXT_SMALL)
 
 async def show_top(message):
-    yield from client.send_message(message.channel, "BALADINHA TOPPER %s %s" % (
+    await client.send_message(message.channel, "BALADINHA TOPPER %s %s" % (
         (":joy:" * random.randint(1,5)),
         (":ok_hand:" * random.randint(1,6))))
 
@@ -301,12 +301,12 @@ atividade = [
 
 async def gorila_routine(ch):
     if random.random() < PIRU_ACTIVITY:
-        yield from client.send_message(ch, random.choice(atividade))
+        await client.send_message(ch, random.choice(atividade))
 
 def make_func(res):
     @asyncio.coroutine
     def response(message):
-        yield from client.send_message(message.channel, res)
+        await client.send_message(message.channel, res)
 
     return response
 
@@ -350,7 +350,7 @@ async def parse_id(data, message):
         else:
             return data[2:-1]
     else:
-        yield from jose_debug(message, "error parsing id %s" % data)
+        await jose_debug(message, "error parsing id %s" % data)
         return
 
 class Extension:
