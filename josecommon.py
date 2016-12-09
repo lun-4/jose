@@ -304,8 +304,7 @@ async def gorila_routine(ch):
         await client.send_message(ch, random.choice(atividade))
 
 def make_func(res):
-    @asyncio.coroutine
-    def response(message):
+    async def response(message):
         await client.send_message(message.channel, res)
 
     return response
