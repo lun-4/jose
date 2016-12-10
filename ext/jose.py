@@ -56,7 +56,9 @@ class JoseBot(jcommon.Extension):
 
     async def load_ext(self, n, n_cl):
         loaded_success = False
+        loaded_almost = False
 
+        print("jose.load_ext: n=%r n_cl=%r" % (n, n_cl))
         module = None
         if n in self.modules: #already loaded
             try:
@@ -65,7 +67,8 @@ class JoseBot(jcommon.Extension):
                     print("Error happened[ext_unload, %s]: %s" % (n, ok[1]))
                     sys.exit(0)
             except Exception as e:
-                print("%s : %s" % (n, repr(e)))
+                print("ALMOST[unload] - %s : %s" % (n, repr(e)))
+                loaded_almost = True
 
             # reimport
             module = importlib.reload(self.modules[n]['module'])
@@ -73,15 +76,24 @@ class JoseBot(jcommon.Extension):
             module = importlib.import_module('ext.%s' % n)
 
         # instantiate from module
-        inst = getattr(module, n_cl)(self.client)
+        cl_inst = getattr(module, n_cl, None)
+        if cl_inst is None:
+            if self.current is not None:
+                await self.say(":train:")
+            print("ERROR: cl_inst = None")
+            loaded_success = False
+            loaded_almost = True
+
+        inst = cl_inst(self.client)
         try:
-            # try to load it
+            # try to ext_load it
             ok = await inst.ext_load()
             if not ok[0]:
                 print("Error happened[ext_load, %s]: %s" % (n, ok[1]))
                 sys.exit(0)
         except Exception as e:
-            print("%s : %s" % (n, repr(e)))
+            print("ALMOST[ext_load] - %s : %s" % (n, repr(e)))
+            loaded_almost = True
         methods = (method for method in dir(inst) if callable(getattr(inst, method)))
 
         self.modules[n] = {'inst': inst, 'methods': [], 'class': n_cl, 'module': module}
@@ -96,10 +108,19 @@ class JoseBot(jcommon.Extension):
         if self.current is not None:
             if loaded_success:
                 await self.say(":ok_hand:")
+            elif loaded_almost:
+                await self.say(":train:")
             else:
                 await self.say(":poop:")
         else:
-            print("load_ext: carregado %s" % n)
+            if not loaded_success:
+                print("errors loading %s" % n)
+                sys.exit(0)
+
+            if loaded_almost:
+                print("almost loaded %s" % n)
+                sys.exit(0)
+            print("load_ext: loaded %s" % n)
 
     async def mod_recv(self, message):
         await self.recv(message)

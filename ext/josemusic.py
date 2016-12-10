@@ -13,7 +13,7 @@ MUSIC_ROLE = 'music'
 if not discord.opus.is_loaded():
     discord.opus.load_opus('opus')
 
-class JoseExtension(jaux.Auxiliar):
+class JoseMusic(jaux.Auxiliar):
     def __init__(self, cl):
         jaux.Auxiliar.__init__(self, cl)
 
@@ -24,10 +24,10 @@ class JoseExtension(jaux.Auxiliar):
         self.started_flag = False
 
     async def ext_load(self):
-        pass
+        return True, ''
 
     async def ext_unload(self):
-        pass
+        return True, ''
 
     def get_voice_state(self):
         if self.state is None:

@@ -52,7 +52,8 @@ class JoseMemes(jcommon.Extension):
         jcommon.Extension.__init__(self, cl)
 
     async def ext_load(self):
-        await self.load_memes()
+        r = await self.load_memes()
+        return r
 
     async def ext_unload(self):
         # supress every kind of debug to self.say
@@ -64,14 +65,14 @@ class JoseMemes(jcommon.Extension):
     async def load_memes(self):
         try:
             self.memes = pickle.load(open('ext/josememes.db', 'rb'))
-            return True
+            return True, ''
         except Exception as e:
             if self.current is not None:
                 await self.debug("load_memes: erro carregando josememes.db(%s)" % e)
-                return False
+                return False, 'error loading josememes.db(%s)' % e
             else:
                 print('load_memes: erro: %s' % e)
-                return False
+                return False, e
             self.memes = {}
 
     async def save_memes(self):

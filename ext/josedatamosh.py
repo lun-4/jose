@@ -20,10 +20,10 @@ class JoseDatamosh(jaux.Auxiliar):
         jaux.Auxiliar.__init__(self, cl)
 
     async def ext_load(self):
-        return
+        return True, ''
 
     async def ext_unload(self):
-        return
+        return True, ''
 
     async def c_datamosh(self, message, args):
         '''

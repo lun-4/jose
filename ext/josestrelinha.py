@@ -26,7 +26,8 @@ class JoseStrelinha(jcommon.Extension):
         self.stars = {}
 
     async def ext_load(self):
-        await self.load_stars()
+        r = await self.load_stars()
+        return r
 
     async def ext_unload(self):
         # supress every kind of debug to self.say
@@ -38,14 +39,14 @@ class JoseStrelinha(jcommon.Extension):
     async def load_stars(self):
         try:
             self.stars = pickle.load(open('ext/estrelinha.db', 'rb'))
-            return True
+            return True, ''
         except Exception as e:
             if self.current is not None:
                 await self.debug("load_stars: erro carregando estrelinha.db(%s)" % e)
-                return False
+                return False, ''
             else:
                 print('load_stars: erro: %s' % e)
-                return False
+                return False, ''
             self.stars = {}
 
     async def save_stars(self):

@@ -115,6 +115,7 @@ class JoseSpeak(jcommon.Extension):
 
     async def ext_load(self):
         buildMapping(wordlist('jose-data.txt'), 1)
+        return True, ''
 
     async def speak_routine(self, ch, run=False):
         if (random.random() < jcommon.chattiness) or run:

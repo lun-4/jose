@@ -24,32 +24,8 @@ class JoseNSFW(jcommon.Extension):
     def __init__(self, cl):
         jcommon.Extension.__init__(self, cl)
 
-    '''async def danbooru_api(self, index_url, search_term):
-        url = ''
-        if search_term == ':latest':
-            await self.say('dbru_api: procurando nos posts mais recentes')
-            url = '%s?limit=%s' % (index_url, PORN_LIMIT)
-        elif search_term == ':random':
-            await self.say('json_api: procurando um ID aleatório')
-            random_flag = True
-            url = '%s?limit=%s' % (index_url, 1)
-        else:
-            await self.say('dbru_api: procurando por %r' % search_term)
-            url = '%s?limit=%s&tags=%s' % (index_url, PORN_LIMIT, search_term)
-
-        r = await aiohttp.request('GET', url)
-        content = await r.text()
-
-        tree = ElementTree.fromstring(content)
-        root = tree
-
-        try:
-            post = random.choice(root)
-            await self.say('%s' % post.attrib['file_url'])
-            return
-        except Exception as e:
-            await self.debug("danbooru: py_error: %s" % str(e))
-            return'''
+    async def ext_load(self):
+        return True, ''
 
     async def get_json(self, url):
         r = await aiohttp.request('GET', url)

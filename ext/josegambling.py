@@ -24,6 +24,7 @@ class JoseGambling(jcommon.Extension):
         self.last_bid = 0.0
         self.gambling_mode = False
         self.gambling_env = {}
+        return True, ''
 
     async def c_aposta(self, message, args):
         '''`!aposta` - inicia o modo aposta se ainda não foi ativado'''
