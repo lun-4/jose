@@ -19,8 +19,8 @@ class MusicEntry:
         self.player = player
 
     def __str__(self):
-        fmt = '*%s* (%s) pedido por %s'
-        return fmt % (self.player.title, self.player.uploader, self.requester)
+        fmt = '[%s] *%s* feito por %s'
+        return fmt % (self.requester, self.player.title, self.player.uploader)
 
 class VoiceState:
     def __init__(self, jm):
@@ -130,7 +130,7 @@ class JoseMusic(jaux.Auxiliar):
             is_playing = self.state.is_playing()
             res += 'state.isplaying = %r\n' % is_playing
             if is_playing:
-                res + 'state.current: %r' % self.state.current
+                res += 'state.current: %r' % self.state.current
 
         await self.say(self.codeblock('', res))
 
