@@ -156,15 +156,6 @@ class JoseMusic(jaux.Auxiliar):
         await self.say('Colocado na fila: %s' % entry)
         await state.songs.put(entry)
 
-    '''async def c_mstart(self, message, args):
-        await self.rolecheck(MUSIC_ROLE)
-        if not self.started_flag:
-            self.started_flag = True
-            await self.state.player_task()
-            await self.say("o player terminou... isso não deveria acontecer... né?")
-        else:
-            await self.say("Player já iniciado")'''
-
     async def c_mpause(self, message, args):
         '''`!mpause` - pausa uma música'''
         await self.rolecheck(MUSIC_ROLE)
@@ -200,4 +191,25 @@ class JoseMusic(jaux.Auxiliar):
         await self.say(res)
 
     async def c_skip(self, message, args):
-        pass
+        if not self.state.is_playing():
+            await self.say('`[jm.c_skip] Nenhuma música sendo tocada para pular`')
+            return
+
+        voter = message.author
+        state = self.state
+        if voter == state.current.requester:
+            await self.say('Solicitante pediu para pular a música...')
+            await state.skip()
+            return
+
+        elif voter.id not in state.skip_votes:
+            state.skip_votes.add(voter.id)
+            total_votes = len(state.skip_votes)
+            if total_votes >= 3:
+                await self.say('3 votos, pulando...')
+                await state.skip()
+                return
+            else:
+                await self.say('Voto adicionado, já existem [%d/3]' % total_votes)
+        else:
+            await self.say('Você já votou.')
