@@ -397,7 +397,7 @@ class Extension:
     def is_owner(self):
         return self.current.id in ADMIN_IDS
 
-class CommandQueue:
+class WaitingQueue:
     def __init__(self):
         self.queue = []
         self.length = 0

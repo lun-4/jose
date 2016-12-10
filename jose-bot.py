@@ -502,7 +502,7 @@ help_helptext = """
 Exemplos: `!help help`, `!help pstatus`, `!help ap`
 """
 
-cmd_queue = CommandQueue()
+cmd_queue = WaitingQueue()
 
 @client.event
 async def on_message(message):
