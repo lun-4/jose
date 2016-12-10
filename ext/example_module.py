@@ -12,10 +12,10 @@ class JoseExtension(jaux.Auxiliar):
         jaux.Auxiliar.__init__(self, cl)
 
     async def ext_load(self):
-        pass
+        return True, ''
 
     async def ext_unload(self):
-        pass
+        return True, ''
 
     async def c_command(self, message, args):
         pass
