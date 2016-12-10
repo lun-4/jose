@@ -66,7 +66,7 @@ class VoiceState:
             print("GOT CURRENT: %s" % self.current)
 
             # show current song
-            await self.jm.say('ZELAO® tocando: %s' % str(self.current), channel=self.jm.chcur)
+            await self.jm.say('ZELAO® tocando: %s' % str(self.current), channel=self.jm.message_channel)
 
             # play and wait for next trigger
             self.current.player.start()
@@ -156,28 +156,47 @@ class JoseMusic(jaux.Auxiliar):
         await self.say('Colocado na fila: %s' % entry)
         await state.songs.put(entry)
 
-    async def c_mstart(self, message, args):
+    '''async def c_mstart(self, message, args):
         await self.rolecheck(MUSIC_ROLE)
         if not self.started_flag:
             self.started_flag = True
             await self.state.player_task()
             await self.say("o player terminou... isso não deveria acontecer... né?")
         else:
-            await self.say("Player já iniciado")
+            await self.say("Player já iniciado")'''
 
     async def c_mpause(self, message, args):
-        pass
+        '''`!mpause` - pausa uma música'''
+        await self.rolecheck(MUSIC_ROLE)
+
+        if self.state.is_playing():
+            self.state.current.player.pause()
 
     async def c_mresume(self, message, args):
-        pass
+        '''`!mresume` - resume uma música'''
+        await self.rolecheck(MUSIC_ROLE)
+
+        if self.state.is_playing():
+            self.state.current.player.resume()
 
     async def c_mstop(self, message, args):
-        pass
+        '''`!mstop` - PARA TUDO'''
+        await self.rolecheck(MUSIC_ROLE)
+        state = self.state
+
+        if state.is_playing():
+            player = state.current.player
+            player.stop()
+
+        state.taskflag = False
+        await self.state.voice.disconnect()
+        del self.state
 
     async def c_mqueue(self, message, args):
-        res = ''
-        for song in self.state.songs.queue:
-            res += ' * %s' % song
+        '''`!mqueue` - mostra a fila de músicas'''
+        res = 'Lista de músicas: \n'
+        for song in list(self.state.songs._queue):
+            res += '\t * %s\n' % song
         await self.say(res)
 
     async def c_skip(self, message, args):
