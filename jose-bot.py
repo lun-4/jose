@@ -401,27 +401,19 @@ commands_start = {
     '!xingar': show_xingar,
     '!elogiar': show_elogio,
     '!cantar': show_cantada,
-    # '!version': show_version,
 
-    # DEAC(too fucking long) '!log': show_debug,
     '!dbgmsg': new_debug,
 
     # DEAC '!animate': make_animation,
-    '!pisca': make_pisca,
+    # DEAC '!pisca': make_pisca,
 
     '!causar': make_causo,
-
-    # (need to work on the polling system)
-    # (   OR  USE  FUCKING   STRAWPOLL   )
-    # DEAC '!pesquisa': make_pesquisa,
-    # DEAC '!voto': make_voto,
 
     '!learn': learn_data,
 
     '!josecoin': help_josecoin,
     '!save': josecoin_save,
     '!load': josecoin_load,
-    # '!jcdebug': josecoin_dbg,
 
     '!ping': pong,
     '!xuxa': demon,
@@ -434,7 +426,7 @@ commands_start = {
     '!adummy': show_gambling,
     '!airport': show_aerotrem,
 
-    '!awoo': make_func("https://images-2.discordapp.net/.eJwVyEEOwiAQAMC_8ABgEdi2nzGEIsW0LmHXeDD-vfUyh_mq99jVojaRzosxa-NMY9UsNFItuhLVvaTeWGc6TBJJeTvKS9g4e3M--BmiB8QJcLoqRnAWg50RA4TgTPoQ3f-0Ryusn72q3wkG3CWg.CTrgww5nr8mw_Fkm0BcEsEGV8t0.jpg"),
+    '!awoo': make_func("https://cdn.discordapp.com/attachments/202055538773721099/257717450135568394/awooo.gif"),
 
     '!price': show_price,
 }
@@ -451,8 +443,6 @@ commands_match = {
     'emule': show_emule,
     'vinheta': show_vinheta,
 
-    # RMV "se fude jose": show_vtnc,
-    # RMV "jose se fude": show_vtnc,
     "vtnc jose": show_vtnc,
     'que rodeio': rodei_teu_cu,
     'anal giratorio': show_agira,
