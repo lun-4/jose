@@ -191,125 +191,6 @@ def jcoin_control(id_user, amnt):
     '''
     return jcoin.transfer(id_user, jcoin.jose_id, amnt, jcoin.LEDGER_PATH)
 
-@asyncio.coroutine
-def make_pesquisa(message):
-    global survey_id
-    # nome:op1,op2,op3...
-    c = len("!pesquisa ")
-    survey_type = 1
-    try:
-        survey_type = int(message.content[c:c+1])
-    except:
-        yield from jose_debug(message,
-            "erro parseando tipo de pesquisa")
-    survey_data = message.content[c+2:]
-
-    sp = survey_data.split(':')
-    if len(sp) != 2:
-        yield from jose_debug(message, "Erro parseando comando: len(%r) != 2" % sp)
-        return
-    survey_name = sp[0]
-    survey_options = sp[1].split(',')
-
-    survey_id += 1
-    jose_env['survey'][survey_id] = {
-        'name': survey_name,
-        'opt': survey_options,
-        'votes': {},
-        'author': message.author,
-    }
-
-    for opt in survey_options:
-        jose_env['survey'][survey_id]['votes'][opt] = 0
-
-    yield from jose_debug(message,
-        "Nova pesquisa de %s feita por %s" % (survey_name, message.author))
-
-    yield from jose_debug(message,
-        "opções: %r" % (survey_options))
-
-@asyncio.coroutine
-def make_voto(message):
-    args = message.content.split(' ')
-    cmd = args[1]
-
-    survey_id = -1
-    try:
-        survey_id = int(args[2])
-    except:
-        pass
-
-    vote = None
-    try:
-        vote = args[3]
-    except:
-        pass
-
-    all_surveys = jose_env['survey']
-
-    if cmd == 'list':
-        if survey_id in all_surveys:
-            #list one survey
-            survey = all_surveys[survey_id]
-            res = ''
-
-            res += ' * %s\n' % survey['name']
-            for iop, op in enumerate(survey['opt']):
-                res += '\t * opção %d. %s\n' % (iop, op)
-
-            yield from client.send_message(message.author, res)
-            return
-        else:
-            #list all
-            res = ''
-
-            for k in all_surveys:
-                res += ' * %d -> %s' % (k, all_surveys[k]['name'])
-                res += '\n'
-
-            yield from client.send_message(message.author, res)
-            return
-
-    elif cmd == 'vote':
-        if survey_id in jose_env['survey']:
-            yield from jose_debug(message, "%r" % all_surveys[survey_id]['votes'])
-            try:
-                survey = all_surveys[survey_id]
-                opt = survey['opt'][int(vote)]
-                survey['votes'][opt] += 1
-            except Exception as e:
-                yield from jose_debug(message, "erro processando voto: %s" % str(e))
-                return
-
-            yield from jose_debug(message, "%r" % all_surveys[survey_id]['votes'])
-            yield from jose_debug(message, 'voto contado com sucesso!')
-            return
-        else:
-            yield from jose_debug(message, "Pesquisa não encontrada.")
-            return
-
-    elif cmd == 'close':
-        if survey_id in jose_env['survey']:
-            survey = jose_env['survey'][survey_id]
-            if message.author == survey['author']:
-                yield from jose_debug(message, "Pesquisa \"%s\" apagada com sucesso." % survey['name'])
-
-                res = ''
-                res += ' Resultados para %s\n' % survey['name']
-                for iop, op in enumerate(survey['opt']):
-                    res += '\t * votos para %d - %s = %d\n' % (iop, op, survey['votes'][op])
-
-                yield from jose_debug(message, res)
-
-                survey = None
-                return
-            else:
-                yield from jose_debug(message, "PermError: sem permissão para fechar a pesquisa")
-                return
-        else:
-            yield from jose_debug(message, "Pesquisa não encontrada.")
-            return
-
 def sanitize_data(data):
     data = re.sub('<@!?([0-9]+)>', '', data)
     data = re.sub('<#!?([0-9]+)>', '', data)
@@ -317,8 +198,7 @@ def sanitize_data(data):
     data = data.replace("@jose-bot", '')
     return data
 
-@asyncio.coroutine
-def add_sentence(content, author):
+async def add_sentence(content, author):
     data = content
     sd = sanitize_data(data)
     debug_log("write %r from %s" % (sd, author))
@@ -353,9 +233,6 @@ async def learn_data(message):
     feedback += "%d linhas, %d palavras e %d bytes foram inseridos\n" % (line_count, word_count, byte_count)
     await jose.say(feedback)
     return
-
-async def show_jenv(message):
-    await jose.say("`%r`" % jose_env)
 
 async def demon(message):
     if DEMON_MODE:
