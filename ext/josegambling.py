@@ -5,6 +5,7 @@ sys.path.append("..")
 
 import discord
 import asyncio
+import decimal
 
 import josecommon as jcommon
 import joseerror as je
@@ -54,13 +55,19 @@ class JoseGambling(jcommon.Extension):
 
         id_from = message.author.id
         id_to = jcoin.jose_id
+        amount = 0.0
         try:
-            amount = round(float(args[1]), 3)
+            if args[1] == 'all':
+                from_amnt = jcoin.get(id_from)[1]['amount']
+                fee_amnt = from_amnt * decimal.Decimal(jcommon.GAMBLING_FEE/100.)
+                amount = from_amnt - fee_amnt
+            else:
+                amount = round(float(args[1]), 3)
         except ValueError:
             await self.say("ValueError: erro parseando o valor")
             return
 
-        fee_amount = amount * (jcommon.GAMBLING_FEE/100.)
+        fee_amount = amount * decimal.Decimal(jcommon.GAMBLING_FEE/100.)
         atleast = (amount + fee_amount)
 
         if amount < self.last_bid:
@@ -69,7 +76,8 @@ class JoseGambling(jcommon.Extension):
 
         a = jcoin.get(id_from)[1]
         if a['amount'] <= atleast:
-            await self.say("sua conta não possui fundos suficientes para apostar(%.2fJC são necessários, você tem %.2fJC, faltam %.2fJC)" % (atleast, a['amount'], atleast - a['amount']))
+            await self.say("sua conta não possui fundos suficientes para apostar(%.2fJC são necessários, você tem %.2fJC, faltam %.2fJC)" % \
+                (atleast, a['amount'], decimal.Decimal(atleast) - a['amount']))
             return
 
         res = jcoin.transfer(id_from, id_to, atleast, jcoin.LEDGER_PATH)

@@ -181,8 +181,8 @@ async def make_causo(message):
     await jose.say(causo.format(x, y))
 
 help_josecoin = make_func(jcoin.JOSECOIN_HELP_TEXT)
-josecoin_save = lambda x,y: None
-josecoin_load = lambda x,y: None
+#josecoin_save = lambda x: None
+#josecoin_load = lambda x: None
 
 @asyncio.coroutine
 def jcoin_control(id_user, amnt):
@@ -274,6 +274,12 @@ exact_commands = {
     'melhor bot': show_shit,
 }
 
+jcoin.load(jconfig.jcoin_path)
+jc = jcoin.JoseCoin(client)
+
+josecoin_save = jc.josecoin_save
+josecoin_load = jc.josecoin_load
+
 commands_start = {
     '!xingar': show_xingar,
     '!elogiar': show_elogio,
@@ -340,12 +346,6 @@ def from_dict(f):
 
 for cmd in commands_start:
     setattr(jose, 'c_%s' % cmd[1:], from_dict(commands_start[cmd]))
-
-jcoin.load(jconfig.jcoin_path)
-jc = jcoin.JoseCoin(client)
-
-josecoin_save = jc.josecoin_save
-josecoin_load = jc.josecoin_load
 
 jose.load_gext(jc, 'josecoin')
 

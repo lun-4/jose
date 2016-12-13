@@ -283,7 +283,10 @@ class JoseBot(jcommon.Extension):
         return
 
     async def c_money(self, message, args):
-        '''`!money qt from to` - converte dinheiro'''
+        '''`!money qt from to` - converte dinheiro usando cotações etc'''
+        if len(args) < 3:
+            await self.say("use `!help money` para saber como se usa")
+
         amount = float(args[1])
         currency_from = args[2]
         currency_to = args[3]
