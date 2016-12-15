@@ -55,7 +55,7 @@ class JoseGambling(jcommon.Extension):
 
         id_from = message.author.id
         id_to = jcoin.jose_id
-        amount = 0.0
+        amount = decimal.Decimal(0)
         try:
             if args[1] == 'all':
                 from_amnt = jcoin.get(id_from)[1]['amount']
@@ -67,8 +67,8 @@ class JoseGambling(jcommon.Extension):
             await self.say("ValueError: erro parseando o valor")
             return
 
-        fee_amount = amount * decimal.Decimal(jcommon.GAMBLING_FEE/100.)
-        atleast = (amount + fee_amount)
+        fee_amount = decimal.Decimal(amount) * decimal.Decimal(jcommon.GAMBLING_FEE/100.)
+        atleast = (decimal.Decimal(amount) + fee_amount)
 
         if amount < self.last_bid:
             await self.say("sua aposta tem que ser maior do que a última, que foi %.2fJC" % self.last_bid)
@@ -86,9 +86,9 @@ class JoseGambling(jcommon.Extension):
             await self.say(res[1])
             # use jenv
             if not id_from in self.gambling_env:
-                self.gambling_env[id_from] = 0
+                self.gambling_env[id_from] = decimal.Decimal(0)
 
-            self.gambling_env[id_from] += amount
+            self.gambling_env[id_from] += decimal.Decimal(amount)
             val = self.gambling_env[id_from]
 
             self.last_bid = amount
@@ -112,10 +112,10 @@ class JoseGambling(jcommon.Extension):
             return
         winner = random.choice(K)
 
-        M = sum(self.gambling_env.values()) # total
+        M = sum(self.gambling_env.values(), decimal.Decimal(0)) # total
         apostadores = len(self.gambling_env)-1 # remove one because of the winner
-        P = (M * PORCENTAGEM_GANHADOR)
-        p = (M * PORCENTAGEM_OUTROS) / apostadores
+        P = (M * decimal.Decimal(PORCENTAGEM_GANHADOR))
+        p = (M * decimal.Decimal(PORCENTAGEM_OUTROS)) / decimal.Decimal(apostadores)
 
         if jcoin.data[jcoin.jose_id]['amount'] < M:
             await self.debug("aposta->jc: **JOSÉ NÃO POSSUI FUNDOS SUFICIENTES PARA A APOSTA**")
@@ -151,10 +151,10 @@ class JoseGambling(jcommon.Extension):
     async def c_areport(self, message, args):
         '''`!areport` - relatório da aposta'''
         res = ''
-        total = 0.0
+        total = decimal.Decimal(0)
         for apostador in self.gambling_env:
             res += '<@%s> apostou %.2fJC\n' % (apostador, self.gambling_env[apostador])
-            total += self.gambling_env[apostador]
+            total += decimal.Decimal(self.gambling_env[apostador])
         res += 'Total apostado: %.2fJC' % (total)
 
         await self.say(res)
