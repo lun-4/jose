@@ -273,6 +273,8 @@ async def random_emoji(maxn):
 
 atividade = [
     'http://i.imgur.com/lkZVh3K.jpg',
+    'http://imgur.com/a/KKwId',
+    'http://imgur.com/a/ekrmK'
 ]
 
 async def gorila_routine(ch):
@@ -290,7 +292,6 @@ show_noabraco = make_func("não vou abraçar")
 show_tampa = make_func("A DO TEU CU\nHÁ, TROLEI")
 show_vtnc = make_func("OQ VC DISSE?\nhttp://i.imgur.com/Otky963.jpg")
 show_shit = make_func("tbm amo vc humano <3")
-show_version = make_func("José %s" % JOSE_VERSION)
 show_emule = make_func("http://i.imgur.com/GO90sEv.png")
 show_frozen_2 = make_func('http://i.imgur.com/HIcjyoW.jpg')
 pong = make_func('pong')

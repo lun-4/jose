@@ -136,7 +136,7 @@ class JoseBot(jcommon.Extension):
         else:
             await self.say("%s: módulo não encontrado/carregado" % n)
 
-    async def c_modules(self, message, args):
+    async def c_modlist(self, message, args):
         mod_gen = (key for key in self.modules)
         mod_generator = []
         for key in mod_gen:
@@ -164,12 +164,11 @@ class JoseBot(jcommon.Extension):
     async def sec_auth(self, f):
         auth = await self.is_admin(self.current.author.id)
         if auth:
-            await self.debug("auth: autorizado")
             self.command_lock = True
             await f()
             self.command_lock = False
         else:
-            await self.debug("PermError: sem permissão")
+            await self.debug("*PermError*: sem permissão")
 
     async def turnoff(self):
         await jcoin.JoseCoin(self.client).josecoin_save(self.current, True)
@@ -333,16 +332,19 @@ class JoseBot(jcommon.Extension):
         await self.client.change_status(g)
 
     async def c_fullwidth(self, message, args):
+        '''`!fullwidth` ou `!fw` - ｆｕｌｌｗｉｄｔｈ　ｃｈａｒａｃｔｅｒｓ'''
         ascii_text = ' '.join(args[1:])
         res = ascii_text.translate(jcommon.ascii_to_wide)
         await self.say(res)
 
     async def c_escolha(self, message, args):
+        '''`!escolha elemento1;elemento2;elemento3;...;elementon` - escolha.'''
         escolhas = (' '.join(args[1:])).split(';')
         choice = random.choice(escolhas)
         await self.say("Eu escolho %s" % choice)
 
     async def c_nick(self, message, args):
+        '''`!nick [nick]` - [SOMENTE ADMIN]'''
         await self.is_admin(message.author.id)
 
         if len(args) < 2:
@@ -405,12 +407,10 @@ class JoseBot(jcommon.Extension):
         for m in module['methods']:
             res += '!%s ' % m[2:]
 
-        await self.say(res)
+        await self.say(self.codeblock('', res))
 
     async def c_uptime(self, message, args):
-        '''
-        `!uptime` - mostra o uptime do josé
-        '''
+        '''`!uptime` - mostra o uptime do josé'''
         sec = (time.time() - self.start_time)
         MINUTE  = 60
         HOUR    = MINUTE * 60
