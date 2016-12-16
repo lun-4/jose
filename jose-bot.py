@@ -181,8 +181,6 @@ async def make_causo(message):
     await jose.say(causo.format(x, y))
 
 help_josecoin = make_func(jcoin.JOSECOIN_HELP_TEXT)
-#josecoin_save = lambda x: None
-#josecoin_load = lambda x: None
 
 @asyncio.coroutine
 def jcoin_control(id_user, amnt):
@@ -531,57 +529,7 @@ def one_message(message):
             yield from func(message)
             return
 
-    '''if message.content.startswith('$guess'):
-        yield from jose.say('Me fale um número de 0 a 10, imundo.')
-
-        def guess_check(m):
-            return m.content.isdigit()
-
-        guess = yield from client.wait_for_message(timeout=5.0, author=message.author, check=guess_check)
-        answer = random.randint(1, 10)
-        if guess is None:
-            fmt = 'Demorou demais, era {}.'
-            yield from jose.say(fmt.format(answer))
-            return
-        if int(guess.content) == answer:
-            yield from jose.say('Acertô miseravi!')
-        else:
-            yield from jose.say('Errou filho da puta, era {}.'.format(answer))
-        return'''
-
-    '''if message.content.startswith('$repl'):
-        yield from jose.say('Fale um comando python(15 segundos de timeout)')
-
-        data = yield from client.wait_for_message(timeout=15.0, author=message.author)
-
-        if data is None:
-            yield from jose.say('demorou demais')
-            return
-
-        try:
-            res = ast.literal_eval(str(data.content))
-            yield from jose.say('eval: %r' % res)
-        except:
-            yield from jose_debug(message, "erro dando eval na expressão dada")
-        return'''
-
-    if message.content.startswith('$josescript'):
-        if MAINTENANCE_MODE:
-            yield from show_maintenance(message)
-            return
-        yield from jose.say('Bem vindo ao REPL do JoseScript!\nPara sair, digite "exit"')
-
-        while True:
-            data = yield from client.wait_for_message(author=message.author)
-            if data.content == 'exit':
-                yield from jose.say('saindo do REPL')
-                break
-            else:
-                yield from josescript_eval(data)
-                # yield from jose.say('eval: %s' % )
-        return
-
-    elif message.content.startswith('$jasm'):
+    if message.content.startswith('$jasm'):
         if MAINTENANCE_MODE:
             yield from show_maintenance(message)
             return
