@@ -210,6 +210,7 @@ class JoseBot(jcommon.Extension):
         '''`!xkcd` - procura tirinhas do XKCD
         `!xkcd` - mostra a tirinha mais recente
         `!xkcd [num]` - mostra a tirinha de número `num`
+        `!xkcd rand` - tirinha aleatória
         '''
         n = False
         if len(args) > 1:

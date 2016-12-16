@@ -469,7 +469,12 @@ def one_message(message):
                 # yield from jose.say('eval: %s' % )
         return
 
-    elif random.random() < jc_probabiblity:
+    # a normal message, spy it
+    if not message.author.bot:
+        with open("zelao.txt", 'a') as f:
+            f.write('%s\n' % message.content)
+
+    if random.random() < jc_probabiblity:
         if not message.channel.is_private:
             if not message.author.id in jose_env['spam']:
                 jose_env['spam'][message.author.id] = 0
