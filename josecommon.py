@@ -11,8 +11,7 @@ random = SystemRandom()
 
 import joseerror as je
 
-JOSE_VERSION = '1.0.1'
-JOSE_BUILD = 501
+JOSE_VERSION = '1.0.2'
 
 APP_CLIENT_ID = 'ID DO JOSE AQUI'
 OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=103988231' % APP_CLIENT_ID
@@ -110,7 +109,7 @@ $jasm - JoseAssembly
 
 '''
 
-JOSE_HELP_TEXT = '''Oi, eu sou o josé(v%s b%d), sou um bot trabalhadô!
+JOSE_HELP_TEXT = '''Oi, eu sou o josé %s, sou um bot trabalhadô!
 Eu tenho mais de 8000 comandos somente para você do grande serverzao!
 
 !htgeral - abre o texto de comandos gerais(o mais recomendado)
@@ -138,7 +137,7 @@ Developers:
 
 (não inclui comandos que o josé responde dependendo das mensagens)
 (nem como funciona a JoseCoin, use !josecoin pra isso)
-''' % (JOSE_VERSION, JOSE_BUILD, JOSE_PORN_HTEXT)
+''' % (JOSE_VERSION, JOSE_PORN_HTEXT)
 
 JOSESCRIPT_HELP_TEXT = '''Bem vindo ao JoséScript!
 colocar variáveis: "nome=valor" (todas as variáveis são strings por padrão)
@@ -314,7 +313,7 @@ show_noabraco = make_func("não vou abraçar")
 show_tampa = make_func("A DO TEU CU\nHÁ, TROLEI")
 show_vtnc = make_func("OQ VC DISSE?\nhttp://i.imgur.com/Otky963.jpg")
 show_shit = make_func("tbm amo vc humano <3")
-show_version = make_func("José v%s b%d" % (JOSE_VERSION, JOSE_BUILD))
+show_version = make_func("José %s" % JOSE_VERSION)
 show_emule = make_func("http://i.imgur.com/GO90sEv.png")
 show_frozen_2 = make_func('http://i.imgur.com/HIcjyoW.jpg')
 pong = make_func('pong')

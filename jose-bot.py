@@ -80,45 +80,6 @@ async def new_debug(message):
 
     await jose_debug(message, dbg)
 
-@asyncio.coroutine
-def josescript_eval(message):
-    if not message.author in josescript_env:
-        josescript_env[message.author] = {
-            'vars': {
-                'jose_version': JOSE_VERSION,
-            }
-        }
-
-    env = josescript_env[message.author]
-    # yield from jose_debug(message, "env %s : %s" % (message.author, repr(env)))
-    for line in message.content.split('\n'):
-        for command in line.split(';'):
-            if command == ']help':
-                yield from jose_debug(message, JOSESCRIPT_HELP_TEXT)
-            elif command.find('=') != -1:
-                d = command.split('=')
-                name = d[0]
-                value = d[1]
-                yield from jose_debug(message, "jsr: set %s to %s" % (name, value))
-                env['vars'][name] = value
-            elif command[:2] == ('g '):
-                var_name = command[2:]
-                var_val = None
-                try:
-                    var_val = env['vars'][var_name]
-                    yield from jose_debug(message, "jsr: %s" % var_val)
-                except KeyError:
-                    yield from jose_debug(message, "jsr: variável %s não encontrada" % var_name)
-                except Exception as e:
-                    yield from jose_debug(message, "error: %s" % str(e))
-            elif command == 'pv':
-                res = ''
-                for key in env['vars']:
-                    res += '%s -> %s\n' % (key, env['vars'][key])
-                yield from jose_debug(message, res)
-            else:
-                yield from jose_debug(message, "jsr: erro identificando comando")
-
 animation_counter = 0
 
 async def make_pisca(message):
@@ -416,7 +377,7 @@ def one_message(message):
 
     if not started:
         started = True
-        initmsg = "josé v%s b%d iniciou em %s" % (JOSE_VERSION, JOSE_BUILD, message.channel)
+        initmsg = "josé %s iniciou em %s" % (JOSE_VERSION, message.channel)
         if DEMON_MODE:
             initmsg = initmsg[::-1]
         elif PARABENS_MODE:
