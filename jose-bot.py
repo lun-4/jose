@@ -80,53 +80,6 @@ async def new_debug(message):
 
     await jose_debug(message, dbg)
 
-animation_counter = 0
-
-async def make_pisca(message):
-    global animation_counter
-    if animation_counter > JOSE_ANIMATION_LIMIT:
-        await jose.debug("LimitError: espere até alguma animação terminar")
-        raise je.LimitError()
-
-    animation_counter += 1
-
-    args = message.content.split(' ')
-    animate_data = ' '.join(args[1:])
-    animate_msg = await jose.say(animate_data)
-
-    for i in range(10):
-        if i%2 == 0:
-            animate_banner = '**%s**' % animate_data
-        else:
-            animate_banner = '%s' % animate_data
-
-        await client.edit_message(animate_msg, animate_data)
-        await asyncio.sleep(1)
-
-    animation_counter -= 1
-
-@asyncio.coroutine
-def make_animation(message):
-    global animation_counter
-    if animation_counter > JOSE_ANIMATION_LIMIT:
-        yield from jose_debug(message, "FilaError: espere até alguma animação terminar")
-        return
-
-    animation_counter += 1
-
-    args = message.content.split(' ')
-    animate = ' '.join(args[1:])
-
-    animate_banner = ' '*(20) + animate + ' '*(10)
-    animate_msg = yield from jose.say(animate_banner)
-
-    for i in range(20):
-        animate_banner = ' '*(10-i) + animate + ' '*(10+i)
-        yield from client.edit_message(animate_msg, animate_banner)
-        time.sleep(.1)
-
-    animation_counter -= 1
-
 causos = [
     '{} foi no matinho com {}',
     '{} inventou de fumar com {} e deu merda',
@@ -229,7 +182,6 @@ async def show_price(message):
 
 exact_commands = {
     'jose': show_help,
-    # DEAC '!help': show_help,
     'melhor bot': show_shit,
 }
 
@@ -244,10 +196,7 @@ commands_start = {
     '!elogiar': show_elogio,
     '!cantar': show_cantada,
 
-    '!dbgmsg': new_debug,
-
-    # DEAC '!animate': make_animation,
-    # DEAC '!pisca': make_pisca,
+    # '!dbgmsg': new_debug,
 
     '!causar': make_causo,
 
