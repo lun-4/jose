@@ -350,8 +350,12 @@ class JoseBot(jcommon.Extension):
         else:
             self.nick = ' '.join(args[1:])
 
-        for server in self.client.servers:
-            m = server.get_member(jcommon.JOSE_ID)
+        if message.server is None:
+            for s in self.client.servers:
+                m = s.get_member(jcommon.JOSE_ID)
+                await self.client.change_nickname(m, self.nick)
+        else:
+            m = message.server.get_member(jcommon.JOSE_ID)
             await self.client.change_nickname(m, self.nick)
 
         return
