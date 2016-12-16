@@ -183,7 +183,7 @@ class JoseBot(jcommon.Extension):
         sys.exit(0)
 
     async def update(self):
-        banner = "atualizando josé para nova versão(era v%s b%d)" % (jcommon.JOSE_VERSION, jcommon.JOSE_BUILD)
+        banner = "atualizando josé para nova versão(versão antiga: %s)" % (jcommon.JOSE_VERSION)
         await self.debug(banner)
         await jcoin.JoseCoin(self.client).josecoin_save(self.current, True)
         await self.client.logout()
@@ -425,8 +425,8 @@ class JoseBot(jcommon.Extension):
     async def c_version(self, message, args):
         '''`!version` - mostra a versão do jose'''
         pyver = '%d.%d.%d' % (sys.version_info[:3])
-        await self.say("`José v%s b%d py:%s discord.py:%s`" % (jcommon.JOSE_VERSION,
-            jcommon.JOSE_BUILD, pyver, discord.__version__))
+        await self.say("`José v%s py:%s discord.py:%s`" % (jcommon.JOSE_VERSION
+            , pyver, discord.__version__))
 
     async def c_jose_add(self, message, args):
         await self.say("José pode ser adicionado para outro servidor usando este link:\n```%s```" % jcommon.OAUTH_URL)
