@@ -18,13 +18,12 @@ OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&perm
 
 #configuration things
 chattiness = .25
-DGO_PROB = .01
 MASTER_ROLE = 'mestra'
 LEARN_ROLE = 'cult'
 JOSE_ANIMATION_LIMIT = 1 # 2 animações simultaneamente
 ADMIN_IDS = ['162819866682851329']
 
-#just for 0.6.6.6 and 6.6.6
+#just for 0.6.6.6 and 6.6.6 or any demon version
 DEMON_MODE = False
 PARABENS_MODE = False
 
@@ -66,12 +65,6 @@ ascii_to_wide.update({0x20: u'\u3000', 0x2D: u'\u2212'})  # space and minus
 
 JOSE_ID = '202587271679967232'
 
-client = None
-
-def set_client(cl):
-    global client
-    client = cl
-
 JOSE_PORN_HTEXT = '''Pornô(Tudo tem preço de %.2fJC):
 !hypno <termos | :latest> - busca por termos no Hypnohub
 !e621 <termos | :latest> - busca por tags no e621
@@ -80,15 +73,12 @@ JOSE_PORN_HTEXT = '''Pornô(Tudo tem preço de %.2fJC):
 
 JOSE_GENERAL_HTEXT = '''
 jose - mostra essa ajuda
-~~$guess - jogo de adivinhar o numero aleatório~~
 !xkcd [number|rand] - mostra ou o xkcd de número tal ou o mais recente se nenhum é dado
 !yt pesquisa - pesquisar no youtube e mostrar o primeiro resultado
-!pisca mensagem - PISCA A MENSAGEM(entre normal e negrito)
-~~!animate mensagem - anima a mensagem(wip)~~
 !money amount from to - conversão entre moedas
 !version - mostra a versão do jose-bot
 !pstatus jogo - muda o jogo que o josé está jogando
-!fullwidth mensagem - converte texto para fullwidth
+!fw mensagem - converte texto para fullwidth
 !escolha escolha1;escolha2;escolha3... - José escolhe por você!
 !learn <texto> - josé aprende textos!
 !ping - pong
@@ -101,10 +91,6 @@ JOSE_TECH_HTEXT = '''Comandos relacionados a coisas *TECNOLÓGICAS*
 
 !enc texto - encripta um texto usando OvoCrypt
 !dec texto - desencripta um texto encriptado com OvoCrypt
-
-Programação:
-$repl - inicia um repl de python
-$josescript - inicia um repl de JoseScript
 $jasm - JoseAssembly
 
 '''
@@ -123,11 +109,9 @@ Jose faz coisas pra pessoas:
 Apostas:
 !ahelp e !adummy irão te mostrar os textos de ajuda para apostadores
 
-Administradores(role "mestra"):
-!exit - desligar o jose(somente pessoas com o role "mestra" são autorizadas)
-!reboot - reinicia o jose(somente role "mestra")
-!setlmsg - altera a pequena mensagem
-!lilmsg - mostra a pequena mensagem
+**ADMIN**:
+!exit - desligar o jose
+!reboot - reinicia o jose
 
 %s
 
@@ -138,14 +122,6 @@ Developers:
 (não inclui comandos que o josé responde dependendo das mensagens)
 (nem como funciona a JoseCoin, use !josecoin pra isso)
 ''' % (JOSE_VERSION, JOSE_PORN_HTEXT)
-
-JOSESCRIPT_HELP_TEXT = '''Bem vindo ao JoséScript!
-colocar variáveis: "nome=valor" (todas as variáveis são strings por padrão)
-
-Variáveis são definidas por usuário: assim nenhum usuário mexe nas variáveis de outro usuário :DD
-pegar valor de variável: "g nome"
-printar todas as variáveis definidas: "pv"
-'''
 
 GAMBLING_HELP_TEXT = '''O que é: Função que permite dois (ou mais) usuários apostarem josecoins por esporte.
 
@@ -283,11 +259,6 @@ async def show_top(message):
         (":ok_hand:" * random.randint(1,6))))
 
 async def check_roles(correct, rolelist):
-    #for role in rolelist:
-    #    if role.name == correct:
-    #        return True
-    #return False
-
     c = [role.name == correct for role in rolelist]
     return True in c
 
