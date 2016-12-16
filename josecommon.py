@@ -65,6 +65,12 @@ ascii_to_wide.update({0x20: u'\u3000', 0x2D: u'\u2212'})  # space and minus
 
 JOSE_ID = '202587271679967232'
 
+client = None
+
+def set_client(cl):
+    global client
+    client = cl
+
 JOSE_PORN_HTEXT = '''Pornô(Tudo tem preço de %.2fJC):
 !hypno <termos | :latest> - busca por termos no Hypnohub
 !e621 <termos | :latest> - busca por tags no e621
