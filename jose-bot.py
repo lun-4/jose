@@ -467,7 +467,6 @@ def one_message(message):
                 else:
                     yield from jose_debug(message, "jasm error: %s" % res[2])
                 pointer = res[1]
-                # yield from jose.say('eval: %s' % )
         return
 
     # a normal message, spy it
@@ -502,7 +501,6 @@ def one_message(message):
                 yield from josecoin_save(message, False)
                 if res[0]:
                     acc_to = jcoin.get(author_id)[1]
-                    # yield from jose.say(res[1])
                     emoji_res = yield from random_emoji(3)
                     if PARABENS_MODE:
                         yield from jose.say("Parabéns")
@@ -511,7 +509,6 @@ def one_message(message):
                 else:
                     yield from jose_debug(message, 'jc_error: %s' % res[1])
         else:
-            #yield from jose_debug(message, 'erro conseguindo JC$ para %s(canal %r) porquê você está em um canal privado.' % (message.author.id, message.channel))
             return
 
     yield from gorila_routine(message.channel)
@@ -522,8 +519,6 @@ async def command_loop():
             msg = await cmd_queue.pop()
             if len(msg.content) > 0:
                 await one_message(msg)
-            else:
-                print("empty message")
         else:
             await asyncio.sleep(0.001)
 
@@ -554,4 +549,4 @@ except:
 finally:
     loop.close()
 
-print("jose: finish line")
+print("jose: exit")
