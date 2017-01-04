@@ -11,7 +11,7 @@ random = SystemRandom()
 
 import joseerror as je
 
-JOSE_VERSION = '1.1.0'
+JOSE_VERSION = '1.1.1'
 
 APP_CLIENT_ID = 'ID DO JOSE AQUI'
 OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=103988231' % APP_CLIENT_ID
@@ -328,6 +328,19 @@ async def parse_id(data, message):
     else:
         await jose_debug(message, "error parsing id %s" % data)
         return
+
+def speak_filter(message):
+    filtered_message = ""
+
+    for i in range(len(message)):
+        char = message[i]
+        char2 = message[i+1]
+        if char == '<' and char2 == '@':
+            ending_tag = message.find('>', i+1)
+            if ending_tag == -1:
+                raise Exception("ending_tag == -1, wtf?")
+        else:
+            filtered_message += char
 
 class Extension:
     def __init__(self, cl):

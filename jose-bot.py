@@ -472,7 +472,7 @@ def one_message(message):
     # a normal message, spy it
     if not message.author.bot:
         with open("zelao.txt", 'a') as f:
-            f.write('%s\n' % message.content)
+            f.write('%s\n' % jc.speak_filter(message.content))
 
     if random.random() < jc_probabiblity:
         if not message.channel.is_private:
