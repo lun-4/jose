@@ -332,15 +332,19 @@ async def parse_id(data, message):
 def speak_filter(message):
     filtered_message = ""
 
-    for i in range(len(message)):
+    i = 0
+    while i < len(message):
         char = message[i]
-        char2 = message[i+1]
-        if char == '<' and char2 == '@':
+        if char == '<' and message[i+1] == '@':
             ending_tag = message.find('>', i+1)
             if ending_tag == -1:
                 raise Exception("ending_tag == -1, wtf?")
+            i += ending_tag + 1
         else:
             filtered_message += char
+        i += 1
+
+    return filtered_message
 
 class Extension:
     def __init__(self, cl):
