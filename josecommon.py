@@ -11,7 +11,7 @@ random = SystemRandom()
 
 import joseerror as je
 
-JOSE_VERSION = '1.1.1'
+JOSE_VERSION = '1.1.2'
 
 APP_CLIENT_ID = 'ID DO JOSE AQUI'
 OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=103988231' % APP_CLIENT_ID
@@ -340,6 +340,8 @@ def speak_filter(message):
             if ending_tag == -1:
                 raise Exception("ending_tag == -1, wtf?")
             i += ending_tag + 1
+        elif char == ';' and message[i+1] == ';':
+            i += message.find('\n', i+1)
         else:
             filtered_message += char
         i += 1
