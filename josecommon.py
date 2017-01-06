@@ -335,11 +335,14 @@ def speak_filter(message):
     i = 0
     while i < len(message):
         char = message[i]
-        if char == '<' and message[i+1] == '@':
-            ending_tag = message.find('>', i+1)
-            if ending_tag == -1:
-                raise Exception("ending_tag == -1, wtf?")
-            i += ending_tag + 1
+        if char == '<':
+            if i+1 > len(message):
+                pass
+            elif message[i+1] == '@':
+                ending_tag = message.find('>', i+1)
+                if ending_tag == -1:
+                    raise Exception("ending_tag == -1, wtf?")
+                i += ending_tag + 1
         elif char == ';':
             if i+1 > len(message):
                 pass
