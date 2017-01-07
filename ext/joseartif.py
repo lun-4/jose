@@ -4,15 +4,32 @@ import discord
 import asyncio
 import sys
 
-import txtutil
+from chatterbot import ChatBot
+chatbot = ChatBot(
+    "José",
+    storage_adapter='chatterbot.storage.JsonFileStorageAdapter',
+    logic_adapters=[
+        'chatterbot.logic.BestMatch'
+    ],
+    trainer='chatterbot.trainers.ChatterBotCorpusTrainer'
+)
+
+chatbot.train("chatterbot.corpus.portuguese.conversations")
 
 sys.path.append("..")
 import jauxiliar as jaux
+import josecommon as jcommon
 import joseerror as je
+
+from random import SystemRandom
+random = SystemRandom()
+
+ARTIF_CHATINESS = .1
 
 class JoseArtif(jaux.Auxiliar):
     def __init__(self, cl):
         jaux.Auxiliar.__init__(self, cl)
+        self.jose_mention = "<@%s>" % jcommon.JOSE_ID
 
     async def ext_load(self):
         return True, ''
@@ -21,28 +38,15 @@ class JoseArtif(jaux.Auxiliar):
         return True, ''
 
     async def e_on_message(self, message):
-        # message as input
-        msg = msg.content
-        # process message (NLTK?)
-        # analyze context
-        # decision maker
-        # response generator
-        '''
-        # generate 5 answers and the one with the best portuguese probability
-        # (above 72%) gets said
-        possible_answers = []
-        answers = {}
+        # give up on anything related, use chatterbot
+        self.current = message
+        msg = message.content.replace(self.jose_mention, "")
+        answer = chatbot.get_response(msg)
 
-        for answer in possible_answers:
-            prob = txtutil.portuguese_probability(answer)
-            if prob > .9:
-                answers[answer] = prob
-
-        answer_used = random.choice(answers)
-        await self.say(answer_used)
-        '''
-        # output
-        pass
+        if random.random() < ARTIF_CHATINESS:
+            await self.say(answer)
+        elif self.jose_mention in message.content:
+            await self.say(answer)
 
     async def c_command(self, message, args):
         pass

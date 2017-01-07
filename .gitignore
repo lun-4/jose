@@ -107,3 +107,4 @@ joseconfig.py
 *.profile
 ext/*.db
 zelao.txt
+database.db
