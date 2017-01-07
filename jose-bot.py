@@ -271,12 +271,29 @@ load_module('josegambling', 'JoseGambling')
 load_module('josedatamosh', 'JoseDatamosh')
 load_module('joseibc', 'JoseIBC')
 load_module('josextra', 'joseXtra')
+load_module('joseartif', 'JoseArtif')
 
 help_helptext = """
 `!help` - achar ajuda para outros comandos
 `!help comando` - procura algum texto de ajuda para o comando dado
 Exemplos: `!help help`, `!help pstatus`, `!help ap`
 """
+
+event_table = {
+    "on_message": [],
+}
+
+for modname in jose.modules:
+    module = jose.modules[modname]
+    modinst = jose.modules[modname]['inst']
+
+    for method in module['handlers']:
+        if method.startswith("e_"):
+            evname = method[method.find("_")+1:]
+            print("Registering Event %s@%s:%s" % (method, modname, evname))
+            if evname in event_table:
+                handler = getattr(modinst, method)
+                event_table[evname].append(handler)
 
 cmd_queue = WaitingQueue()
 
@@ -473,6 +490,10 @@ def one_message(message):
     if not message.author.bot:
         with open("zelao.txt", 'a') as f:
             f.write('%s\n' % speak_filter(message.content))
+
+    # use e_on_message calls
+    for handler in event_table['on_message']:
+        yield from handler(message)
 
     if random.random() < jc_probabiblity:
         if not message.channel.is_private:

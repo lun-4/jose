@@ -43,7 +43,7 @@ class JoseBot(jcommon.Extension):
         print("carregando módulo: %s" % n)
         methods = (method for method in dir(inst) if callable(getattr(inst, method)))
 
-        self.modules[n] = {'inst': inst, 'methods': [], 'class': ''}
+        self.modules[n] = {'inst': inst, 'methods': [], 'handlers': [], 'class': ''}
 
         for method in methods:
             if method.startswith('c_'):
@@ -58,7 +58,7 @@ class JoseBot(jcommon.Extension):
         loaded_success = False
         loaded_almost = False
 
-        print("jose.load_ext: n=%r n_cl=%r" % (n, n_cl))
+        print("jose.load_ext: %s@%s" % (n_cl, n))
         module = None
         if n in self.modules: #already loaded
             try:
@@ -96,13 +96,17 @@ class JoseBot(jcommon.Extension):
             loaded_almost = True
         methods = (method for method in dir(inst) if callable(getattr(inst, method)))
 
-        self.modules[n] = {'inst': inst, 'methods': [], 'class': n_cl, 'module': module}
+        self.modules[n] = {'inst': inst, 'methods': [], 'class': n_cl, 'module': module, 'handlers': []}
 
         for method in methods:
             if method.startswith('c_'):
                 print("add %s" % method)
                 setattr(self, method, getattr(inst, method))
                 self.modules[n]['methods'].append(method)
+                loaded_success = True
+            elif method.startswith('e_'):
+                print("handler %s" % method)
+                self.modules[n]['handlers'].append(method)
                 loaded_success = True
 
         if self.current is not None:
