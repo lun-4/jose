@@ -24,7 +24,8 @@ import joseerror as je
 from random import SystemRandom
 random = SystemRandom()
 
-ARTIF_CHATINESS = .1
+# 3 percent of all messages
+ARTIF_CHATINESS = .03
 
 class JoseArtif(jaux.Auxiliar):
     def __init__(self, cl):
@@ -39,13 +40,10 @@ class JoseArtif(jaux.Auxiliar):
 
     async def e_on_message(self, message):
         # give up on anything related, use chatterbot
-        self.current = message
-        msg = message.content.replace(self.jose_mention, "")
-        answer = chatbot.get_response(msg)
-
-        if random.random() < ARTIF_CHATINESS:
-            await self.say(answer)
-        elif self.jose_mention in message.content:
+        if random.random() < ARTIF_CHATINESS or self.jose_mention in message.content:
+            self.current = message
+            msg = message.content.replace(self.jose_mention, "")
+            answer = chatbot.get_response(msg)
             await self.say(answer)
 
     async def c_command(self, message, args):

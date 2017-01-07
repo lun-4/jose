@@ -345,7 +345,7 @@ def speak_filter(message):
         elif char == ';':
             if i+1 < len(message):
                 if message[i+1] == ';':
-                    i += message.find('\n', i+1)
+                    i += len(message)
         else:
             filtered_message += char
         i += 1
