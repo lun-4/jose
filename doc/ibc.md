@@ -9,14 +9,30 @@ The basis is the `!syscall` command that recieves JSON data and based on that it
 ```javascript
 {
     'whoami': discord_id, //str
-    'callnumber': number_of_syscall, //int
-    'params': [ // parameters to the call
+    "callnumber": number_of_syscall, //int
+    "arguments": [ // parameters to the call
         arg1,
         arg2,
         arg3,
         ...,
         argn
     ]
+}
+```
+
+### Example
+```javascript
+// Should return "OK"
+{
+    "callnumber": 2,
+    "arguments": ["a", 2]
+}
+
+
+// Should return 2
+{
+    "callnumber": 3,
+    "arguments": ["a"]
 }
 ```
 

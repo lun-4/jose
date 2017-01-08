@@ -9,15 +9,36 @@ import joseerror as je
 
 import json
 
+ibc_global_dict = {}
+IBC_MAX_DICTSIZE = 10
+
 async def syscall_pong(ibc, args):
     await ibc.say("pong")
 
 async def syscall_say(ibc, args):
     await ibc.say(' '.join(args))
 
+async def syscall_dict_set(ibc, args):
+    key = args[0]
+    val = args[1]
+    if len(ibc_global_dict) > IBC_MAX_DICTSIZE:
+        await ibc.say("E_MAX_MEM")
+        return -1
+    ibc_global_dict[key] = val
+    await ibc.say("OK")
+
+async def syscall_dict_get(ibc, args):
+    key = args[0]
+    if key in ibc_global_dict:
+        await ibc.say(ibc_global_dict[key])
+    else:
+        await ibc.say("E_NO_KEY")
+
 syscall_functions = {
     0: syscall_pong,
     1: syscall_say,
+    2: syscall_dict_set,
+    3: syscall_dict_get,
 }
 
 class JoseIBC(jaux.Auxiliar):
