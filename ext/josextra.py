@@ -60,3 +60,6 @@ class joseXtra(jaux.Auxiliar):
 
     async def c_tm(self, message, args):
         await self.say('%s™' % ' '.join(args[1:]))
+
+    async def c_loteria(self, message, args):
+        await self.say("nao")
