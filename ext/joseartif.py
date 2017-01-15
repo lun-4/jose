@@ -42,6 +42,7 @@ class JoseArtif(jaux.Auxiliar):
         # give up on anything related, use chatterbot
         if random.random() < ARTIF_CHATINESS or self.jose_mention in message.content:
             self.current = message
+            await self.client.send_typing(message.channel)
             msg = message.content.replace(self.jose_mention, "")
             answer = chatbot.get_response(msg)
             await self.say(answer)

@@ -2,11 +2,15 @@
 
 import discord
 import aiohttp
+import json
 
 import sys
 sys.path.append("..")
 import jauxiliar as jaux
 import joseerror as je
+
+from random import SystemRandom
+random = SystemRandom()
 
 class joseXtra(jaux.Auxiliar):
     def __init__(self, cl):
@@ -27,8 +31,6 @@ class joseXtra(jaux.Auxiliar):
         n = False
         if len(args) > 1:
             n = args[1]
-
-        loop = asyncio.get_event_loop()
 
         url = "http://xkcd.com/info.0.json"
         r = await aiohttp.request('GET', url)
