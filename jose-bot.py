@@ -174,7 +174,7 @@ async def show_price(message):
     await jose.say(res)
     return
 
-show_pior_bot = make_func("me tree :christmas_tree: me spam :christmas_tree: no oxygen :christmas_tree:  if ban")
+show_pior_bot = make_func("me tree :christmas_tree: me spam :christmas_tree: no oxygen :christmas_tree:  if ban\n" * 4)
 
 '''
     RMV : removed(or marked to remove)
