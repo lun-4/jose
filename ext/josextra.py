@@ -3,6 +3,8 @@
 import discord
 import aiohttp
 import json
+import subprocess
+import re
 
 import sys
 sys.path.append("..")
@@ -65,3 +67,36 @@ class joseXtra(jaux.Auxiliar):
 
     async def c_loteria(self, message, args):
         await self.say("nao")
+
+    async def c_status(self, message, args):
+        # ping discordapp one time
+
+        msg = await self.client.send_message(message.channel, "Pong!")
+
+        discordapp_ping = subprocess.Popen(
+            ["ping", "-c", "1", "discordapp.com"],
+            stdout = subprocess.PIPE,
+            stderr = subprocess.PIPE
+        )
+
+        d_out, d_error = discordapp_ping.communicate()
+        matcher = re.compile("rtt min/avg/max/mdev = (\d+.\d+)/(\d+.\d+)/(\d+.\d+)/(\d+.\d+)")
+        d_rtt = matcher.search(d_out.decode('utf-8')).groups()
+
+        edit1 = await self.client.edit_message(msg, msg.content + """
+%s : min %sms avg %sms max %sms
+""" % ("discordapp.com", d_rtt[0], d_rtt[1], d_rtt[2]))
+
+        google_ping = subprocess.Popen(
+            ["ping", "-c", "1", "google.com"],
+            stdout = subprocess.PIPE,
+            stderr = subprocess.PIPE
+        )
+
+        g_out, g_error = google_ping.communicate()
+        matcher = re.compile("rtt min/avg/max/mdev = (\d+.\d+)/(\d+.\d+)/(\d+.\d+)/(\d+.\d+)")
+        g_rtt = matcher.search(g_out.decode('utf-8')).groups()
+
+        edit2 = await self.client.edit_message(edit1, edit1.content + """
+%s : min %sms avg %sms max %sms
+""" % ("google.com", g_rtt[0], g_rtt[1], g_rtt[2]))

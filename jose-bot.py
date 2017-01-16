@@ -174,6 +174,8 @@ async def show_price(message):
     await jose.say(res)
     return
 
+show_pior_bot = make_func("me tree :christmas_tree: me spam :christmas_tree: no oxygen :christmas_tree:  if ban")
+
 '''
     RMV : removed(or marked to remove)
     DEAC : deactivated until better solution
@@ -183,6 +185,7 @@ async def show_price(message):
 exact_commands = {
     'jose': show_help,
     'melhor bot': show_shit,
+    'pior bot': show_pior_bot,
 }
 
 jcoin.load(jconfig.jcoin_path)
