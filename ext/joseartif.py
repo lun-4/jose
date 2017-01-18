@@ -5,7 +5,7 @@ import asyncio
 import sys
 import json
 
-from chatterbot import ChatBot
+'''from chatterbot import ChatBot
 chatbot = ChatBot(
     "José",
     storage_adapter='chatterbot.storage.JsonFileStorageAdapter',
@@ -15,7 +15,7 @@ chatbot = ChatBot(
     trainer='chatterbot.trainers.ChatterBotCorpusTrainer'
 )
 
-chatbot.train("chatterbot.corpus.portuguese.conversations")
+chatbot.train("chatterbot.corpus.portuguese.conversations")'''
 
 sys.path.append("..")
 import jauxiliar as jaux
