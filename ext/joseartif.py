@@ -41,14 +41,15 @@ class JoseArtif(jaux.Auxiliar):
         return True, ''
 
     async def e_on_message(self, message):
-        # give up on anything related, use chatterbot
+        '''# give up on anything related, use chatterbot
         if random.random() < ARTIF_CHATINESS or self.jose_mention in message.content:
             self.current = message
             await self.client.send_typing(message.channel)
             msg = message.content.replace(self.jose_mention, "")
             answer = chatbot.get_response(msg)
             self.answers += 1
-            await self.say(answer)
+            await self.say(answer)'''
+        pass
 
     async def c_chatstatus(self, message, args):
         with open('database.db', 'r') as f:
