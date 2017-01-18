@@ -76,8 +76,7 @@ class JoseNSFW(jcommon.Extension):
     async def porn_routine(self):
         res = await jcoin.jcoin_control(self.current.author.id, jcommon.PORN_PRICE)
         if not res[0]:
-            await client.send_message(message.channel,
-                "PermError: %s" % res[1])
+            await self.say("PermError: %s" % res[1])
             return False
         return True
 
