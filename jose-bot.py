@@ -218,7 +218,7 @@ commands_start = {
 
     '!ahelp': show_gambling_full,
     '!adummy': show_gambling,
-    '!airport': show_aerotrem,
+    #'!airport': show_aerotrem,
 
     '!awoo': make_func("https://cdn.discordapp.com/attachments/202055538773721099/257717450135568394/awooo.gif"),
 
