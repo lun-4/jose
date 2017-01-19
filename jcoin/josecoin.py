@@ -42,7 +42,7 @@ def empty_acc(name, amnt):
 
 def new_acc(id_acc, name, init_amnt=None):
     if init_amnt is None:
-        init_amnt = Decimal('25')
+        init_amnt = Decimal('10')
 
     if id_acc in data:
         return False, 'conta já existe'
