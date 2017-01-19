@@ -8,7 +8,7 @@ sys.path.append("..")
 import josecommon as jcommon
 import joseerror as je
 
-JOSECOIN_VERSION = '0.5'
+JOSECOIN_VERSION = '0.6'
 
 from decimal import *
 getcontext().prec = 3
@@ -27,7 +27,7 @@ Alguns comandos pedem JC$ em troca da sua funcionalidade(*comandos nsfw incluíd
 data = {}
 jose_id = jcommon.JOSE_ID
 
-LEDGER_PATH = 'jcoin/josecoin-4.journal'
+LEDGER_PATH = 'jcoin/josecoin-5.journal'
 
 def ledger_data(fpath, data):
     with open(fpath, 'a') as f:

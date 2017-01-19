@@ -58,7 +58,7 @@ class JoseGambling(jcommon.Extension):
         amount = decimal.Decimal(0)
         try:
             if args[1] == 'all':
-                from_amnt = jcoin.get(id_from)[1]['amount']
+                from_amnt = jcoin.get(id_from)[1]['amount'] - 0.1
                 fee_amnt = from_amnt * decimal.Decimal(jcommon.GAMBLING_FEE/100.)
                 amount = from_amnt - fee_amnt
             else:
