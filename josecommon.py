@@ -33,7 +33,7 @@ GAMBLING_MODE = False
 
 JOSE_SPAM_TRIGGER = 4
 PIRU_ACTIVITY = .00069
-jc_probabiblity = .07
+jc_probabiblity = .01
 JC_REWARDS = [1, 1.2, 2, 2.5, 3.14, 5, 5.1, 6.28, 7.4]
 
 PORN_LIMIT = 14
