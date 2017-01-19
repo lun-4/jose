@@ -42,7 +42,8 @@ def empty_acc(name, amnt):
 
 def new_acc(id_acc, name, init_amnt=None):
     if init_amnt is None:
-        init_amnt = Decimal('10')
+        # the readjust gave so little prices I need to lower this
+        init_amnt = Decimal('3')
 
     if id_acc in data:
         return False, 'conta já existe'
