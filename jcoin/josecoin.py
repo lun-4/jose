@@ -100,7 +100,7 @@ def load(fname):
     except Exception as e:
         return False, str(e)
 
-    # data[jose_id] = empty_acc('jose-bot', Decimal('1000000'))
+    data[jose_id] = empty_acc('jose-bot', Decimal('1000000'))
     #ledger_data(fname.replace('db', 'journal'), '%f;LOAD;%r\n' % (time.time(), data))
     return True, "load %s" % fname
 
