@@ -11,7 +11,7 @@ random = SystemRandom()
 
 import joseerror as je
 
-JOSE_VERSION = '1.1.6'
+JOSE_VERSION = '1.1.7'
 
 APP_CLIENT_ID = 'ID DO JOSE AQUI'
 OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=103988231' % APP_CLIENT_ID
@@ -32,7 +32,7 @@ MAINTENANCE_MODE = False
 GAMBLING_MODE = False
 
 JOSE_SPAM_TRIGGER = 4
-PIRU_ACTIVITY = .00069
+PIRU_ACTIVITY = .000069
 jc_probabiblity = .01
 JC_REWARDS = [0, 0, 0.2, 0.6, 1, 1.2, 1.5]
 
