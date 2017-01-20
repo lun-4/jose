@@ -505,6 +505,11 @@ def one_message(message):
 
             # only if author has account
             if str(message.author.id) in jcoin.data:
+                # if it is on the wrong server, return
+                print(message.server.id, message.server.id != "271378126234320897")
+                if message.server.id != "271378126234320897":
+                    return
+
                 jose_env['spam'][message.author.id] += 1
                 if jose_env['spam'][message.author.id] >= JOSE_SPAM_TRIGGER:
 
@@ -530,11 +535,7 @@ def one_message(message):
                     if res[0]:
                         acc_to = jcoin.get(author_id)[1]
                         emoji_res = yield from random_emoji(3)
-                        #if PARABENS_MODE:
-                        #    # yield from jose.say("Parabéns")
-                        #else:
-                            # remove output
-                            #yield from jose.say('%s %.2fJC > %s' % (emoji_res, amount, acc_to['name']))
+                        yield from jose.say('%s %.2fJC > %s' % (emoji_res, amount, acc_to['name']))
                     else:
                         yield from jose_debug(message, 'jc_error: %s' % res[1])
         else:
