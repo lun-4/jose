@@ -11,7 +11,24 @@ random = SystemRandom()
 
 import joseerror as je
 
-JOSE_VERSION = '1.1.7'
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# José.log = all logs
+handler = logging.FileHandler('José.log')
+handler.setLevel(logging.INFO)
+
+# create a logging format
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+
+# add the handlers to the logger
+logger.addHandler(handler)
+
+
+JOSE_VERSION = '1.2.0'
 
 APP_CLIENT_ID = 'ID DO JOSE AQUI'
 OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=103988231' % APP_CLIENT_ID
@@ -172,7 +189,7 @@ GAMBLING_HELP_TEXT_SMALL = '''Aposta for Dummies:
 debug_logs = []
 
 async def debug_log(string):
-    print(string)
+    logger.debug(string)
     today_str = time.strftime("%d-%m-%Y")
     with open("logs/jose_debug-%s.log" % today_str, 'a') as f:
         f.write(string+'\n')
@@ -357,6 +374,7 @@ class Extension:
         self.client = cl
         self.current = None
         self.loop = cl.loop
+        self.logger = logger
 
     async def say(self, msg, channel=None):
         if channel is None:

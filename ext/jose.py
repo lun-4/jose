@@ -40,34 +40,34 @@ class JoseBot(jcommon.Extension):
         self.queue = []
 
     def load_gext(self, inst, n):
-        print("carregando módulo: %s" % n)
+        self.logger.info("Loading gext %s", n)
         methods = (method for method in dir(inst) if callable(getattr(inst, method)))
 
         self.modules[n] = {'inst': inst, 'methods': [], 'handlers': [], 'class': ''}
 
         for method in methods:
             if method.startswith('c_'):
-                print("add %s" % method)
+                self.logger.debug("add %s", method)
                 setattr(self, method, getattr(inst, method))
                 self.modules[n]['methods'].append(method)
 
-        print("módulo carregado: %s" % n)
+        self.logger.info("Loaded gext %s", n)
         return True
 
     async def load_ext(self, n, n_cl):
         loaded_success = False
         loaded_almost = False
 
-        print("jose.load_ext: %s@%s" % (n_cl, n))
+        self.logger.info("load_ext: %s@%s", n_cl, n)
         module = None
         if n in self.modules: #already loaded
             try:
                 ok = await self.modules[n]['inst'].ext_unload()
                 if not ok[0]:
-                    print("Error happened[ext_unload, %s]: %s" % (n, ok[1]))
+                    self.logger.error("Error happened on ext_unload(%s): %s", n, ok[1])
                     sys.exit(0)
             except Exception as e:
-                print("ALMOST[unload] - %s : %s" % (n, repr(e)))
+                self.logger.warn("Almost unloaded %s: %s", n, repr(e))
                 loaded_almost = True
 
             # reimport
@@ -80,7 +80,7 @@ class JoseBot(jcommon.Extension):
         if cl_inst is None:
             if self.current is not None:
                 await self.say(":train:")
-            print("ERROR: cl_inst = None")
+            self.logger.error("cl_inst = None")
             loaded_success = False
             loaded_almost = True
 
@@ -89,10 +89,10 @@ class JoseBot(jcommon.Extension):
             # try to ext_load it
             ok = await inst.ext_load()
             if not ok[0]:
-                print("Error happened[ext_load, %s]: %s" % (n, ok[1]))
+                self.logger.error("Error happened on ext_load(%s): %s", n, ok[1])
                 sys.exit(0)
         except Exception as e:
-            print("ALMOST[ext_load] - %s : %s" % (n, repr(e)))
+            self.logger.warn("Almost loaded %s: %s", n, repr(e))
             loaded_almost = True
         methods = (method for method in dir(inst) if callable(getattr(inst, method)))
 
@@ -100,12 +100,12 @@ class JoseBot(jcommon.Extension):
 
         for method in methods:
             if method.startswith('c_'):
-                print("add %s" % method)
+                self.logger.debug("add %s", method)
                 setattr(self, method, getattr(inst, method))
                 self.modules[n]['methods'].append(method)
                 loaded_success = True
             elif method.startswith('e_'):
-                print("handler %s" % method)
+                self.logger.debug("handler %s" % method)
                 self.modules[n]['handlers'].append(method)
                 loaded_success = True
 
@@ -118,13 +118,13 @@ class JoseBot(jcommon.Extension):
                 await self.say(":poop:")
         else:
             if not loaded_success:
-                print("errors loading %s" % n)
+                self.logger.error("Error loading %s", n)
                 sys.exit(0)
 
             if loaded_almost:
-                print("almost loaded %s" % n)
+                self.logger.error("Almost loaded %s", n)
                 sys.exit(0)
-            print("load_ext: loaded %s" % n)
+            self.logger.info("Loaded %s" % n)
 
     async def mod_recv(self, message):
         await self.recv(message)
@@ -279,7 +279,7 @@ class JoseBot(jcommon.Extension):
 
         loop = asyncio.get_event_loop()
 
-        print("!yt @ %s : %s" % (message.author.id, search_term))
+        self.logger.info("Youtube request @ %s : %s", message.author, search_term)
 
         query_string = urllib.parse.urlencode({"search_query" : search_term})
 
@@ -299,7 +299,8 @@ class JoseBot(jcommon.Extension):
     async def c_sndc(self, message, args):
         '''`!sndc [termo 1] [termo 2]...` - procura no soundcloud'''
         query = ' '.join(args[1:])
-        print("soundcloud -> %s" % query)
+
+        self.logger.info("Soundcloud request: %s", query)
 
         if len(query) < 3:
             await self.say("preciso de mais coisas para pesquisar(length < 3)")

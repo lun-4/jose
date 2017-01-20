@@ -118,7 +118,7 @@ async def add_sentence(content, author):
         with open('jose-data.txt', 'a') as f:
             f.write(sd+'\n')
     else:
-        print("ignoring(len(sd.strip) < 1)")
+        logger.debug("add_sentence: ignoring len(sd.strip) < 1")
 
 async def learn_data(message):
     res = await jcoin_control(message.author.id, LEARN_PRICE)
@@ -293,7 +293,7 @@ for modname in jose.modules:
     for method in module['handlers']:
         if method.startswith("e_"):
             evname = method[method.find("_")+1:]
-            print("Registering Event %s@%s:%s" % (method, modname, evname))
+            logger.info("Register Event %s@%s:%s", method, modname, evname)
             if evname in event_table:
                 handler = getattr(modinst, method)
                 event_table[evname].append(handler)
@@ -343,7 +343,7 @@ def one_message(message):
 
     # log stuff
     bnr = '%s(%r) : %s : %r' % (message.channel, message.channel.is_private, message.author, message.content)
-    print(bnr)
+    logger.debug(bnr)
 
     if not started:
         started = True
@@ -506,7 +506,7 @@ def one_message(message):
             # only if author has account
             if str(message.author.id) in jcoin.data:
                 # if it is on the wrong server, return
-                print(message.server.id, message.server.id != "271378126234320897")
+                logger.debug("%s %s", message.server.id, message.server.id != "271378126234320897")
                 if message.server.id != "271378126234320897":
                     return
 
@@ -555,21 +555,18 @@ async def command_loop():
 @client.event
 async def on_ready():
     print("="*25)
-    print('josé ready:')
-    print('name', client.user.name)
-    print('id', client.user.id)
+    logger.info("josé ready, name = %s, id = %s", client.user.name, client.user.id)
     print('='*25)
 
 
 async def main_task():
     global client
 
-    print("start")
+    logger.info("José Starting")
     await client.start(jconfig.discord_token)
 
 loop = asyncio.get_event_loop()
 try:
-    print("iniciando loop de processamento")
     asyncio.ensure_future(command_loop())
 
     print("main_task")
@@ -579,4 +576,4 @@ except:
 finally:
     loop.close()
 
-print("jose: exit")
+logger.info("Exiting")

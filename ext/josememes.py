@@ -71,7 +71,7 @@ class JoseMemes(jcommon.Extension):
                 await self.debug("load_memes: erro carregando josememes.db(%s)" % e)
                 return False, 'error loading josememes.db(%s)' % e
             else:
-                print('load_memes: erro: %s' % e)
+                self.logger.error("load_memes: %s", e)
                 return False, e
             self.memes = {}
 
@@ -83,7 +83,7 @@ class JoseMemes(jcommon.Extension):
             if self.current is not None:
                 await self.debug("save_memes: pyerr: %s" % e)
             else:
-                print(traceback.print_exc())
+                self.logger.error("Error in save_memes", exc_info=True)
             return False
 
     async def c_aprovado(self, message, args):
@@ -200,7 +200,7 @@ class JoseMemes(jcommon.Extension):
             return
 
         elif command == 'saveload':
-            print('saveload')
+            self.logger.info("saveloading meme database")
             done = await self.save_memes()
             if done:
                 await self.say("jmemes: banco de dados salvo")
@@ -475,7 +475,7 @@ class JoseMemes(jcommon.Extension):
         wiki_api_url = '%s%s%s' % (wiki_api_endpoint, wiki_api_params,
             urllib.parse.quote(wiki_searchterm))
 
-        print("requesting %s" % wiki_api_url)
+        self.logger.info("Wiki request: %s", wiki_api_url)
         try:
             response = await asyncio.wait_for(aiohttp.request('GET', wiki_api_url), 8)
         except asyncio.TimeoutError:
@@ -486,7 +486,7 @@ class JoseMemes(jcommon.Extension):
         wiki_json = json.loads(response_text)
 
         if using_query:
-            print("using query method")
+            self.logger.debug("Wiki: Use query method")
             w_search_data = wiki_json['query']['search']
             w_all = ''
             for result in w_search_data[:6]:
@@ -505,7 +505,7 @@ class JoseMemes(jcommon.Extension):
                 await self.say("sem resultados")
                 return
 
-            print(w_suggestions_text)
+            self.logger.debug(w_suggestions_text)
             search_paragaph = w_suggestions_text[0]
 
             if len(w_suggestions) > 1:
@@ -514,7 +514,6 @@ class JoseMemes(jcommon.Extension):
             if len(search_paragaph) >= 500:
                 search_paragaph = search_paragaph[:500] + '...'
 
-            print('debug: wiki request finished')
             await self.say(
             """`%s:%s` =
 ```
