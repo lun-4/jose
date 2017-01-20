@@ -100,3 +100,15 @@ class joseXtra(jaux.Auxiliar):
         edit2 = await self.client.edit_message(edit1, edit1.content + """
 %s : min %sms avg %sms max %sms
 """ % ("google.com", g_rtt[0], g_rtt[1], g_rtt[2]))
+
+    async def c_invite(self, message, args):
+        invite = None
+
+        if len(args) > 1:
+            invite = args[1]
+        else:
+            return
+
+        if invite:
+            await self.client.accept_invite(invite)
+            await self.say("Invite aceito!")
