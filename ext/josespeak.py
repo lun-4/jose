@@ -113,13 +113,17 @@ class JoseSpeak(jcommon.Extension):
     def __init__(self, cl):
         jcommon.Extension.__init__(self, cl)
         self.cult_generator = Texter('jose-data.txt', 1)
-        self.serverzao_generator = Texter('zelao.txt', 1)
+        self.global_generator = Texter('zelao.txt', 1)
 
     async def ext_load(self):
         return True, ''
 
+    async def e_on_message(self):
+        if random.random() < 0.03:
+            await self.speak(self.global_generator)
+
     async def speak(self, texter):
-        res = await texter.gen_sentence(1, 100)
+        res = await texter.gen_sentence(1, 50)
         if jcommon.DEMON_MODE:
             res = res[::-1]
         elif jcommon.PARABENS_MODE:
@@ -132,7 +136,7 @@ class JoseSpeak(jcommon.Extension):
 
     async def c_sfalar(self, message, args):
         """`!sfalar` - falar usando textos do serverzao"""
-        await self.speak(self.serverzao_generator)
+        await self.speak(self.global_generator)
 
     async def c_josetxt(self, message, args):
         '''`!josetxt` - Mostra a quantidade de linhas, palavras e bytes no jose-data.txt
