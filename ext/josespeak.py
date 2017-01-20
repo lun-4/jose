@@ -118,8 +118,10 @@ class JoseSpeak(jcommon.Extension):
     async def ext_load(self):
         return True, ''
 
-    async def e_on_message(self):
+    async def e_on_message(self, message):
         if random.random() < 0.03:
+            self.current = message
+            await self.client.send_typing(message.channel)
             await self.speak(self.global_generator)
 
     async def speak(self, texter):
