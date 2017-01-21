@@ -52,7 +52,7 @@ class JoseBot(jcommon.Extension):
             else:
                 self.logger.info("%s doesn't have ext_unload", modname)
 
-        logger.info("Unloaded all modules")
+        self.logger.info("Unloaded all modules")
 
     def load_gext(self, inst, n):
         self.logger.info("Loading gext %s", n)
