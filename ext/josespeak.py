@@ -226,7 +226,7 @@ class JoseSpeak(jcommon.Extension):
             if len(filtered_line) > 0:
                 # no issues, add it
                 self.logger.debug("add line %s", filtered_line)
-                print("add line %s", filtered_line)
+                print("add line %r" % filtered_line)
                 self.database[message.server.id].append(filtered_line)
 
         # save everyone
