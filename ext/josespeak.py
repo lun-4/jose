@@ -10,6 +10,8 @@ import joseerror as je
 import re
 import random
 import subprocess
+import json
+import io
 
 def fixCaps(word):
     if word.isupper() and (word != "I" or word != "Eu"):
@@ -23,19 +25,25 @@ def fixCaps(word):
 def toHashKey(lst):
     return tuple(lst)
 
-def wordlist(filename):
-    f = open(filename, 'r')
-    wordlist = [fixCaps(w) for w in re.findall(r"[\w']+|[.,!?;]", f.read())]
-    f.close()
+def wordlist(filename, file_object=None):
+    if file_object is None:
+        file_object = open(filename, 'r')
+
+    wordlist = [fixCaps(w) for w in re.findall(r"[\w']+|[.,!?;]", file_object.read())]
+    file_object.close()
     return wordlist
 
 class Texter:
-    def __init__(self, textpath, markov_length):
+    def __init__(self, textpath, markov_length, text):
         self.tempMapping = {}
         self.mapping = {}
         self.starts = []
 
-        self.build_mapping(wordlist(textpath), markov_length)
+        if textpath is None:
+            text_object = io.StringIO(text)
+            self.build_mapping(wordlist(None, text_object), markov_length)
+        else:
+            self.build_mapping(wordlist(textpath), markov_length)
 
     def add_temp_mapping(self, history, word):
         while len(history) > 0:
@@ -115,14 +123,50 @@ class JoseSpeak(jcommon.Extension):
         self.cult_generator = Texter('jose-data.txt', 1)
         self.global_generator = Texter('zelao.txt', 1)
 
+        self.database = {}
+        self.text_generators = {}
+        self.database_path = 'markov-database.json'
+
+    async def create_generators(self):
+        for serverid in self.database:
+            messages = self.database[serverid]
+            self.logger.info("Generating Texter for %s, %d messages", serverid, len(messages))
+            self.text_generators[serverid] = Texter(None, 1, '\n'.join(messages))
+
     async def ext_load(self):
-        return True, ''
+        try:
+            self.database = json.load(open(self.database_path, 'r'))
+            # load generators
+            await self.create_generators()
+            return True, ''
+        except Exception as e:
+            return False, str(e)
+
+    async def ext_unload(self):
+        try:
+            json.dump(self.database, open(self.database_path, 'w'))
+            del self.text_generators
+            self.text_generators = {}
+            return True, ''
+        except Exception as e:
+            return False, str(e)
 
     async def e_on_message(self, message):
+        # store message in json database
+        if message.server.id not in self.database:
+            self.logger.info("New server in database: %s", message.server.id)
+            self.database[message.server.id] = []
+
+        for line in message.content.split('\n'):
+            # append every line to the database
+            self.database[message.server.id].append(line)
+
+        # TODO: reload text generators every hour or so
+
         if random.random() < 0.03:
             self.current = message
             await self.client.send_typing(message.channel)
-            await self.speak(self.global_generator)
+            await self.speak(self.text_generators[message.server.id])
 
     async def speak(self, texter):
         res = await texter.gen_sentence(1, 50)
@@ -137,11 +181,14 @@ class JoseSpeak(jcommon.Extension):
         await self.speak(self.cult_generator)
 
     async def c_sfalar(self, message, args):
-        """`!sfalar` - falar usando textos do serverzao"""
+        """`!sfalar` - falar usando textos do seu servidor atual"""
+        await self.speak(self.text_generators[message.server.id])
+
+    async def c_gfalar(self, message, args):
+        """`!gfalar` - falar usando o texto global"""
         await self.speak(self.global_generator)
 
     async def c_josetxt(self, message, args):
-        '''`!josetxt` - Mostra a quantidade de linhas, palavras e bytes no jose-data.txt
-        '''
+        '''`!josetxt` - Mostra a quantidade de linhas, palavras e bytes no jose-data.txt'''
         output = subprocess.Popen(['wc', 'jose-data.txt'], stdout=subprocess.PIPE).communicate()[0]
         await self.say(output)
