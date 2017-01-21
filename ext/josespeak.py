@@ -151,6 +151,11 @@ class JoseSpeak(jcommon.Extension):
         except Exception as e:
             return False, str(e)
 
+    async def c_forcereload(self, message, args):
+        await ext_unload()
+        await ext_load()
+        await self.say("done")
+
     async def e_on_message(self, message):
         # store message in json database
         if message.server.id not in self.database:
@@ -164,9 +169,11 @@ class JoseSpeak(jcommon.Extension):
         # TODO: reload text generators every hour or so
 
         if random.random() < 0.03:
-            self.current = message
-            await self.client.send_typing(message.channel)
-            await self.speak(self.text_generators[message.server.id])
+            # ensure the server already has its database
+            if message.server.id in self.text_generators:
+                self.current = message
+                await self.client.send_typing(message.channel)
+                await self.speak(self.text_generators[message.server.id])
 
     async def speak(self, texter):
         res = await texter.gen_sentence(1, 50)
