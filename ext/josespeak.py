@@ -181,6 +181,12 @@ class JoseSpeak(jcommon.Extension):
         # filter message before adding
         filtered_msg = jcommon.speak_filter(message.content)
 
+        if message.server.id not in self.wlengths:
+            self.wlengths[message.server.id] = 5
+
+        if message.server.id not in self.messages:
+            self.wlengths[message.server.id] = 1 # the message being received now
+
         # get word count
         self.wlengths[message.server.id] += len(filtered_msg.split())
         self.messages[message.server.id] += 1
@@ -205,7 +211,7 @@ class JoseSpeak(jcommon.Extension):
                 self.current = message
                 await self.client.send_typing(message.channel)
 
-                length = self.text_lengths[message.server.id]
+                length = int(self.text_lengths[message.server.id])
                 await self.speak(self.text_generators[message.server.id], length)
 
     async def speak(self, texter, length_words):
