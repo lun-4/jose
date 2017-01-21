@@ -133,8 +133,13 @@ class JoseSpeak(jcommon.Extension):
             self.logger.info("Generating Texter for %s, %d messages", serverid, len(messages))
             self.text_generators[serverid] = Texter(None, 1, '\n'.join(messages))
 
+    async def c_savedb(self):
+        json.dump(self.database, open(self.database_path, 'w'))
+        await self.say(":floppy_disk: saved :floppy_disk:")
+
     async def ext_load(self):
         try:
+            self.text_generators = {}
             self.database = json.load(open(self.database_path, 'r'))
             # load generators
             await self.create_generators()
@@ -146,7 +151,6 @@ class JoseSpeak(jcommon.Extension):
         try:
             json.dump(self.database, open(self.database_path, 'w'))
             del self.text_generators
-            self.text_generators = {}
             return True, ''
         except Exception as e:
             return False, str(e)
@@ -171,6 +175,7 @@ class JoseSpeak(jcommon.Extension):
             filtered_line = jcommon.speak_filter(line)
             if len(filtered_line) > 0:
                 # no issues, add it
+                self.logger.debug("add line %s", filtered_line)
                 self.database[message.server.id].append(filtered_line)
 
         # TODO: reload text generators every hour or so
