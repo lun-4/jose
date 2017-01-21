@@ -152,8 +152,8 @@ class JoseSpeak(jcommon.Extension):
             return False, str(e)
 
     async def c_forcereload(self, message, args):
-        await ext_unload()
-        await ext_load()
+        await self.ext_unload()
+        await self.ext_load()
         await self.say("done")
 
     async def e_on_message(self, message):
