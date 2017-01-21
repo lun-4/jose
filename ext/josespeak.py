@@ -34,7 +34,7 @@ def wordlist(filename, file_object=None):
     return wordlist
 
 class Texter:
-    def __init__(self, textpath, markov_length, text):
+    def __init__(self, textpath, markov_length, text=None):
         self.tempMapping = {}
         self.mapping = {}
         self.starts = []
