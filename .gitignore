@@ -108,3 +108,4 @@ joseconfig.py
 ext/*.db
 zelao.txt
 database.db
+markov-database.json
