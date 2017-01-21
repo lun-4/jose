@@ -271,7 +271,7 @@ class JoseSpeak(jcommon.Extension):
 
     async def c_falar(self, message, args):
         """`!falar wordlength` - josé fala"""
-        if len(args) < 1:
+        if len(args) < 2:
             await self.say(self.c_sfalar.__doc__, int(args[1]))
             return
 
@@ -283,7 +283,7 @@ class JoseSpeak(jcommon.Extension):
 
     async def c_sfalar(self, message, args):
         """`!sfalar wordlength` - falar usando textos do seu servidor atual"""
-        if len(args) < 1:
+        if len(args) < 2:
             await self.say(self.c_sfalar.__doc__)
             return
 
@@ -295,7 +295,7 @@ class JoseSpeak(jcommon.Extension):
 
     async def c_gfalar(self, message, args):
         """`!gfalar wordlength` - falar usando o texto global"""
-        if len(args) < 1:
+        if len(args) < 2:
             await self.say(self.c_sfalar.__doc__)
             return
 
