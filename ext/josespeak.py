@@ -269,7 +269,7 @@ class JoseSpeak(jcommon.Extension):
         await self.say(res)
 
     async def c_falar(self, message, args):
-        """`!falar [wordlength]` - josé fala(wordmax default 10)"""
+        """`!falar [wordmax]` - josé fala(wordmax default 10)"""
         wordlength = 10
 
         if len(args) > 2:
@@ -279,7 +279,7 @@ class JoseSpeak(jcommon.Extension):
             else:
                 wordlength = int(args[1])
 
-        await self.speak(self.cult_generator)
+        await self.speak(self.cult_generator, wordlength)
 
     async def c_sfalar(self, message, args):
         """`!sfalar [wordmax]` - falar usando textos do seu servidor atual(wordmax default 10)"""
@@ -292,7 +292,7 @@ class JoseSpeak(jcommon.Extension):
             else:
                 wordlength = int(args[1])
 
-        await self.speak(self.text_generators[message.server.id], int(args[1]))
+        await self.speak(self.text_generators[message.server.id], wordlength)
 
     async def c_gfalar(self, message, args):
         """`!gfalar [wordmax]` - falar usando o texto global(wordmax default 10)"""
@@ -305,7 +305,7 @@ class JoseSpeak(jcommon.Extension):
             else:
                 wordlength = int(args[1])
 
-        await self.speak(self.global_generator, int(args[1]))
+        await self.speak(self.global_generator, wordlength)
 
     async def c_josetxt(self, message, args):
         '''`!josetxt` - Mostra a quantidade de linhas, palavras e bytes no jose-data.txt'''
