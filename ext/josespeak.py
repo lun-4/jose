@@ -151,6 +151,7 @@ class JoseSpeak(jcommon.Extension):
         self.logger.info("Generated %d texters", len(self.text_generators))
 
     async def save_databases(self):
+        self.logger.info("Saved databases")
         json.dump(self.database, open(self.database_path, 'w'))
         json.dump(self.wlengths, open(self.db_length_path, 'w'))
         json.dump(self.messages, open(self.db_msg_path, 'w'))
@@ -249,8 +250,6 @@ class JoseSpeak(jcommon.Extension):
 
         self.counter += 1
 
-        # TODO: reload text generators every hour or so
-
         if random.random() < 0.03 or self.flag:
             self.flag = False
             # ensure the server already has its database
@@ -270,38 +269,41 @@ class JoseSpeak(jcommon.Extension):
         await self.say(res)
 
     async def c_falar(self, message, args):
-        """`!falar wordlength` - josé fala"""
-        if len(args) < 2:
-            await self.say(self.c_sfalar.__doc__, int(args[1]))
-            return
+        """`!falar [wordlength]` - josé fala(wordmax default 10)"""
+        wordlength = 10
 
-        if int(args[1]) > 100:
-            await self.say("Nope :tm:")
-            return
+        if len(args) > 2:
+            if int(args[1]) > 100:
+                await self.say("Nope :tm:")
+                return
+            else:
+                wordlength = int(args[1])
 
         await self.speak(self.cult_generator)
 
     async def c_sfalar(self, message, args):
-        """`!sfalar wordlength` - falar usando textos do seu servidor atual"""
-        if len(args) < 2:
-            await self.say(self.c_sfalar.__doc__)
-            return
+        """`!sfalar [wordmax]` - falar usando textos do seu servidor atual(wordmax default 10)"""
+        wordlength = 10
 
-        if int(args[1]) > 100:
-            await self.say("Nope :tm:")
-            return
+        if len(args) > 2:
+            if int(args[1]) > 100:
+                await self.say("Nope :tm:")
+                return
+            else:
+                wordlength = int(args[1])
 
         await self.speak(self.text_generators[message.server.id], int(args[1]))
 
     async def c_gfalar(self, message, args):
-        """`!gfalar wordlength` - falar usando o texto global"""
-        if len(args) < 2:
-            await self.say(self.c_sfalar.__doc__)
-            return
+        """`!gfalar [wordmax]` - falar usando o texto global(wordmax default 10)"""
+        wordlength = 10
 
-        if int(args[1]) > 100:
-            await self.say("Nope :tm:")
-            return
+        if len(args) > 2:
+            if int(args[1]) > 100:
+                await self.say("Nope :tm:")
+                return
+            else:
+                wordlength = int(args[1])
 
         await self.speak(self.global_generator, int(args[1]))
 
