@@ -130,6 +130,7 @@ class JoseSpeak(jcommon.Extension):
         self.wlengths = {}
         self.messages = {}
         self.text_lengths = {}
+        self.counter = 0
 
         self.database_path = 'markov-database.json'
         self.db_length_path = 'db/wordlength.json'
@@ -138,16 +139,23 @@ class JoseSpeak(jcommon.Extension):
     async def create_generators(self):
         for serverid in self.database:
             messages = self.database[serverid]
-            self.logger.info("Generating Texter for %s, %d messages", serverid, len(messages))
+            self.logger.info("Generating Texter for server ID %s with %d messages", serverid, len(messages))
             self.text_generators[serverid] = Texter(None, 1, '\n'.join(messages))
 
-    async def c_savedb(self, message, args):
+        self.logger.info("Generated %d texters", len(self.text_generators))
+
+    async def save_databases(self):
         json.dump(self.database, open(self.database_path, 'w'))
         json.dump(self.wlengths, open(self.db_length_path, 'w'))
         json.dump(self.messages, open(self.db_msg_path, 'w'))
+
+    async def c_savedb(self, message, args):
+        """`!savedb` - saves all available databases(autosave for each 50 messages)"""
+        await self.save_databases()
         await self.say(":floppy_disk: saved database :floppy_disk:")
 
     async def c_speaktrigger(self, message, args):
+        """`!speaktrigger` - trigger jose's speaking code"""
         self.flag = True
         await self.e_on_message(message)
 
@@ -163,29 +171,29 @@ class JoseSpeak(jcommon.Extension):
 
             # make generators
             await self.create_generators()
+
             return True, ''
         except Exception as e:
             return False, str(e)
 
     async def ext_unload(self):
         try:
-            json.dump(self.database, open(self.database_path, 'w'))
-            json.dump(self.wlengths, open(self.db_length_path, 'w'))
-            json.dump(self.messages, open(self.db_msg_path, 'w'))
-            del self.text_generators
-            self.text_generators = {}
+            await self.save_databases()
+            self.text_generators.clear()
+
             return True, ''
         except Exception as e:
             return False, str(e)
 
     async def c_forcereload(self, message, args):
+        """`!forcereload` - save and load josespeak module"""
         ok = await self.ext_unload()
         if not ok[1]:
             await self.say('ext_unload :warning: ' % ok[2])
 
         ok = await self.ext_load()
         if not ok[1]:
-            await self.say('ext_load:warning: ' % ok[2])
+            await self.say('ext_load :warning: ' % ok[2])
 
         await self.say("done")
 
@@ -218,7 +226,14 @@ class JoseSpeak(jcommon.Extension):
             if len(filtered_line) > 0:
                 # no issues, add it
                 self.logger.debug("add line %s", filtered_line)
+                print("add line %s", filtered_line)
                 self.database[message.server.id].append(filtered_line)
+
+        # save everyone
+        if (self.counter % 50) == 0:
+            await self.save_databases()
+
+        self.counter += 1
 
         # TODO: reload text generators every hour or so
 
