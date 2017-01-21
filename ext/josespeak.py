@@ -125,7 +125,13 @@ class JoseSpeak(jcommon.Extension):
 
         self.database = {}
         self.text_generators = {}
+        self.wlengths = {}
+        self.messages = {}
+        self.text_lengths = {}
+
         self.database_path = 'markov-database.json'
+        self.db_length_path = 'db/wordlength.json'
+        self.db_msg_path = 'db/messages.json'
 
     async def create_generators(self):
         for serverid in self.database:
@@ -133,15 +139,21 @@ class JoseSpeak(jcommon.Extension):
             self.logger.info("Generating Texter for %s, %d messages", serverid, len(messages))
             self.text_generators[serverid] = Texter(None, 1, '\n'.join(messages))
 
-    async def c_savedb(self):
+    async def c_savedb(self, message, args):
         json.dump(self.database, open(self.database_path, 'w'))
         await self.say(":floppy_disk: saved :floppy_disk:")
 
     async def ext_load(self):
         try:
             self.text_generators = {}
+            self.text_lengths = {}
+
+            # load things in files
             self.database = json.load(open(self.database_path, 'r'))
-            # load generators
+            self.wlengths = json.load(open(self.db_length_path, 'r'))
+            self.messages = json.load(open(self.db_msg_path, 'r'))
+
+            # make generators
             await self.create_generators()
             return True, ''
         except Exception as e:
@@ -169,6 +181,13 @@ class JoseSpeak(jcommon.Extension):
         # filter message before adding
         filtered_msg = jcommon.speak_filter(message.content)
 
+        # get word count
+        self.wlengths[message.server.id] += len(filtered_msg.split())
+        self.messages[message.server.id] += 1
+
+        # recalc
+        self.text_lengths[message.server.id] = self.wlengths[message.server.id] / self.messages[message.server.id]
+
         for line in filtered_msg.split('\n'):
             # append every line to the database
             # filter lines before adding
@@ -185,10 +204,12 @@ class JoseSpeak(jcommon.Extension):
             if message.server.id in self.text_generators:
                 self.current = message
                 await self.client.send_typing(message.channel)
-                await self.speak(self.text_generators[message.server.id])
 
-    async def speak(self, texter):
-        res = await texter.gen_sentence(1, 50)
+                length = self.text_lengths[message.server.id]
+                await self.speak(self.text_generators[message.server.id], length)
+
+    async def speak(self, texter, length_words):
+        res = await texter.gen_sentence(1, length_words)
         if jcommon.DEMON_MODE:
             res = res[::-1]
         elif jcommon.PARABENS_MODE:
@@ -196,16 +217,28 @@ class JoseSpeak(jcommon.Extension):
         await self.say(res)
 
     async def c_falar(self, message, args):
-        """`!falar` - josé fala"""
+        """`!falar wordlength` - josé fala"""
+        if len(args) < 1:
+            await self.say(self.c_sfalar.__doc__, int(args[1]))
+            return
+
         await self.speak(self.cult_generator)
 
     async def c_sfalar(self, message, args):
-        """`!sfalar` - falar usando textos do seu servidor atual"""
-        await self.speak(self.text_generators[message.server.id])
+        """`!sfalar wordlength` - falar usando textos do seu servidor atual"""
+        if len(args) < 1:
+            await self.say(self.c_sfalar.__doc__)
+            return
+
+        await self.speak(self.text_generators[message.server.id], int(args[1]))
 
     async def c_gfalar(self, message, args):
-        """`!gfalar` - falar usando o texto global"""
-        await self.speak(self.global_generator)
+        """`!gfalar wordlength` - falar usando o texto global"""
+        if len(args) < 1:
+            await self.say(self.c_sfalar.__doc__)
+            return
+
+        await self.speak(self.global_generator, int(args[1]))
 
     async def c_josetxt(self, message, args):
         '''`!josetxt` - Mostra a quantidade de linhas, palavras e bytes no jose-data.txt'''
