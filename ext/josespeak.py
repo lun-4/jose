@@ -239,6 +239,10 @@ class JoseSpeak(jcommon.Extension):
             await self.say(self.c_sfalar.__doc__, int(args[1]))
             return
 
+        if int(args[1]) > 100:
+            await self.say("Nope :tm:")
+            return
+
         await self.speak(self.cult_generator)
 
     async def c_sfalar(self, message, args):
@@ -247,12 +251,20 @@ class JoseSpeak(jcommon.Extension):
             await self.say(self.c_sfalar.__doc__)
             return
 
+        if int(args[1]) > 100:
+            await self.say("Nope :tm:")
+            return
+
         await self.speak(self.text_generators[message.server.id], int(args[1]))
 
     async def c_gfalar(self, message, args):
         """`!gfalar wordlength` - falar usando o texto global"""
         if len(args) < 1:
             await self.say(self.c_sfalar.__doc__)
+            return
+
+        if int(args[1]) > 100:
+            await self.say("Nope :tm:")
             return
 
         await self.speak(self.global_generator, int(args[1]))
