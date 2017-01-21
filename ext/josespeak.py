@@ -123,6 +123,8 @@ class JoseSpeak(jcommon.Extension):
         self.cult_generator = Texter('jose-data.txt', 1)
         self.global_generator = Texter('zelao.txt', 1)
 
+        self.flag = False
+
         self.database = {}
         self.text_generators = {}
         self.wlengths = {}
@@ -141,7 +143,13 @@ class JoseSpeak(jcommon.Extension):
 
     async def c_savedb(self, message, args):
         json.dump(self.database, open(self.database_path, 'w'))
-        await self.say(":floppy_disk: saved :floppy_disk:")
+        json.dump(self.wlengths, open(self.db_length_path, 'w'))
+        json.dump(self.messages, open(self.db_msg_path, 'w'))
+        await self.say(":floppy_disk: saved database :floppy_disk:")
+
+    async def c_speaktrigger(self, message, args):
+        self.flag = True
+        await self.e_on_message(message)
 
     async def ext_load(self):
         try:
@@ -162,6 +170,8 @@ class JoseSpeak(jcommon.Extension):
     async def ext_unload(self):
         try:
             json.dump(self.database, open(self.database_path, 'w'))
+            json.dump(self.wlengths, open(self.db_length_path, 'w'))
+            json.dump(self.messages, open(self.db_msg_path, 'w'))
             del self.text_generators
             return True, ''
         except Exception as e:
@@ -185,7 +195,7 @@ class JoseSpeak(jcommon.Extension):
             self.wlengths[message.server.id] = 5
 
         if message.server.id not in self.messages:
-            self.wlengths[message.server.id] = 1 # the message being received now
+            self.messages[message.server.id] = 1 # the message being received now
 
         # get word count
         self.wlengths[message.server.id] += len(filtered_msg.split())
@@ -205,7 +215,8 @@ class JoseSpeak(jcommon.Extension):
 
         # TODO: reload text generators every hour or so
 
-        if random.random() < 0.03:
+        if random.random() < 0.03 or self.flag:
+            self.flag = False
             # ensure the server already has its database
             if message.server.id in self.text_generators:
                 self.current = message
