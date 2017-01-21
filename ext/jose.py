@@ -39,6 +39,18 @@ class JoseBot(jcommon.Extension):
         self.command_lock = False
         self.queue = []
 
+    async def unload_all(self):
+        # unload all modules
+        for modname in self.modules:
+            module = self.modules[modname]
+            ok = await module['inst'].ext_unload()
+            if not ok[0]:
+                self.logger.error("Error happened when ext_unload(%s): %s", n, ok[1])
+            else:
+                self.logger.info("Unloaded %s", modname)
+
+        logger.info("Unloaded all modules")
+
     def load_gext(self, inst, n):
         self.logger.info("Loading gext %s", n)
         methods = (method for method in dir(inst) if callable(getattr(inst, method)))
@@ -176,11 +188,13 @@ class JoseBot(jcommon.Extension):
 
     async def turnoff(self):
         await jcoin.JoseCoin(self.client).josecoin_save(self.current, True)
+        await self.unload_all()
         await self.client.logout()
         sys.exit(0)
 
     async def reboot(self):
         await jcoin.JoseCoin(self.client).josecoin_save(self.current, True)
+        await self.unload_all()
         await self.client.logout()
         os.system("./reload_jose.sh &")
         sys.exit(0)
