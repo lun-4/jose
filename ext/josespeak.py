@@ -173,6 +173,7 @@ class JoseSpeak(jcommon.Extension):
             json.dump(self.wlengths, open(self.db_length_path, 'w'))
             json.dump(self.messages, open(self.db_msg_path, 'w'))
             del self.text_generators
+            self.text_generators = {}
             return True, ''
         except Exception as e:
             return False, str(e)
