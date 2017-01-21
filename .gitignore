@@ -109,3 +109,5 @@ ext/*.db
 zelao.txt
 database.db
 markov-database.json
+db/messages.json
+db/wordlength.json
