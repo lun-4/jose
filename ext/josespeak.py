@@ -136,6 +136,12 @@ class JoseSpeak(jcommon.Extension):
         self.db_length_path = 'db/wordlength.json'
         self.db_msg_path = 'db/messages.json'
 
+        # load timers in async context
+        asyncio.async(self._load_timer(), loop=self.loop)
+
+    async def _load_timer(self):
+        await self.textertimer()
+
     async def create_generators(self):
         for serverid in self.database:
             messages = self.database[serverid]
@@ -184,6 +190,14 @@ class JoseSpeak(jcommon.Extension):
             return True, ''
         except Exception as e:
             return False, str(e)
+
+    async def textertimer(self):
+        while True:
+            # wait 15 minutes to generate texters
+            await asyncio.sleep(900)
+
+            # should work
+            await self.create_generators()
 
     async def c_forcereload(self, message, args):
         """`!forcereload` - save and load josespeak module"""
