@@ -363,6 +363,9 @@ def speak_filter(message):
             if i+1 < len(message):
                 if message[i+1] == ';':
                     i += len(message)
+        elif char == '!' and i == 0:
+            #jose command, skip it
+            i += len(message)
         else:
             filtered_message += char
         i += 1

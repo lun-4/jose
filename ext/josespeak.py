@@ -162,9 +162,16 @@ class JoseSpeak(jcommon.Extension):
             self.logger.info("New server in database: %s", message.server.id)
             self.database[message.server.id] = []
 
-        for line in message.content.split('\n'):
+        # filter message before adding
+        filtered_msg = jcommon.speak_filter(message.content)
+
+        for line in filtered_msg.split('\n'):
             # append every line to the database
-            self.database[message.server.id].append(line)
+            # filter lines before adding
+            filtered_line = jcommon.speak_filter(line)
+            if len(filtered_line) > 0:
+                # no issues, add it
+                self.database[message.server.id].append(filtered_line)
 
         # TODO: reload text generators every hour or so
 
