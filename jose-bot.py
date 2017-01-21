@@ -565,6 +565,16 @@ async def main_task():
     logger.info("José Starting")
     await client.start(jconfig.discord_token)
 
+async def unload_all():
+    # unload all modules
+    for modname in jose.modules:
+        module = jose.modules[modname]
+        ok = await module['inst'].ext_unload()
+        if not ok[0]:
+            self.logger.error("Error happened when ext_unload(%s): %s", n, ok[1])
+
+    logger.info("Unloaded")
+
 loop = asyncio.get_event_loop()
 try:
     asyncio.ensure_future(command_loop())
@@ -577,12 +587,5 @@ finally:
     loop.close()
 
 logger.info("Exiting")
-
-# unload all modules
-for modname in jose.modules:
-    module = jose.modules[modname]
-    ok = await module['inst'].ext_unload()
-    if not ok[0]:
-        self.logger.error("Error happened when ext_unload(%s): %s", n, ok[1])
-
+loop.run_until_complete(unload_all())
 logger.info("Exited")
