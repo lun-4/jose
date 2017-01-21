@@ -587,5 +587,7 @@ finally:
     loop.close()
 
 logger.info("Exiting")
+exitloop = asyncio.get_event_loop()
 loop.run_until_complete(unload_all())
+exitloop.close()
 logger.info("Exited")
