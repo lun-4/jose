@@ -188,12 +188,12 @@ class JoseSpeak(jcommon.Extension):
     async def c_forcereload(self, message, args):
         """`!forcereload` - save and load josespeak module"""
         ok = await self.ext_unload()
-        if not ok[1]:
-            await self.say('ext_unload :warning: ' % ok[2])
+        if not ok[0]:
+            await self.say('ext_unload :warning: ' % ok[1])
 
         ok = await self.ext_load()
-        if not ok[1]:
-            await self.say('ext_load :warning: ' % ok[2])
+        if not ok[0]:
+            await self.say('ext_load :warning: ' % ok[1])
 
         await self.say("done")
 
