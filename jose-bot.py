@@ -526,6 +526,7 @@ def one_message(message):
 
                 author_id = str(message.author.id)
                 amount = random.choice(JC_REWARDS)
+                acc_to = jcoin.get(author_id)[1]
 
                 if amount == 0:
                     yield from jose.say("0JC > %s" % (acc_to['name']))
@@ -533,7 +534,6 @@ def one_message(message):
                     res = jcoin.transfer(jcoin.jose_id, author_id, amount, jcoin.LEDGER_PATH)
                     yield from josecoin_save(message, False)
                     if res[0]:
-                        acc_to = jcoin.get(author_id)[1]
                         emoji_res = yield from random_emoji(3)
                         yield from jose.say('%s %.2fJC > %s' % (emoji_res, amount, acc_to['name']))
                     else:
