@@ -577,3 +577,12 @@ finally:
     loop.close()
 
 logger.info("Exiting")
+
+# unload all modules
+for modname in jose.modules:
+    module = jose.modules[modname]
+    ok = await module['inst'].ext_unload()
+    if not ok[0]:
+        self.logger.error("Error happened when ext_unload(%s): %s", n, ok[1])
+
+logger.info("Exited")
