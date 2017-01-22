@@ -2,6 +2,7 @@ import discord
 import asyncio
 import time
 import base64
+import re
 from xml.etree import ElementTree
 
 import randemoji as emoji
@@ -348,6 +349,12 @@ async def parse_id(data, message):
 
 def speak_filter(message):
     filtered_message = ""
+
+    # remove URLs
+    filtered_message = re.sub(r'^https?:\/\/.*[\r\n]*', '', message, flags=re.MULTILINE)
+
+    # remove numbers
+    filtered_message = re.sub(r'\d+', '', filtered_message)
 
     i = 0
     while i < len(message):
