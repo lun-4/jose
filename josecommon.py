@@ -351,10 +351,10 @@ def speak_filter(message):
     filtered_message = ""
 
     # remove URLs
-    filtered_message = re.sub(r'^https?:\/\/.*[\r\n]*', '', message, flags=re.MULTILINE)
+    message = re.sub(r'^https?:\/\/.*[\r\n]*', '', message, flags=re.MULTILINE)
 
     # remove numbers
-    filtered_message = re.sub(r'\d+', '', filtered_message)
+    message = re.sub(r'\d+', '', message)
 
     i = 0
     while i < len(message):

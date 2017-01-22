@@ -45,11 +45,14 @@ class JoseBot(jcommon.Extension):
             module = self.modules[modname]
             # if ext_unload exists
             if getattr(module['inst'], 'ext_unload', False):
-                ok = await module['inst'].ext_unload()
-                if not ok[0]:
-                    self.logger.error("Error happened when ext_unload(%s): %s", n, ok[1])
-                else:
-                    self.logger.info("Unloaded %s", modname)
+                try:
+                    ok = await module['inst'].ext_unload()
+                    if not ok[0]:
+                        self.logger.error("Error happened when ext_unload(%s): %s", modname, ok[1])
+                    else:
+                        self.logger.info("Unloaded %s", modname)
+                except Exception as e:
+                    self.logger.warn("Almost unloaded %s: %s", modname, repr(e))
             else:
                 self.logger.info("%s doesn't have ext_unload", modname)
 
