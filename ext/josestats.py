@@ -85,7 +85,7 @@ class JoseStats(jaux.Auxiliar):
         sizes = await self.db_fsizes()
         for db in sizes:
             val = sizes[db]
-            sizes[db] = '%.3f' % val/1024
+            sizes[db] = '%.3f' % (val / 1024)
         res = "\n".join(": ".join(_) + "KB" for _ in sizes.items())
         await self.say(self.codeblock("", res))
 
