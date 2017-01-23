@@ -454,12 +454,15 @@ class WaitingQueue:
         return self.queue.pop()
 
 def parse_command(message):
-    if message.content[0] == '!':
-        k = message.content.find(" ")
-        command = message.content[1:k]
+    if not isinstance(message, str):
+        message = message.content
+
+    if message[0] == '!':
+        k = message.find(" ")
+        command = message[1:k]
         if k == -1:
-            command = message.content[1:]
-        args = message.content.split(' ')
+            command = message[1:]
+        args = message.split(' ')
         method = "c_%s" % command
         return commands, args, method
     else:
