@@ -38,10 +38,10 @@ class JoseStats(jaux.Auxiliar):
 
     async def db_fsizes(self):
         return {
-            'markovdb': str(os.path.getsize(jcommon.MARKOV_DB_PATH)),
-            'wlength': str(os.path.getsize(jcommon.MARKOV_LENGTH_PATH)),
-            'messages': str(os.path.getsize(jcommon.MARKOV_MESSAGES_PATH)),
-            'itself': str(os.path.getsize(jcommon.STAT_DATABASE_PATH)),
+            'markovdb': str(os.path.getsize(jcommon.MARKOV_DB_PATH)/1024),
+            'wlength': str(os.path.getsize(jcommon.MARKOV_LENGTH_PATH)/1024),
+            'messages': str(os.path.getsize(jcommon.MARKOV_MESSAGES_PATH)/1024),
+            'itself': str(os.path.getsize(jcommon.STAT_DATABASE_PATH)/1024),
         }
 
     async def e_any_message(self, message):
@@ -83,7 +83,7 @@ class JoseStats(jaux.Auxiliar):
     async def c_querysiz(self, message, args):
         '''`!querysiz` - Mostra os tamanhos dos bancos de dados do josé, em kilobytes(KB)'''
         sizes = await self.db_fsizes()
-        res = "\n".join(": ".join(_) for _ in sizes.items())
+        res = "\n".join(": ".join(_) + "KB" for _ in sizes.items())
         await self.say(self.codeblock("", res))
 
     async def c_query(self, message, args):
