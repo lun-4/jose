@@ -259,7 +259,12 @@ class JoseMemes(jcommon.Extension):
 
             probables = [key for key in self.memes if term in key.lower()]
             if len(probables) > 0:
-                await self.say("Resultados: %s" % ', '.join(probables))
+                to_send = "Resultados: %s" % ', '.join(probables)
+                # check length of message
+                if len(to_send) > 1900:
+                    await self.say(":bus: Resultados muito grandes :bus:")
+                else:
+                    await self.say(to_send)
             else:
                 await self.say("%r: Nenhum resultado encontrado" % term)
         elif command == 'rename':
