@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+
+import discord
+import asyncio
+import sys
+import json
+
+sys.path.append("..")
+import jauxiliar as jaux
+import joseerror as je
+
+class JoseStats(jaux.Auxiliar):
+    def __init__(self, cl):
+        jaux.Auxiliar.__init__(self, cl)
+        self.statistics = {}
+        self.db_stats_path = 'db/stats.json'
+        self.counter = 0
+
+    async def savedb(self):
+        json.dump(self.statistics, open(self.db_stats_path, 'w'))
+
+    async def ext_load(self):
+        try:
+            self.statistics = {}
+            self.database = json.load(open(self.db_stats_path, 'r'))
+            return True, ''
+        except Exception as e:
+            return False, str(e)
+
+    async def ext_unload(self):
+        try:
+            await self.savedb()
+            return True, ''
+        except Exception as e:
+            return False, str(e)
+
+    async def e_any_message(self, message):
+        serverid = message.server.id
+        authorid = message.author.id
+        channel = message.channel.id
+
+        if serverid not in self.statistics:
+            self.statistics[serverid] = {
+                "commands": {},
+                "messages": {}
+            }
+
+        serverdb = self.statistics[serverid]
+
+        if self.counter % 50 == 0:
+            await self.savedb()
+
+        command, args, method = jcommon.parse_command(message.content)
+
+        if authorid not in serverdb['messages']:
+            serverdb['messages'][authorid] = [0, 0]
+
+        if not command:
+            # normal message, calculate average wordlength for this user
+            # serverdb['messages'][authorid][0] => number of messages
+            # serverdb['messages'][authorid][1] => combined wordlength of all messages
+            serverdb['messages'][authorid][0] += 1
+            serverdb['messages'][authorid][1] += len(message.content.split())
+        else:
+            # command
+            if command not in serverdb['commands']:
+                serverdb['commands'][command] = 0
+
+            serverdb['commands'][command] += 1
+
+        self.counter += 1
+
+    async def c_query(self, message, args):
+        pass

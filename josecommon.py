@@ -29,7 +29,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 
-JOSE_VERSION = '1.2.2'
+JOSE_VERSION = '1.2.3'
 
 APP_CLIENT_ID = 'ID DO JOSE AQUI'
 OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=103988231' % APP_CLIENT_ID
@@ -447,3 +447,15 @@ class WaitingQueue:
                 pass
         self.length -= 1
         return self.queue.pop()
+
+def parse_command(message):
+    if message.content[0] == '!':
+        k = message.content.find(" ")
+        command = message.content[1:k]
+        if k == -1:
+            command = message.content[1:]
+        args = message.content.split(' ')
+        method = "c_%s" % command
+        return commands, args, method
+    else:
+        return False, None, None

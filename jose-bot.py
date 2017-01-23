@@ -266,7 +266,7 @@ def load_module(n, n_cl):
 
 load_module('josensfw', 'JoseNSFW')
 load_module('josememes', 'JoseMemes')
-load_module('josemusic', 'JoseMusic')
+# load_module('josemusic', 'JoseMusic')
 load_module('josespeak', 'JoseSpeak')
 load_module('josegambling', 'JoseGambling')
 # load_module('josegames', 'JoseGames')
@@ -275,6 +275,7 @@ load_module('josedatamosh', 'JoseDatamosh')
 load_module('joseibc', 'JoseIBC')
 load_module('josextra', 'joseXtra')
 load_module('joseartif', 'JoseArtif')
+load_module('josestats', 'JoseStats')
 
 help_helptext = """
 `!help` - achar ajuda para outros comandos

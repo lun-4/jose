@@ -75,7 +75,7 @@ class joseXtra(jaux.Auxiliar):
         msg = await self.client.send_message(message.channel, "Pong!")
 
         discordapp_ping = subprocess.Popen(
-            ["ping", "-c", "1", "discordapp.com"],
+            ["ping", "-c", "3", "discordapp.com"],
             stdout = subprocess.PIPE,
             stderr = subprocess.PIPE
         )
@@ -89,7 +89,7 @@ class joseXtra(jaux.Auxiliar):
 """ % ("discordapp.com", d_rtt[0], d_rtt[1], d_rtt[2]))
 
         google_ping = subprocess.Popen(
-            ["ping", "-c", "1", "google.com"],
+            ["ping", "-c", "3", "google.com"],
             stdout = subprocess.PIPE,
             stderr = subprocess.PIPE
         )
