@@ -464,6 +464,6 @@ def parse_command(message):
             command = message[1:]
         args = message.split(' ')
         method = "c_%s" % command
-        return commands, args, method
+        return command, args, method
     else:
         return False, None, None
