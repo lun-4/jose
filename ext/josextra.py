@@ -100,3 +100,6 @@ class joseXtra(jaux.Auxiliar):
         edit2 = await self.client.edit_message(edit1, edit1.content + """
 %s : min %sms avg %sms max %sms
 """ % ("google.com", g_rtt[0], g_rtt[1], g_rtt[2]))
+
+    async def c_info(self, message, args):
+        await self.say("""José v%s, feito por Luna Mendes\nhttps://github.com/lkmnds/jose""" % (jcommon.JOSE_VERSION))
