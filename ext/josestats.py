@@ -84,7 +84,7 @@ class JoseStats(jaux.Auxiliar):
         '''`!querysiz` - Mostra os tamanhos dos bancos de dados do josé, em kilobytes(KB)'''
         sizes = await self.db_fsizes()
         for db in sizes:
-            sizes[db] = '%.3f' % db/1024
+            sizes[db] = '%.3f' % sizes[db]/1024
         res = "\n".join(": ".join(_) + "KB" for _ in sizes.items())
         await self.say(self.codeblock("", res))
 
