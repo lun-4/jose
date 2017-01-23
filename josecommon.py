@@ -392,7 +392,11 @@ class Extension:
     async def say(self, msg, channel=None):
         if channel is None:
             channel = self.current.channel
-        await self.client.send_message(channel, msg)
+
+        if len(msg) > 2000:
+            await self.client.send_message(channel, ":elephant: Mensagem muito grande :elephant:")
+        else:
+            await self.client.send_message(channel, msg)
 
     async def debug(self, msg, flag=True):
         await jose_debug(self.current, msg, flag)

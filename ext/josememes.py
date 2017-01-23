@@ -100,7 +100,7 @@ class JoseMemes(jcommon.Extension):
         *alias*: !m
 
         Subcomandos:
-        `!meme add <trigger>;<meme>` - toda vez que alguém mandar um `!meme get <trigger>`, josé falará `<meme>`
+        `!meme add <trigger>;<meme>` - toda vez que alguém mandar um `!meme get <trigger>`, josé falará `<meme>`(limite de <trigger> é 96 chars)
         `!meme get <trigger>` - josé falará o que estiver programado para falar de acordo com `<trigger>`
         `!meme search <termo>` - procura o banco de dados de memes por um meme específico
         `!meme rm <meme>` - remove um meme
@@ -108,7 +108,7 @@ class JoseMemes(jcommon.Extension):
         `!meme owner <meme>` - mostra quem "criou" o `<meme>`
         `!meme count` - mostra a quantidade de memes
         `!meme stat` - estatísticas sobre o uso dos memes
-        `!meme istat <meme>` - estatísticas sobre o uso de um meme específico
+        `!meme istat <meme>` - estatísticas individuais sobre um meme
         `!meme page <página>` - mostra a página tal de todos os memes disponíveis(inicia de 1, não do 0)
         `!meme see @user <página>` - mostra todos os memes que a @pessoa fez(`página` inicia de 0, não de 1)
         `!meme check` - checa o banco de dados de memes
@@ -139,6 +139,7 @@ class JoseMemes(jcommon.Extension):
 
             for pat in self.patterns:
                 if re.search(pat, url):
+                    # if facebook, upload to Discord
                     await self.say("Detectado um link do facebook, tratando...")
 
                     with aiohttp.ClientSession() as session:
@@ -156,11 +157,14 @@ class JoseMemes(jcommon.Extension):
                         url = msg.attachments[0]['url']
                         break
 
+            # create meme in database
             self.memes[meme] = {
                 'owner': message.author.id,
                 'data': url,
                 'uses': 0,
             }
+
+            # save it because of my sanity
             await self.save_memes()
             await self.say("%s: meme adicionado!" % meme)
             return
@@ -257,12 +261,13 @@ class JoseMemes(jcommon.Extension):
                 await self.say("Pesquisas vazias não são permitidas")
                 return
 
+            # better than google
             probables = [key for key in self.memes if term in key.lower()]
             if len(probables) > 0:
                 to_send = "Resultados: %s" % ', '.join(probables)
                 # check length of message
-                if len(to_send) > 1900:
-                    await self.say(":bus: Resultados muito grandes :bus:")
+                if len(to_send) > 1995: # 1 9 9 5
+                    await self.say(":elephant: Resultados muito grandes :elephant:")
                 else:
                     await self.say(to_send)
             else:
@@ -313,9 +318,11 @@ class JoseMemes(jcommon.Extension):
             inconsistency = False
             i = 1
             for k in copy:
+                inconsistency_report = ''
                 if 'uses' not in copy[k]:
-                    await self.say('INCONSISTENCY: %s' % k)
+                    inconsistency_report += "%s, " % k
                     inconsistency = True
+                await self.say("`%s`" % inconsistency_report)
 
             if inconsistency:
                 await self.say("INCONSISTENCY entries detected.")

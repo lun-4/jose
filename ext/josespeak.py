@@ -83,7 +83,10 @@ class Texter:
         index = random.random()
         # Shorten prevList until it's in mapping
         while toHashKey(prevList) not in self.mapping:
-            prevList.pop(0)
+            if len(prevList) == 0:
+                pass
+            else:
+                prevList.pop(0)
 
         # Get a random word from the mapping, given prevList
         for k, v in self.mapping[toHashKey(prevList)].items():
