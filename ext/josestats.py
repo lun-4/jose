@@ -38,10 +38,10 @@ class JoseStats(jaux.Auxiliar):
 
     async def db_fsizes(self):
         return {
-            'markovdb': os.path.getsize(jcommon.MARKOV_DB_PATH),
-            'wlength': os.path.getsize(jcommon.MARKOV_LENGTH_PATH),
-            'messages': os.path.getsize(jcommon.MARKOV_MESSAGES_PATH),
-            'itself': os.path.getsize(jcommon.STAT_DATABASE_PATH),
+            'markovdb': str(os.path.getsize(jcommon.MARKOV_DB_PATH)),
+            'wlength': str(os.path.getsize(jcommon.MARKOV_LENGTH_PATH)),
+            'messages': str(os.path.getsize(jcommon.MARKOV_MESSAGES_PATH)),
+            'itself': str(os.path.getsize(jcommon.STAT_DATABASE_PATH)),
         }
 
     async def e_any_message(self, message):
