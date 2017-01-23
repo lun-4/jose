@@ -283,7 +283,14 @@ Exemplos: `!help help`, `!help pstatus`, `!help ap`
 """
 
 event_table = {
+    # any message that is not a command
     "on_message": [],
+
+    # any message, including commands
+    "any_message": [],
+
+    # TODO: called on discord.client.logout
+    "logout": [],
 }
 
 for modname in jose.modules:
@@ -365,6 +372,10 @@ def one_message(message):
     st = time.time()
 
     yield from jose.recv(message) # at least
+
+    # any_message event
+    for handler in event_table['any_message']:
+        yield from handler(message)
 
     # get command and push it to jose
     if message.content[0] == '!':
