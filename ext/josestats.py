@@ -11,6 +11,38 @@ import jauxiliar as jaux
 import joseerror as je
 import josecommon as jcommon
 
+QUERIES = {
+    "topmsg": "loc[msg].sort"
+    "gltopcmd": "db[cmd].sort"
+}
+
+DEFAULT_STATS_FILE = '''{
+    "gl_queries": 0,
+    "gl_messages": 0,
+    "gl_commands": {},
+}'''
+
+'''
+    database format, json
+    {
+        "gl_queries": number of queries,
+        "gl_commands": {
+            "!savedb": 2
+        }
+        "gl_messages": number of messages
+        "serverID1": {
+            "commands": {
+                '!m stat': 30,
+                '!top10': 10
+            },
+            "messages": {
+                "authorid1": [number of messages, total wordlength of all messages],
+                "authorid2": [number of messages, total wordlength of all messages]
+            }
+        }
+    }
+'''
+
 class JoseStats(jaux.Auxiliar):
     def __init__(self, cl):
         jaux.Auxiliar.__init__(self, cl)
@@ -19,12 +51,30 @@ class JoseStats(jaux.Auxiliar):
         self.counter = 0
 
     async def savedb(self):
+        self.logger.info("Saving statistics database")
         json.dump(self.statistics, open(self.db_stats_path, 'w'))
 
     async def ext_load(self):
         try:
             self.statistics = {}
+            if not os.path.isfile(self.db_stats_path):
+                # recreate
+                with open(self.db_stats_path, 'w') as f:
+                    f.write(DEFAULT_STATS_FILE)
+
             self.database = json.load(open(self.db_stats_path, 'r'))
+
+            # make sure i'm making sane things
+            # also make the checks in ext_load so it doesn't try the cpu
+            if 'gl_messages' not in self.statistics:
+                self.statistics['gl_messages'] = 0
+
+            if 'gl_commands' not in self.statistics:
+                self.statistics['gl_commands'] = {}
+
+            if 'gl_queries' not in self.statistics:
+                self.statistics['gl_queries'] = 0
+
             return True, ''
         except Exception as e:
             return False, str(e)
@@ -50,6 +100,7 @@ class JoseStats(jaux.Auxiliar):
         channel = message.channel.id
 
         if serverid not in self.statistics:
+            self.logger.info("New server in statistics: %s", serverid)
             self.statistics[serverid] = {
                 "commands": {},
                 "messages": {}
@@ -71,12 +122,17 @@ class JoseStats(jaux.Auxiliar):
             # serverdb['messages'][authorid][1] => combined wordlength of all messages
             serverdb['messages'][authorid][0] += 1
             serverdb['messages'][authorid][1] += len(message.content.split())
+            self.statistics['gl_messages'] += 1
         else:
             # command
             if command not in serverdb['commands']:
                 serverdb['commands'][command] = 0
 
+            if command not in serverdb['gl_commands']:
+                serverdb['gl_commands'][command] = 0
+
             serverdb['commands'][command] += 1
+            self.statistics['gl_commands'][command] += 1
 
         self.counter += 1
 
@@ -89,16 +145,25 @@ class JoseStats(jaux.Auxiliar):
         res = "\n".join(": ".join(_) + "KB" for _ in sizes.items())
         await self.say(self.codeblock("", res))
 
-    async def c_query(self, message, args):
-        '''`!query string` - Fazer pedidos ao banco de dados de estatísticas do josé'''
+    async def c_rawquery(self, message, args):
+        '''`!rawquery string` - Fazer pedidos ao banco de dados de estatísticas do josé'''
         query_string = ' '.join(args[1:])
         if True:
             await self.say("not available for now")
             return
 
         # TODO: make_query
-        response = await self.make_query(query_string)
+        response = await self.make_raw_query(query_string)
         if len(response) > 1999: # 1 9 9 9
             await self.say(":elephant: Resultado muito grande :elephant:")
         else:
             await self.say(self.codeblock("", reponse))
+
+    async def c_query(self, message, args):
+        '''`!query data` - Fazer pedidos ao banco de dados de estatísticas do josé
+A lista de possíveis dados está em https://github.com/lkmnds/jose/blob/master/doc/queries.md'''
+        # use the database and make raw queries
+
+    async def c_session(self, message, args):
+        '''`!session` - Dados interessantes sobre essa sessão'''
+        # uptime etc
