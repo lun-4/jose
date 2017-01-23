@@ -4,16 +4,18 @@ import discord
 import asyncio
 import sys
 import json
+import os
 
 sys.path.append("..")
 import jauxiliar as jaux
 import joseerror as je
+import josecommon as jcommon
 
 class JoseStats(jaux.Auxiliar):
     def __init__(self, cl):
         jaux.Auxiliar.__init__(self, cl)
         self.statistics = {}
-        self.db_stats_path = 'db/stats.json'
+        self.db_stats_path = jcommon.STAT_DATABASE_PATH
         self.counter = 0
 
     async def savedb(self):
@@ -33,6 +35,14 @@ class JoseStats(jaux.Auxiliar):
             return True, ''
         except Exception as e:
             return False, str(e)
+
+    async def db_fsizes(self):
+        return {
+            'markovdb': os.path.getsize(jcommon.MARKOV_DB_PATH),
+            'wlength': os.path.getsize(jcommon.MARKOV_LENGTH_PATH),
+            'messages': os.path.getsize(jcommon.MARKOV_MESSAGES_PATH),
+            'itself': os.path.getsize(jcommon.STAT_DATABASE_PATH),
+        }
 
     async def e_any_message(self, message):
         serverid = message.server.id
@@ -70,5 +80,22 @@ class JoseStats(jaux.Auxiliar):
 
         self.counter += 1
 
+    async def c_querysiz(self, message, args):
+        '''`!querysiz` - Mostra os tamanhos dos bancos de dados do josé, em kilobytes(KB)'''
+        sizes = await self.db_fsizes()
+        res = "\n".join(": ".join(_) for _ in sizes.items())
+        await self.say(self.codeblock("", res))
+
     async def c_query(self, message, args):
-        pass
+        '''`!query string` - Fazer pedidos ao banco de dados de estatísticas do josé'''
+        query_string = ' '.join(args[1:])
+        if True:
+            await self.say("not available for now")
+            return
+
+        # TODO: make_query
+        response = await self.make_query(query_string)
+        if len(response) > 1999: # 1 9 9 9
+            await self.say(":elephant: Resultado muito grande :elephant:")
+        else:
+            await self.say(self.codeblock("", reponse))

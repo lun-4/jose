@@ -135,9 +135,9 @@ class JoseSpeak(jcommon.Extension):
         self.text_lengths = {}
         self.counter = 0
 
-        self.database_path = 'markov-database.json'
-        self.db_length_path = 'db/wordlength.json'
-        self.db_msg_path = 'db/messages.json'
+        self.database_path = jcommon.MARKOV_DB_PATH
+        self.db_length_path = jcommon.MARKOV_LENGTH_PATH
+        self.db_msg_path = MARKOV_MESSAGES_PATH
 
         # load timers in async context
         asyncio.async(self._load_timer(), loop=self.loop)

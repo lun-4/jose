@@ -31,6 +31,11 @@ logger.addHandler(handler)
 
 JOSE_VERSION = '1.2.3'
 
+MARKOV_DB_PATH = 'markov-database.json'
+MARKOV_LENGTH_PATH = 'db/wordlength.json'
+MARKOV_MESSAGES_PATH = 'db/messages.json'
+STAT_DATABASE_PATH = 'db/stats.json'
+
 APP_CLIENT_ID = 'ID DO JOSE AQUI'
 OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=103988231' % APP_CLIENT_ID
 
@@ -427,7 +432,7 @@ class Extension:
         return "```%s\n%s```" % (lang, string)
 
     def noasync(self, func, args):
-        asyncio.async(func(*args), loop=self.loop)
+        asyncio.ensure_future(func(*args), loop=self.loop)
 
     def is_owner(self):
         return self.current.id in ADMIN_IDS
