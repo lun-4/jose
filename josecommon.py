@@ -356,6 +356,9 @@ def speak_filter(message):
     # remove numbers
     message = re.sub(r'\d+', '', message)
 
+    # remove discord mentions
+    message = re.sub(r'<@(\!)?\d+>', '', message)
+
     i = 0
     while i < len(message):
         char = message[i]
