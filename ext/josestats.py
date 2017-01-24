@@ -5,6 +5,7 @@ import asyncio
 import sys
 import json
 import os
+import operator
 
 sys.path.append("..")
 import jauxiliar as jaux
@@ -149,7 +150,7 @@ class JoseStats(jaux.Auxiliar):
         '''`!rawquery string` - Fazer pedidos ao banco de dados de estatísticas do josé'''
         query_string = ' '.join(args[1:])
         if True:
-            await self.say("not available for now")
+            await self.say("raw queries not available for now")
             return
 
         # TODO: make_query
@@ -162,7 +163,26 @@ class JoseStats(jaux.Auxiliar):
     async def c_query(self, message, args):
         '''`!query data` - Fazer pedidos ao banco de dados de estatísticas do josé
 A lista de possíveis dados está em https://github.com/lkmnds/jose/blob/master/doc/queries.md'''
-        # use the database and make raw queries
+
+        querytype = ' '.join(args[1:])
+        response = ''
+
+        self.database['gl_queries'] += 1
+
+        if querytype == 'summary':
+            response += "Total messages received: %d\n" % self.database['gl_messages']
+            response += "Total queries done: %d\n" % self.database['gl_queries']
+
+            # calculate most used command
+            sorted_gcmd = sorted(self.database['gl_commands'].items(), key=operator.itemgetter(1))
+            most_used_commmand = sorted_gcmd[-1][0]
+            muc_uses = sorted_gcmd[-1][1]
+            response += "Most used command: %s with %d uses\n" % (most_used_commmand, muc_uses)
+
+        if len(response) > 1999: # 1 9 9 9
+            await self.say(":elephant: Resultado muito grande :elephant:")
+        else:
+            await self.say(self.codeblock("", reponse))
 
     async def c_session(self, message, args):
         '''`!session` - Dados interessantes sobre essa sessão'''
