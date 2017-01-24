@@ -191,7 +191,13 @@ A lista de possíveis dados está em https://github.com/lkmnds/jose/blob/master/
         elif querytype == 'this':
             sid = message.server.id
             sdb = self.statistics[sid]
-            response += "Mensagens recebidas deste servidor: %d\n" % sdb['messages']
+
+            total_msg = 0
+            for authorid in sdb['messages']:
+                msguser, wlenuser = sdb['messages'][authorid]
+                total_msg += msguser
+
+            response += "Mensagens recebidas deste servidor: %d\n" % total_msg
             response += "Comandos recebidos deste servidor: %d\n" % sum(sdb['commands'].values())
 
             # calculate most used command
