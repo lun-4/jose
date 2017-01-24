@@ -173,6 +173,7 @@ A lista de possíveis dados está em https://github.com/lkmnds/jose/blob/master/
 
         if querytype == 'summary':
             response += "Mensagens recebidas: %d\n" % self.statistics['gl_messages']
+            response += "Comandos recebidos: %d\n" % sum(self.statistics['gl_commands'].values())
             response += "Pedidos recebidos(queries): %d\n" % self.statistics['gl_queries']
 
             # calculate most used command

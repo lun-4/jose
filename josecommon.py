@@ -356,7 +356,7 @@ def speak_filter(message):
     filtered_message = ""
 
     # remove URLs
-    message = re.sub(r'https?:\/\/([\/\?\w\.\&\;\=])+', '', message, flags=re.MULTILINE)
+    message = re.sub(r'https?:\/\/([\/\?\w\.\&\;\=\-])+', '', message, flags=re.MULTILINE)
 
     # remove numbers
     message = re.sub(r'\d+', '', message)
