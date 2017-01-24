@@ -190,8 +190,7 @@ A lista de possíveis dados está em https://github.com/lkmnds/jose/blob/master/
 
             total_msg = 0
             for authorid in sdb['messages']:
-                msguser, wlenuser = sdb['messages'][authorid]
-                total_msg += msguser
+                total_msg += sdb['messages'][authorid]
 
             response += "Mensagens recebidas deste servidor: %d\n" % total_msg
             response += "Comandos recebidos deste servidor: %d\n" % sum(sdb['commands'].values())
