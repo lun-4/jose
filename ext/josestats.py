@@ -138,7 +138,6 @@ class JoseStats(jaux.Auxiliar):
             self.statistics[serverid]['messages'][authorid] += 1
             self.statistics['gl_messages'] += 1
 
-        self.statistics[serverid] = serverdb
         self.counter += 1
 
     async def c_rawquery(self, message, args):

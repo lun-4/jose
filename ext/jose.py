@@ -167,12 +167,12 @@ class JoseBot(jcommon.Extension):
                 # normally loaded ext, can use !reload on it
                 mod_generator.append('ext:%s' % key)
             else:
-                # externally loaded ext, can reload
+                # externally loaded ext, can't reload
                 mod_generator.append('gext:%s' % key)
         await self.say("módulos carregados: %s" % (" ".join(mod_generator)))
 
     def says(self, msg):
-        # calls self.say but in an non-async way
+        # calls self.say but in an non-async context
         asyncio.ensure_future(self.say(msg), loop=self.loop)
 
     async def c_htjose(self, message, args):
