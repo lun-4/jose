@@ -67,7 +67,7 @@ class JoseStats(jaux.Auxiliar):
             self.statistics = json.load(open(self.db_stats_path, 'r'))
 
             # make sure i'm making sane things
-            # also make the checks in ext_load so it doesn't try the cpu
+            # also make the checks in ext_load so it doesn't fry the cpu
             if 'gl_messages' not in self.statistics:
                 self.statistics['gl_messages'] = 0
 
@@ -103,7 +103,6 @@ class JoseStats(jaux.Auxiliar):
     async def e_any_message(self, message):
         serverid = message.server.id
         authorid = message.author.id
-        channel = message.channel.id
 
         if serverid not in self.statistics:
             self.logger.info("New server in statistics: %s", serverid)
@@ -116,23 +115,15 @@ class JoseStats(jaux.Auxiliar):
         # probably that's what caused the "query delay until reload"
         serverdb = self.statistics[serverid]
 
+        if authorid not in serverdb['messages']:
+            self.statistics[serverid]['messages'][authorid] = 0
+
         if self.counter % 50 == 0:
             await self.savedb()
 
         command, args, method = jcommon.parse_command(message.content)
 
-        if authorid not in serverdb['messages']:
-            self.statistics[serverid]['messages'][authorid] = [0, 0]
-
-        if not command:
-            # normal message, calculate average wordlength for this user
-            # serverdb['messages'][authorid][0] => number of messages
-            # serverdb['messages'][authorid][1] => combined wordlength of all messages
-            self.statistics[serverid]['messages'][authorid][0] += 1
-            self.statistics[serverid]['messages'][authorid][1] += len(message.content.split())
-            self.statistics['gl_messages'] += 1
-        else:
-            # command
+        if command:
             if command not in serverdb['commands']:
                 self.statistics[serverid]['commands'][command] = 0
 
@@ -141,8 +132,13 @@ class JoseStats(jaux.Auxiliar):
 
             self.statistics[serverid]['commands'][command] += 1
             self.statistics['gl_commands'][command] += 1
+        else:
+            # normal message
+            # serverdb['messages'][authorid] => number of messages
+            self.statistics[serverid]['messages'][authorid] += 1
+            self.statistics['gl_messages'] += 1
 
-        #self.statistics[serverid] = serverdb
+        self.statistics[serverid] = serverdb
         self.counter += 1
 
     async def c_rawquery(self, message, args):
