@@ -64,7 +64,7 @@ class JoseStats(jaux.Auxiliar):
                 with open(self.db_stats_path, 'w') as f:
                     f.write(DEFAULT_STATS_FILE)
 
-            self.database = json.load(open(self.db_stats_path, 'r'))
+            self.statistics = json.load(open(self.db_stats_path, 'r'))
 
             # make sure i'm making sane things
             # also make the checks in ext_load so it doesn't try the cpu
@@ -169,14 +169,14 @@ A lista de possíveis dados está em https://github.com/lkmnds/jose/blob/master/
         querytype = ' '.join(args[1:])
         response = ''
 
-        self.database['gl_queries'] += 1
+        self.statistics['gl_queries'] += 1
 
         if querytype == 'summary':
-            response += "Mensagens recebidas: %d\n" % self.database['gl_messages']
-            response += "Pedidos recebidos(queries): %d\n" % self.database['gl_queries']
+            response += "Mensagens recebidas: %d\n" % self.statistics['gl_messages']
+            response += "Pedidos recebidos(queries): %d\n" % self.statistics['gl_queries']
 
             # calculate most used command
-            sorted_gcmd = sorted(self.database['gl_commands'].items(), key=operator.itemgetter(1))
+            sorted_gcmd = sorted(self.statistics['gl_commands'].items(), key=operator.itemgetter(1))
 
             if len(sorted_gcmd) > 1:
                 most_used_commmand = sorted_gcmd[-1][0]
