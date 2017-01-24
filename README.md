@@ -1,31 +1,31 @@
 José
 =========
 
-*en*: José is in Brazilian Portuguese(including documentation which follows this README file)
+*The documentation for José is available in English as well as in Portuguese*
 
-José é o melhor bot para a galerinha do mal dentro do Discord!
+*Este arquivo em português pode ser encontrado em [README-pt.md](https://github.com/lkmnds/jose/blob/master/README-pt.md)*
 
-Atualmente o bot está somente em português brasileiro e não é recomendado usar em outros servidores,
-você terá que configurar manualmente(`git clone`) e rodar ele separadamente
+José is a general-purpose bot for Discord written in Python.
+The bot talks in portuguese and only that, no translation module is available for now, nor is planned.
 
-Instruções(Linux):
+**Python 3.5+ is needed**
+
+Instructions for Linux:
 ```bash
 $ git clone https://github.com/lkmnds/jose.git
 $ cd jose
 $ nano joseconfig.py
-$ pip install discord.py youtube_dl Pillow
+$ pip install discord.py Pillow
 ```
 
-`joseconfig.py` de exemplo:
+Example `joseconfig.py` file:
 ```python
 discord_token = 'DISCORD OAUTH2 BOT TOKEN'
 soundcloud_id = 'SOUNDCLOUD API ID'
 jcoin_path = 'jcoin/josecoin.db'
 ```
 
-Recomendável ter um `jose-data.txt` com sentenças do jeito que você quiser, o josé irá falar elas com o comando `!falar`
-
-Rodando:
+Using:
 ```
 python3 jose-bot.py
 ```
