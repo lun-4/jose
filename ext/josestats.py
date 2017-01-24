@@ -12,8 +12,9 @@ import jauxiliar as jaux
 import joseerror as je
 import josecommon as jcommon
 
+# TODO: query language
 QUERIES = {
-    "topmsg": "loc[msg].sort"
+    "topmsg": "loc[msg].sort",
     "gltopcmd": "db[cmd].sort"
 }
 
