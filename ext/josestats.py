@@ -130,8 +130,8 @@ class JoseStats(jaux.Auxiliar):
             if command not in serverdb['commands']:
                 serverdb['commands'][command] = 0
 
-            if command not in serverdb['gl_commands']:
-                serverdb['gl_commands'][command] = 0
+            if command not in self.statistics['gl_commands']:
+                self.statistics['gl_commands'][command] = 0
 
             serverdb['commands'][command] += 1
             self.statistics['gl_commands'][command] += 1
