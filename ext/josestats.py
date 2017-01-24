@@ -161,7 +161,7 @@ class JoseStats(jaux.Auxiliar):
 
     async def c_query(self, message, args):
         '''`!query data` - Fazer pedidos ao banco de dados de estatísticas do josé
-A lista de possíveis dados está em https://github.com/lkmnds/jose/blob/master/doc/queries.md'''
+A lista de possíveis dados está em https://github.com/lkmnds/jose/blob/master/doc/queries-pt.md'''
 
         if len(args) < 2:
             await self.say(self.c_query.__doc__)
@@ -188,6 +188,19 @@ A lista de possíveis dados está em https://github.com/lkmnds/jose/blob/master/
             for db in sizes:
                 sizes[db] = '%.3f' % (sizes[db] / 1024)
             response = "\n".join(": ".join(_) + "KB" for _ in sizes.items())
+        elif querytype == 'this':
+            sid = message.server.id
+            sdb = self.statistics[sid]
+            response += "Mensagens recebidas deste servidor: %d\n" % sdb['messages']
+            response += "Comandos recebidos deste servidor: %d\n" % sum(sdb['commands'].values())
+
+            # calculate most used command
+            sorted_gcmd = sorted(sdb['commands'].items(), key=operator.itemgetter(1))
+
+            if len(sorted_gcmd) > 1:
+                most_used_commmand = sorted_gcmd[-1][0]
+                muc_uses = sorted_gcmd[-1][1]
+                response += "Comando mais usado deste servidor: %s, usado %d vezes\n" % (most_used_commmand, muc_uses)
         else:
             await self.say("Tipo de pedido não encontrado")
             return
