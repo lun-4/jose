@@ -163,28 +163,32 @@ class JoseStats(jaux.Auxiliar):
         '''`!query data` - Fazer pedidos ao banco de dados de estatísticas do josé
 A lista de possíveis dados está em https://github.com/lkmnds/jose/blob/master/doc/queries.md'''
 
+        if len(args) < 2:
+            await self.say(self.c_query.__doc__)
+
         querytype = ' '.join(args[1:])
         response = ''
 
         self.database['gl_queries'] += 1
 
         if querytype == 'summary':
-            response += "Total messages received: %d\n" % self.database['gl_messages']
-            response += "Total queries done: %d\n" % self.database['gl_queries']
+            response += "Mensagens recebidas: %d\n" % self.database['gl_messages']
+            response += "Pedidos recebidos(queries): %d\n" % self.database['gl_queries']
 
             # calculate most used command
             sorted_gcmd = sorted(self.database['gl_commands'].items(), key=operator.itemgetter(1))
 
-            most_used_commmand = sorted_gcmd[-1][0]
-            muc_uses = sorted_gcmd[-1][1]
-            response += "Most used command: %s with %d uses\n" % (most_used_commmand, muc_uses)
+            if len(sorted_gcmd) > 1:
+                most_used_commmand = sorted_gcmd[-1][0]
+                muc_uses = sorted_gcmd[-1][1]
+                response += "Comando mais usado: %s, usado %d vezes\n" % (most_used_commmand, muc_uses)
         elif querytype == 'dbsize':
             sizes = await self.db_fsizes()
             for db in sizes:
                 sizes[db] = '%.3f' % (sizes[db] / 1024)
             response = "\n".join(": ".join(_) + "KB" for _ in sizes.items())
 
-        if len(response) > 1999: # 1 9 9 9
+        if len(response) >= 2000: # 1 9 9 9
             await self.say(":elephant: Resultado muito grande :elephant:")
         else:
             await self.say(self.codeblock("", response))
