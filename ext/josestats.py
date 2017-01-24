@@ -96,7 +96,7 @@ class JoseStats(jaux.Auxiliar):
             'itself': os.path.getsize(jcommon.STAT_DATABASE_PATH),
         }
 
-    async def c_saveqdb(self):
+    async def c_saveqdb(self, message, args):
         await self.savedb()
         await self.say(":floppy_disk: saved query database :floppy_disk:")
 
@@ -112,6 +112,8 @@ class JoseStats(jaux.Auxiliar):
                 "messages": {}
             }
 
+        # USE AS REFERENCE, NOT TO WRITE
+        # probably that's what caused the "query delay until reload"
         serverdb = self.statistics[serverid]
 
         if self.counter % 50 == 0:
@@ -120,36 +122,28 @@ class JoseStats(jaux.Auxiliar):
         command, args, method = jcommon.parse_command(message.content)
 
         if authorid not in serverdb['messages']:
-            serverdb['messages'][authorid] = [0, 0]
+            self.statistics[serverid]['messages'][authorid] = [0, 0]
 
         if not command:
             # normal message, calculate average wordlength for this user
             # serverdb['messages'][authorid][0] => number of messages
             # serverdb['messages'][authorid][1] => combined wordlength of all messages
-            serverdb['messages'][authorid][0] += 1
-            serverdb['messages'][authorid][1] += len(message.content.split())
+            self.statistics[serverid]['messages'][authorid][0] += 1
+            self.statistics[serverid]['messages'][authorid][1] += len(message.content.split())
             self.statistics['gl_messages'] += 1
         else:
             # command
             if command not in serverdb['commands']:
-                serverdb['commands'][command] = 0
+                self.statistics[serverid]['commands'][command] = 0
 
             if command not in self.statistics['gl_commands']:
                 self.statistics['gl_commands'][command] = 0
 
-            serverdb['commands'][command] += 1
+            self.statistics[serverid]['commands'][command] += 1
             self.statistics['gl_commands'][command] += 1
 
-        self.statistics[serverid] = serverdb
+        #self.statistics[serverid] = serverdb
         self.counter += 1
-
-    async def c_querysiz(self, message, args):
-        '''`!querysiz` - Mostra os tamanhos dos bancos de dados do josé, em kilobytes(KB)'''
-        sizes = await self.db_fsizes()
-        for db in sizes:
-            sizes[db] = '%.3f' % (sizes[db] / 1024)
-        res = "\n".join(": ".join(_) + "KB" for _ in sizes.items())
-        await self.say(self.codeblock("", res))
 
     async def c_rawquery(self, message, args):
         '''`!rawquery string` - Fazer pedidos ao banco de dados de estatísticas do josé'''
@@ -180,11 +174,15 @@ A lista de possíveis dados está em https://github.com/lkmnds/jose/blob/master/
 
             # calculate most used command
             sorted_gcmd = sorted(self.database['gl_commands'].items(), key=operator.itemgetter(1))
-            await self.say(repr(sorted_gcmd))
 
             most_used_commmand = sorted_gcmd[-1][0]
             muc_uses = sorted_gcmd[-1][1]
             response += "Most used command: %s with %d uses\n" % (most_used_commmand, muc_uses)
+        elif querytype == 'dbsize':
+            sizes = await self.db_fsizes()
+            for db in sizes:
+                sizes[db] = '%.3f' % (sizes[db] / 1024)
+            response = "\n".join(": ".join(_) + "KB" for _ in sizes.items())
 
         if len(response) > 1999: # 1 9 9 9
             await self.say(":elephant: Resultado muito grande :elephant:")
