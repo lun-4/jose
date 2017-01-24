@@ -188,6 +188,9 @@ A lista de possíveis dados está em https://github.com/lkmnds/jose/blob/master/
             for db in sizes:
                 sizes[db] = '%.3f' % (sizes[db] / 1024)
             response = "\n".join(": ".join(_) + "KB" for _ in sizes.items())
+        else:
+            await self.say("Tipo de pedido não encontrado")
+            return
 
         if len(response) >= 2000: # 1 9 9 9
             await self.say(":elephant: Resultado muito grande :elephant:")
