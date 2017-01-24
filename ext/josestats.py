@@ -96,6 +96,10 @@ class JoseStats(jaux.Auxiliar):
             'itself': os.path.getsize(jcommon.STAT_DATABASE_PATH),
         }
 
+    async def c_saveqdb(self):
+        await self.savedb()
+        await self.say(":floppy_disk: saved query database :floppy_disk:")
+
     async def e_any_message(self, message):
         serverid = message.server.id
         authorid = message.author.id
@@ -136,14 +140,14 @@ class JoseStats(jaux.Auxiliar):
             serverdb['commands'][command] += 1
             self.statistics['gl_commands'][command] += 1
 
+        self.statistics[serverid] = serverdb
         self.counter += 1
 
     async def c_querysiz(self, message, args):
         '''`!querysiz` - Mostra os tamanhos dos bancos de dados do josé, em kilobytes(KB)'''
         sizes = await self.db_fsizes()
         for db in sizes:
-            val = sizes[db]
-            sizes[db] = '%.3f' % (val / 1024)
+            sizes[db] = '%.3f' % (sizes[db] / 1024)
         res = "\n".join(": ".join(_) + "KB" for _ in sizes.items())
         await self.say(self.codeblock("", res))
 
@@ -176,6 +180,8 @@ A lista de possíveis dados está em https://github.com/lkmnds/jose/blob/master/
 
             # calculate most used command
             sorted_gcmd = sorted(self.database['gl_commands'].items(), key=operator.itemgetter(1))
+            await self.say(repr(sorted_gcmd))
+
             most_used_commmand = sorted_gcmd[-1][0]
             muc_uses = sorted_gcmd[-1][1]
             response += "Most used command: %s with %d uses\n" % (most_used_commmand, muc_uses)
@@ -183,7 +189,7 @@ A lista de possíveis dados está em https://github.com/lkmnds/jose/blob/master/
         if len(response) > 1999: # 1 9 9 9
             await self.say(":elephant: Resultado muito grande :elephant:")
         else:
-            await self.say(self.codeblock("", reponse))
+            await self.say(self.codeblock("", response))
 
     async def c_session(self, message, args):
         '''`!session` - Dados interessantes sobre essa sessão'''
