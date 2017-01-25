@@ -14,6 +14,7 @@ wac = wolframalpha.Client(jconfig.WOLFRAMALPHA_APP_ID)
 class JoseMath(jaux.Auxiliar):
     def __init__(self, cl):
         jaux.Auxiliar.__init__(self, cl)
+        self.wac = wac
 
     async def ext_load(self):
         return True, ''
@@ -25,9 +26,14 @@ class JoseMath(jaux.Auxiliar):
         '''`!wolframalpha terms` - make a request to Wolfram|Alpha'''
         if len(args) < 2:
             await self.say(self.c_wolframalpha.__doc__)
+            return
 
         term_to_wolfram = ' '.join(args[1:])
 
-        res = wac.query(term_to_wolfram)
-        response_wolfram = next(res.results).text
-        await self.say(self.codeblock("", response_wolfram))
+        res = self.wac.query(term_to_wolfram)
+        if len(res.results) < 1:
+            await self.say("Sem resposeta")
+            return
+        else:
+            response_wolfram = next(res.results).text
+            await self.say(self.codeblock("", response_wolfram))
