@@ -31,9 +31,9 @@ class JoseMath(jaux.Auxiliar):
         term_to_wolfram = ' '.join(args[1:])
 
         res = self.wac.query(term_to_wolfram)
-        if len(res.results) < 1:
-            await self.say("Sem resposeta")
-            return
-        else:
+        if getattr(res, 'results', False):
             response_wolfram = next(res.results).text
             await self.say(self.codeblock("", response_wolfram))
+        else:
+            await self.say("Sem resposeta")
+            return
