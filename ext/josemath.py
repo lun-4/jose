@@ -30,8 +30,11 @@ class JoseMath(jaux.Auxiliar):
 
         res = wac.query(term_to_wolfram)
 
+        await self.say("length of pods in response: %d" % len(res.pods))
+
         response_wolfram = ''
         for pod in res.pods:
+            print(pod)
             response_wolfram += repr(pod) + '\n'
 
         await self.say(self.codeblock("", response_wolfram))
