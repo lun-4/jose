@@ -101,6 +101,10 @@ class JoseStats(jaux.Auxiliar):
         await self.say(":floppy_disk: saved query database :floppy_disk:")
 
     async def e_any_message(self, message):
+        if message.server is None:
+            # I'm at a DM, how i'm supposed to make account of that
+            return
+
         serverid = message.server.id
         authorid = message.author.id
 
