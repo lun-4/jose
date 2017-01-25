@@ -9,12 +9,14 @@ José é o melhor bot para a galerinha do mal dentro do Discord!
 Atualmente o bot está somente em português brasileiro e não é recomendado usar em outros servidores,
 você terá que configurar manualmente(`git clone`) e rodar ele separadamente
 
+**Python 3.5+ é necessário**
+
 Instruções(Linux):
 ```bash
 $ git clone https://github.com/lkmnds/jose.git
 $ cd jose
 $ nano joseconfig.py
-$ pip install discord.py youtube_dl Pillow
+$ pip install discord.py Pillow wolframalpha
 ```
 
 `joseconfig.py` de exemplo:

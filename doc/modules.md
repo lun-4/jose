@@ -1,6 +1,7 @@
 José's Modules
 ============
 
-All modules in jose derive from the code in `example_module.py`.
-
-**ADVICE FOR NEW MODULES**: Since `jaux.Auxiliar` is being used in the example code, it is gonna be used in all modules since it doesn't create circular imports(like jcommon importing jcoin that imports jcommon...)
+José's code is separated in 3 parts:
+ * `main`, located at `jose-bot.py`. which has some commands and the discord.py events
+ * `ext`, located at `ext/`. jose's extensions, most of the functionality is there
+ * `jcoin`, located at `jcoin/josecoin.py` just for JoseCoin
