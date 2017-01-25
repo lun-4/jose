@@ -216,6 +216,10 @@ class JoseSpeak(jcommon.Extension):
         await self.say("done")
 
     async def e_on_message(self, message):
+        if message.server is None:
+            # ignore DMs here as well
+            return
+
         # store message in json database
         if message.server.id not in self.database:
             self.logger.info("New server in database: %s", message.server.id)
