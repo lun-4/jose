@@ -159,6 +159,12 @@ class JoseBot(jcommon.Extension):
         else:
             await self.say("%s: módulo não encontrado/carregado" % n)
 
+    async def c_unload(self, message, args):
+        pass # TODO
+
+    async def c_loadmod(self, message, args):
+        pass # TODO
+
     async def c_modlist(self, message, args):
         mod_gen = (key for key in self.modules)
         mod_generator = []
