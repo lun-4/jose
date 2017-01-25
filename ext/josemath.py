@@ -36,7 +36,12 @@ class JoseMath(jaux.Auxiliar):
                 response_wolfram = next(res.results).text
             except StopIteration:
                 await self.say(":warning: Erro tentando pegar o texto da resposta :warning:")
+                return
             await self.say(self.codeblock("", response_wolfram))
         else:
             await self.say(":cyclone: Sem resposta :cyclone:")
             return
+
+    async def c_wa(self, message, args):
+        '''`!wa terms` - alias para `!wolframalpha`'''
+        await self.c_wolframalpha(self, message, args)
