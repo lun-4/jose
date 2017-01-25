@@ -16,7 +16,7 @@ Instruções(Linux):
 $ git clone https://github.com/lkmnds/jose.git
 $ cd jose
 $ nano joseconfig.py
-$ pip install discord.py Pillow wolframalpha
+$ pip install discord.py Pillow wolframalpha pyowm
 ```
 
 `joseconfig.py` de exemplo:
@@ -24,6 +24,8 @@ $ pip install discord.py Pillow wolframalpha
 discord_token = 'DISCORD OAUTH2 BOT TOKEN'
 soundcloud_id = 'SOUNDCLOUD API ID'
 jcoin_path = 'jcoin/josecoin.db'
+WOLFRAMALPHA_APP_ID = 'WOLFRAM|ALPHA APP ID'
+OWM_APIKEY = 'OpenWeatherMap API Key'
 ```
 
 Recomendável ter um `jose-data.txt` com sentenças do jeito que você quiser, o josé irá falar elas com o comando `!falar`

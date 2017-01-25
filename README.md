@@ -15,7 +15,7 @@ Instructions for Linux:
 $ git clone https://github.com/lkmnds/jose.git
 $ cd jose
 $ nano joseconfig.py
-$ pip install discord.py Pillow wolframalpha
+$ pip install discord.py Pillow wolframalpha pyowm
 ```
 
 Example `joseconfig.py` file:
@@ -24,6 +24,7 @@ discord_token = 'DISCORD OAUTH2 BOT TOKEN'
 soundcloud_id = 'SOUNDCLOUD API ID'
 jcoin_path = 'jcoin/josecoin.db'
 WOLFRAMALPHA_APP_ID = 'WOLFRAM|ALPHA APP ID'
+OWM_APIKEY = 'OpenWeatherMap API Key'
 ```
 
 Using:

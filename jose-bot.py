@@ -444,13 +444,10 @@ def one_message(message):
                 pass
 
             end = time.time()
-            delta = end-st
-            if delta > 10:
+            delta = end - st
+            if delta > 13:
                 yield from jose.say("Alguma coisa está demorando demais para responder(delta=%.4fs)..." % delta)
 
-            # yield from jose.unlock()
-
-            # yield from jose.say("time: real %.4fs user %.4fs" % (delta, delta+(delta/4)))
             return
         except Exception as e:
             yield from jose.say("jose: py_err: ```%s```" % traceback.format_exc())
