@@ -9,7 +9,7 @@ import joseerror as je
 import joseconfig as jconfig
 
 import wolframalpha
-wac = wolframalpha.Client(jcoing.WOLFRAMALPHA_APP_ID)
+wac = wolframalpha.Client(jconfig.WOLFRAMALPHA_APP_ID)
 
 class JoseMath(jaux.Auxiliar):
     def __init__(self, cl):
