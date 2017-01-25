@@ -30,10 +30,8 @@ class JoseBot(jcommon.Extension):
         self.nick = 'jose-bot'
         self.modules = {}
         self.env = {
-            'survey': {},
             'spam': {},
             'spamcl': {},
-            # 'apostas': {},
         }
         self.start_time = time.time()
         self.command_lock = False
@@ -151,7 +149,12 @@ class JoseBot(jcommon.Extension):
             await module['inst'].recv(message)
 
     async def c_reload(self, message, args):
+        '''`!relaod module` - recarrega um módulo do josé'''
         await self.is_admin(message.author.id)
+
+        if len(args) < 2:
+            await self.say(self.c_reload.__doc__)
+            return
 
         n = args[1]
         if n in self.modules:
@@ -166,6 +169,7 @@ class JoseBot(jcommon.Extension):
         pass # TODO
 
     async def c_modlist(self, message, args):
+        '''`!modlist` - Módulos do josé'''
         mod_gen = (key for key in self.modules)
         mod_generator = []
         for key in mod_gen:
@@ -255,6 +259,11 @@ class JoseBot(jcommon.Extension):
         return
 
     async def c_enc(self, message, args):
+        '''`!enc text` - encriptar'''
+        if len(args) < 2:
+            await self.say(self.c_enc.__doc__)
+            return
+
         to_encrypt = ' '.join(args[1:])
         encdata = await jcommon.str_xor(to_encrypt, jcommon.JCRYPT_KEY)
         a85data = base64.a85encode(bytes(encdata, 'UTF-8'))
@@ -262,6 +271,11 @@ class JoseBot(jcommon.Extension):
         return
 
     async def c_dec(self, message, args):
+        '''`!dec text` - desencriptar'''
+        if len(args) < 2:
+            await self.say(self.c_dec.__doc__)
+            return
+
         to_decrypt = ' '.join(args[1:])
         to_decrypt = to_decrypt.encode('UTF-8')
         try:
@@ -302,6 +316,10 @@ class JoseBot(jcommon.Extension):
 
     async def c_yt(self, message, args):
         '''`!yt [termo 1] [termo 2]...` - procura no youtube'''
+        if len(args) < 2:
+            await self.say(self.c_yt.__doc__)
+            return
+
         search_term = ' '.join(args[1:])
 
         loop = asyncio.get_event_loop()
@@ -325,6 +343,10 @@ class JoseBot(jcommon.Extension):
 
     async def c_sndc(self, message, args):
         '''`!sndc [termo 1] [termo 2]...` - procura no soundcloud'''
+        if len(args) < 2:
+            await self.say(self.c_sndc.__doc__)
+            return
+
         query = ' '.join(args[1:])
 
         self.logger.info("Soundcloud request: %s", query)
@@ -364,13 +386,21 @@ class JoseBot(jcommon.Extension):
         await self.client.change_presence(game=g)
 
     async def c_fullwidth(self, message, args):
-        '''`!fullwidth` ou `!fw` - ｆｕｌｌｗｉｄｔｈ　ｃｈａｒａｃｔｅｒｓ'''
+        '''`!fullwidth text` - ｆｕｌｌｗｉｄｔｈ　ｃｈａｒａｃｔｅｒｓ'''
+        if len(args) < 2:
+            await self.say("Nada de mensagem vazia")
+            return
+
         ascii_text = ' '.join(args[1:])
         res = ascii_text.translate(jcommon.ascii_to_wide)
         await self.say(res)
 
     async def c_escolha(self, message, args):
         '''`!escolha elemento1;elemento2;elemento3;...;elementon` - escolha.'''
+        if len(args) < 2:
+            await self.say(self.c_escolha.__doc__)
+            return
+
         escolhas = (' '.join(args[1:])).split(';')
         choice = random.choice(escolhas)
         await self.say("Eu escolho %s" % choice)
@@ -432,6 +462,10 @@ class JoseBot(jcommon.Extension):
 
     async def c_clist(self, message, args):
         '''`!clist module` - mostra todos os comandos de tal módulo'''
+        if len(args) < 2:
+            await self.say(self.c_clist.__doc__)
+            return
+
         modname = args[1]
         module = self.modules[modname]
 
