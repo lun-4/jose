@@ -15,9 +15,17 @@ import josecommon as jcommon
 from random import SystemRandom
 random = SystemRandom()
 
+docsdict = {
+    "modules": "https://github.com/lkmnds/jose/blob/master/doc/modules.md",
+    "events": "https://github.com/lkmnds/jose/blob/master/doc/events.md",
+    "queries": "https://github.com/lkmnds/jose/blob/master/doc/queries.md",
+    "queries-pt": "https://github.com/lkmnds/jose/blob/master/doc/queries.md",
+}
+
 class joseXtra(jaux.Auxiliar):
     def __init__(self, cl):
         jaux.Auxiliar.__init__(self, cl)
+        self.docs = docsdict
 
     async def ext_load(self):
         return True, ''
@@ -104,3 +112,21 @@ class joseXtra(jaux.Auxiliar):
 
     async def c_info(self, message, args):
         await self.say("""José v%s, feito por Luna Mendes\nhttps://github.com/lkmnds/jose""" % (jcommon.JOSE_VERSION))
+
+    async def c_docs(self, message, args):
+        '''`!docs <topic>` - Documentação do josé
+        `!docs list` lista todos os tópicos disponíveis'''
+        if len(args) < 2:
+            await self.say(self.c_docs.__doc__)
+            return
+
+        topic = ' '.join(args[1:])
+
+        if topic == 'list':
+            topics = ' '.join(self.docs)
+            await self.say(topics)
+        else:
+            if topic in self.docs:
+                await self.say(self.docs[topic])
+            else:
+                await self.say("%s: tópico não encontrado" % topic)

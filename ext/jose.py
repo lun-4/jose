@@ -360,8 +360,8 @@ class JoseBot(jcommon.Extension):
     async def c_pstatus(self, message, args):
         '''`!pstatus` - muda o status do josé'''
         playing_name = ' '.join(args[1:])
-        g = discord.Game(name=playing_name, url=playing_name, type='game')
-        await self.client.change_status(g)
+        g = discord.Game(name=playing_name, url=playing_name)
+        await self.client.change_presence(game=g)
 
     async def c_fullwidth(self, message, args):
         '''`!fullwidth` ou `!fw` - ｆｕｌｌｗｉｄｔｈ　ｃｈａｒａｃｔｅｒｓ'''
