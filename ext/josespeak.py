@@ -169,6 +169,10 @@ class JoseSpeak(jcommon.Extension):
         self.flag = True
         await self.e_on_message(message)
 
+    async def c_spt(self, message, args):
+        '''`!spt` - alias para `!speaktrigger`'''
+        await self.c_speaktrigger(message, args)
+
     async def ext_load(self):
         try:
             self.text_generators = {}

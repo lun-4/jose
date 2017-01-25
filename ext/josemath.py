@@ -27,7 +27,8 @@ class JoseMath(jaux.Auxiliar):
         return True, ''
 
     async def c_wolframalpha(self, message, args):
-        '''`!wolframalpha terms` - make a request to Wolfram|Alpha'''
+        '''`!wolframalpha terms` - make a request to Wolfram|Alpha
+        **ratelimit GLOBAL: 2 chamadas por hora**'''
         if len(args) < 2:
             await self.say(self.c_wolframalpha.__doc__)
             return
@@ -52,7 +53,8 @@ class JoseMath(jaux.Auxiliar):
 
     async def c_temperature(self, message, args):
         '''`!temperature location` - Temperatura de um local, usando OpenWeatherMap
-        mostra tanto em Celsius quanto em Fahrenheit'''
+        mostra tanto em Celsius quanto em Fahrenheit
+        **ratelimit GLOBAL: 60 chamadas / minuto**'''
         if len(args) < 2:
             await self.say(self.c_temperature.__doc__)
             return
