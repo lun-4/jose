@@ -35,5 +35,5 @@ class JoseMath(jaux.Auxiliar):
             response_wolfram = next(res.results).text
             await self.say(self.codeblock("", response_wolfram))
         else:
-            await self.say("Sem resposeta")
+            await self.say(":cyclone: Sem resposta :cyclone:")
             return
