@@ -44,4 +44,4 @@ class JoseMath(jaux.Auxiliar):
 
     async def c_wa(self, message, args):
         '''`!wa terms` - alias para `!wolframalpha`'''
-        await self.c_wolframalpha(self, message, args)
+        await self.c_wolframalpha(message, args)
