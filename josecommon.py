@@ -44,7 +44,7 @@ chattiness = .25
 MASTER_ROLE = 'mestra'
 LEARN_ROLE = 'cult'
 JOSE_ANIMATION_LIMIT = 1 # 2 animações simultaneamente
-ADMIN_IDS = ['162819866682851329']
+ADMIN_IDS = ['162819866682851329', '144377237997748224']
 
 #just for 0.6.6.6 and 6.6.6 or any demon version
 DEMON_MODE = False
