@@ -32,7 +32,10 @@ class JoseMath(jaux.Auxiliar):
 
         res = self.wac.query(term_to_wolfram)
         if getattr(res, 'results', False):
-            response_wolfram = next(res.results).text
+            try:
+                response_wolfram = next(res.results).text
+            except StopIteration:
+                await self.say(":warning: Erro tentando pegar o texto da resposta :warning:")
             await self.say(self.codeblock("", response_wolfram))
         else:
             await self.say(":cyclone: Sem resposta :cyclone:")

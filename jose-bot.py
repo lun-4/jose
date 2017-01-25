@@ -438,7 +438,7 @@ def one_message(message):
 
             except je.PermissionError:
                 yield from jose.say("permissão ¯\_(ツ)_/¯ 💠 ¯\_(ツ)_/¯ negada")
-            except RuntimeError:
+            except RuntimeError as e:
                 yield from jose.say('jose: py_rt_err: %s' % repr(e))
             except je.LimitError:
                 pass
