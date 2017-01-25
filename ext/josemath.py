@@ -11,7 +11,7 @@ import joseconfig as jconfig
 import wolframalpha
 wac = wolframalpha.Client(jcoing.WOLFRAMALPHA_APP_ID)
 
-class JoseExtension(jaux.Auxiliar):
+class JoseMath(jaux.Auxiliar):
     def __init__(self, cl):
         jaux.Auxiliar.__init__(self, cl)
 

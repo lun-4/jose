@@ -276,6 +276,7 @@ load_module('joseibc', 'JoseIBC')
 load_module('josextra', 'joseXtra')
 load_module('joseartif', 'JoseArtif')
 load_module('josestats', 'JoseStats')
+load_module('josemath', 'JoseMath')
 
 help_helptext = """
 `!help` - achar ajuda para outros comandos
