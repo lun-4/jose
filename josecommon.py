@@ -29,7 +29,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 
-JOSE_VERSION = '1.2.3'
+JOSE_VERSION = '1.2.4'
 
 MARKOV_DB_PATH = 'markov-database.json'
 MARKOV_LENGTH_PATH = 'db/wordlength.json'

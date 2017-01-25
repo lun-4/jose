@@ -280,8 +280,8 @@ load_module('josemath', 'JoseMath')
 
 help_helptext = """
 `!help` - achar ajuda para outros comandos
-`!help comando` - procura algum texto de ajuda para o comando dado
-Exemplos: `!help help`, `!help pstatus`, `!help ap`
+`!help <comando>` - procura algum texto de ajuda para o comando dado
+Exemplos: `!help help`, `!help pstatus`, `!help ap`, `!help wa`, etc.
 """
 
 event_table = {

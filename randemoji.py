@@ -7,7 +7,9 @@
 
 from itertools import accumulate
 from bisect import bisect
-from random import randrange
+from random import SystemRandom
+r = SystemRandom()
+randrange = r.randrange
 from unicodedata import name as unicode_name
 
 # Set the unicode version.
