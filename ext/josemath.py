@@ -29,12 +29,5 @@ class JoseMath(jaux.Auxiliar):
         term_to_wolfram = ' '.join(args[1:])
 
         res = wac.query(term_to_wolfram)
-
-        await self.say(next(res.results).text)
-
-        response_wolfram = ''
-        for pod in res.pods:
-            print(pod)
-            response_wolfram += repr(pod) + '\n'
-
+        response_wolfram = next(res.results).text
         await self.say(self.codeblock("", response_wolfram))
