@@ -15,8 +15,30 @@ Each module is described in the form `class@file`.
 
 ### List of Modules
  * `jose` is the main module, which can load the others
- * `joseArtif@joseartif`
-
+ * **[DEPRECATED MODULE]** `joseArtif@joseartif`
+  * Named José *Artif*icial Intelligence, used for conversations using [Chatterbot](https://github.com/gunthercox/ChatterBot)
+  * Was deprecated because it became to laggy
+ * `JoseDatamosh@josedatamosh`
+  * Implements datamosh capabilities using the `!datamosh <photo_url>` command
+ * `JoseGambling@josegambling`
+  * Implements the gambling game, `!ap`
+ * `JoseIBC@joseibc`
+  * Implements Inter-Bot Communication, a project i've been working on from time to time
+ * `JoseMath@josemath`
+  * Things related to math! `!wolframalpha` lives there.
+ * `JoseMemes@josememes`
+  * Implements the `!meme` command and other things memes like `!fullwidth`
+ * **[DEPRECATED MODULE]** `JoseMusic@josemusic`
+  * Implemented music commands
+  * Deprecated because it was buggy and other bots did it better
+ * `JoseNSFW@josensfw`
+  * just NSFW commands
+ * `JoseSpeak@josespeak`
+  * It has the Markov Chain Text Generator code in it and it handles the `on_message` event to generate texts per server
+ * `JoseStats@josestats`
+  * Statistics module, number of messages, commands, etc
+ * `JoseXtra@josextra`
+  * Extra stuff
 
 ### Loading of a Module(`jose.load_ext`)
  * To load a module, you need the file of that module and the class that represents it.
