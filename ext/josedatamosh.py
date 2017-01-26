@@ -39,10 +39,10 @@ Resultados de fotos jogadas ao !datamosh:
         ```
         '''
 
-        auth = await self.jc_control(message.author.id, 3)
+        '''auth = await self.jc_control(message.author.id, 3)
         if not auth:
             await self.say("jc.auth: não autorizado")
-            return
+            return'''
 
         iterations = 10
         if len(args) > 2:
