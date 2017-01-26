@@ -291,15 +291,15 @@ class JoseBot(jcommon.Extension):
         '''`!shutdown` - desliga o josé'''
         await self.sec_auth(self.turnoff)
 
-'''
     async def c_reboot(self, message, args):
         '''`!reboot` - reinicia o josé'''
-        await self.sec_auth(self.reboot)
+        #await self.sec_auth(self.reboot)
+        pass
 
     async def c_update(self, message, args):
         '''`!update` - atualiza o josé'''
-        await self.sec_auth(self.update)
-'''
+        #await self.sec_auth(self.update)
+        pass
 
     async def c_rand(self, message, args):
         '''`!rand min max` - gera um número aleatório no intervalo [min, max]'''
