@@ -61,7 +61,11 @@ class JoseMath(jaux.Auxiliar):
 
         location = ' '.join(args[1:])
 
-        observation = owm.weather_at_place(location)
+        try:
+            observation = owm.weather_at_place(location)
+        except:
+            await self.say("Erro tentando conseguir a temperatura para esse local")
+            return
         w = observation.get_weather()
 
         tempcelsius = w.get_temperature("celsius")
