@@ -19,9 +19,9 @@ def parse(string, message):
     i = 0
     while i < len(string):
         char = string[i]
-        if char == '%' and string[i+1] == '%'
+        if char == '%' and string[i+1] == '%':
             res.append("%")
-        elif char == '%' and string[i+1] == 'a'
+        elif char == '%' and string[i+1] == 'a':
             res.append("<@%s>" % message.author.id)
         else:
             res.append(char)
@@ -30,7 +30,7 @@ def parse(string, message):
     return ''.join(res)
 
 async def mw_response(mw, message):
-        return parse(mw['response'], message)
+    return parse(mw['response'], message)
 
 async def mw_match(mw, string):
     for word in mw['words']:
