@@ -123,7 +123,6 @@ class JoseMagicWord(jaux.Auxiliar):
                     return
 
         # create mw with new id
-        last_id = serverdb[len(serverdb)]
         new_id = len(serverdb) + 1
         serverdb[str(new_id)] = {
             'words': magicwords,
