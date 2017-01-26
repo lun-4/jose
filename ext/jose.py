@@ -117,7 +117,10 @@ class JoseBot(jcommon.Extension):
             loaded_success = False
             loaded_almost = True
 
-        inst = cl_inst(self.client)
+        inst = None
+        if cl_inst is not None:
+            inst = cl_inst(self.client)
+
         try:
             # try to ext_load it
             ok = await inst.ext_load()
@@ -127,20 +130,28 @@ class JoseBot(jcommon.Extension):
         except Exception as e:
             self.logger.warn("Almost loaded %s: %s", n, repr(e))
             loaded_almost = True
-        methods = (method for method in dir(inst) if callable(getattr(inst, method)))
 
-        self.modules[n] = {'inst': inst, 'methods': [], 'class': n_cl, 'module': module, 'handlers': []}
+        # if instantiated, register the commands and events
+        if inst is not None:
+            methods = (method for method in dir(inst) if callable(getattr(inst, method)))
+            self.modules[n] = {
+                'inst': inst,
+                'methods': [],
+                'class': n_cl,
+                'module': module,
+                'handlers': []
+            }
 
-        for method in methods:
-            if method.startswith('c_'):
-                self.logger.debug("add %s", method)
-                setattr(self, method, getattr(inst, method))
-                self.modules[n]['methods'].append(method)
-                loaded_success = True
-            elif method.startswith('e_'):
-                self.logger.debug("handler %s" % method)
-                self.modules[n]['handlers'].append(method)
-                loaded_success = True
+            for method in methods:
+                if method.startswith('c_'):
+                    self.logger.debug("add %s", method)
+                    setattr(self, method, getattr(inst, method))
+                    self.modules[n]['methods'].append(method)
+                    loaded_success = True
+                elif method.startswith('e_'):
+                    self.logger.debug("handler %s" % method)
+                    self.modules[n]['handlers'].append(method)
+                    loaded_success = True
 
         if self.current is not None:
             if loaded_success:
@@ -211,7 +222,7 @@ class JoseBot(jcommon.Extension):
             return
 
         # parse class@module
-        modname, modclass = args[1].split('@')
+        modclass, modname = args[1].split('@')
 
         ok = await self.load_ext(modname, modclass)
         if not ok:
