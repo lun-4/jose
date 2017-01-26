@@ -199,6 +199,6 @@ class JoseMagicWord(jaux.Auxiliar):
         }
 
         # say to Python to FUCKING DELETE IT
-        del serverdb[set_id]
+        del self.magicwords[message.server.id][set_id]
         await self.savedb()
         await self.say("Deleted set %s" % set_id)
