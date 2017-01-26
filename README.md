@@ -25,7 +25,7 @@ soundcloud_id = 'SOUNDCLOUD API ID'
 jcoin_path = 'jcoin/josecoin.db'
 WOLFRAMALPHA_APP_ID = 'WOLFRAM|ALPHA APP ID'
 OWM_APIKEY = 'OpenWeatherMap API Key'
-DEFAULT_MAGICWORD_DATABASE = 'db/magicwords.json'
+MAGICWORD_PATH = 'db/magicwords.json'
 ```
 
 Using:
