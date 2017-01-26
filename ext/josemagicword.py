@@ -24,6 +24,7 @@ def parse(string, message):
             res.append("%")
         elif char == '%' and string[i+1] == 'a':
             res.append("<@%s>" % message.author.id)
+            i += 1
         else:
             res.append(char)
         i += 1
@@ -112,10 +113,15 @@ class JoseMagicWord(jaux.Auxiliar):
             self.logger.info("New MW Database for %s", message.server.id)
             self.magicwords[message.server.id] = {}
 
-        # check duplicates
+        # check limits
         serverdb = self.magicwords[message.server.id]
+        if len(serverdb) > 10:
+            await self.say("This server reached the limit of 10 Magic Words.")
+            return
+
+        # check duplicates
         for set_id in serverdb:
-            mw = serverdb[mword_id]
+            mw = serverdb[set_id]
             for word in magicwords:
                 if word in mw['words']:
                     await self.say(":warning: Conflict: `%s` conflicts with Magic Word Set %d" % \
