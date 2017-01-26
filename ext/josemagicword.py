@@ -123,13 +123,13 @@ class JoseMagicWord(jaux.Auxiliar):
                     return
 
         # create mw with new id
-        new_id = len(serverdb) + 1
-        serverdb[str(new_id)] = {
+        new_id = str(len(serverdb) + 1)
+        serverdb[new_id] = {
             'words': magicwords,
             'response': mwresponse
         }
 
-        await self.say("M.W. Set %d created!" % new_id)
+        await self.say("M.W. Set %s created!" % new_id)
 
 
     async def c_listmw(self, message, args):
@@ -146,7 +146,7 @@ class JoseMagicWord(jaux.Auxiliar):
             res = []
             for set_id in serverdb:
                 mw = serverdb[set_id]
-                res.append("%d: %s > %s" % (set_id, mw['words'], mw['response']))
+                res.append("%s: %s > %s" % (set_id, mw['words'], mw['response']))
 
             await self.say(self.codeblock("", ''.join(res)))
         else:
@@ -157,7 +157,7 @@ class JoseMagicWord(jaux.Auxiliar):
                 return
 
             mw = serverdb[set_id]
-            await self.say("`%d: %s > %s`" % (set_id, mw['words'], mw['response']))
+            await self.say("`%s: %s > %s`" % (set_id, mw['words'], mw['response']))
 
 
     async def c_delmagic(self, message, args):
@@ -180,4 +180,4 @@ class JoseMagicWord(jaux.Auxiliar):
             return
 
         del serverdb[set_id]
-        await self.say("Deleted set %d" % set_id)
+        await self.say("Deleted set %s" % set_id)
