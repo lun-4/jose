@@ -209,7 +209,7 @@ class JoseBot(jcommon.Extension):
             self.logger.info("!unload: %s" % modname)
             res = await self.unload_mod(modname)
             if res[0]:
-                await self.say(":cry: `%s` is dead :skull:")
+                await self.say(":skull: `%s` is dead :skull:" % modname)
             else:
                 await self.say(":warning: Error happened: %s" % res[1])
 
@@ -225,11 +225,11 @@ class JoseBot(jcommon.Extension):
         modclass, modname = args[1].split('@')
 
         ok = await self.load_ext(modname, modclass)
-        if not ok:
+        if ok:
             self.logger.info("!loadmod: %s" % modname)
             await self.say(":ok_hand: Success loading `%s`!" % modname)
         else:
-            await self.say(":warning: Error loading `%s` :warning: ")
+            await self.say(":warning: Error loading `%s` :warning:" % modname)
 
     async def c_modlist(self, message, args):
         '''`!modlist` - Módulos do josé'''
@@ -287,14 +287,11 @@ class JoseBot(jcommon.Extension):
         os.system("./reload_jose.sh &")
         sys.exit(0)
 
-    async def c_exit(self, message, args):
-        '''`!exit` - desliga o josé'''
+    async def c_shutdown(self, message, args):
+        '''`!shutdown` - desliga o josé'''
         await self.sec_auth(self.turnoff)
 
-    async def c_shutdown(self, message, args):
-        '''`!shutdown` - alias para `!exit`'''
-        await self.c_exit(message, args)
-
+'''
     async def c_reboot(self, message, args):
         '''`!reboot` - reinicia o josé'''
         await self.sec_auth(self.reboot)
@@ -302,6 +299,7 @@ class JoseBot(jcommon.Extension):
     async def c_update(self, message, args):
         '''`!update` - atualiza o josé'''
         await self.sec_auth(self.update)
+'''
 
     async def c_rand(self, message, args):
         '''`!rand min max` - gera um número aleatório no intervalo [min, max]'''
@@ -444,6 +442,8 @@ class JoseBot(jcommon.Extension):
 
     async def c_pstatus(self, message, args):
         '''`!pstatus` - muda o status do josé'''
+        await self.is_admin(message.author.id)
+
         playing_name = ' '.join(args[1:])
         g = discord.Game(name=playing_name, url=playing_name)
         await self.client.change_presence(game=g)
@@ -530,12 +530,12 @@ class JoseBot(jcommon.Extension):
             return
 
         modname = args[1]
-        module = self.modules[modname]
 
-        res = ''
-        for m in module['methods']:
-            res += '!%s ' % m[2:]
+        if modname not in self.modules:
+            await self.say("`%s`: Módulo não encontrado")
+            return
 
+        res = ' '.join(self.modules[modname]['methods'])
         await self.say(self.codeblock('', res))
 
     async def c_uptime(self, message, args):
@@ -553,11 +553,6 @@ class JoseBot(jcommon.Extension):
         fmt = "uptime: %d dias, %d horas, %d minutos, %d segundos"
         await self.debug(fmt % (days, hours, minutes, seconds))
 
-    # !eval `await self.say("hello")`
-    # !eval `self.loop.run_until_complete(self.say("Hello"))`
-    # !eval `self.loop.run_until_complete(self.reboot())`
-    # !eval `self.says(str(self.modules))`
-    # !eval `self.loop.run_until_complete(self.say(discord.__version__))`
     async def c_eval(self, message, args):
         # eval expr
         await self.is_admin(message.author.id)
