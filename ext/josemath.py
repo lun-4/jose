@@ -42,7 +42,7 @@ class JoseMath(jaux.Auxiliar):
             except StopIteration:
                 await self.say(":warning: Erro tentando pegar o texto da resposta :warning:")
                 return
-            await self.say(self.codeblock("", response_wolfram))
+            await self.say("%s:\n%s" % (term_to_wolfram, self.codeblock("", response_wolfram)))
         else:
             await self.say(":cyclone: Sem resposta :cyclone:")
             return

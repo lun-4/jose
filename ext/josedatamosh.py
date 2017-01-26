@@ -27,7 +27,7 @@ class JoseDatamosh(jaux.Auxiliar):
 
     async def c_datamosh(self, message, args):
         '''
-        `!datamosh <url> [iterations]` - *Datamoshing.* (3JC/datamosh)
+        `!datamosh <url> [iterations]` - *Datamoshing.*
         ```
 Formatos recomendados(*testados*): JPG, PNG
 Formatos NÃO recomendados: BMP, GIF
@@ -81,7 +81,7 @@ Resultados de fotos jogadas ao !datamosh:
             width, height = img.size
 
             if width > 1280 or height > 720:
-                await self.say("Resolução muito grande(>720p)")
+                await self.say("Resolução muito grande(largura > 1280 ou altura > 720 pixels)")
                 return
 
             output_image = io.BytesIO()

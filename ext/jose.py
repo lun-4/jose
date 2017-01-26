@@ -56,6 +56,22 @@ class JoseBot(jcommon.Extension):
 
         self.logger.info("Unloaded all modules")
 
+    async def unload_mod(self, modname):
+        module = self.modules[modname]
+        # if ext_unload exists
+        if getattr(module['inst'], 'ext_unload', False):
+            try:
+                ok = await module['inst'].ext_unload()
+                # delete stuff from the module table
+                del self.modules[modname]
+                return ok
+            except Exception as e:
+                self.logger.error("%s[ERROR]: %s" % (modname, repr(e)))
+                return False, repr(e)
+        else:
+            self.logger.info("%s doesn't have ext_unload", modname)
+            return False, "ext_unload isn't available in %s" % modname)
+
     def load_gext(self, inst, n):
         self.logger.info("Loading gext %s", n)
         methods = (method for method in dir(inst) if callable(getattr(inst, method)))
@@ -129,10 +145,13 @@ class JoseBot(jcommon.Extension):
         if self.current is not None:
             if loaded_success:
                 await self.say(":ok_hand:")
+                return True
             elif loaded_almost:
                 await self.say(":train:")
+                return False
             else:
                 await self.say(":poop:")
+                return False
         else:
             if not loaded_success:
                 self.logger.error("Error loading %s", n)
@@ -149,7 +168,7 @@ class JoseBot(jcommon.Extension):
             await module['inst'].recv(message)
 
     async def c_reload(self, message, args):
-        '''`!relaod module` - recarrega um módulo do josé'''
+        '''`!reload module` - recarrega um módulo do josé'''
         await self.is_admin(message.author.id)
 
         if len(args) < 2:
@@ -160,13 +179,44 @@ class JoseBot(jcommon.Extension):
         if n in self.modules:
             await self.load_ext(n, self.modules[n]['class'])
         else:
-            await self.say("%s: módulo não encontrado/carregado" % n)
+            await self.say("%s: module not found/loaded" % n)
 
     async def c_unload(self, message, args):
-        pass # TODO
+        '''`!unload module` - desrecarrega um módulo do josé'''
+        await self.is_admin(message.author.id)
+
+        if len(args) < 2:
+            await self.say(self.c_reload.__doc__)
+            return
+
+        modname = args[1]
+
+        if modname not in self.modules:
+            await self.say("%s: module not loaded" % modname)
+        else:
+            # unload it
+            res = await self.unload_mod(modname)
+            if res[0]:
+                await self.say(":cry: `%s` is dead :skull:")
+            else:
+                await self.say(":warning: Error happened: %s" % res[1])
 
     async def c_loadmod(self, message, args):
-        pass # TODO
+        '''`!loadmod class@module` - carrega um módulo do josé'''
+        await self.is_admin(message.author.id)
+
+        if len(args) < 2:
+            await self.say(self.c_reload.__doc__)
+            return
+
+        # parse class@module
+        modname, modclass = args[1].split('@')
+
+        ok = await self.load_ext(modname, modclass)
+        if not ok:
+            await self.say(":ok_hand: Success loading `%s`!" % modname)
+        else:
+            await self.say(":warning: Error loading `%s` :warning: ")
 
     async def c_modlist(self, message, args):
         '''`!modlist` - Módulos do josé'''
