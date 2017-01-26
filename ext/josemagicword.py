@@ -71,18 +71,17 @@ class JoseMagicWord(jaux.Auxiliar):
             return False, str(e)
 
     async def e_any_message(self, message):
-        if message.server.id not in self.magicwords:
-            self.magicwords[message.server.id] = {}
-
         if self.counter % 25 == 0:
             await self.savedb()
 
-        mwsdb = self.magicwords[message.server.id]
-
-        for set_id in mwsdb:
-            mw = mwsdb[set_id]
-            if mw_match(mw, message.content):
-                await self.say(mw_response(mw, message))
+        if message.server.id in self.magicwords:
+            mwsdb = self.magicwords[message.server.id]
+            print(mwsdb)
+            for set_id in mwsdb:
+                mw = mwsdb[set_id]
+                print(mw)
+                if mw_match(mw, message.content):
+                    await self.say(mw_response(mw, message))
 
         self.counter += 1
 
@@ -110,8 +109,8 @@ class JoseMagicWord(jaux.Auxiliar):
             return
 
         if message.server.id not in self.magicwords:
-            await self.say(":warning: Database not created")
-            return
+            self.logger.info("New MW Database for %s", message.sever.id)
+            self.magicwords[message.server.id] = {}
 
         # check duplicates
         serverdb = self.magicwords[message.server.id]
