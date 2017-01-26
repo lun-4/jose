@@ -76,12 +76,12 @@ class JoseMagicWord(jaux.Auxiliar):
 
         if message.server.id in self.magicwords:
             mwsdb = self.magicwords[message.server.id]
-            print(mwsdb)
             for set_id in mwsdb:
                 mw = mwsdb[set_id]
-                print(mw)
-                if mw_match(mw, message.content):
-                    await self.say(mw_response(mw, message))
+                match = await mw_match(mw, message.content)
+                if match:
+                    response = await mw_response(mw, message)
+                    await self.say(response)
 
         self.counter += 1
 
