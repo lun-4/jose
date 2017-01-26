@@ -138,7 +138,7 @@ class JoseMagicWord(jaux.Auxiliar):
         while str(new_id) in serverdb:
             new_id += 1
 
-        serverdb[new_id] = {
+        serverdb[str(new_id)] = {
             'words': magicwords,
             'response': mwresponse
         }
@@ -192,6 +192,11 @@ class JoseMagicWord(jaux.Auxiliar):
         if set_id not in serverdb:
             await self.say("Magic Word Set `%r` not found" % set_id)
             return
+
+        # so it doesn't trigger again
+        serverdb[set_id] = {
+            'words': [],
+            'response': '',
 
         del serverdb[set_id]
         await self.savedb()
