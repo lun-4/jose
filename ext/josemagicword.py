@@ -36,7 +36,7 @@ async def mw_response(mw, message):
 
 async def mw_match(mw, string):
     for word in mw['words']:
-        if word == string:
+        if word in string:
             return True
 
 class JoseMagicWord(jaux.Auxiliar):
@@ -82,7 +82,7 @@ class JoseMagicWord(jaux.Auxiliar):
                 match = await mw_match(mw, message.content.lower())
                 if match:
                     response = await mw_response(mw, message)
-                    await self.say(response)
+                    await self.say(response, channel=message.channel)
 
         self.counter += 1
 
@@ -190,8 +190,9 @@ class JoseMagicWord(jaux.Auxiliar):
         set_id = args[1]
 
         if set_id not in serverdb:
-            await self.say("Magic Word Set not found")
+            await self.say("Magic Word Set `%r` not found" % set_id)
             return
 
         del serverdb[set_id]
+        await self.savedb()
         await self.say("Deleted set %s" % set_id)

@@ -269,6 +269,7 @@ class JoseBot(jcommon.Extension):
     async def turnoff(self):
         await jcoin.JoseCoin(self.client).josecoin_save(self.current, True)
         await self.unload_all()
+        await self.say(":wave: kthxbye :wave:")
         await self.client.logout()
         sys.exit(0)
 
