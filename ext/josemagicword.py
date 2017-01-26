@@ -3,7 +3,8 @@
 import discord
 import asyncio
 import sys
-import hashlib
+import os
+import json
 
 sys.path.append("..")
 import jauxiliar as jaux
