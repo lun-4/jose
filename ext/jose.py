@@ -70,7 +70,7 @@ class JoseBot(jcommon.Extension):
                 return False, repr(e)
         else:
             self.logger.info("%s doesn't have ext_unload", modname)
-            return False, "ext_unload isn't available in %s" % modname)
+            return False, "ext_unload isn't available in %s" % (modname)
 
     def load_gext(self, inst, n):
         self.logger.info("Loading gext %s", n)
