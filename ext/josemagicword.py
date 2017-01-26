@@ -43,6 +43,7 @@ class JoseMagicWord(jaux.Auxiliar):
         jaux.Auxiliar.__init__(self, cl)
         self.db_magicword_path = jconfig.MAGICWORD_PATH
         self.magicwords = {}
+        self.counter = 0
 
     async def savedb(self):
         self.logger.info("Saving Magicword database")
@@ -81,6 +82,8 @@ class JoseMagicWord(jaux.Auxiliar):
         for mw in mwsdb:
             if mw_match(mw, message.content):
                 await self.say(mw_response(mw, message))
+
+        self.counter += 1
 
     async def c_setmagic(self, message, args):
         '''`!setmw magicword1,magicword2,magicword3;response` - Magic Words
