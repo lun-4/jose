@@ -162,7 +162,7 @@ class JoseMagicWord(jaux.Auxiliar):
                 mw = serverdb[set_id]
                 res.append("%s: %s > %s" % (set_id, mw['words'], mw['response']))
 
-            await self.say(self.codeblock("", ''.join(res)))
+            await self.say(self.codeblock("", '\n'.join(res)))
         else:
             set_id = args[1]
 
