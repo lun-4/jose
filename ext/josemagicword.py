@@ -194,8 +194,8 @@ class JoseMagicWord(jaux.Auxiliar):
 
         # so it doesn't trigger again
         self.magicwords[message.server.id][set_id] = {
-            'words': [uuid.uuid4()],
-            'response': uuid.uuid4(),
+            'words': [str(uuid.uuid4())],
+            'response': str(uuid.uuid4()),
         }
 
         # say to Python to FUCKING DELETE IT
