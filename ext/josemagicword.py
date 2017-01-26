@@ -79,7 +79,7 @@ class JoseMagicWord(jaux.Auxiliar):
             mwsdb = self.magicwords[message.server.id]
             for set_id in mwsdb:
                 mw = mwsdb[set_id]
-                match = await mw_match(mw, message.content)
+                match = await mw_match(mw, message.content.lower())
                 if match:
                     response = await mw_response(mw, message)
                     await self.say(response)
@@ -105,13 +105,17 @@ class JoseMagicWord(jaux.Auxiliar):
         magicwords, mwresponse = mwstr.split(';')
         magicwords = magicwords.split(',')
 
-        if len(magicwords) > 5:
-            await self.say(":warning: Maximum of 4 magic words allowed in each set.")
+        if len(magicwords) > 10:
+            await self.say(":warning: Maximum of 10 magic words allowed in each set.")
             return
 
         if message.server.id not in self.magicwords:
             self.logger.info("New MW Database for %s", message.server.id)
             self.magicwords[message.server.id] = {}
+
+        # case insensitive
+        for i, word in enumerate(magicwords):
+            magicwords[i] = word.lower()
 
         # check limits
         serverdb = self.magicwords[message.server.id]
@@ -129,7 +133,11 @@ class JoseMagicWord(jaux.Auxiliar):
                     return
 
         # create mw with new id
-        new_id = str(len(serverdb) + 1)
+        new_id = 1
+        # find the first open position for a magic word
+        while str(new_id) in serverdb:
+            new_id += 1
+
         serverdb[new_id] = {
             'words': magicwords,
             'response': mwresponse
