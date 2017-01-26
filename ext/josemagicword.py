@@ -11,6 +11,8 @@ import jauxiliar as jaux
 import joseerror as je
 import joseconfig as jconfig
 
+import uuid
+
 DEFAULT_MAGICWORD_DATABASE = '''
 {}
 '''
@@ -138,7 +140,7 @@ class JoseMagicWord(jaux.Auxiliar):
         while str(new_id) in serverdb:
             new_id += 1
 
-        serverdb[str(new_id)] = {
+        self.magicwords[message.server.id][str(new_id)] = {
             'words': magicwords,
             'response': mwresponse
         }
@@ -185,20 +187,18 @@ class JoseMagicWord(jaux.Auxiliar):
             await self.say(":warning: Database not created")
             return
 
-        serverdb = self.magicwords[message.server.id]
-
         set_id = args[1]
-
-        if set_id not in serverdb:
+        if set_id not in self.magicwords[message.server.id]:
             await self.say("Magic Word Set `%r` not found" % set_id)
             return
 
         # so it doesn't trigger again
-        serverdb[set_id] = {
-            'words': [],
-            'response': '',
+        self.magicwords[message.server.id][set_id] = {
+            'words': [uuid.uuid4()],
+            'response': uuid.uuid4(),
         }
 
+        # say to Python to FUCKING DELETE IT
         del serverdb[set_id]
         await self.savedb()
         await self.say("Deleted set %s" % set_id)
