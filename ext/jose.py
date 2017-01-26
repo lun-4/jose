@@ -195,6 +195,7 @@ class JoseBot(jcommon.Extension):
             await self.say("%s: module not loaded" % modname)
         else:
             # unload it
+            self.logger.info("!unload: %s" % modname)
             res = await self.unload_mod(modname)
             if res[0]:
                 await self.say(":cry: `%s` is dead :skull:")
@@ -214,6 +215,7 @@ class JoseBot(jcommon.Extension):
 
         ok = await self.load_ext(modname, modclass)
         if not ok:
+            self.logger.info("!loadmod: %s" % modname)
             await self.say(":ok_hand: Success loading `%s`!" % modname)
         else:
             await self.say(":warning: Error loading `%s` :warning: ")

@@ -409,15 +409,21 @@ def one_message(message):
                 if cmd_ht == 'help':
                     yield from jose.say(help_helptext)
                     return
+
                 jose_method = getattr(jose, 'c_%s' % cmd_ht)
+
+                if jose_method is None:
+                    yield from jose.say("%s: Command not found" % cmd_ht)
+                    return
+
             except Exception as e:
-                yield from jose.say("%s: %r" % (command, e))
+                yield from jose.say("help.%s: %r" % (cmd_ht, e))
                 return
 
             try:
                 yield from jose.say(jose_method.__doc__)
             except Exception as e:
-                yield from jose.say(repr(e))
+                yield from jose.say("error getting helptext for %s: %r" % (command, repr(e)))
             return
 
         try:
