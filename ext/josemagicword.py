@@ -79,13 +79,14 @@ class JoseMagicWord(jaux.Auxiliar):
 
         mwsdb = self.magicwords[message.server.id]
 
-        for mw in mwsdb:
+        for set_id in mwsdb:
+            mw = mwsdb[set_id]
             if mw_match(mw, message.content):
                 await self.say(mw_response(mw, message))
 
         self.counter += 1
 
-    async def c_setmagic(self, message, args):
+    async def c_setmw(self, message, args):
         '''`!setmw magicword1,magicword2,magicword3;response` - Magic Words
         docs: https://github.com/lkmnds/jose/blob/master/doc/magicwords.md'''
 
@@ -160,7 +161,7 @@ class JoseMagicWord(jaux.Auxiliar):
             await self.say("`%s: %s > %s`" % (set_id, mw['words'], mw['response']))
 
 
-    async def c_delmagic(self, message, args):
+    async def c_delmw(self, message, args):
         '''`!delmw set` - deletes a magic word set'''
 
         if len(args) < 2:
