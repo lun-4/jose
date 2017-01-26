@@ -197,6 +197,7 @@ class JoseMagicWord(jaux.Auxiliar):
         serverdb[set_id] = {
             'words': [],
             'response': '',
+        }
 
         del serverdb[set_id]
         await self.savedb()
