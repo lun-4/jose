@@ -90,7 +90,7 @@ class JoseMagicWord(jaux.Auxiliar):
         docs: https://github.com/lkmnds/jose/blob/master/doc/magicwords.md'''
 
         if len(args) < 2:
-            await self.say(self.c_setmagic.__doc__)
+            await self.say(self.c_setmw.__doc__)
             return
 
         # get string that represents the magic word
@@ -109,7 +109,7 @@ class JoseMagicWord(jaux.Auxiliar):
             return
 
         if message.server.id not in self.magicwords:
-            self.logger.info("New MW Database for %s", message.sever.id)
+            self.logger.info("New MW Database for %s", message.server.id)
             self.magicwords[message.server.id] = {}
 
         # check duplicates
@@ -164,7 +164,7 @@ class JoseMagicWord(jaux.Auxiliar):
         '''`!delmw set` - deletes a magic word set'''
 
         if len(args) < 2:
-            await self.say(self.c_delmagic.__doc__)
+            await self.say(self.c_delmw.__doc__)
             return
 
         if message.server.id not in self.magicwords:
