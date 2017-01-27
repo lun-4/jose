@@ -47,8 +47,7 @@ jasm_env = {}
 if PARABENS_MODE:
     old_send = client.send_message
 
-    @asyncio.coroutine
-    def newsend(ch, d):
+    async def newsend(ch, d):
         return old_send(ch, 'Parabéns %s' % d)
 
     client.send_message = newsend
@@ -96,8 +95,7 @@ async def make_causo(message):
 
 help_josecoin = make_func(jcoin.JOSECOIN_HELP_TEXT)
 
-@asyncio.coroutine
-def jcoin_control(id_user, amnt):
+async def jcoin_control(id_user, amnt):
     '''
     returns True if user can access
     '''
@@ -315,22 +313,24 @@ async def on_message(message):
     global cmd_queue
     await cmd_queue.push(message)
 
-@asyncio.coroutine
-def one_message(message):
+async def one_message(message):
     global jose
     global started
     global counter
     global help_helptext
 
+    async def send_message(string, channel=message.channel):
+        await client.send_message(string, channel)
+
     if message.content == '!construção': #override maintenance mode
-        yield from main_status(message)
+        await main_status(message)
         return
 
     for user_id in list(jose_env['spamcl']):
         if time.time() > jose_env['spamcl'][user_id]:
             del jose_env['spamcl'][user_id]
             del jose_env['spam'][user_id]
-            yield from jose.say("<@%s> : cooldown destruído" % user_id)
+            await jose.say("<@%s> : cooldown destruído" % user_id)
 
     if jose.command_lock:
         return
@@ -345,7 +345,7 @@ def one_message(message):
             try:
                 jcoin.data[message.author.id]['name'] = message.author.name
             except Exception as e:
-                yield from jose_debug(message, "aid.jc: pyerr: ```%s```" % traceback.format_exc())
+                await jose_debug(message, "aid.jc: pyerr: ```%s```" % traceback.format_exc())
 
     # we do not want the bot to reply to itself
     if message.author == client.user:
@@ -363,22 +363,22 @@ def one_message(message):
         elif PARABENS_MODE:
             initmsg = "Parabéns %s" % initmsg
 
-        yield from jose_debug(message, initmsg)
-        yield from josecoin_load(message, False)
+        await jose_debug(message, initmsg)
+        await josecoin_load(message, False)
         return
 
     counter += 1
     if counter > 11:
-        yield from josecoin_save(message, False)
+        await josecoin_save(message, False)
         counter = 0
 
     st = time.time()
 
-    yield from jose.recv(message) # at least
+    await jose.recv(message) # at least
 
     # any_message event
     for handler in event_table['any_message']:
-        yield from handler(message)
+        await handler(message)
 
     # get command and push it to jose
     if message.content[0] == '!':
@@ -394,12 +394,12 @@ def one_message(message):
 
         if command == 'help':
             # load helptext
-            yield from jose.recv(message) # default
+            await jose.recv(message) # default
 
             cmd_ht = 'help'
             try:
                 if args[1] == 'help':
-                    yield from jose.say(help_helptext)
+                    await jose.say(help_helptext)
                     return
                 else:
                     cmd_ht = args[1]
@@ -408,28 +408,28 @@ def one_message(message):
 
             try:
                 if cmd_ht == 'help':
-                    yield from jose.say(help_helptext)
+                    await jose.say(help_helptext)
                     return
 
                 jose_method = getattr(jose, 'c_%s' % cmd_ht)
 
                 if jose_method is None:
-                    yield from jose.say("%s: Command not found" % cmd_ht)
+                    await jose.say("%s: Command not found" % cmd_ht)
                     return
 
             except Exception as e:
-                yield from jose.say("help.%s: %r" % (cmd_ht, e))
+                await jose.say("help.%s: %r" % (cmd_ht, e))
                 return
 
             try:
-                yield from jose.say(jose_method.__doc__)
+                await jose.say(jose_method.__doc__)
             except Exception as e:
-                yield from jose.say("error getting helptext for %s: %r" % (command, repr(e)))
+                await jose.say("error getting helptext for %s: %r" % (command, repr(e)))
             return
 
         try:
             if MAINTENANCE_MODE:
-                yield from show_maintenance(message)
+                await show_maintenance(message)
                 return
 
             # call c_ bullshit
@@ -439,49 +439,49 @@ def one_message(message):
                 return
 
             # but first, repeat the recv steps
-            yield from jose.mod_recv(message)
+            await jose.mod_recv(message)
             try:
-                yield from jose_method(message, args)
+                await jose_method(message, args)
 
             except je.PermissionError:
-                yield from jose.say("permissão ¯\_(ツ)_/¯ 💠 ¯\_(ツ)_/¯ negada")
+                await jose.say("permissão ¯\_(ツ)_/¯ 💠 ¯\_(ツ)_/¯ negada")
             except RuntimeError as e:
-                yield from jose.say('jose: py_rt_err: %s' % repr(e))
+                await jose.say('jose: py_rt_err: %s' % repr(e))
             except je.LimitError:
                 pass
 
             end = time.time()
             delta = end - st
             if delta > 13:
-                yield from jose.say("Alguma coisa está demorando demais para responder(delta=%.4fs)..." % delta)
+                await jose.say("Alguma coisa está demorando demais para responder(delta=%.4fs)..." % delta)
 
             return
         except Exception as e:
-            yield from jose.say("jose: py_err: ```%s```" % traceback.format_exc())
+            await jose.say("jose: py_err: ```%s```" % traceback.format_exc())
             # return
 
     if message.content in exact_commands:
         if MAINTENANCE_MODE:
-            yield from show_maintenance(message)
+            await show_maintenance(message)
             return
         func = exact_commands[message.content]
-        yield from func(message)
+        await func(message)
         return
 
     for command in commands_match:
         if command in message.content:
             if MAINTENANCE_MODE:
-                yield from show_maintenance(message)
+                await show_maintenance(message)
                 return
             func = commands_match[command]
-            yield from func(message)
+            await func(message)
             return
 
     if message.content.startswith('$jasm'):
         if MAINTENANCE_MODE:
-            yield from show_maintenance(message)
+            await show_maintenance(message)
             return
-        yield from jose.say('Bem vindo ao REPL do JoseAssembly!\nPara sair, digite "exit"')
+        await jose.say('Bem vindo ao REPL do JoseAssembly!\nPara sair, digite "exit"')
 
         if not (message.author.id in jasm_env):
             jasm_env[message.author.id] = jasm.empty_env()
@@ -489,20 +489,20 @@ def one_message(message):
         pointer = jasm_env[message.author.id]
 
         while True:
-            data = yield from client.wait_for_message(author=message.author)
+            data = await client.wait_for_message(author=message.author)
             if data.content == 'exit':
-                yield from jose.say('saindo do REPL')
+                await jose.say('saindo do REPL')
                 break
             else:
-                insts = yield from jasm.parse(data.content)
-                res = yield from jasm.execute(insts, pointer)
+                insts = await jasm.parse(data.content)
+                res = await jasm.execute(insts, pointer)
                 if res[0] == True:
                     if len(res[2]) < 1:
-                        yield from jose.say("**debug: nenhum resultado**")
+                        await jose.say("**debug: nenhum resultado**")
                     else:
-                        yield from jose.say(res[2])
+                        await jose.say(res[2])
                 else:
-                    yield from jose_debug(message, "jasm error: %s" % res[2])
+                    await jose_debug(message, "jasm error: %s" % res[2])
                 pointer = res[1]
         return
 
@@ -513,7 +513,7 @@ def one_message(message):
 
     # use e_on_message calls
     for handler in event_table['on_message']:
-        yield from handler(message)
+        await handler(message)
 
     if random.random() < jc_probabiblity:
         if not message.channel.is_private:
@@ -533,7 +533,7 @@ def one_message(message):
                     # set timeout of user
                     if not message.author.id in jose_env['spamcl']:
                         jose_env['spamcl'][message.author.id] = time.time() + 300
-                        yield from jose.say('@%s recebe cooldown de 5 minutos!' % message.author)
+                        await jose.say('@%s recebe cooldown de 5 minutos!' % message.author)
                         return
                     else:
                         return
@@ -546,19 +546,19 @@ def one_message(message):
                 acc_to = jcoin.get(author_id)[1]
 
                 if amount == 0:
-                    yield from jose.say("0JC > %s" % (acc_to['name']))
+                    await jose.say("0JC > %s" % (acc_to['name']))
                 else:
                     res = jcoin.transfer(jcoin.jose_id, author_id, amount, jcoin.LEDGER_PATH)
-                    yield from josecoin_save(message, False)
+                    await josecoin_save(message, False)
                     if res[0]:
-                        emoji_res = yield from random_emoji(3)
-                        yield from jose.say('%s %.2fJC > %s' % (emoji_res, amount, acc_to['name']))
+                        emoji_res = await random_emoji(3)
+                        await jose.say('%s %.2fJC > %s' % (emoji_res, amount, acc_to['name']))
                     else:
-                        yield from jose_debug(message, 'jc_error: %s' % res[1])
+                        await jose_debug(message, 'jc_error: %s' % res[1])
         else:
             return
 
-    yield from gorila_routine(message.channel)
+    await gorila_routine(message.channel)
 
 async def command_loop():
     while True:
@@ -578,7 +578,8 @@ async def on_ready():
 
 async def main_task():
     global client
-
+    startupdelta = time.time() - jose.start_time
+    logger.info("took %.2f seconds on startup", startupdelta)
     logger.info("José Starting")
     await client.start(jconfig.discord_token)
 
