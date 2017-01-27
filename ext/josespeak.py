@@ -84,6 +84,7 @@ class Texter:
         # Shorten prevList until it's in mapping
         while toHashKey(prevList) not in self.mapping:
             if len(prevList) == 0:
+                self.logger.error("Texter.next_word: len(prevList) == 0")
                 pass
             else:
                 prevList.pop(0)
@@ -146,15 +147,16 @@ class JoseSpeak(jcommon.Extension):
         await self.textertimer()
 
     async def create_generators(self):
+        total_messages = 0
         for serverid in self.database:
             messages = self.database[serverid]
-            self.logger.info("Generating Texter for server ID %s with %d messages", serverid, len(messages))
+            total_messages += len(messages)
             self.text_generators[serverid] = Texter(None, 1, '\n'.join(messages))
 
-        self.logger.info("Generated %d texters", len(self.text_generators))
+        self.logger.info("Generated %d texters, %d messages", len(self.text_generators), total_messages)
 
     async def save_databases(self):
-        self.logger.info("Saved databases")
+        self.logger.info("Saved josespeak database")
         json.dump(self.database, open(self.database_path, 'w'))
         json.dump(self.wlengths, open(self.db_length_path, 'w'))
         json.dump(self.messages, open(self.db_msg_path, 'w'))

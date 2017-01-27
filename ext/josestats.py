@@ -11,6 +11,7 @@ sys.path.append("..")
 import jauxiliar as jaux
 import joseerror as je
 import josecommon as jcommon
+import joseconfig as jconfig
 
 # TODO: query language
 QUERIES = {
@@ -90,10 +91,11 @@ class JoseStats(jaux.Auxiliar):
 
     async def db_fsizes(self):
         return {
-            'markovdb': os.path.getsize(jcommon.MARKOV_DB_PATH),
-            'wlength': os.path.getsize(jcommon.MARKOV_LENGTH_PATH),
-            'messages': os.path.getsize(jcommon.MARKOV_MESSAGES_PATH),
-            'itself': os.path.getsize(jcommon.STAT_DATABASE_PATH),
+            'jspeak:markovdb': os.path.getsize(jcommon.MARKOV_DB_PATH),
+            'jspeak:word_length': os.path.getsize(jcommon.MARKOV_LENGTH_PATH),
+            'jspeak:message_count': os.path.getsize(jcommon.MARKOV_MESSAGES_PATH),
+            'jstats:statistics': os.path.getsize(jcommon.STAT_DATABASE_PATH),
+            'jmword:magicword': os.path.getsize(jconfig.MAGICWORD_PATH)
         }
 
     async def c_saveqdb(self, message, args):

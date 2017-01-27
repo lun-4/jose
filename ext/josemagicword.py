@@ -77,6 +77,10 @@ class JoseMagicWord(jaux.Auxiliar):
         if self.counter % 25 == 0:
             await self.savedb()
 
+        if message.server is None:
+            # ignore DMs
+            return
+
         if message.server.id in self.magicwords:
             mwsdb = self.magicwords[message.server.id]
             for set_id in mwsdb:
