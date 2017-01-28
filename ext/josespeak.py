@@ -161,17 +161,17 @@ class JoseSpeak(jcommon.Extension):
         json.dump(self.wlengths, open(self.db_length_path, 'w'))
         json.dump(self.messages, open(self.db_msg_path, 'w'))
 
-    async def c_savedb(self, message, args):
+    async def c_savedb(self, message, args, cxt):
         """`!savedb` - saves all available databases(autosave for each 50 messages)"""
         await self.save_databases()
-        await self.say(":floppy_disk: saved database :floppy_disk:")
+        await cxt.say(":floppy_disk: saved database :floppy_disk:")
 
-    async def c_speaktrigger(self, message, args):
+    async def c_speaktrigger(self, message, args, cxt):
         """`!speaktrigger` - trigger jose's speaking code"""
         self.flag = True
         await self.e_on_message(message)
 
-    async def c_spt(self, message, args):
+    async def c_spt(self, message, args, cxt):
         '''`!spt` - alias para `!speaktrigger`'''
         await self.c_speaktrigger(message, args)
 
@@ -209,17 +209,17 @@ class JoseSpeak(jcommon.Extension):
             # should work
             await self.create_generators()
 
-    async def c_forcereload(self, message, args):
+    async def c_forcereload(self, message, args, cxt):
         """`!forcereload` - save and load josespeak module"""
         ok = await self.ext_unload()
         if not ok[0]:
-            await self.say('ext_unload :warning: ' % ok[1])
+            await cxt.say('ext_unload :warning: ' % ok[1])
 
         ok = await self.ext_load()
         if not ok[0]:
-            await self.say('ext_load :warning: ' % ok[1])
+            await cxt.say('ext_load :warning: ' % ok[1])
 
-        await self.say("done")
+        await cxt.say("done")
 
     async def e_on_message(self, message):
         if message.server is None:
@@ -279,48 +279,48 @@ class JoseSpeak(jcommon.Extension):
             res = res[::-1]
         elif jcommon.PARABENS_MODE:
             res = 'Parabéns %s' % res
-        await self.say(res)
+        await cxt.say(res)
 
-    async def c_falar(self, message, args):
+    async def c_falar(self, message, args, cxt):
         """`!falar [wordmax]` - josé fala(wordmax default 10)"""
         wordlength = 10
 
         if len(args) > 2:
             if int(args[1]) > 100:
-                await self.say("Nope :tm:")
+                await cxt.say("Nope :tm:")
                 return
             else:
                 wordlength = int(args[1])
 
         await self.speak(self.cult_generator, wordlength)
 
-    async def c_sfalar(self, message, args):
+    async def c_sfalar(self, message, args, cxt):
         """`!sfalar [wordmax]` - falar usando textos do seu servidor atual(wordmax default 10)"""
         wordlength = 10
 
         if len(args) > 2:
             if int(args[1]) > 100:
-                await self.say("Nope :tm:")
+                await cxt.say("Nope :tm:")
                 return
             else:
                 wordlength = int(args[1])
 
         await self.speak(self.text_generators[message.server.id], wordlength)
 
-    async def c_gfalar(self, message, args):
+    async def c_gfalar(self, message, args, cxt):
         """`!gfalar [wordmax]` - falar usando o texto global(wordmax default 10)"""
         wordlength = 10
 
         if len(args) > 2:
             if int(args[1]) > 100:
-                await self.say("Nope :tm:")
+                await cxt.say("Nope :tm:")
                 return
             else:
                 wordlength = int(args[1])
 
         await self.speak(self.global_generator, wordlength)
 
-    async def c_josetxt(self, message, args):
+    async def c_josetxt(self, message, args, cxt):
         '''`!josetxt` - Mostra a quantidade de linhas, palavras e bytes no jose-data.txt'''
         output = subprocess.Popen(['wc', 'jose-data.txt'], stdout=subprocess.PIPE).communicate()[0]
-        await self.say(output)
+        await cxt.say(output)
