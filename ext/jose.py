@@ -551,6 +551,7 @@ class JoseBot(jcommon.Extension):
             return
 
         res = ' '.join(self.modules[modname]['methods'])
+        res = res.replace('c_', '!')
         await cxt.say(self.codeblock('', res))
 
     async def c_uptime(self, message, args, cxt):
