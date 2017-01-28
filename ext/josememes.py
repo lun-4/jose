@@ -473,7 +473,7 @@ class JoseMemes(jcommon.Extension):
         mensagem_muito_blackmirror = random.choice(BLACK_MIRROR_MESSAGES)
         await cxt.say(mensagem_muito_blackmirror)
 
-    async def wikimedia_api(self, params):
+    async def wikimedia_api(self, params, cxt):
         using_query = False
         wiki_searchterm = ' '.join(params['args'][1:])
         wiki_methodname = params['name']
@@ -548,10 +548,10 @@ class JoseMemes(jcommon.Extension):
         if ':query' in args:
             args[args.index(':query')] = ''
             wikipedia_params['searchparams'] = ''
-            await self.wikimedia_api(wikipedia_params)
+            await self.wikimedia_api(wikipedia_params, cxt)
         else:
             del wikipedia_params['queryparams']
-            await self.wikimedia_api(wikipedia_params)
+            await self.wikimedia_api(wikipedia_params, cxt)
 
     async def c_deswiki(self, message, args, cxt):
         '''`!deswiki [terms]` - procurar na DESCICLOPEDIA!!!'''
@@ -562,5 +562,5 @@ class JoseMemes(jcommon.Extension):
                 'endpoint': 'http://desciclopedia.org/api.php',
                 'searchparams': '?format=json&action=opensearch&search=',
                 #'queryparams': '?format=json&action=query&list=search&srsearch='
-            }
+            }, cxt
         )
