@@ -86,14 +86,14 @@ class JoseMemes(jcommon.Extension):
                 self.logger.error("Error in save_memes", exc_info=True)
             return False
 
-    async def c_aprovado(self, message, args):
+    async def c_aprovado(self, message, args, cxt):
         '''`!aprovado` - O Melhor Sean Anthony®'''
-        await self.say('http://gaveta.com.br/images/Aprovacao-Sean-Anthony.png')
+        await cxt.say('http://gaveta.com.br/images/Aprovacao-Sean-Anthony.png')
 
-    async def c_htmpr(self, message, args):
-        await self.say(MEMES_TECH_HELP)
+    async def c_htmpr(self, message, args, cxt):
+        await cxt.say(MEMES_TECH_HELP)
 
-    async def c_meme(self, message, args):
+    async def c_meme(self, message, args, cxt):
         '''
         !meme: Adicione e mostre memes com o josé!
         **RECOMENDADO**: use `!htmpr` para descobrir problemas técnicos.
@@ -119,7 +119,7 @@ class JoseMemes(jcommon.Extension):
         '''
 
         if len(args) < 2:
-            await self.say(self.c_meme.__doc__)
+            await cxt.say(self.c_meme.__doc__)
             return
 
         command = args[1]
@@ -130,17 +130,17 @@ class JoseMemes(jcommon.Extension):
             url = args_sp[1]
 
             if len(meme) > 96:
-                await self.say("*não tem meme grátis*")
+                await cxt.say("*não tem meme grátis*")
                 return
 
             if meme in self.memes:
-                await self.say("%s: meme já existe" % meme)
+                await cxt.say("%s: meme já existe" % meme)
                 return
 
             for pat in self.patterns:
                 if re.search(pat, url):
                     # if facebook, upload to Discord
-                    await self.say("Detectado um link do facebook, tratando...")
+                    await cxt.say("Detectado um link do facebook, tratando...")
 
                     with aiohttp.ClientSession() as session:
                         data = io.BytesIO()
@@ -166,7 +166,7 @@ class JoseMemes(jcommon.Extension):
 
             # save it because of my sanity
             await self.save_memes()
-            await self.say("%s: meme adicionado!" % meme)
+            await cxt.say("%s: meme adicionado!" % meme)
             return
         elif command == 'rm':
             meme = ' '.join(args[2:])
@@ -177,19 +177,19 @@ class JoseMemes(jcommon.Extension):
                 if (message.author.id == meme_data['owner']) or is_admin:
                     del self.memes[meme]
                     await self.save_memes()
-                    await self.say("%s: meme removido" % meme)
+                    await cxt.say("%s: meme removido" % meme)
                     return
                 else:
                     raise je.PermissionError()
 
                 return
             else:
-                await self.say("%s: meme não encontrado" % meme)
+                await cxt.say("%s: meme não encontrado" % meme)
                 return
         elif command == 'save':
             done = await self.save_memes()
             if done:
-                await self.say("jmemes: banco de dados salvo")
+                await cxt.say("jmemes: banco de dados salvo")
             else:
                 raise IOError("banco de dados não salvo corretamente")
 
@@ -197,7 +197,7 @@ class JoseMemes(jcommon.Extension):
         elif command == 'load':
             done = await self.load_memes()
             if done:
-                await self.say("jmemes: banco de dados carregado")
+                await cxt.say("jmemes: banco de dados carregado")
             else:
                 raise IOError("banco de dados não carregado corretamente")
 
@@ -207,27 +207,27 @@ class JoseMemes(jcommon.Extension):
             self.logger.info("saveloading meme database")
             done = await self.save_memes()
             if done:
-                await self.say("jmemes: banco de dados salvo")
+                await cxt.say("jmemes: banco de dados salvo")
             else:
                 raise IOError("banco de dados não salvo corretamente")
 
             done = await self.load_memes()
             if done:
-                await self.say("jmemes: banco de dados carregado")
+                await cxt.say("jmemes: banco de dados carregado")
             else:
                 raise IOError("banco de dados não carregado corretamente")
 
             return
         #elif command == 'list':
-        #    await self.say("memes: %s" % ', '.join(self.memes.keys()))
+        #    await cxt.say("memes: %s" % ', '.join(self.memes.keys()))
         elif command == 'get':
             meme = ' '.join(args[2:])
             if meme in self.memes:
                 self.memes[meme]['uses'] += 1
-                await self.say(self.memes[meme]['data'])
+                await cxt.say(self.memes[meme]['data'])
                 await self.save_memes()
             else:
-                await self.say("%s: meme não encontrado" % meme)
+                await cxt.say("%s: meme não encontrado" % meme)
             return
         elif command == 'cnv': # debug purposes
             for key in self.memes:
@@ -235,7 +235,7 @@ class JoseMemes(jcommon.Extension):
                 url = meme['data']
                 for pat in self.patterns:
                     if re.search(pat, url[:40]):
-                        await self.say("Detectado um link do facebook, tratando...")
+                        await cxt.say("Detectado um link do facebook, tratando...")
 
                         with aiohttp.ClientSession() as session:
                             data = io.BytesIO()
@@ -253,12 +253,12 @@ class JoseMemes(jcommon.Extension):
                             await asyncio.sleep(0.3)
                         meme['data'] = url
             await self.save_memes()
-            await self.say("done.")
+            await cxt.say("done.")
         elif command == 'search':
             term = ' '.join(args[2:])
             term = term.lower()
             if term.strip() == '':
-                await self.say("Pesquisas vazias não são permitidas")
+                await cxt.say("Pesquisas vazias não são permitidas")
                 return
 
             # better than google
@@ -267,11 +267,11 @@ class JoseMemes(jcommon.Extension):
                 to_send = "Resultados: %s" % ', '.join(probables)
                 # check length of message
                 if len(to_send) > 1995: # 1 9 9 5
-                    await self.say(":elephant: Resultados muito grandes :elephant:")
+                    await cxt.say(":elephant: Resultados muito grandes :elephant:")
                 else:
-                    await self.say(to_send)
+                    await cxt.say(to_send)
             else:
-                await self.say("%r: Nenhum resultado encontrado" % term)
+                await cxt.say("%r: Nenhum resultado encontrado" % term)
         elif command == 'rename':
             args_s = ' '.join(args[2:])
             args_sp = args_s.split(';')
@@ -279,7 +279,7 @@ class JoseMemes(jcommon.Extension):
             newname = args_sp[1]
 
             if not oldname in self.memes:
-                await self.say("%s: meme não encontrado" % oldname)
+                await cxt.say("%s: meme não encontrado" % oldname)
                 return
 
             # swapping
@@ -294,7 +294,7 @@ class JoseMemes(jcommon.Extension):
             }
 
             del self.memes[oldname]
-            await self.say("`%s` foi renomeado para `%s`!" % (oldname, newname))
+            await cxt.say("`%s` foi renomeado para `%s`!" % (oldname, newname))
             await self.save_memes()
             return
 
@@ -302,13 +302,13 @@ class JoseMemes(jcommon.Extension):
             meme = ' '.join(args[2:])
             if meme in self.memes:
                 u = discord.utils.get(message.server.members, id=self.memes[meme]['owner'])
-                await self.say("%s foi criado por %s" % (meme, u))
+                await cxt.say("%s foi criado por %s" % (meme, u))
             else:
-                await self.say("%s: meme não encontrado" % meme)
+                await cxt.say("%s: meme não encontrado" % meme)
             return
 
         elif command == 'count':
-            await self.say("quantidade de memes: %s" % len(self.memes))
+            await cxt.say("quantidade de memes: %s" % len(self.memes))
 
         elif command == 'stat':
             stat = ''
@@ -322,10 +322,10 @@ class JoseMemes(jcommon.Extension):
                 if 'uses' not in copy[k]:
                     inconsistency_report += "%s, " % k
                     inconsistency = True
-                await self.say("`%s`" % inconsistency_report)
+                await cxt.say("`%s`" % inconsistency_report)
 
             if inconsistency:
-                await self.say("INCONSISTENCY entries detected.")
+                await cxt.say("INCONSISTENCY entries detected.")
                 return
 
             for key in sorted(copy, key=lambda key: -copy[key]['uses']):
@@ -333,29 +333,29 @@ class JoseMemes(jcommon.Extension):
                 stat += '%d lugar: %s com %d usos\n' % (i, \
                     key, copy[key]['uses'])
                 i += 1
-            await self.say(self.codeblock('', stat))
+            await cxt.say(self.codeblock('', stat))
 
         elif command == 'istat':
             meme = ' '.join(args[2:])
             if meme in self.memes:
-                await self.say(self.codeblock('', 'usos: %d' % self.memes[meme]['uses']))
+                await cxt.say(self.codeblock('', 'usos: %d' % self.memes[meme]['uses']))
             else:
-                await self.say("%s: meme não encontrado" % meme)
+                await cxt.say("%s: meme não encontrado" % meme)
             return
 
         elif command == 'page':
             if len(args) < 3:
-                await self.say("SyntaxError: `!m page <page>`")
+                await cxt.say("SyntaxError: `!m page <page>`")
                 return
             page = args[2]
 
             try:
                 page = int(page)
             except Exception as e:
-                await self.say("jmemes: %r" % e)
+                await cxt.say("jmemes: %r" % e)
 
             if page < 0:
-                await self.say("EI EI EI EI CALMAI CUZAO")
+                await cxt.say("EI EI EI EI CALMAI CUZAO")
                 return
 
             PER_PAGE = 50
@@ -366,21 +366,21 @@ class JoseMemes(jcommon.Extension):
             x_slice = x[min_it:max_it]
 
             if len(x_slice) < 1:
-                await self.say("*nao tem meme gratis*")
+                await cxt.say("*nao tem meme gratis*")
                 return
 
             report = ', '.join(x_slice)
-            await self.say(report)
+            await cxt.say(report)
 
         elif command == 'check':
-            await self.say("checking INCONSISTENCY data")
+            await cxt.say("checking INCONSISTENCY data")
             for key in self.memes:
                 meme = self.memes[key]
                 if 'uses' not in meme:
-                    await self.say("INCONSISTENCY(uses): %s" % key)
+                    await cxt.say("INCONSISTENCY(uses): %s" % key)
                     self.memes[key].update({"uses": 0})
 
-            await self.say("checking duplicates(by value)")
+            await cxt.say("checking duplicates(by value)")
             new_memes = {}
             for k in self.memes:
                 v = self.memes[k]
@@ -390,9 +390,9 @@ class JoseMemes(jcommon.Extension):
 
             for v in new_memes:
                 if len(new_memes[v]) > 1:
-                    await self.say("DUPLICATE(s): ```%s```\n" % (new_memes[v]))
+                    await cxt.say("DUPLICATE(s): ```%s```\n" % (new_memes[v]))
 
-            await self.say("done.")
+            await cxt.say("done.")
             return
 
         elif command == 'see':
@@ -406,53 +406,53 @@ class JoseMemes(jcommon.Extension):
 
             from_owner = [x for x in self.memes if self.memes[x]['owner'] == owner_id]
             if len(from_owner) < 1:
-                await self.say("*nao tem owner gratis*")
+                await cxt.say("*nao tem owner gratis*")
                 return
 
             corte = from_owner[page*50:(page+1)*50]
             res = len(from_owner), len(corte), ', '.join(corte)
             report = '''Quantidade: %d[%d],\nMemes: %s''' % (res)
-            await self.say(report)
+            await cxt.say(report)
 
         elif command == 'rand':
             key = random.choice(list(self.memes.keys()))
-            await self.say('%s: %s' % (key, self.memes[key]['data']))
+            await cxt.say('%s: %s' % (key, self.memes[key]['data']))
 
         elif command == 'searchc':
             terms = ' '.join(args[2:])
             terms = terms.lower()
             if terms.strip() == '':
-                await self.say("Pesquisas vazias não são permitidas")
+                await cxt.say("Pesquisas vazias não são permitidas")
                 return
 
             probables = [key for key in self.memes if terms in self.memes[key]['data'].lower()]
             if len(probables) <= 70:
-                await self.say("Resultados: %s" % ', '.join(probables))
+                await cxt.say("Resultados: %s" % ', '.join(probables))
             elif len(probables) > 70:
-                await self.say("PORRA EH MUITO RESULTADO NAO AGUENTO[%d resultados]" % len(probables))
+                await cxt.say("PORRA EH MUITO RESULTADO NAO AGUENTO[%d resultados]" % len(probables))
             else:
-                await self.say("%r: Nenhum resultado encontrado" % terms)
+                await cxt.say("%r: Nenhum resultado encontrado" % terms)
 
         else:
-            await self.say("comando inválido: %s" % command)
+            await cxt.say("comando inválido: %s" % command)
 
         return
 
-    async def c_m(self, message, args):
+    async def c_m(self, message, args, cxt):
         '''`!m` - alias para `!meme`'''
         await self.c_meme(message, args)
 
-    async def c_fullwidth(self, message, args):
+    async def c_fullwidth(self, message, args, cxt):
         '''`!fullwidth texto` - converte texto para fullwidth'''
         # looks like discord made fullwidth suppoert available again :D
         text = ' '.join(args[1:])
-        await self.say(text.translate(self.WIDE_MAP))
+        await cxt.say(text.translate(self.WIDE_MAP))
 
-    async def c_fw(self, message, args):
+    async def c_fw(self, message, args, cxt):
         '''`!fw` - alias para `!fullwidth`'''
         await self.c_fullwidth(message, args)
 
-    async def c_emoji(self, message, args):
+    async def c_emoji(self, message, args, cxt):
         '''`!emoji [qt]` - gera de 1 a 5(ou `qt`(máx. 512)) emojis aleatórios'''
         res = ''
         if len(args) < 2:
@@ -460,18 +460,18 @@ class JoseMemes(jcommon.Extension):
         else:
             a = int(args[1])
             if a < 1:
-                await self.say("*Emojis inexistentes*")
+                await cxt.say("*Emojis inexistentes*")
                 return
             if a >= 512:
-                await self.say("*Não tem emoji grátis*")
+                await cxt.say("*Não tem emoji grátis*")
                 return
             res = await jcommon.random_emoji(int(args[1]))
-        await self.say(res)
+        await cxt.say(res)
 
-    async def c_blackmirror(self, message, args):
+    async def c_blackmirror(self, message, args, cxt):
         '''`!blackmirror` - COISAS MUITO BLACK MIRROR, MEU'''
         mensagem_muito_blackmirror = random.choice(BLACK_MIRROR_MESSAGES)
-        await self.say(mensagem_muito_blackmirror)
+        await cxt.say(mensagem_muito_blackmirror)
 
     async def wikimedia_api(self, params):
         using_query = False
@@ -491,7 +491,7 @@ class JoseMemes(jcommon.Extension):
         try:
             response = await asyncio.wait_for(aiohttp.request('GET', wiki_api_url), 8)
         except asyncio.TimeoutError:
-            await self.say("`[wiki:%s] Timeout reached`" % wiki_methodname)
+            await cxt.say("`[wiki:%s] Timeout reached`" % wiki_methodname)
             return
 
         response_text = await response.text()
@@ -506,7 +506,7 @@ class JoseMemes(jcommon.Extension):
                 w_snippet = w_snippet.replace('<span class=\"searchmatch\">', '')
                 w_snippet = w_snippet.replace('</span>', '')
                 w_all += '\t%s: %s...\n' % (result['title'], w_snippet[:120])
-            await self.say(self.codeblock(w_all, ''))
+            await cxt.say(self.codeblock(w_all, ''))
             return
         else:
             w_suggestions = wiki_json[1]
@@ -514,7 +514,7 @@ class JoseMemes(jcommon.Extension):
             w_wiki_urls = wiki_json[3]
 
             if len(w_suggestions) < 1:
-                await self.say("sem resultados")
+                await cxt.say("sem resultados")
                 return
 
             self.logger.debug(w_suggestions_text)
@@ -526,7 +526,7 @@ class JoseMemes(jcommon.Extension):
             if len(search_paragaph) >= 500:
                 search_paragaph = search_paragaph[:500] + '...'
 
-            await self.say(
+            await cxt.say(
             """`%s:%s` =
 ```
     %s
@@ -535,7 +535,7 @@ class JoseMemes(jcommon.Extension):
             """ % (wiki_methodname, wiki_searchterm, search_paragaph, w_wiki_urls[0]))
             return
 
-    async def c_wiki(self, message, args):
+    async def c_wiki(self, message, args, cxt):
         '''`!wiki [terms]` - procurar na WIKIPEDIA!!!'''
         wikipedia_params = {
             'name': 'en.wikipedia',
@@ -553,7 +553,7 @@ class JoseMemes(jcommon.Extension):
             del wikipedia_params['queryparams']
             await self.wikimedia_api(wikipedia_params)
 
-    async def c_deswiki(self, message, args):
+    async def c_deswiki(self, message, args, cxt):
         '''`!deswiki [terms]` - procurar na DESCICLOPEDIA!!!'''
         await self.wikimedia_api(
             {

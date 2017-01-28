@@ -25,7 +25,7 @@ class JoseDatamosh(jaux.Auxiliar):
     async def ext_unload(self):
         return True, ''
 
-    async def c_datamosh(self, message, args):
+    async def c_datamosh(self, message, args, cxt):
         '''
         `!datamosh <url> [iterations]` - *Datamoshing.*
         ```
@@ -41,7 +41,7 @@ Resultados de fotos jogadas ao !datamosh:
 
         '''auth = await self.jc_control(message.author.id, 3)
         if not auth:
-            await self.say("jc.auth: não autorizado")
+            await cxt.say("jc.auth: não autorizado")
             return'''
 
         iterations = 10
@@ -49,11 +49,11 @@ Resultados de fotos jogadas ao !datamosh:
             try:
                 iterations = int(args[2])
             except Exception as e:
-                await self.say("Erro parseando argumentos(%r)." % e)
+                await cxt.say("Erro parseando argumentos(%r)." % e)
                 return
 
         if iterations > 129:
-            await self.say("*engracadinho*")
+            await cxt.say("*engracadinho*")
             return
 
         data = io.BytesIO()
@@ -73,7 +73,7 @@ Resultados de fotos jogadas ao !datamosh:
         try:
             img = Image.open(data)
         except Exception as e:
-            await self.say("Erro abrindo imagem com o Pillow(%r)" % e)
+            await cxt.say("Erro abrindo imagem com o Pillow(%r)" % e)
             return
 
         if img.format in ['JPEG', 'JPEG 2000']:
@@ -81,7 +81,7 @@ Resultados de fotos jogadas ao !datamosh:
             width, height = img.size
 
             if width > 1280 or height > 720:
-                await self.say("Resolução muito grande(largura > 1280 ou altura > 720 pixels)")
+                await cxt.say("Resolução muito grande(largura > 1280 ou altura > 720 pixels)")
                 return
 
             output_image = io.BytesIO()
@@ -127,8 +127,8 @@ Resultados de fotos jogadas ao !datamosh:
 
             output_image.close()
         elif img.format in ['PNG']:
-            await self.say("*não tenho algoritmo pra PNG*\n*espera porra*\n é sério porra")
+            await cxt.say("*não tenho algoritmo pra PNG*\n*espera porra*\n é sério porra")
         elif img.format in ['GIF']:
-            await self.say("*o sr esta de brincando comigo NAO VAI TE GIF NO DATAMOSH* é muito caro em relação a processamento NAO")
+            await cxt.say("*o sr esta de brincando comigo NAO VAI TE GIF NO DATAMOSH* é muito caro em relação a processamento NAO")
         else:
-            await self.say("Formato desconhecido(%s)" % img.format)
+            await cxt.say("Formato desconhecido(%s)" % img.format)

@@ -51,7 +51,7 @@ class JoseArtif(jaux.Auxiliar):
             await self.say(answer)'''
         pass
 
-    async def c_chatstatus(self, message, args):
+    async def c_chatstatus(self, message, args, cxt):
         with open('database.db', 'r') as f:
             dbjson = json.load(f)
         len_entries = len(dbjson)
@@ -59,4 +59,4 @@ class JoseArtif(jaux.Auxiliar):
 I made %d answers in this session
 I have %d entries in my database
 ```""" % (self.answers, len_entries)
-        await self.say(report_str)
+        await cxt.say(report_str)
