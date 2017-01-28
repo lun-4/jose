@@ -73,7 +73,7 @@ class JoseNSFW(jcommon.Extension):
         await cxt.say('ID: %d, URL: %s' % (post['id'], post_url))
         return
 
-    async def porn_routine(self):
+    async def porn_routine(self, cxt):
         res = await jcoin.jcoin_control(self.current.author.id, jcommon.PORN_PRICE)
         if not res[0]:
             await cxt.say("PermError: %s" % res[1])
@@ -81,20 +81,20 @@ class JoseNSFW(jcommon.Extension):
         return True
 
     async def c_hypno(self, message, args, cxt):
-        access = await self.porn_routine()
+        access = await self.porn_routine(cxt)
         if access:
             # ¯\_(ツ)_/¯
             await self.json_api(cxt, 'http://hypnohub.net/post/index.json', '',
                 ' '.join(args[1:]), 'file_url', None, True)
 
     async def c_yandere(self, message, args, cxt):
-        access = await self.porn_routine()
+        access = await self.porn_routine(cxt)
         if access:
             await self.json_api(cxt, 'https://yande.re/post.json', '',
                 ' '.join(args[1:]), 'file_url')
 
     async def c_e621(self, message, args, cxt):
-        access = await self.porn_routine()
+        access = await self.porn_routine(cxt)
         if access:
             await self.json_api(cxt, 'https://e621.net/post/index.json', 'https://e621.net/post/show.json',
                 ' '.join(args[1:]), 'file_url')

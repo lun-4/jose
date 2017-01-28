@@ -174,7 +174,7 @@ class JoseCoin(jcommon.Extension):
     async def c_write(self, message, args):
         '''`!write @mention new_amount` - sobrescreve o saldo de uma conta'''
         global data
-        await self.rolecheck(jcommon.MASTER_ROLE)
+        await self.is_admin(message.author.id)
 
         id_from = await jcommon.parse_id(args[1], message)
         new_amount = Decimal(args[2])
@@ -232,7 +232,6 @@ class JoseCoin(jcommon.Extension):
 
         if range_max >= 16:
             await self.say("LimitError: valores maiores do que 16 não válidos")
-            #raise jcommon.LimitError()
             return
 
         order = []
