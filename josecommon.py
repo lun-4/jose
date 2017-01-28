@@ -458,7 +458,7 @@ def parse_command(message):
     if not isinstance(message, str):
         message = message.content
 
-    if message[0] == '!':
+    if message.startswith(JOSE_PREFIX):
         k = message.find(" ")
         command = message[1:k]
         if k == -1:
@@ -478,7 +478,7 @@ class Context:
         if channel is None:
             channel = self.message.channel
 
-        if len(msg) > 2000:
+        if len(string) > 2000:
             await self.client.send_message(channel, ":elephant: Mensagem muito grande :elephant:")
         else:
             await self.client.send_message(channel, string)
