@@ -440,7 +440,7 @@ class JoseMemes(jcommon.Extension):
 
     async def c_m(self, message, args, cxt):
         '''`!m` - alias para `!meme`'''
-        await self.c_meme(message, args)
+        await self.c_meme(message, args, cxt)
 
     async def c_fullwidth(self, message, args, cxt):
         '''`!fullwidth texto` - converte texto para fullwidth'''
@@ -450,7 +450,7 @@ class JoseMemes(jcommon.Extension):
 
     async def c_fw(self, message, args, cxt):
         '''`!fw` - alias para `!fullwidth`'''
-        await self.c_fullwidth(message, args)
+        await self.c_fullwidth(message, args, cxt)
 
     async def c_emoji(self, message, args, cxt):
         '''`!emoji [qt]` - gera de 1 a 5(ou `qt`(máx. 512)) emojis aleatórios'''

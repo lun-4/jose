@@ -49,7 +49,7 @@ class JoseMath(jaux.Auxiliar):
 
     async def c_wa(self, message, args, cxt):
         '''`!wa terms` - alias para `!wolframalpha`'''
-        await self.c_wolframalpha(message, args)
+        await self.c_wolframalpha(message, args, cxt)
 
     async def c_temperature(self, message, args, cxt):
         '''`!temperature location` - Temperatura de um local, usando OpenWeatherMap

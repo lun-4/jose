@@ -173,7 +173,7 @@ class JoseSpeak(jcommon.Extension):
 
     async def c_spt(self, message, args, cxt):
         '''`!spt` - alias para `!speaktrigger`'''
-        await self.c_speaktrigger(message, args)
+        await self.c_speaktrigger(message, args, cxt)
 
     async def ext_load(self):
         try:
