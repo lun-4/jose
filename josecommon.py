@@ -3,6 +3,7 @@ import asyncio
 import time
 import base64
 import re
+import io
 from xml.etree import ElementTree
 
 import randemoji as emoji
@@ -482,3 +483,18 @@ class Context:
             await self.client.send_message(channel, ":elephant: Mensagem muito grande :elephant:")
         else:
             await self.client.send_message(channel, string)
+
+class EmptyContext:
+    def __init__(self, client, message):
+        self.client = client
+        self.message = message
+        self.buffer = io.StringIO()
+
+    async def say(self, string, channel=None):
+        if len(string) > 2000:
+            await self.buffer.write(":elephant: Mensagem muito grande :elephant:\n")
+        else:
+            await self.buffer.write("%s\n" % string)
+
+    async def close(self):
+        return self.buffer.close()

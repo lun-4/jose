@@ -324,3 +324,12 @@ class JoseSpeak(jcommon.Extension):
         '''`!josetxt` - Mostra a quantidade de linhas, palavras e bytes no jose-data.txt'''
         output = subprocess.Popen(['wc', 'jose-data.txt'], stdout=subprocess.PIPE).communicate()[0]
         await cxt.say(output)
+
+    async def c_jwormhole(self, message, args, cxt):
+        '''`!jwormhole` - Envia mensagens do !speaktrigger para o Wormhole do Septapus!'''
+        ecxt = jcommon.EmptyContext(self.client, message)
+        await self.c_speaktrigger(message, args, ecxt)
+        await cxt.say("@Septapus#2651 wormhole send %s" % ecxt.buffer.read())
+        ecxt.close()
+
+    async def c_jw(self, message, args, cxt)
