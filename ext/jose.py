@@ -352,15 +352,17 @@ class JoseBot(jcommon.Extension):
     async def c_money(self, message, args):
         '''`!money quantity from to` - converte dinheiro usando cotações etc
         `!money list` - lista todas as moedas disponíveis'''
+
+        if len(args) > 1:
+            if args[1] == 'list':
+                r = await aiohttp.request('GET', "http://api.fixer.io/latest")
+                content = await r.text()
+                data = json.loads(content)
+                await self.say(self.codeblock("", " ".join(data["rates"])))
+                return
+
         if len(args) < 3:
             await self.say(self.c_money.__doc__)
-            return
-
-        if args[1] == 'list':
-            r = await aiohttp.request('GET', "http://api.fixer.io/latest")
-            content = await r.text()
-            data = json.loads(content)
-            await self.say(self.codeblock("", " ".join(data["rates"])))
             return
 
         try:
