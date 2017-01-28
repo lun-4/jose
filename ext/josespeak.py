@@ -329,8 +329,7 @@ class JoseSpeak(jcommon.Extension):
         '''`!jwormhole` - Envia mensagens do !speaktrigger para o Wormhole do Septapus!'''
         ecxt = jcommon.EmptyContext(self.client, message)
         await self.c_speaktrigger(message, args, ecxt)
-        await cxt.say("<@127296623779774464> wormhole send %s" % ecxt.buffer.read())
-        await ecxt.close()
+        await cxt.say("<@127296623779774464> wormhole send %s" % ecxt.getall())
 
     async def c_jw(self, message, args, cxt):
         '''`!jw` - alias para `!jwormhole`'''
@@ -342,5 +341,5 @@ class JoseSpeak(jcommon.Extension):
         await cxt.say('''```
 ecxt: %s, %s
 ecxt.buffer: %s
-        ```''' % (e_cxt.client, e_cxt.message, e_cxt.buffer))
-        await e_cxt.close()
+getall: %s
+        ```''' % (e_cxt.client, e_cxt.message, e_cxt.buffer, e_cxt.getall()))

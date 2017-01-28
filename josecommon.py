@@ -488,13 +488,10 @@ class EmptyContext:
     def __init__(self, client, message):
         self.client = client
         self.message = message
-        self.buffer = io.StringIO()
+        self.messages = []
 
     async def say(self, string, channel=None):
-        if len(string) > 2000:
-            self.buffer.write(":elephant: Mensagem muito grande :elephant:\n")
-        else:
-            self.buffer.write("%s\n" % string)
+        self.messages.append(string)
 
-    async def close(self):
-        return self.buffer.close()
+    async def getall(self):
+        return '\n'.join(self.messages)
