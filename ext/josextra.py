@@ -138,10 +138,10 @@ class joseXtra(jaux.Auxiliar):
         await self.say(fmt.format(user_use, response))
 
     async def c_xingar(self, message, args, cxt):
-        await self.mkresponse(message, '{}, {}', xingamentos)
+        await self.mkresponse(message, '{}, {}', jcommon.xingamentos)
 
     async def c_elogio(self, message, args, cxt):
-        await self.mkresponse(message, '{}, {}', xingamentos)
+        await self.mkresponse(message, '{}, {}', jcommon.elogios)
 
     async def c_cantada(self, message, args, cxt):
-        await self.mkresponse(message, 'Ei {}, {}', xingamentos)
+        await self.mkresponse(message, 'Ei {}, {}', jcommon.cantadas)
