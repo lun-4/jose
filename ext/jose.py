@@ -87,7 +87,7 @@ class JoseBot(jcommon.Extension):
         self.logger.info("Loaded gext %s", n)
         return True
 
-    async def load_ext(self, n, n_cl):
+    async def load_ext(self, n, n_cl, cxt):
         loaded_success = False
         loaded_almost = False
 
@@ -153,7 +153,7 @@ class JoseBot(jcommon.Extension):
                     self.modules[n]['handlers'].append(method)
                     loaded_success = True
 
-        if self.current is not None:
+        if cxt is not None:
             if loaded_success:
                 await cxt.say(":ok_hand:")
                 return True
@@ -188,7 +188,7 @@ class JoseBot(jcommon.Extension):
 
         n = args[1]
         if n in self.modules:
-            await self.load_ext(n, self.modules[n]['class'])
+            await self.load_ext(n, self.modules[n]['class'], cxt)
         else:
             await cxt.say("%s: module not found/loaded" % n)
 
@@ -224,7 +224,7 @@ class JoseBot(jcommon.Extension):
         # parse class@module
         modclass, modname = args[1].split('@')
 
-        ok = await self.load_ext(modname, modclass)
+        ok = await self.load_ext(modname, modclass, cxt)
         if ok:
             self.logger.info("!loadmod: %s" % modname)
             await cxt.say(":ok_hand: Success loading `%s`!" % modname)

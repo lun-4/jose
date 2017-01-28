@@ -228,7 +228,7 @@ jose.load_gext(jc, 'josecoin')
 
 def load_module(n, n_cl):
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(jose.load_ext(n, n_cl))
+    loop.run_until_complete(jose.load_ext(n, n_cl, None))
 
 load_module('josensfw', 'JoseNSFW')
 load_module('josememes', 'JoseMemes')
