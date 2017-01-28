@@ -169,7 +169,7 @@ class JoseSpeak(jcommon.Extension):
     async def c_speaktrigger(self, message, args, cxt):
         """`!speaktrigger` - trigger jose's speaking code"""
         self.flag = True
-        await self.e_on_message(message)
+        await self.e_on_message(message, cxt)
 
     async def c_spt(self, message, args, cxt):
         '''`!spt` - alias para `!speaktrigger`'''
