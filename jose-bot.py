@@ -18,6 +18,7 @@ from josecommon import *
 import jcoin.josecoin as jcoin
 import joseconfig as jconfig
 import joseerror as je
+from inspect import signature
 
 logging.basicConfig(level=logging.INFO)
 
@@ -385,7 +386,11 @@ async def on_message(message):
             # but first, repeat the recv steps
             await jose.mod_recv(message)
             try:
-                await jose_method(message, args)
+                sig = signature(jose_method)
+                if len(sig.parameters) == 3:
+                    await jose_method(message, args, jcommon.Context(message))
+                else:
+                    await jose_method(message, args)
 
             except je.PermissionError:
                 await jose.say("permissão ¯\_(ツ)_/¯ 💠 ¯\_(ツ)_/¯ negada")

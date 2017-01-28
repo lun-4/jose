@@ -467,3 +467,17 @@ def parse_command(message):
         return command, args, method
     else:
         return False, None, None
+
+class Context:
+    def __init__(self, client, message):
+        self.message = message
+        self.client = client
+
+    async def say(self, string, channel=None):
+        if channel is None:
+            channel = self.message.channel
+
+        if len(msg) > 2000:
+            await self.client.send_message(channel, ":elephant: Mensagem muito grande :elephant:")
+        else:
+            await self.client.send_message(channel, string)

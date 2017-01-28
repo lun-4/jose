@@ -26,11 +26,11 @@ class JoseMath(jaux.Auxiliar):
     async def ext_unload(self):
         return True, ''
 
-    async def c_wolframalpha(self, **kwargs):
+    async def c_wolframalpha(self, message, args, cxt):
         '''`!wolframalpha terms` - make a request to Wolfram|Alpha
         **ratelimit GLOBAL: 2 chamadas por hora**'''
         if len(args) < 2:
-            await self.say(self.c_wolframalpha.__doc__)
+            await cxt.say(self.c_wolframalpha.__doc__)
             return
 
         term_to_wolfram = ' '.join(args[1:])
@@ -40,23 +40,23 @@ class JoseMath(jaux.Auxiliar):
             try:
                 response_wolfram = next(res.results).text
             except StopIteration:
-                await self.say(":warning: Erro tentando pegar o texto da resposta :warning:")
+                await cxt.say(":warning: Erro tentando pegar o texto da resposta :warning:")
                 return
-            await self.say("%s:\n%s" % (term_to_wolfram, self.codeblock("", response_wolfram)))
+            await cxt.say("%s:\n%s" % (term_to_wolfram, self.codeblock("", response_wolfram)))
         else:
-            await self.say(":cyclone: Sem resposta :cyclone:")
+            await cxt.say(":cyclone: Sem resposta :cyclone:")
             return
 
-    async def c_wa(self, **kwargs):
+    async def c_wa(self, message, args, cxt):
         '''`!wa terms` - alias para `!wolframalpha`'''
         await self.c_wolframalpha(message, args)
 
-    async def c_temperature(self, **kwargs):
+    async def c_temperature(self, message, args, cxt):
         '''`!temperature location` - Temperatura de um local, usando OpenWeatherMap
         mostra tanto em Celsius quanto em Fahrenheit
         **ratelimit GLOBAL: 60 chamadas / minuto**'''
         if len(args) < 2:
-            await self.say(self.c_temperature.__doc__)
+            await cxt.say(self.c_temperature.__doc__)
             return
 
         location = ' '.join(args[1:])
@@ -64,7 +64,7 @@ class JoseMath(jaux.Auxiliar):
         try:
             observation = owm.weather_at_place(location)
         except:
-            await self.say("Erro tentando conseguir a temperatura para esse local")
+            await cxt.say("Erro tentando conseguir a temperatura para esse local")
             return
         w = observation.get_weather()
 
@@ -74,12 +74,12 @@ class JoseMath(jaux.Auxiliar):
         celsiusnow = tempcelsius['temp']
         fahnow = tempfahren['temp']
 
-        await self.say("%s °C, %s °F" % (celsiusnow, fahnow))
+        await cxt.say("%s °C, %s °F" % (celsiusnow, fahnow))
 
-    async def c_temp(self, **kwargs):
+    async def c_temp(self, message, args, cxt):
         '''`!temp location` - alias para `!temperature`'''
-        await self.c_temperature(**kwargs)
+        await self.c_temperature(message, args, cxt)
 
-    async def c_therm(self, **kwargs):
+    async def c_therm(self, message, args, cxt):
         '''`!therm location` - alias para `!temperature`'''
-        await self.c_temperature(**kwargs)
+        await self.c_temperature(message, args, cxt)
