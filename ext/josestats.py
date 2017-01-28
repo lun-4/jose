@@ -209,7 +209,7 @@ A lista de possíveis dados está em https://github.com/lkmnds/jose/blob/master/
                 response += "Comando mais usado deste servidor: %s, usado %d vezes\n" % (most_used_commmand, muc_uses)
         elif querytype == 'topcmd':
             g_cmd = self.statistics['gl_commands']
-            sorted_gcmd = sorted(g_cmd.items(), key=operator.itemgetter(1))
+            sorted_gcmd = sorted(g_cmd.items(), key=operator.itemgetter(1), reverse=True)
             response = '\n'.join(['%s - %d vezes' % (x, y) for (x, y) in sorted_gcmd[:10]])
         else:
             await cxt.say("Tipo de pedido não encontrado")
