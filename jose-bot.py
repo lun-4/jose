@@ -393,7 +393,8 @@ async def on_message(message):
                 # if function can receive the Context, do it
                 # else just do it normally
                 if len(sig.parameters) == 3:
-                    await jose_method(message, args, Context(message))
+                    cxt = Context(client, message)
+                    await jose_method(message, args, cxt)
                 else:
                     await jose_method(message, args)
 
