@@ -330,16 +330,17 @@ class JoseSpeak(jcommon.Extension):
         ecxt = jcommon.EmptyContext(self.client, message)
         await self.c_speaktrigger(message, args, ecxt)
         await cxt.say("<@127296623779774464> wormhole send %s" % ecxt.buffer.read())
-        ecxt.close()
+        await ecxt.close()
 
     async def c_jw(self, message, args, cxt):
         '''`!jw` - alias para `!jwormhole`'''
         await self.c_jwormhole(message, args, cxt)
 
     async def c_jwtest(self, message, args, cxt):
-        e_cxt = common.EmptyContext(self.client, message)
+        e_cxt = jcommon.EmptyContext(self.client, message)
         await self.c_speaktrigger(message, args, e_cxt)
         await cxt.say('''```
 ecxt: %s, %s
 ecxt.buffer: %s
         ```''' % (e_cxt.client, e_cxt.message, e_cxt.buffer))
+        await e_cxt.close()
