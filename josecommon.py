@@ -30,7 +30,7 @@ logger.addHandler(handler)
 
 
 JOSE_PREFIX = "!"
-JOSE_VERSION = '1.2.4'
+JOSE_VERSION = '1.3.0'
 
 MARKOV_DB_PATH = 'markov-database.json'
 MARKOV_LENGTH_PATH = 'db/wordlength.json'
