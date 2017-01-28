@@ -112,7 +112,7 @@ class JoseBot(jcommon.Extension):
         cl_inst = getattr(module, n_cl, None)
         if cl_inst is None:
             if self.current is not None:
-                await self.say(":train:")
+                await cxt.say(":train:")
             self.logger.error("cl_inst = None")
             loaded_success = False
             loaded_almost = True
@@ -155,13 +155,13 @@ class JoseBot(jcommon.Extension):
 
         if self.current is not None:
             if loaded_success:
-                await self.say(":ok_hand:")
+                await cxt.say(":ok_hand:")
                 return True
             elif loaded_almost:
-                await self.say(":train:")
+                await cxt.say(":train:")
                 return False
             else:
-                await self.say(":poop:")
+                await cxt.say(":poop:")
                 return False
         else:
             if not loaded_success:
@@ -178,47 +178,47 @@ class JoseBot(jcommon.Extension):
         for module in list(self.modules.values()):
             await module['inst'].recv(message)
 
-    async def c_reload(self, message, args):
+    async def c_reload(self, message, args, cxt):
         '''`!reload module` - recarrega um módulo do josé'''
         await self.is_admin(message.author.id)
 
         if len(args) < 2:
-            await self.say(self.c_reload.__doc__)
+            await cxt.say(self.c_reload.__doc__)
             return
 
         n = args[1]
         if n in self.modules:
             await self.load_ext(n, self.modules[n]['class'])
         else:
-            await self.say("%s: module not found/loaded" % n)
+            await cxt.say("%s: module not found/loaded" % n)
 
-    async def c_unload(self, message, args):
+    async def c_unload(self, message, args, cxt):
         '''`!unload module` - desrecarrega um módulo do josé'''
         await self.is_admin(message.author.id)
 
         if len(args) < 2:
-            await self.say(self.c_reload.__doc__)
+            await cxt.say(self.c_reload.__doc__)
             return
 
         modname = args[1]
 
         if modname not in self.modules:
-            await self.say("%s: module not loaded" % modname)
+            await cxt.say("%s: module not loaded" % modname)
         else:
             # unload it
             self.logger.info("!unload: %s" % modname)
             res = await self.unload_mod(modname)
             if res[0]:
-                await self.say(":skull: `%s` is dead :skull:" % modname)
+                await cxt.say(":skull: `%s` is dead :skull:" % modname)
             else:
-                await self.say(":warning: Error happened: %s" % res[1])
+                await cxt.say(":warning: Error happened: %s" % res[1])
 
-    async def c_loadmod(self, message, args):
+    async def c_loadmod(self, message, args, cxt):
         '''`!loadmod class@module` - carrega um módulo do josé'''
         await self.is_admin(message.author.id)
 
         if len(args) < 2:
-            await self.say(self.c_reload.__doc__)
+            await cxt.say(self.c_reload.__doc__)
             return
 
         # parse class@module
@@ -227,11 +227,11 @@ class JoseBot(jcommon.Extension):
         ok = await self.load_ext(modname, modclass)
         if ok:
             self.logger.info("!loadmod: %s" % modname)
-            await self.say(":ok_hand: Success loading `%s`!" % modname)
+            await cxt.say(":ok_hand: Success loading `%s`!" % modname)
         else:
-            await self.say(":warning: Error loading `%s` :warning:" % modname)
+            await cxt.say(":warning: Error loading `%s` :warning:" % modname)
 
-    async def c_modlist(self, message, args):
+    async def c_modlist(self, message, args, cxt):
         '''`!modlist` - Módulos do josé'''
         mod_gen = (key for key in self.modules)
         mod_generator = []
@@ -242,20 +242,20 @@ class JoseBot(jcommon.Extension):
             else:
                 # externally loaded ext, can't reload
                 mod_generator.append('gext:%s' % key)
-        await self.say("módulos carregados: %s" % (" ".join(mod_generator)))
+        await cxt.say("módulos carregados: %s" % (" ".join(mod_generator)))
 
     def says(self, msg):
         # calls self.say but in an non-async context
         asyncio.ensure_future(self.say(msg), loop=self.loop)
 
-    async def c_htjose(self, message, args):
-        await self.say(jcommon.JOSE_HELP_TEXT, channel=message.author)
+    async def c_htjose(self, message, args, cxt):
+        await cxt.say(jcommon.JOSE_HELP_TEXT, channel=message.author)
 
-    async def c_htgeral(self, message, args):
-        await self.say(jcommon.JOSE_GENERAL_HTEXT, channel=message.author)
+    async def c_htgeral(self, message, args, cxt):
+        await cxt.say(jcommon.JOSE_GENERAL_HTEXT, channel=message.author)
 
-    async def c_httech(self, message, args):
-        await self.say(jcommon.JOSE_TECH_HTEXT, channel=message.author)
+    async def c_httech(self, message, args, cxt):
+        await cxt.say(jcommon.JOSE_TECH_HTEXT, channel=message.author)
 
     async def sec_auth(self, f):
         auth = await self.is_admin(self.current.author.id)
@@ -269,7 +269,7 @@ class JoseBot(jcommon.Extension):
     async def turnoff(self):
         await jcoin.JoseCoin(self.client).josecoin_save(self.current, True)
         await self.unload_all()
-        await self.say(":wave: kthxbye :wave:")
+        await cxt.say(":wave: kthxbye :wave:")
         await self.client.logout()
         sys.exit(0)
 
@@ -288,21 +288,21 @@ class JoseBot(jcommon.Extension):
         os.system("./reload_jose.sh &")
         sys.exit(0)
 
-    async def c_shutdown(self, message, args):
+    async def c_shutdown(self, message, args, cxt):
         '''`!shutdown` - desliga o josé'''
         await self.sec_auth(self.turnoff)
 
-    async def c_reboot(self, message, args):
+    async def c_reboot(self, message, args, cxt):
         '''`!reboot` - reinicia o josé'''
         #await self.sec_auth(self.reboot)
         pass
 
-    async def c_update(self, message, args):
+    async def c_update(self, message, args, cxt):
         '''`!update` - atualiza o josé'''
         #await self.sec_auth(self.update)
         pass
 
-    async def c_rand(self, message, args):
+    async def c_rand(self, message, args, cxt):
         '''`!rand min max` - gera um número aleatório no intervalo [min, max]'''
         n_min, n_max = 0,0
         try:
@@ -317,25 +317,25 @@ class JoseBot(jcommon.Extension):
             return
 
         n_rand = random.randint(n_min, n_max)
-        await self.say("Número aleatório de %d a %d: %d" % (n_min, n_max, n_rand))
+        await cxt.say("Número aleatório de %d a %d: %d" % (n_min, n_max, n_rand))
         return
 
-    async def c_enc(self, message, args):
+    async def c_enc(self, message, args, cxt):
         '''`!enc text` - encriptar'''
         if len(args) < 2:
-            await self.say(self.c_enc.__doc__)
+            await cxt.say(self.c_enc.__doc__)
             return
 
         to_encrypt = ' '.join(args[1:])
         encdata = await jcommon.str_xor(to_encrypt, jcommon.JCRYPT_KEY)
         a85data = base64.a85encode(bytes(encdata, 'UTF-8'))
-        await self.say('resultado(enc): %s' % a85data.decode('UTF-8'))
+        await cxt.say('resultado(enc): %s' % a85data.decode('UTF-8'))
         return
 
-    async def c_dec(self, message, args):
+    async def c_dec(self, message, args, cxt):
         '''`!dec text` - desencriptar'''
         if len(args) < 2:
-            await self.say(self.c_dec.__doc__)
+            await cxt.say(self.c_dec.__doc__)
             return
 
         to_decrypt = ' '.join(args[1:])
@@ -343,13 +343,13 @@ class JoseBot(jcommon.Extension):
         try:
             to_decrypt = base64.a85decode(to_decrypt).decode('UTF-8')
         except Exception as e:
-            await self.say("dec: erro tentando desencodar a mensagem(%r)" % e)
+            await cxt.say("dec: erro tentando desencodar a mensagem(%r)" % e)
             return
         plaintext = await jcommon.str_xor(to_decrypt, jcommon.JCRYPT_KEY)
-        await self.say("resultado(dec): %s" % plaintext)
+        await cxt.say("resultado(dec): %s" % plaintext)
         return
 
-    async def c_money(self, message, args):
+    async def c_money(self, message, args, cxt):
         '''`!money quantity from to` - converte dinheiro usando cotações etc
         `!money list` - lista todas as moedas disponíveis'''
 
@@ -358,17 +358,17 @@ class JoseBot(jcommon.Extension):
                 r = await aiohttp.request('GET', "http://api.fixer.io/latest")
                 content = await r.text()
                 data = json.loads(content)
-                await self.say(self.codeblock("", " ".join(data["rates"])))
+                await cxt.say(self.codeblock("", " ".join(data["rates"])))
                 return
 
         if len(args) < 3:
-            await self.say(self.c_money.__doc__)
+            await cxt.say(self.c_money.__doc__)
             return
 
         try:
             amount = float(args[1])
         except Exception as e:
-            await self.say("Error parsing `quantity`")
+            await cxt.say("Error parsing `quantity`")
             return
 
         currency_from = args[2]
@@ -386,14 +386,14 @@ class JoseBot(jcommon.Extension):
         rate = data['rates'][currency_to]
         res = amount * rate
 
-        await self.say('{} {} = {} {}'.format(
+        await cxt.say('{} {} = {} {}'.format(
             amount, currency_from, res, currency_to
         ))
 
-    async def c_yt(self, message, args):
+    async def c_yt(self, message, args, cxt):
         '''`!yt [termo 1] [termo 2]...` - procura no youtube'''
         if len(args) < 2:
-            await self.say(self.c_yt.__doc__)
+            await cxt.say(self.c_yt.__doc__)
             return
 
         search_term = ' '.join(args[1:])
@@ -415,12 +415,12 @@ class JoseBot(jcommon.Extension):
             await client.send_message(message.channel, "!yt: Nenhum resultado encontrado.")
             return
 
-        await self.say("http://www.youtube.com/watch?v=" + search_results[0])
+        await cxt.say("http://www.youtube.com/watch?v=" + search_results[0])
 
-    async def c_sndc(self, message, args):
+    async def c_sndc(self, message, args, cxt):
         '''`!sndc [termo 1] [termo 2]...` - procura no soundcloud'''
         if len(args) < 2:
-            await self.say(self.c_sndc.__doc__)
+            await cxt.say(self.c_sndc.__doc__)
             return
 
         query = ' '.join(args[1:])
@@ -428,7 +428,7 @@ class JoseBot(jcommon.Extension):
         self.logger.info("Soundcloud request: %s", query)
 
         if len(query) < 3:
-            await self.say("preciso de mais coisas para pesquisar(length < 3)")
+            await cxt.say("preciso de mais coisas para pesquisar(length < 3)")
             return
 
         search_url = 'https://api.soundcloud.com/search?q=%s&facet=model&limit=10&offset=0&linked_partitioning=1&client_id='+jconfig.soundcloud_id
@@ -449,13 +449,13 @@ class JoseBot(jcommon.Extension):
 
             for entity in doc['collection']:
                 if entity['kind'] == 'track':
-                    await self.say(entity['permalink_url'])
+                    await cxt.say(entity['permalink_url'])
                     return
 
-            await self.say("verifique sua pesquisa, porque nenhuma track foi encontrada.")
+            await cxt.say("verifique sua pesquisa, porque nenhuma track foi encontrada.")
             return
 
-    async def c_pstatus(self, message, args):
+    async def c_pstatus(self, message, args, cxt):
         '''`!pstatus` - muda o status do josé'''
         await self.is_admin(message.author.id)
 
@@ -463,27 +463,27 @@ class JoseBot(jcommon.Extension):
         g = discord.Game(name=playing_name, url=playing_name)
         await self.client.change_presence(game=g)
 
-    async def c_fullwidth(self, message, args):
+    async def c_fullwidth(self, message, args, cxt):
         '''`!fullwidth text` - ｆｕｌｌｗｉｄｔｈ　ｃｈａｒａｃｔｅｒｓ'''
         if len(args) < 2:
-            await self.say("Nada de mensagem vazia")
+            await cxt.say("Nada de mensagem vazia")
             return
 
         ascii_text = ' '.join(args[1:])
         res = ascii_text.translate(jcommon.ascii_to_wide)
-        await self.say(res)
+        await cxt.say(res)
 
-    async def c_escolha(self, message, args):
+    async def c_escolha(self, message, args, cxt):
         '''`!escolha elemento1;elemento2;elemento3;...;elementon` - escolha.'''
         if len(args) < 2:
-            await self.say(self.c_escolha.__doc__)
+            await cxt.say(self.c_escolha.__doc__)
             return
 
         escolhas = (' '.join(args[1:])).split(';')
         choice = random.choice(escolhas)
-        await self.say("Eu escolho %s" % choice)
+        await cxt.say("Eu escolho %s" % choice)
 
-    async def c_nick(self, message, args):
+    async def c_nick(self, message, args, cxt):
         '''`!nick [nick]` - [SOMENTE ADMIN]'''
         await self.is_admin(message.author.id)
 
@@ -502,7 +502,7 @@ class JoseBot(jcommon.Extension):
 
         return
 
-    async def c_distatus(self, message, args):
+    async def c_distatus(self, message, args, cxt):
         '''`!distatus` - mostra alguns dados para mostrar se o Discord está funcionando corretamente'''
         await self.is_admin(message.author.id)
 
@@ -527,33 +527,33 @@ class JoseBot(jcommon.Extension):
         else:
             looks_like = 'Tudo bem... eu acho'
 
-        await self.say(fmt % (host, rtt[0], rtt[1], rtt[2], rtt[3], looks_like))
+        await cxt.say(fmt % (host, rtt[0], rtt[1], rtt[2], rtt[3], looks_like))
 
-    async def c_version(self, message, args):
+    async def c_version(self, message, args, cxt):
         '''`!version` - mostra a versão do jose'''
         pyver = '%d.%d.%d' % (sys.version_info[:3])
-        await self.say("`José v%s py:%s discord.py:%s`" % (jcommon.JOSE_VERSION
+        await cxt.say("`José v%s py:%s discord.py:%s`" % (jcommon.JOSE_VERSION
             , pyver, discord.__version__))
 
-    async def c_jose_add(self, message, args):
-        await self.say("José pode ser adicionado para outro servidor usando este link:\n```%s```" % jcommon.OAUTH_URL)
+    async def c_jose_add(self, message, args, cxt):
+        await cxt.say("José pode ser adicionado para outro servidor usando este link:\n```%s```" % jcommon.OAUTH_URL)
 
-    async def c_clist(self, message, args):
+    async def c_clist(self, message, args, cxt):
         '''`!clist module` - mostra todos os comandos de tal módulo'''
         if len(args) < 2:
-            await self.say(self.c_clist.__doc__)
+            await cxt.say(self.c_clist.__doc__)
             return
 
         modname = args[1]
 
         if modname not in self.modules:
-            await self.say("`%s`: Módulo não encontrado")
+            await cxt.say("`%s`: Módulo não encontrado")
             return
 
         res = ' '.join(self.modules[modname]['methods'])
-        await self.say(self.codeblock('', res))
+        await cxt.say(self.codeblock('', res))
 
-    async def c_uptime(self, message, args):
+    async def c_uptime(self, message, args, cxt):
         '''`!uptime` - mostra o uptime do josé'''
         sec = (time.time() - self.start_time)
         MINUTE  = 60
@@ -568,7 +568,7 @@ class JoseBot(jcommon.Extension):
         fmt = "uptime: %d dias, %d horas, %d minutos, %d segundos"
         await self.debug(fmt % (days, hours, minutes, seconds))
 
-    async def c_eval(self, message, args):
+    async def c_eval(self, message, args, cxt):
         # eval expr
         await self.is_admin(message.author.id)
 
@@ -577,4 +577,4 @@ class JoseBot(jcommon.Extension):
             eval_cmd = eval_cmd[1:-1]
 
         res = eval(eval_cmd)
-        await self.say("```%s``` -> `%s`" % (eval_cmd, res))
+        await cxt.say("```%s``` -> `%s`" % (eval_cmd, res))
