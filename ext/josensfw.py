@@ -33,7 +33,7 @@ class JoseNSFW(jcommon.Extension):
         r = json.loads(r)
         return r
 
-    async def json_api(self, index_url, show_url, search_term, post_key, rspec=False, hypnohub_flag=False):
+    async def json_api(self, cxt, index_url, show_url, search_term, post_key, rspec=False, hypnohub_flag=False):
         url = ''
         random_flag = False
         if search_term == ':latest':
@@ -84,25 +84,25 @@ class JoseNSFW(jcommon.Extension):
         access = await self.porn_routine()
         if access:
             # ¯\_(ツ)_/¯
-            await self.json_api('http://hypnohub.net/post/index.json', '',
+            await self.json_api(cxt, 'http://hypnohub.net/post/index.json', '',
                 ' '.join(args[1:]), 'file_url', None, True)
 
     async def c_yandere(self, message, args, cxt):
         access = await self.porn_routine()
         if access:
-            await self.json_api('https://yande.re/post.json', '',
+            await self.json_api(cxt, 'https://yande.re/post.json', '',
                 ' '.join(args[1:]), 'file_url')
 
     async def c_e621(self, message, args, cxt):
         access = await self.porn_routine()
         if access:
-            await self.json_api('https://e621.net/post/index.json', 'https://e621.net/post/show.json',
+            await self.json_api(cxt, 'https://e621.net/post/index.json', 'https://e621.net/post/show.json',
                 ' '.join(args[1:]), 'file_url')
 
     async def c_porn(self, message, args, cxt):
         access = await self.porn_routine()
         if access:
-            await self.json_api('http://api.porn.com/videos/find.json', '',
+            await self.json_api(cxt, 'http://api.porn.com/videos/find.json', '',
                 ' '.join(args[1:]), 'url', 'result')
 
     async def c_urban(self, message, args, cxt):
