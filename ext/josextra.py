@@ -33,7 +33,7 @@ class joseXtra(jaux.Auxiliar):
     async def ext_unload(self):
         return True, ''
 
-    async def c_xkcd(self, message, args):
+    async def c_xkcd(self, message, args, cxt):
         '''`!xkcd` - procura tirinhas do XKCD
         `!xkcd` - mostra a tirinha mais recente
         `!xkcd [num]` - mostra a tirinha de número `num`
@@ -66,18 +66,18 @@ class joseXtra(jaux.Auxiliar):
                 r = await aiohttp.request('GET', url)
                 content = await r.text()
                 info = json.loads(content)
-            await self.say('xkcd número %s : %s' % (n, info['img']))
+            await cxt.say('xkcd número %s : %s' % (n, info['img']))
 
         except Exception as e:
-            await self.say("err: %r" % e)
+            await cxt.say("err: %r" % e)
 
-    async def c_tm(self, message, args):
-        await self.say('%s™' % ' '.join(args[1:]))
+    async def c_tm(self, message, args, cxt):
+        await cxt.say('%s™' % ' '.join(args[1:]))
 
-    async def c_loteria(self, message, args):
-        await self.say("nao")
+    async def c_loteria(self, message, args, cxt):
+        await cxt.say("nao")
 
-    async def c_status(self, message, args):
+    async def c_status(self, message, args, cxt):
         # ping discordapp one time
 
         msg = await self.client.send_message(message.channel, "Pong!")
@@ -110,32 +110,32 @@ class joseXtra(jaux.Auxiliar):
 %s : min %sms avg %sms max %sms
 """ % ("google.com", g_rtt[0], g_rtt[1], g_rtt[2]))
 
-    async def c_info(self, message, args):
-        await self.say("""José v%s, feito por Luna Mendes\nhttps://github.com/lkmnds/jose""" % (jcommon.JOSE_VERSION))
+    async def c_info(self, message, args, cxt):
+        await cxt.say("""José v%s, feito por Luna Mendes\nhttps://github.com/lkmnds/jose""" % (jcommon.JOSE_VERSION))
 
-    async def c_docs(self, message, args):
+    async def c_docs(self, message, args, cxt):
         '''`!docs <topic>` - Documentação do josé
         `!docs list` lista todos os tópicos disponíveis'''
         if len(args) < 2:
-            await self.say(self.c_docs.__doc__)
+            await cxt.say(self.c_docs.__doc__)
             return
 
         topic = ' '.join(args[1:])
 
         if topic == 'list':
             topics = ' '.join(self.docs)
-            await self.say(topics)
+            await cxt.say(topics)
         else:
             if topic in self.docs:
-                await self.say(self.docs[topic])
+                await cxt.say(self.docs[topic])
             else:
-                await self.say("%s: tópico não encontrado" % topic)
+                await cxt.say("%s: tópico não encontrado" % topic)
 
     async def mkresponse(message, fmt, phrases):
         d = message.content.split(' ')
         user_use = d[1]
         response = random.choice(phrases)
-        await self.say(fmt.format(user_use, response))
+        await cxt.say(fmt.format(user_use, response))
 
     async def c_xingar(self, message, args, cxt):
         await self.mkresponse(message, '{}, {}', jcommon.xingamentos)

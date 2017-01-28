@@ -98,9 +98,9 @@ class JoseStats(jaux.Auxiliar):
             'jmword:magicword': os.path.getsize(jconfig.MAGICWORD_PATH)
         }
 
-    async def c_saveqdb(self, message, args):
+    async def c_saveqdb(self, message, args, cxt):
         await self.savedb()
-        await self.say(":floppy_disk: saved query database :floppy_disk:")
+        await cxt.say(":floppy_disk: saved query database :floppy_disk:")
 
     async def e_any_message(self, message):
         if message.server is None:
@@ -146,26 +146,26 @@ class JoseStats(jaux.Auxiliar):
 
         self.counter += 1
 
-    async def c_rawquery(self, message, args):
+    async def c_rawquery(self, message, args, cxt):
         '''`!rawquery string` - Fazer pedidos ao banco de dados de estatísticas do josé'''
         query_string = ' '.join(args[1:])
         if True:
-            await self.say("raw queries not available for now")
+            await cxt.say("raw queries not available for now")
             return
 
         # TODO: make_query
         response = await self.make_raw_query(query_string)
         if len(response) > 1999: # 1 9 9 9
-            await self.say(":elephant: Resultado muito grande :elephant:")
+            await cxt.say(":elephant: Resultado muito grande :elephant:")
         else:
-            await self.say(self.codeblock("", reponse))
+            await cxt.say(self.codeblock("", reponse))
 
-    async def c_query(self, message, args):
+    async def c_query(self, message, args, cxt):
         '''`!query data` - Fazer pedidos ao banco de dados de estatísticas do josé
 A lista de possíveis dados está em https://github.com/lkmnds/jose/blob/master/doc/queries-pt.md'''
 
         if len(args) < 2:
-            await self.say(self.c_query.__doc__)
+            await cxt.say(self.c_query.__doc__)
 
         querytype = ' '.join(args[1:])
         response = ''
@@ -208,14 +208,14 @@ A lista de possíveis dados está em https://github.com/lkmnds/jose/blob/master/
                 muc_uses = sorted_gcmd[-1][1]
                 response += "Comando mais usado deste servidor: %s, usado %d vezes\n" % (most_used_commmand, muc_uses)
         else:
-            await self.say("Tipo de pedido não encontrado")
+            await cxt.say("Tipo de pedido não encontrado")
             return
 
         if len(response) >= 2000: # 1 9 9 9
-            await self.say(":elephant: Resultado muito grande :elephant:")
+            await cxt.say(":elephant: Resultado muito grande :elephant:")
         else:
-            await self.say(self.codeblock("", response))
+            await cxt.say(self.codeblock("", response))
 
-    async def c_session(self, message, args):
+    async def c_session(self, message, args, cxt):
         '''`!session` - Dados interessantes sobre essa sessão'''
         # uptime etc
