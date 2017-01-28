@@ -102,7 +102,7 @@ class JoseStats(jaux.Auxiliar):
         await self.savedb()
         await cxt.say(":floppy_disk: saved query database :floppy_disk:")
 
-    async def e_any_message(self, message):
+    async def e_any_message(self, message, cxt):
         if message.server is None:
             # I'm at a DM, how i'm supposed to make account of that
             return

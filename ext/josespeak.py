@@ -221,7 +221,7 @@ class JoseSpeak(jcommon.Extension):
 
         await cxt.say("done")
 
-    async def e_on_message(self, message):
+    async def e_on_message(self, message, cxt):
         if message.server is None:
             # ignore DMs here as well
             return
@@ -271,9 +271,9 @@ class JoseSpeak(jcommon.Extension):
                 await self.client.send_typing(message.channel)
 
                 length = int(self.text_lengths[message.server.id])
-                await self.speak(self.text_generators[message.server.id], length)
+                await self.speak(self.text_generators[message.server.id], length, cxt)
 
-    async def speak(self, texter, length_words):
+    async def speak(self, texter, length_words, cxt):
         res = await texter.gen_sentence(1, length_words)
         if jcommon.DEMON_MODE:
             res = res[::-1]
@@ -292,7 +292,7 @@ class JoseSpeak(jcommon.Extension):
             else:
                 wordlength = int(args[1])
 
-        await self.speak(self.cult_generator, wordlength)
+        await self.speak(self.cult_generator, wordlength, cxt)
 
     async def c_sfalar(self, message, args, cxt):
         """`!sfalar [wordmax]` - falar usando textos do seu servidor atual(wordmax default 10)"""
@@ -305,7 +305,7 @@ class JoseSpeak(jcommon.Extension):
             else:
                 wordlength = int(args[1])
 
-        await self.speak(self.text_generators[message.server.id], wordlength)
+        await self.speak(self.text_generators[message.server.id], wordlength, cxt)
 
     async def c_gfalar(self, message, args, cxt):
         """`!gfalar [wordmax]` - falar usando o texto global(wordmax default 10)"""
@@ -318,7 +318,7 @@ class JoseSpeak(jcommon.Extension):
             else:
                 wordlength = int(args[1])
 
-        await self.speak(self.global_generator, wordlength)
+        await self.speak(self.global_generator, wordlength, cxt)
 
     async def c_josetxt(self, message, args, cxt):
         '''`!josetxt` - Mostra a quantidade de linhas, palavras e bytes no jose-data.txt'''

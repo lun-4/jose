@@ -40,7 +40,7 @@ class JoseArtif(jaux.Auxiliar):
     async def ext_unload(self):
         return True, ''
 
-    async def e_on_message(self, message):
+    async def e_on_message(self, message, cxt):
         '''# give up on anything related, use chatterbot
         if random.random() < ARTIF_CHATINESS or self.jose_mention in message.content:
             self.current = message

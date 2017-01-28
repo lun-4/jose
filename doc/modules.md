@@ -50,18 +50,18 @@ Each module is described in the form `class@file`.
   * If the method starts with `c_`, this method becomes a command:
 
 ```python
-    async def c_ping(self, message, args):
-        await self.say("pong")
+    async def c_ping(self, message, args, cxt):
+        await cxt.say("pong")
 ```
 
   * If the method starts with `e_`, it becomes an [event handler](https://github.com/lkmnds/jose/blob/master/doc/events.md)
 
 ```python
-    async def e_any_message(self, message):
-        await self.say("I received a message: %s" % message)
+    async def e_any_message(self, message, cxt):
+        await cxt.say("I received a message: %s" % message)
 
-    async def e_on_message(self, message):
-        await self.say("I received a message that is not a command: %s" % message)
+    async def e_on_message(self, message, cxt):
+        await cxt.say("I received a message that is not a command: %s" % message)
 ```
 
  * If any errors happened and that was before any connection to Discord was made(before login), it exits.

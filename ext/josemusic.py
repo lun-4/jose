@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+"""
+    ===DEPRECATED MODULE===
+"""
+
 import discord
 import asyncio
 import sys

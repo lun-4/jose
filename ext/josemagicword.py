@@ -73,7 +73,7 @@ class JoseMagicWord(jaux.Auxiliar):
         except Exception as e:
             return False, str(e)
 
-    async def e_any_message(self, message):
+    async def e_any_message(self, message, cxt):
         if self.counter % 25 == 0:
             await self.savedb()
 
@@ -88,23 +88,23 @@ class JoseMagicWord(jaux.Auxiliar):
                 match = await mw_match(mw, message.content.lower())
                 if match:
                     response = await mw_response(mw, message)
-                    await self.say(response, channel=message.channel)
+                    await cxt.say(response, channel=message.channel)
 
         self.counter += 1
 
-    async def c_setmw(self, message, args):
+    async def c_setmw(self, message, args, cxt):
         '''`!setmw magicword1,magicword2,magicword3;response` - Magic Words
         docs: https://github.com/lkmnds/jose/blob/master/doc/magicwords.md'''
 
         if len(args) < 2:
-            await self.say(self.c_setmw.__doc__)
+            await cxt.say(self.c_setmw.__doc__)
             return
 
         # get string that represents the magic word
         mwstr = ' '.join(args[1:])
 
         if ';' not in mwstr:
-            await self.say("Malformed string")
+            await cxt.say("Malformed string")
             return
 
         # parse the string
@@ -112,7 +112,7 @@ class JoseMagicWord(jaux.Auxiliar):
         magicwords = magicwords.split(',')
 
         if len(magicwords) > 10:
-            await self.say(":warning: Maximum of 10 magic words allowed in each set.")
+            await cxt.say(":warning: Maximum of 10 magic words allowed in each set.")
             return
 
         if message.server.id not in self.magicwords:
@@ -126,7 +126,7 @@ class JoseMagicWord(jaux.Auxiliar):
         # check limits
         serverdb = self.magicwords[message.server.id]
         if len(serverdb) > 10:
-            await self.say("This server reached the limit of 10 Magic Words.")
+            await cxt.say("This server reached the limit of 10 Magic Words.")
             return
 
         # check duplicates
@@ -134,7 +134,7 @@ class JoseMagicWord(jaux.Auxiliar):
             mw = serverdb[set_id]
             for word in magicwords:
                 if word in mw['words']:
-                    await self.say(":warning: Conflict: `%s` conflicts with Magic Word Set %d" % \
+                    await cxt.say(":warning: Conflict: `%s` conflicts with Magic Word Set %d" % \
                         (word, set_id))
                     return
 
@@ -149,14 +149,14 @@ class JoseMagicWord(jaux.Auxiliar):
             'response': mwresponse
         }
 
-        await self.say("M.W. Set %s created!" % new_id)
+        await cxt.say("M.W. Set %s created!" % new_id)
 
 
-    async def c_listmw(self, message, args):
+    async def c_listmw(self, message, args, cxt):
         '''`!listmw [set]` - lists available magic words'''
 
         if message.server.id not in self.magicwords:
-            await self.say(":warning: Database not created")
+            await cxt.say(":warning: Database not created")
             return
 
         serverdb = self.magicwords[message.server.id]
@@ -168,32 +168,32 @@ class JoseMagicWord(jaux.Auxiliar):
                 mw = serverdb[set_id]
                 res.append("%s: %s > %s" % (set_id, mw['words'], mw['response']))
 
-            await self.say(self.codeblock("", '\n'.join(res)))
+            await cxt.say(self.codeblock("", '\n'.join(res)))
         else:
             set_id = args[1]
 
             if set_id not in serverdb:
-                await self.say("Magic Word Set not found")
+                await cxt.say("Magic Word Set not found")
                 return
 
             mw = serverdb[set_id]
-            await self.say("`%s: %s > %s`" % (set_id, mw['words'], mw['response']))
+            await cxt.say("`%s: %s > %s`" % (set_id, mw['words'], mw['response']))
 
 
-    async def c_delmw(self, message, args):
+    async def c_delmw(self, message, args, cxt):
         '''`!delmw set` - deletes a magic word set'''
 
         if len(args) < 2:
-            await self.say(self.c_delmw.__doc__)
+            await cxt.say(self.c_delmw.__doc__)
             return
 
         if message.server.id not in self.magicwords:
-            await self.say(":warning: Database not created")
+            await cxt.say(":warning: Database not created")
             return
 
         set_id = args[1]
         if set_id not in self.magicwords[message.server.id]:
-            await self.say("Magic Word Set `%r` not found" % set_id)
+            await cxt.say("Magic Word Set `%r` not found" % set_id)
             return
 
         # so it doesn't trigger again
@@ -205,4 +205,4 @@ class JoseMagicWord(jaux.Auxiliar):
         # say to Python to FUCKING DELETE IT
         del self.magicwords[message.server.id][set_id]
         await self.savedb()
-        await self.say("Deleted set %s" % set_id)
+        await cxt.say("Deleted set %s" % set_id)

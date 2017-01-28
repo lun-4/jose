@@ -326,7 +326,7 @@ async def on_message(message):
 
     # any_message event
     for handler in event_table['any_message']:
-        await handler(message)
+        await handler(message, Context(client, message))
 
     # get command and push it to jose
     if message.content.startswith(JOSE_PREFIX):
@@ -468,7 +468,7 @@ async def on_message(message):
 
     # handle e_on_message
     for handler in event_table['on_message']:
-        await handler(message)
+        await handler(message, Context(client, message))
 
     if random.random() < jc_probabiblity:
         if not message.channel.is_private:

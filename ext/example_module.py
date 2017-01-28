@@ -17,5 +17,5 @@ class JoseExtension(jaux.Auxiliar):
     async def ext_unload(self):
         return True, ''
 
-    async def c_command(self, message, args):
+    async def c_command(self, message, args, cxt):
         pass
