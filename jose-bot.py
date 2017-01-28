@@ -131,7 +131,7 @@ async def main_status(message):
         MAINTENANCE_MODE = not MAINTENANCE_MODE
         await jose_debug(message, "Modo de construção: %s" % (MAINTENANCE_MODE))
     else:
-        await jose_debug(message, "PermError: Não permitido alterar o status do jose")
+        raise je.PermissionError()
 
 async def show_maintenance(message):
     await jose.say("**JOSÉ EM CONSTRUÇÃO, AGUARDE**\nhttps://umasofe.files.wordpress.com/2012/11/placa.jpg")
