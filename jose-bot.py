@@ -387,8 +387,10 @@ async def on_message(message):
             await jose.mod_recv(message)
             try:
                 sig = signature(jose_method)
+                # if function can receive the Context, do it
+                # else just do it normally
                 if len(sig.parameters) == 3:
-                    await jose_method(message, args, jcommon.Context(message))
+                    await jose_method(message, args, Context(message))
                 else:
                     await jose_method(message, args)
 
