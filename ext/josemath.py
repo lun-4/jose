@@ -26,7 +26,7 @@ class JoseMath(jaux.Auxiliar):
     async def ext_unload(self):
         return True, ''
 
-    async def c_wolframalpha(self, message, args):
+    async def c_wolframalpha(self, **kwargs):
         '''`!wolframalpha terms` - make a request to Wolfram|Alpha
         **ratelimit GLOBAL: 2 chamadas por hora**'''
         if len(args) < 2:
@@ -47,11 +47,11 @@ class JoseMath(jaux.Auxiliar):
             await self.say(":cyclone: Sem resposta :cyclone:")
             return
 
-    async def c_wa(self, message, args):
+    async def c_wa(self, **kwargs):
         '''`!wa terms` - alias para `!wolframalpha`'''
         await self.c_wolframalpha(message, args)
 
-    async def c_temperature(self, message, args):
+    async def c_temperature(self, **kwargs):
         '''`!temperature location` - Temperatura de um local, usando OpenWeatherMap
         mostra tanto em Celsius quanto em Fahrenheit
         **ratelimit GLOBAL: 60 chamadas / minuto**'''
@@ -76,10 +76,10 @@ class JoseMath(jaux.Auxiliar):
 
         await self.say("%s °C, %s °F" % (celsiusnow, fahnow))
 
-    async def c_temp(self, message, args):
+    async def c_temp(self, **kwargs):
         '''`!temp location` - alias para `!temperature`'''
-        await self.c_temperature(message, args)
+        await self.c_temperature(**kwargs)
 
-    async def c_therm(self, message, args):
+    async def c_therm(self, **kwargs):
         '''`!therm location` - alias para `!temperature`'''
-        await self.c_temperature(message, args)
+        await self.c_temperature(**kwargs)
