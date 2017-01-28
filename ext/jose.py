@@ -354,12 +354,13 @@ class JoseBot(jcommon.Extension):
         `!money list` - lista todas as moedas disponíveis'''
         if len(args) < 3:
             await self.say(self.c_money.__doc__)
+            return
 
         if args[1] == 'list':
             r = await aiohttp.request('GET', "http://api.fixer.io/latest")
             content = await r.text()
             data = json.loads(content)
-            await self.say(self.codeblock("", " ".join(data)))
+            await self.say(self.codeblock("", " ".join(data["rates"])))
             return
 
         try:
