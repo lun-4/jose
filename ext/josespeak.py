@@ -332,4 +332,6 @@ class JoseSpeak(jcommon.Extension):
         await cxt.say("@Septapus#2651 wormhole send %s" % ecxt.buffer.read())
         ecxt.close()
 
-    async def c_jw(self, message, args, cxt)
+    async def c_jw(self, message, args, cxt):
+        '''`!jw` - alias para `!jwormhole`'''
+        await self.c_jwormhole(message, args, cxt)
