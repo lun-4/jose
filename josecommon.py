@@ -492,9 +492,9 @@ class EmptyContext:
 
     async def say(self, string, channel=None):
         if len(string) > 2000:
-            await self.buffer.write(":elephant: Mensagem muito grande :elephant:\n")
+            self.buffer.write(":elephant: Mensagem muito grande :elephant:\n")
         else:
-            await self.buffer.write("%s\n" % string)
+            self.buffer.write("%s\n" % string)
 
     async def close(self):
         return self.buffer.close()
