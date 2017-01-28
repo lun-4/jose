@@ -69,7 +69,7 @@ class joseXtra(jaux.Auxiliar):
             await self.say('xkcd número %s : %s' % (n, info['img']))
 
         except Exception as e:
-            await self.debug("xkcd: pyerr: %s" % str(e))
+            await self.say("err: %r" % e)
 
     async def c_tm(self, message, args):
         await self.say('%s™' % ' '.join(args[1:]))
@@ -130,3 +130,18 @@ class joseXtra(jaux.Auxiliar):
                 await self.say(self.docs[topic])
             else:
                 await self.say("%s: tópico não encontrado" % topic)
+
+    async def mkresponse(message, fmt, phrases):
+        d = message.content.split(' ')
+        user_use = d[1]
+        response = random.choice(phrases)
+        await self.say(fmt.format(user_use, response))
+
+    async def c_xingar(self, message, args, cxt):
+        await self.mkresponse(message, '{}, {}', xingamentos)
+
+    async def c_elogio(self, message, args, cxt):
+        await self.mkresponse(message, '{}, {}', xingamentos)
+
+    async def c_cantada(self, message, args, cxt):
+        await self.mkresponse(message, 'Ei {}, {}', xingamentos)

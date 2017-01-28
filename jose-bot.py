@@ -4,12 +4,10 @@ import sys
 import os
 import ast
 import time
-import subprocess
 import re
 import traceback
 import logging
 from random import SystemRandom
-import cProfile
 random = SystemRandom()
 
 import discord
@@ -37,10 +35,8 @@ jose = jose_bot.JoseBot(client)
 
 GAMBLING_LAST_BID = 0.0
 
-#enviroment things
-josescript_env = {}
+#enviroment thingies
 jose_env = jose.env
-survey_id = 0
 jasm_env = {}
 
 if PARABENS_MODE:
@@ -50,27 +46,6 @@ if PARABENS_MODE:
         return old_send(ch, 'Parabéns %s' % d)
 
     client.send_message = newsend
-
-# !pesquisa 1 Qual o melhor mensageiro:discord,skype,teamspeak,raidcall
-
-def make_something(fmt, dict_messages):
-    async def func(message):
-        d = message.content.split(' ')
-        user_use = d[1]
-
-        new_message = random.choice(dict_messages)
-        await jose.say(fmt.format(user_use, new_message))
-
-    return func
-
-show_xingar = make_something('{}, {}', xingamentos)
-show_elogio = make_something('{}, {}', elogios)
-show_cantada = make_something('Ei {}, {}', cantadas)
-
-async def show_aerotrem(message):
-    ch = discord.Object(id='206590341317394434')
-    aviao = random.choice(aviaos)
-    await client.send_message(ch, aviao)
 
 async def new_debug(message):
     args = message.content.split(' ')
@@ -192,12 +167,6 @@ josecoin_save = jc.josecoin_save
 josecoin_load = jc.josecoin_load
 
 commands_start = {
-    '!xingar': show_xingar,
-    '!elogiar': show_elogio,
-    '!cantar': show_cantada,
-
-    # '!dbgmsg': new_debug,
-
     '!causar': make_causo,
 
     '!learn': learn_data,
@@ -215,7 +184,6 @@ commands_start = {
 
     '!ahelp': show_gambling_full,
     '!adummy': show_gambling,
-    #'!airport': show_aerotrem,
 
     '!awoo': make_func("https://cdn.discordapp.com/attachments/202055538773721099/257717450135568394/awooo.gif"),
 

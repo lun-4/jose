@@ -350,15 +350,18 @@ class JoseBot(jcommon.Extension):
         return
 
     async def c_money(self, message, args):
-        '''`!money qt from to` - converte dinheiro usando cotações etc'''
+        '''`!money quantity from to` - converte dinheiro usando cotações etc'''
         if len(args) < 3:
-            await self.say("use `!help money` para saber como se usa")
+            await self.say(self.c_money.__doc__)
 
-        amount = float(args[1])
+        try:
+            amount = float(args[1])
+        except Exception as e:
+            await self.say("Error parsing `quantity`")
+            return
+
         currency_from = args[2]
         currency_to = args[3]
-
-        loop = asyncio.get_event_loop()
 
         url = "http://api.fixer.io/latest?base={}".format(currency_from.upper())
         r = await aiohttp.request('GET', url)
