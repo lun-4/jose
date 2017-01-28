@@ -312,6 +312,9 @@ async def on_message(message):
     if message.author == client.user:
         return
 
+    if len(message.content) < 0:
+        return
+
     counter += 1
     if counter > 11:
         await josecoin_save(message, False)
@@ -326,7 +329,7 @@ async def on_message(message):
         await handler(message)
 
     # get command and push it to jose
-    if message.content[0] == '!':
+    if message.content.startswith(JOSE_PREFIX):
         #parse command
         #rules:
         # !{command} {args...}

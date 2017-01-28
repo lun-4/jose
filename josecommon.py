@@ -29,6 +29,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 
+JOSE_PREFIX = "!"
 JOSE_VERSION = '1.2.4'
 
 MARKOV_DB_PATH = 'markov-database.json'
