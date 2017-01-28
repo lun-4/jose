@@ -19,3 +19,6 @@ Query types for the `!query` command
 
  * `!query this`
   * Queries the server where the command originated and shows (almost) the same things as `!query summary`, but using a local database
+
+ * `!query topcmd`
+  * Shows the most used commands in josé

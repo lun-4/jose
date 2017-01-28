@@ -19,3 +19,6 @@ Tipos de pedidos para o comando `!query`
 
  * `!query this`
   * Mostra as mesmas informações que o `!query summary`, mas informações locais
+
+ * `!query topcmd`
+  * Mostra os comandos mais usados
