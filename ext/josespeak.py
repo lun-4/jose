@@ -340,6 +340,6 @@ class JoseSpeak(jcommon.Extension):
         await self.c_speaktrigger(message, args, e_cxt)
         await cxt.say('''```
 ecxt: %s, %s
-ecxt.buffer: %s
+ecxt.[messages]: %s
 getall: %s
-        ```''' % (e_cxt.client, e_cxt.message, e_cxt.buffer, e_cxt.getall()))
+        ```''' % (e_cxt.client, e_cxt.message, e_cxt.messages, e_cxt.getall()))
