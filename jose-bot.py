@@ -324,12 +324,6 @@ async def one_message(message):
         await main_status(message)
         return
 
-    for user_id in list(jose_env['spamcl']):
-        if time.time() > jose_env['spamcl'][user_id]:
-            del jose_env['spamcl'][user_id]
-            del jose_env['spam'][user_id]
-            await jose.say("<@%s> : cooldown destruído" % user_id)
-
     if jose.command_lock:
         return
 
@@ -497,14 +491,12 @@ async def one_message(message):
         with open("zelao.txt", 'a') as f:
             f.write('%s\n' % speak_filter(message.content))
 
-    # use e_on_message calls
+    # handle e_on_message
     for handler in event_table['on_message']:
         await handler(message)
 
     if random.random() < jc_probabiblity:
         if not message.channel.is_private:
-            if not message.author.id in jose_env['spam']:
-                jose_env['spam'][message.author.id] = 0
 
             # only if author has account
             if str(message.author.id) in jcoin.data:
@@ -512,17 +504,6 @@ async def one_message(message):
                 logger.debug("%s %s", message.server.id, message.server.id != "271378126234320897")
                 if message.server.id != "271378126234320897":
                     return
-
-                jose_env['spam'][message.author.id] += 1
-                if jose_env['spam'][message.author.id] >= JOSE_SPAM_TRIGGER:
-
-                    # set timeout of user
-                    if not message.author.id in jose_env['spamcl']:
-                        jose_env['spamcl'][message.author.id] = time.time() + 300
-                        await jose.say('@%s recebe cooldown de 5 minutos!' % message.author)
-                        return
-                    else:
-                        return
 
                 if MAINTENANCE_MODE:
                     return
