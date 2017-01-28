@@ -35,7 +35,6 @@ set_client(client) # to jcommon
 # initialize jose instance
 jose = jose_bot.JoseBot(client)
 
-started = False
 GAMBLING_LAST_BID = 0.0
 
 #enviroment things
@@ -315,7 +314,6 @@ async def on_message(message):
 
 async def one_message(message):
     global jose
-    global started
     global counter
     global help_helptext
 
@@ -354,18 +352,6 @@ async def one_message(message):
     # log stuff
     bnr = '%s(%r) : %s : %r' % (message.channel, message.channel.is_private, message.author, message.content)
     logger.debug(bnr)
-
-    if not started:
-        started = True
-        initmsg = "josé %s iniciou em %s" % (JOSE_VERSION, message.channel)
-        if DEMON_MODE:
-            initmsg = initmsg[::-1]
-        elif PARABENS_MODE:
-            initmsg = "Parabéns %s" % initmsg
-
-        await jose_debug(message, initmsg)
-        await josecoin_load(message, False)
-        return
 
     counter += 1
     if counter > 11:
