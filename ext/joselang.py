@@ -4,6 +4,7 @@ import discord
 import asyncio
 import sys
 import json
+import os
 
 sys.path.append("..")
 import jauxiliar as jaux
