@@ -145,7 +145,7 @@ class JoseCoin(jcommon.Extension):
         if not res[0]:
             await self.debug('error: %r' % res)
 
-    async def c_saldo(self, message, args):
+    async def c_saldo(self, message, args, cxt):
         '''`!saldo [@mention]` - mostra o saldo seu ou de outra pessoa'''
         args = message.content.split(' ')
 
@@ -158,20 +158,20 @@ class JoseCoin(jcommon.Extension):
         res = get(id_check)
         if res[0]:
             accdata = res[1]
-            await self.say('%s -> %.2f' % (accdata['name'], accdata['amount']))
+            await cxt.say(('%s -> %.2f' % (accdata['name'], accdata['amount']))
         else:
-            await self.say('conta não encontrada(`id:%s`)' % (id_check))
+            await cxt.say('conta não encontrada(`id:%s`)' % (id_check))
 
-    async def c_conta(self, message, args):
+    async def c_conta(self, message, args, cxt):
         print("new jcoin account %s" % message.author.id)
 
         res = new_acc(message.author.id, str(message.author))
         if res[0]:
-            await self.say(res[1])
+            await cxt.say(res[1])
         else:
-            await self.say('jc->err: %s' % res[1])
+            await cxt.say('jc->err: %s' % res[1])
 
-    async def c_write(self, message, args):
+    async def c_write(self, message, args, cxt):
         '''`!write @mention new_amount` - sobrescreve o saldo de uma conta'''
         global data
         await self.is_admin(message.author.id)
@@ -180,23 +180,23 @@ class JoseCoin(jcommon.Extension):
         new_amount = Decimal(args[2])
 
         data[id_from]['amount'] = new_amount
-        await self.say("<@%s> tem %.2fJC agora" % (id_from, data[id_from]['amount']))
+        await cxt.say("<@%s> tem %.2fJC agora" % (id_from, data[id_from]['amount']))
 
-    async def c_enviar(self, message, args):
+    async def c_enviar(self, message, args, cxt):
         '''`!enviar @mention quantidade` - envia JCoins para uma conta'''
 
         if len(args) != 3:
-            await self.say(self.c_enviar.__doc__)
+            await cxt.say(self.c_enviar.__doc__)
             return
 
         id_to = args[1]
         try:
             amount = Decimal(args[2])
         except ValueError:
-            await self.say("ValueError: erro parseando o valor")
+            await cxt.say("ValueError: erro parseando o valor")
             return
         except Exception as e:
-            await self.say("Exception: `%r`" % e)
+            await cxt.say("Exception: `%r`" % e)
             return
 
         id_from = message.author.id
@@ -205,14 +205,14 @@ class JoseCoin(jcommon.Extension):
         res = transfer(id_from, id_to, amount, LEDGER_PATH)
         await self.josecoin_save(message, False)
         if res[0]:
-            await self.say(res[1])
+            await cxt.say(res[1])
         else:
-            await self.say('jc_err: `%s`' % res[1])
+            await cxt.say('jc_err: `%s`' % res[1])
 
-    async def c_topunflip(self, message, args):
+    async def c_topunflip(self, message, args, cxt):
         self.top10_flag = not self.top10_flag
 
-    async def c_top10(self, message, args):
+    async def c_top10(self, message, args, cxt):
         if self.top10_flag:
             raise je.LimitError()
         self.top10_flag = True
@@ -231,7 +231,7 @@ class JoseCoin(jcommon.Extension):
         }
 
         if range_max >= 16:
-            await self.say("LimitError: valores maiores do que 16 não válidos")
+            await cxt.say("LimitError: valores maiores do que 16 não válidos")
             return
 
         order = []
