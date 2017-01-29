@@ -1,10 +1,8 @@
 import discord
 import asyncio
 import time
-import base64
 import re
 import io
-from xml.etree import ElementTree
 
 import randemoji as emoji
 
@@ -76,8 +74,6 @@ BASE_PRICE = 3 * ((len(JC_REWARDS) * (JC_REWARDS[len(JC_REWARDS)-1] * jc_probabi
 
 PORN_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / PORN_MEMBERS)
 LEARN_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / LEARN_MEMBERS)
-# LEARN_PRICE -= 12
-
 OP_TAX_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / TOTAL)
 
 PRICE_TABLE = {
@@ -96,6 +92,9 @@ client = None
 def set_client(cl):
     global client
     client = cl
+
+# Reference to the language database
+dblang_ref = None
 
 JOSE_PORN_HTEXT = '''Pornô(Tudo tem preço de %.2fJC):
 !hypno <termos | :latest> - busca por termos no Hypnohub
@@ -478,6 +477,19 @@ class Context:
             await self.client.send_message(channel, ":elephant: Mensagem muito grande :elephant:")
         else:
             await self.client.send_message(channel, string)
+
+    async def sayt(msgid, **kwargs):
+        if channel is None:
+            channel = self.message.channel
+
+        if message.server.id not in dblang_ref:
+            await self.say(":warning: No Language has been defined for this server, use `!language` to set up :warning:")
+            return
+
+        lang = dblang_ref[message.server.id]
+        translatedstr = get_translated(lang, msgid, **kwargs)
+
+        await self.say(translated)
 
 class EmptyContext:
     def __init__(self, client, message):

@@ -14,11 +14,12 @@ import josecommon as jcommon
 class JoseLanguage(jaux.Auxiliar):
     def __init__(self, cl):
         jaux.Auxiliar.__init__(self, cl)
-        self.landgb = {}
+        self.langdb = {}
         self.LANGLIST = [
             'pt', 'en'
         ]
         self.db_languages_path = jcommon.LANGUAGES_PATH
+        jcommon.dblang_ref = self.langdb
 
     async def savedb(self):
         self.logger.info("Saving language database")
