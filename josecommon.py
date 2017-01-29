@@ -37,6 +37,7 @@ MARKOV_DB_PATH = 'markov-database.json'
 MARKOV_LENGTH_PATH = 'db/wordlength.json'
 MARKOV_MESSAGES_PATH = 'db/messages.json'
 STAT_DATABASE_PATH = 'db/stats.json'
+LANGUAGES_PATH = 'db/languages.json'
 
 APP_CLIENT_ID = 'ID DO JOSE AQUI'
 OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=103988231' % APP_CLIENT_ID
