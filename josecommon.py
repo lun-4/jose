@@ -335,11 +335,6 @@ async def str_xor(s,t):
 
 JCRYPT_KEY = 'vcefodaparabensfrozen2meuovomeuovinhoayylmaogordoquaseexploderindo'
 
-class Context:
-    def __init__(self, message):
-        self.rtime = time.time()
-        self.message = message
-
 async def parse_id(data, message):
     '''
     <@196461455569059840>
