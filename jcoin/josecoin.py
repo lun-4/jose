@@ -256,6 +256,6 @@ class JoseCoin(jcommon.Extension):
                 'amount': 0.0,
             }
 
-        await self.say('\n'.join(order))
+        await cxt.say('\n'.join(order))
         print("top10 unflag")
         self.top10_flag = False
