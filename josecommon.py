@@ -141,8 +141,7 @@ Apostas:
 !ahelp e !adummy irão te mostrar os textos de ajuda para apostadores
 
 **ADMIN**:
-!exit - desligar o jose
-!reboot - reinicia o jose
+!shutdown - desligar o jose
 
 %s
 

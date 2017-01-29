@@ -133,17 +133,15 @@ class JoseCoin(jcommon.Extension):
 
     async def josecoin_save(self, message, dbg_flag=True):
         self.current = message
-        await self.debug("saving josecoin data", dbg_flag)
         res = save('jcoin/josecoin.db')
         if not res[0]:
-            await self.debug('error: %r' % res)
+            await self.client.send_message(message.channel, "err: `%r`" % res)
 
     async def josecoin_load(self, message, dbg_flag=True):
         self.current = message
-        await self.debug("loading josecoin data", dbg_flag)
         res = load('jcoin/josecoin.db')
         if not res[0]:
-            await self.debug('error: %r' % res)
+            await self.client.send_message(message.channel, "err: `%r`" % res)
 
     async def c_saldo(self, message, args, cxt):
         '''`!saldo [@mention]` - mostra o saldo seu ou de outra pessoa'''
@@ -158,7 +156,7 @@ class JoseCoin(jcommon.Extension):
         res = get(id_check)
         if res[0]:
             accdata = res[1]
-            await cxt.say(('%s -> %.2f' % (accdata['name'], accdata['amount']))
+            await cxt.say(('%s -> %.2f' % (accdata['name'], accdata['amount'])))
         else:
             await cxt.say('conta não encontrada(`id:%s`)' % (id_check))
 
