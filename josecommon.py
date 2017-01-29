@@ -464,6 +464,16 @@ def parse_command(message):
     else:
         return False, None, None
 
+async def get_translated(langid, msgid, **kwargs):
+    if message.server.id not in dblang_ref:
+        await self.say(":warning: No Language has been defined for this server, use `!language` to set up :warning:")
+        return
+
+    lang = dblang_ref[message.server.id]
+    translatedstr = get_translated(lang, msgid, **kwargs)
+
+    await self.say(translated)
+
 class Context:
     def __init__(self, client, message):
         self.message = message
@@ -478,17 +488,16 @@ class Context:
         else:
             await self.client.send_message(channel, string)
 
-    async def sayt(msgid, **kwargs):
+    async def sayt(msgid, channel=None, **kwargs):
         if channel is None:
             channel = self.message.channel
 
-        if message.server.id not in dblang_ref:
+        if self.message.server.id not in dblang_ref:
             await self.say(":warning: No Language has been defined for this server, use `!language` to set up :warning:")
             return
 
-        lang = dblang_ref[message.server.id]
-        translatedstr = get_translated(lang, msgid, **kwargs)
-
+        lang = dblang_ref[self.message.server.id]
+        translatedstr = await get_translated(lang, msgid, **kwargs)
         await self.say(translated)
 
 class EmptyContext:
@@ -499,6 +508,15 @@ class EmptyContext:
 
     async def say(self, string, channel=None):
         self.messages.append(string)
+
+    async def sayt(self, msgid, channnel=None, **kwargs):
+        if message.server.id not in dblang_ref:
+            await self.say(":warning: No Language has been defined for this server, use `!language` to set up :warning:")
+            return
+
+        lang = dblang_ref[self.message.server.id]
+        translatedstr = await get_translated(lang, msgid, **kwargs)
+        self.messages.append(translatedstr)
 
     async def getall(self):
         return '\n'.join(self.messages)
