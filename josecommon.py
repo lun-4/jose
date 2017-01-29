@@ -3,6 +3,7 @@ import asyncio
 import time
 import re
 import io
+import gettext
 
 import randemoji as emoji
 
@@ -464,15 +465,14 @@ def parse_command(message):
     else:
         return False, None, None
 
+# === LANGUAGE STUFF ===
+
+# initialize language object for each language
+lang_en = gettext.translation('jose', localedir='locale', languages=['en'])
+lang_pt = gettext.translation('jose', localedir='locale', languages=['pt'])
+
 async def get_translated(langid, msgid, **kwargs):
-    if message.server.id not in dblang_ref:
-        await self.say(":warning: No Language has been defined for this server, use `!language` to set up :warning:")
-        return
-
-    lang = dblang_ref[message.server.id]
-    translatedstr = get_translated(lang, msgid, **kwargs)
-
-    await self.say(translated)
+    return string
 
 class Context:
     def __init__(self, client, message):
