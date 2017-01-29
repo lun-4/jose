@@ -3,9 +3,12 @@
 import discord
 import asyncio
 import sys
+import json
+
 sys.path.append("..")
 import jauxiliar as jaux
 import joseerror as je
+import josecommon as jcommon
 
 class JoseLanguage(jaux.Auxiliar):
     def __init__(self, cl):
