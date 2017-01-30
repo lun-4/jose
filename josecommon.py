@@ -468,11 +468,14 @@ def parse_command(message):
 # === LANGUAGE STUFF ===
 
 # initialize language object for each language
-lang_en = gettext.translation('jose', localedir='locale', languages=['en'])
-lang_pt = gettext.translation('jose', localedir='locale', languages=['pt'])
+langobjects = {
+    'en': gettext.translation('jose', localedir='locale', languages=['en']),
+    'pt': gettext.translation('jose', localedir='locale', languages=['pt'])
+}
 
 async def get_translated(langid, msgid, **kwargs):
-    return string
+    lang = langobjects[langid]
+    return lang.gettext(msgid, **kwargs)
 
 class Context:
     def __init__(self, client, message):

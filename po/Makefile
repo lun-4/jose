@@ -1,9 +1,9 @@
 messages:
-	xgettext -a --files-from=POTFILES.in --from-code=UTF-8 --directory=.. --output=messages.po
+	xgettext -a -d jose --files-from=POTFILES.in --from-code=UTF-8 --directory=..
 
 pofiles:
-	msginit --locale=en --input=messages.po
-	msginit --locale=pt --input=messages.po
+	msginit --locale=pt --input=jose.po
+	msginit --locale=en --input=jose.po
 
 clear:
 	rm *.po
