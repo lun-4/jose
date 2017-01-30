@@ -2,9 +2,9 @@ import discord
 import asyncio
 import time
 import re
-import io
 import gettext
 import json
+import os
 
 import randemoji as emoji
 
