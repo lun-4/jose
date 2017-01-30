@@ -257,30 +257,30 @@ class JoseBot(jcommon.Extension):
     async def c_httech(self, message, args, cxt):
         await cxt.say(jcommon.JOSE_TECH_HTEXT, channel=message.author)
 
-    async def sec_auth(self, f):
+    async def sec_auth(self, f, cxt):
         auth = await self.is_admin(self.current.author.id)
         if auth:
             self.command_lock = True
-            await f()
+            await f(cxt)
             self.command_lock = False
         else:
             await self.debug("*PermError*: sem permissão")
 
-    async def turnoff(self):
+    async def turnoff(self, cxt):
         await jcoin.JoseCoin(self.client).josecoin_save(self.current, True)
         await self.unload_all()
         await cxt.say(":wave: kthxbye :wave:")
         await self.client.logout()
         sys.exit(0)
 
-    async def reboot(self):
+    async def reboot(self, cxt):
         await jcoin.JoseCoin(self.client).josecoin_save(self.current, True)
         await self.unload_all()
         await self.client.logout()
         os.system("./reload_jose.sh &")
         sys.exit(0)
 
-    async def update(self):
+    async def update(self, cxt):
         banner = "atualizando josé para nova versão(versão antiga: %s)" % (jcommon.JOSE_VERSION)
         await self.debug(banner)
         await jcoin.JoseCoin(self.client).josecoin_save(self.current, True)
@@ -290,7 +290,7 @@ class JoseBot(jcommon.Extension):
 
     async def c_shutdown(self, message, args, cxt):
         '''`!shutdown` - desliga o josé'''
-        await self.sec_auth(self.turnoff)
+        await self.sec_auth(self.turnoff, cxt)
 
     async def c_reboot(self, message, args, cxt):
         '''`!reboot` - reinicia o josé'''
