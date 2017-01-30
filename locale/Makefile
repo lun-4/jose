@@ -2,16 +2,21 @@ messages:
 	xgettext -a -d jose --files-from=POTFILES.in --from-code=UTF-8 --directory=..
 
 pofiles:
-	msginit --locale=pt --input=jose.po -o jose/pt.po
-	msginit --locale=en --input=jose.po -o jose/en.po
+	msginit --locale=pt --input=jose.po -o en/LC_MESSAGES/pt.po
+	msginit --locale=en --input=jose.po -o en/LC_MESSAGES/en.po
 
 mofiles:
-	msgfmt -o jose/en.mo en.po
-	msgfmt -o jose/pt.mo pt.po
+	msgfmt -o en/LC_MESSAGES/pt.mo pt/LC_MESSAGES/pt.po
+	msgfmt -o en/LC_MESSAGES/en.mo en/LC_MESSAGES/en.po
 
 poclear:
 	rm *.po
-	rm jose/*.po
+	rm */*.po
 
-clear:
-	rm jose/en.mo
+moclear:
+	rm */*.mo
+
+clearall:
+	rm *.po
+	rm */*.po
+	rm */*.mo
