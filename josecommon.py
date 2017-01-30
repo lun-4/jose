@@ -4,6 +4,7 @@ import time
 import re
 import io
 import gettext
+import json
 
 import randemoji as emoji
 
@@ -476,6 +477,24 @@ langobjects = {
     'pt': gettext.GNUTranslations(open(PT_LANGUAGE_PATH, 'rb')),
 }
 
+# langdb stuff
+async def langdb_set(sid, lang):
+    langdb[sid] = lang
+
+async def langdb_get(sid):
+    return langdb.get(sid, None)
+
+async def save_langdb():
+    json.dump(langdb, open(LANGUAGES_PATH, 'w'))
+
+async def load_langdb():
+    if not os.path.isfile(LANGUAGES_PATH):
+        # recreate
+        with open(LANGUAGES_PATH, 'w') as f:
+            f.write('{}')
+
+    langdb = json.load(open(LANGUAGES_PATH, 'r'))
+
 async def get_translated(langid, string, **kwargs):
     lang = langobjects.get(langid, None)
     if lang is None:
@@ -502,7 +521,7 @@ class Context:
 
             # since 'default' doesn't exist in the language table
             # it will go back to fallback and just send the message already
-            lang = langdb.get(self.message.server.id, 'default')
+            lang = langdb_get(self.message.server.id)
             translated = await get_translated(lang, string, **kwargs)
 
             await self.client.send_message(channel, translated)

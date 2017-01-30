@@ -3,8 +3,6 @@
 import discord
 import asyncio
 import sys
-import json
-import os
 
 sys.path.append("..")
 import jauxiliar as jaux
@@ -22,17 +20,11 @@ class JoseLanguage(jaux.Auxiliar):
 
     async def savedb(self):
         self.logger.info("Saving language database")
-        json.dump(jcommon.langdb, open(self.db_languages_path, 'w'))
+        await jcommon.save_langdb()
 
     async def ext_load(self):
         try:
-            jcommon.langdb = {}
-            if not os.path.isfile(self.db_languages_path):
-                # recreate
-                with open(self.db_languages_path, 'w') as f:
-                    f.write('{}')
-
-            jcommon.langdb = json.load(open(self.db_languages_path, 'r'))
+            await jcommon.load_langdb()
 
             return True, ''
         except Exception as e:
@@ -62,7 +54,7 @@ class JoseLanguage(jaux.Auxiliar):
             #await cxt.sayt("jlang_lang_404", language=language)
             return
 
-        jcommon.langdb[message.server.id] = language
+        jcommon.langdb_set(message.server.id, language)
         await cxt.say("Set language to %s" % language)
         #await cxt.sayt("jlang_set_lang", language=language)
         await self.savedb()
