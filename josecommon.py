@@ -476,9 +476,13 @@ langobjects = {
     'pt': gettext.GNUTranslations(open(PT_LANGUAGE_PATH, 'rb')),
 }
 
-async def get_translated(langid, msgid, **kwargs):
-    lang = langobjects[langid]
-    return lang.gettext(msgid, **kwargs)
+async def get_translated(langid, string, **kwargs):
+    lang = langobjects.get(langid, None)
+    if lang is None:
+        # fallback, just return the same string
+        return string
+    else:
+        return lang.gettext(string, **kwargs)
 
 class Context:
     def __init__(self, client, message):
@@ -496,8 +500,11 @@ class Context:
                 await self.client.send_message(channel, \
                     ":warning: No Language has been defined for this server, use `!language` to set up :warning:")
 
-            lang = dblang_ref[self.message.server.id]
+            # since 'default' doesn't exist in the language table
+            # it will go back to fallback and just send the message already
+            lang = dblang_ref.get(self.message.server.id, 'default')
             translatedstr = await get_translated(lang, msgid, **kwargs)
+
             await self.client.send_message(channel, translated)
 
 class EmptyContext:
