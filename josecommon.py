@@ -95,7 +95,7 @@ def set_client(cl):
     client = cl
 
 # Reference to the language database
-dblang_ref = None
+langdb = None
 
 JOSE_PORN_HTEXT = '''Pornô(Tudo tem preço de %.2fJC):
 !hypno <termos | :latest> - busca por termos no Hypnohub
@@ -496,13 +496,13 @@ class Context:
         if len(string) > 2000:
             await self.client.send_message(channel, ":elephant: Mensagem muito grande :elephant:")
         else:
-            if self.message.server.id not in dblang_ref:
+            if self.message.server.id not in langdb:
                 await self.client.send_message(channel, \
                     ":warning: No Language has been defined for this server, use `!language` to set up :warning:")
 
             # since 'default' doesn't exist in the language table
             # it will go back to fallback and just send the message already
-            lang = dblang_ref.get(self.message.server.id, 'default')
+            lang = langdb.get(self.message.server.id, 'default')
             translated = await get_translated(lang, string, **kwargs)
 
             await self.client.send_message(channel, translated)

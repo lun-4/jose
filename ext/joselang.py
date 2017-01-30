@@ -14,26 +14,25 @@ import josecommon as jcommon
 class JoseLanguage(jaux.Auxiliar):
     def __init__(self, cl):
         jaux.Auxiliar.__init__(self, cl)
-        self.langdb = {}
         self.LANGLIST = [
             'pt', 'en'
         ]
+        jcommon.langdb = {}
         self.db_languages_path = jcommon.LANGUAGES_PATH
-        jcommon.dblang_ref = self.langdb
 
     async def savedb(self):
         self.logger.info("Saving language database")
-        json.dump(self.langdb, open(self.db_languages_path, 'w'))
+        json.dump(jcommon.langdb, open(self.db_languages_path, 'w'))
 
     async def ext_load(self):
         try:
-            self.langdb = {}
+            jcommon.langdb = {}
             if not os.path.isfile(self.db_languages_path):
                 # recreate
                 with open(self.db_languages_path, 'w') as f:
                     f.write('{}')
 
-            self.langdb = json.load(open(self.db_languages_path, 'r'))
+            jcommon.langdb = json.load(open(self.db_languages_path, 'r'))
 
             return True, ''
         except Exception as e:
@@ -63,7 +62,7 @@ class JoseLanguage(jaux.Auxiliar):
             #await cxt.sayt("jlang_lang_404", language=language)
             return
 
-        self.langdb[message.server.id] = language
+        jcommon.langdb[message.server.id] = language
         await cxt.say("Set language to %s" % language)
         #await cxt.sayt("jlang_set_lang", language=language)
         await self.savedb()
