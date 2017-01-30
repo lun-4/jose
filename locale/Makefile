@@ -6,7 +6,10 @@ pofiles:
 	msginit --locale=en --input=jose.po -o en/LC_MESSAGES/en.po
 
 mofiles:
-	msgfmt -o en/LC_MESSAGES/pt.mo pt/LC_MESSAGES/pt.po
+	mkdir -p pt/LC_MESSAGES
+	msgfmt -o pt/LC_MESSAGES/pt.mo pt/LC_MESSAGES/pt.po
+
+	mkdir -p en/LC_MESSAGES
 	msgfmt -o en/LC_MESSAGES/en.mo en/LC_MESSAGES/en.po
 
 poclear:
