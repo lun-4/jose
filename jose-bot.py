@@ -211,21 +211,23 @@ def load_module(n, n_cl):
     loop = asyncio.get_event_loop()
     loop.run_until_complete(jose.load_ext(n, n_cl, None))
 
-load_module('josensfw', 'JoseNSFW')
-load_module('josememes', 'JoseMemes')
-# load_module('josemusic', 'JoseMusic')
-load_module('josespeak', 'JoseSpeak')
-load_module('josegambling', 'JoseGambling')
-# load_module('josegames', 'JoseGames')
-# load_module('josestrelinha', "JoseStrelinha")
-load_module('josedatamosh', 'JoseDatamosh')
-load_module('joseibc', 'JoseIBC')
-load_module('josextra', 'joseXtra')
-load_module('joseartif', 'JoseArtif')
-load_module('josestats', 'JoseStats')
-load_module('josemath', 'JoseMath')
-load_module('josemagicword', 'JoseMagicWord')
+# essential stuff
 load_module('joselang', 'JoseLanguage')
+load_module('josespeak', 'JoseSpeak')
+load_module('josestats', 'JoseStats')
+load_module('josemagicword', 'JoseMagicWord')
+
+# fun stuff
+load_module('josememes', 'JoseMemes')
+load_module('josensfw', 'JoseNSFW')
+load_module('josedatamosh', 'JoseDatamosh')
+load_module('josextra', 'joseXtra')
+load_module('josegambling', 'JoseGambling')
+
+# etc
+load_module('joseibc', 'JoseIBC')
+load_module('joseartif', 'JoseArtif')
+load_module('josemath', 'JoseMath')
 
 help_helptext = """
 `!help` - achar ajuda para outros comandos
@@ -244,6 +246,7 @@ event_table = {
     "logout": [],
 }
 
+# register events
 for modname in jose.modules:
     module = jose.modules[modname]
     modinst = jose.modules[modname]['inst']
@@ -255,15 +258,6 @@ for modname in jose.modules:
             if evname in event_table:
                 handler = getattr(modinst, method)
                 event_table[evname].append(handler)
-
-# cmd_queue = WaitingQueue()
-
-'''
-@client.event
-async def on_message(message):
-    global cmd_queue
-    await cmd_queue.push(message)
-'''
 
 @client.event
 async def on_message(message):
@@ -484,17 +478,6 @@ async def on_message(message):
 
     await gorila_routine(message.channel)
 
-'''
-async def command_loop():
-    while True:
-        if cmd_queue.length > 0:
-            msg = await cmd_queue.pop()
-            if len(msg.content) > 0:
-                await one_message(msg)
-        else:
-            await asyncio.sleep(0.001)
-'''
-
 @client.event
 async def on_ready():
     print("="*25)
@@ -511,11 +494,10 @@ async def main_task():
 
 loop = asyncio.get_event_loop()
 try:
-    #asyncio.ensure_future(command_loop())
-
     print("main_task")
     loop.run_until_complete(main_task())
 except:
+    # unload everything and logout
     loop.run_until_complete(jose.unload_all())
     loop.run_until_complete(client.logout())
 finally:
