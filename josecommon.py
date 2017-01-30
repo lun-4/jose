@@ -493,8 +493,8 @@ class Context:
             await self.client.send_message(channel, ":elephant: Mensagem muito grande :elephant:")
         else:
             if self.message.server.id not in dblang_ref:
-                await self.say(":warning: No Language has been defined for this server, use `!language` to set up :warning:")
-                return
+                await self.client.send_message(channel, \
+                    ":warning: No Language has been defined for this server, use `!language` to set up :warning:")
 
             lang = dblang_ref[self.message.server.id]
             translatedstr = await get_translated(lang, msgid, **kwargs)
