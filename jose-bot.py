@@ -119,12 +119,6 @@ async def learn_data(message):
     await jose.say(feedback)
     return
 
-async def demon(message):
-    if DEMON_MODE:
-        await jose.say(random.choice(demon_videos))
-    else:
-        await jose.say("espere até que o modo demônio seja sumonado em momentos específicos.")
-
 async def main_status(message):
     global MAINTENANCE_MODE
     auth = await check_roles(MASTER_ROLE, message.author.roles)
@@ -169,25 +163,12 @@ josecoin_load = jc.josecoin_load
 
 commands_start = {
     '!causar': make_causo,
-
     '!learn': learn_data,
-
     '!josecoin': help_josecoin,
-    '!save': josecoin_save,
-    '!load': josecoin_load,
-
-    '!ping': pong,
-    '!xuxa': demon,
-    'axux!': demon,
-
     '!jasm': make_func(jasm.JASM_HELP_TEXT),
-    '!construção': main_status,
-
     '!ahelp': show_gambling_full,
     '!adummy': show_gambling,
-
     '!awoo': make_func("https://cdn.discordapp.com/attachments/202055538773721099/257717450135568394/awooo.gif"),
-
     '!price': show_price,
 }
 
