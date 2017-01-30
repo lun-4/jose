@@ -485,14 +485,14 @@ class Context:
         self.message = message
         self.client = client
 
-    async def say(self, string, channel=None):
+    async def say(self, string, channel=None, **kwargs):
         if channel is None:
             channel = self.message.channel
 
         if len(string) > 2000:
             await self.client.send_message(channel, ":elephant: Mensagem muito grande :elephant:")
         else:
-            if message.server.id not in dblang_ref:
+            if self.message.server.id not in dblang_ref:
                 await self.say(":warning: No Language has been defined for this server, use `!language` to set up :warning:")
                 return
 
