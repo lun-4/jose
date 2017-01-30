@@ -23,7 +23,7 @@ class JoseLanguage(jaux.Auxiliar):
 
     async def savedb(self):
         self.logger.info("Saving language database")
-        json.dump(self.landgb, open(self.db_languages_path, 'w'))
+        json.dump(self.langdb, open(self.db_languages_path, 'w'))
 
     async def ext_load(self):
         try:
