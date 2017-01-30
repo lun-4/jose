@@ -4,10 +4,15 @@ José Manual v0.0.1
 # How to Install in new server??????????
 
  * Make sure you have Python 3.5+ installed
+ * Make sure you have `gettext` installed
 ```bash
 git clone https://github.com/lkmnds/jose.git
 cd jose
 pip3 install discord.py Pillow wolframalpha pyowm
+
+# generate language files
+cd po
+make mofiles
 ```
 
 ### Configuration
@@ -32,4 +37,4 @@ in a shell(probably on tmux so it doesn't exits when you exit the shell):
 python3 jose-bot.py
 ```
 
-CTRL-C unloads and stops everything(use that AFTER josé logs in, you can use if errors happen in startup)
+CTRL-C unloads and stops everything(use that AFTER josé logs on, you can use if errors happen in startup)

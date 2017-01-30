@@ -492,19 +492,13 @@ class Context:
         if len(string) > 2000:
             await self.client.send_message(channel, ":elephant: Mensagem muito grande :elephant:")
         else:
-            await self.client.send_message(channel, string)
+            if message.server.id not in dblang_ref:
+                await self.say(":warning: No Language has been defined for this server, use `!language` to set up :warning:")
+                return
 
-    async def sayt(msgid, channel=None, **kwargs):
-        if channel is None:
-            channel = self.message.channel
-
-        if self.message.server.id not in dblang_ref:
-            await self.say(":warning: No Language has been defined for this server, use `!language` to set up :warning:")
-            return
-
-        lang = dblang_ref[self.message.server.id]
-        translatedstr = await get_translated(lang, msgid, **kwargs)
-        await self.say(translated)
+            lang = dblang_ref[self.message.server.id]
+            translatedstr = await get_translated(lang, msgid, **kwargs)
+            await self.client.send_message(channel, translated)
 
 class EmptyContext:
     def __init__(self, client, message):
@@ -514,15 +508,6 @@ class EmptyContext:
 
     async def say(self, string, channel=None):
         self.messages.append(string)
-
-    async def sayt(self, msgid, channnel=None, **kwargs):
-        if message.server.id not in dblang_ref:
-            await self.say(":warning: No Language has been defined for this server, use `!language` to set up :warning:")
-            return
-
-        lang = dblang_ref[self.message.server.id]
-        translatedstr = await get_translated(lang, msgid, **kwargs)
-        self.messages.append(translatedstr)
 
     async def getall(self):
         return '\n'.join(self.messages)
