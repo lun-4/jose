@@ -503,7 +503,7 @@ class Context:
             # since 'default' doesn't exist in the language table
             # it will go back to fallback and just send the message already
             lang = dblang_ref.get(self.message.server.id, 'default')
-            translatedstr = await get_translated(lang, string, **kwargs)
+            translated = await get_translated(lang, string, **kwargs)
 
             await self.client.send_message(channel, translated)
 
