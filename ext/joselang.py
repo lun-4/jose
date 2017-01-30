@@ -63,7 +63,7 @@ class JoseLanguage(jaux.Auxiliar):
             #await cxt.sayt("jlang_lang_404", language=language)
             return
 
-        self.landgb[message.server.id] = language
+        self.langdb[message.server.id] = language
         await cxt.say("Set language to %s" % language)
         #await cxt.sayt("jlang_set_lang", language=language)
         await self.savedb()
