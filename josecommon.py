@@ -467,10 +467,13 @@ def parse_command(message):
 
 # === LANGUAGE STUFF ===
 
+EN_LANGUAGE_PATH = './locale/en/LC_MESSAGES/en.mo'
+PT_LANGUAGE_PATH = './locale/pt/LC_MESSAGES/pt.mo'
+
 # initialize language object for each language
 langobjects = {
-    'en': gettext.translation('jose', localedir='locale', languages=['en']),
-    'pt': gettext.translation('jose', localedir='locale', languages=['pt'])
+    'en': gettext.GNUTranslations(open(EN_LANGUAGE_PATH, 'rb')),
+    'pt': gettext.GNUTranslations(open(PT_LANGUAGE_PATH, 'rb')),
 }
 
 async def get_translated(langid, msgid, **kwargs):

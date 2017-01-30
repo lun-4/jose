@@ -1,5 +1,6 @@
 messages:
-	xgettext -a -d jose --files-from=POTFILES.in --from-code=UTF-8 --directory=..
+	xgettext --files-from=POTFILES.in -d jose --from-code=UTF-8 \
+		--keyword=say --directory=..
 
 pofiles:
 	mkdir -p pt/LC_MESSAGES
@@ -20,6 +21,6 @@ moclear:
 	rm */*.mo
 
 clearall:
-	rm *.po
-	rm */*.po
-	rm */*.mo
+	rm -f *.po
+	rm -f */LC_MESSAGES/*.po
+	rm -f */LC_MESSAGES/*.mo
