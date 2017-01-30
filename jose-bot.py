@@ -77,16 +77,16 @@ async def jcoin_control(id_user, amnt):
     return jcoin.transfer(id_user, jcoin.jose_id, amnt, jcoin.LEDGER_PATH)
 
 def sanitize_data(data):
-    data = re.sub('<@!?([0-9]+)>', '', data)
-    data = re.sub('<#!?([0-9]+)>', '', data)
-    data = re.sub('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', '', data)
+    data = re.sub(r'<@!?([0-9]+)>', '', data)
+    data = re.sub(r'<#!?([0-9]+)>', '', data)
+    data = re.sub(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', '', data)
     data = data.replace("@jose-bot", '')
     return data
 
 async def add_sentence(content, author):
     data = content
     sd = sanitize_data(data)
-    debug_log("write %r from %s" % (sd, author))
+    logger.debug("write %r from %s" % (sd, author))
     if len(sd.strip()) > 1:
         with open('jose-data.txt', 'a') as f:
             f.write(sd+'\n')
