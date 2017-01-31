@@ -524,7 +524,8 @@ class Context:
             lang = await langdb_get(self.message.server.id)
             translated = await get_translated(lang, string, **kwargs)
 
-            await self.client.send_message(channel, translated)
+            ret = await self.client.send_message(channel, translated)
+            return ret
 
 class EmptyContext:
     def __init__(self, client, message):

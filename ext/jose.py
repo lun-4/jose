@@ -305,7 +305,7 @@ class JoseBot(jcommon.Extension):
     async def c_ping(self, message, args, cxt):
         '''`!ping` - pong'''
         t_init = time.time()
-        pong = await self.say("pong")
+        pong = await cxt.say("pong")
         t_end = time.time()
         delta = t_end - t_init
         await self.client.edit_message(pong, "pong in %.2fms" % (delta))
