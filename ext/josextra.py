@@ -88,6 +88,9 @@ class joseXtra(jaux.Auxiliar):
         mem_mb = mem_bytes / 1024 / 1024
         res.append("Memory Usage: %.2f MB" % mem_mb)
 
+        # get num of servers
+        res.append("Guilds: %d" % (len(self.client.servers)))
+
         await cxt.say(self.codeblock("", '\n'.join(res)))
 
     async def c_status(self, message, args, cxt):
