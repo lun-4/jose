@@ -15,7 +15,7 @@ Instructions for Linux:
 $ git clone https://github.com/lkmnds/jose.git
 $ cd jose
 $ nano joseconfig.py
-$ pip install discord.py Pillow wolframalpha pyowm
+$ pip install discord.py Pillow wolframalpha pyowm psutil
 ```
 
 Example `joseconfig.py` file:

@@ -15,8 +15,6 @@ class JoseLanguage(jaux.Auxiliar):
         self.LANGLIST = [
             'pt', 'en'
         ]
-        jcommon.langdb = {}
-        self.db_languages_path = jcommon.LANGUAGES_PATH
 
     async def savedb(self):
         self.logger.info("Saving language database")
@@ -37,6 +35,11 @@ class JoseLanguage(jaux.Auxiliar):
         except Exception as e:
             return False, str(e)
 
+    async def c_reloadlangdb(self, message, args, cxt):
+        await self.savedb()
+        await jcommon.load_langdb()
+        await cxt.say(":speech_left: langdb reloaded")
+
     async def c_language(self, message, args, cxt):
         '''`!language lang` - sets language for a server'''
         if message.server is None:
@@ -55,7 +58,7 @@ class JoseLanguage(jaux.Auxiliar):
             return
 
         await jcommon.langdb_set(message.server.id, language)
-        await cxt.say("Set language to %s" % language)
+        await cxt.say(":speech_left: Set language to %s" % language)
         #await cxt.sayt("jlang_set_lang", language=language)
         await self.savedb()
 

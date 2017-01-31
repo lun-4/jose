@@ -5,6 +5,7 @@ import aiohttp
 import json
 import subprocess
 import re
+import psutil
 
 import sys
 sys.path.append("..")
@@ -76,6 +77,17 @@ class joseXtra(jaux.Auxiliar):
 
     async def c_loteria(self, message, args, cxt):
         await cxt.say("nao")
+
+    async def c_report(self, message, args, cxt):
+        res = []
+
+        # get memory usage
+        process = psutil.Process(os.getpid())
+        mem_bytes = process.memory_info().rss
+        mem_mb = mem_bytes / 1024 / 1024
+        res.append("Memory Usage: %.2f MB" % mem_mb)
+
+        await cxt.say(self.codeblock("", '\n'.join(res)))
 
     async def c_status(self, message, args, cxt):
         # ping discordapp one time

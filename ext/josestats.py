@@ -96,7 +96,7 @@ class JoseStats(jaux.Auxiliar):
             'jspeak:message_count': os.path.getsize(jcommon.MARKOV_MESSAGES_PATH),
             'jstats:statistics': os.path.getsize(jcommon.STAT_DATABASE_PATH),
             'jmword:magicword': os.path.getsize(jconfig.MAGICWORD_PATH),
-            'jlang:language': os.path.getsize(jconfig.LANGUAGES_PATH),
+            'jlang:language': os.path.getsize(jcommon.LANGUAGES_PATH),
         }
 
     async def c_saveqdb(self, message, args, cxt):

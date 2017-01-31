@@ -8,7 +8,7 @@ José Manual v0.0.1
 ```bash
 git clone https://github.com/lkmnds/jose.git
 cd jose
-pip3 install discord.py Pillow wolframalpha pyowm
+pip3 install discord.py Pillow wolframalpha pyowm psutil
 
 # generate language files
 cd po
