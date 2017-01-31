@@ -327,6 +327,10 @@ class JoseSpeak(jcommon.Extension):
 
     async def c_jwormhole(self, message, args, cxt):
         '''`!jwormhole` - Envia mensagens do !speaktrigger para o Wormhole do Septapus!'''
+        if message.server is None:
+            await cxt.say("Esse comando não está disponível em DMs")
+            return
+
         ecxt = jcommon.EmptyContext(self.client, message)
         await self.c_speaktrigger(message, args, ecxt)
         res = await ecxt.getall()
