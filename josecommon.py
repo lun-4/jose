@@ -95,7 +95,7 @@ def set_client(cl):
     global client
     client = cl
 
-# Reference to the language database
+# Language database
 langdb = None
 
 JOSE_PORN_HTEXT = '''Pornô(Tudo tem preço de %.2fJC):
@@ -485,14 +485,17 @@ async def langdb_get(sid):
     return langdb.get(sid, None)
 
 async def save_langdb():
+    logger.info("Saving language database")
     json.dump(langdb, open(LANGUAGES_PATH, 'w'))
 
 async def load_langdb():
     if not os.path.isfile(LANGUAGES_PATH):
         # recreate
+        logger.info("Recreating language database")
         with open(LANGUAGES_PATH, 'w') as f:
             f.write('{}')
 
+    logger.info("Loading language database")
     langdb = json.load(open(LANGUAGES_PATH, 'r'))
 
 async def get_translated(langid, string, **kwargs):
@@ -515,6 +518,9 @@ class Context:
         if len(string) > 2000:
             await self.client.send_message(channel, ":elephant: Mensagem muito grande :elephant:")
         else:
+            if langdb is None:
+                await load_langdb()
+
             if self.message.server.id not in langdb:
                 await self.client.send_message(channel, \
                     ":warning: No Language has been defined for this server, use `!language` to set up :warning:")

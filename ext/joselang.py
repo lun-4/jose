@@ -17,7 +17,6 @@ class JoseLanguage(jaux.Auxiliar):
         ]
 
     async def savedb(self):
-        self.logger.info("Saving language database")
         await jcommon.save_langdb()
 
     async def ext_load(self):
