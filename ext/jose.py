@@ -308,7 +308,7 @@ class JoseBot(jcommon.Extension):
         pong = await cxt.say("pong")
         t_end = time.time()
         delta = t_end - t_init
-        await self.client.edit_message(pong, "pong, **%.2fms**" % (delta * 100))
+        await self.client.edit_message(pong, "pong, **%.2fms**" % (delta * 1000))
 
     async def c_rand(self, message, args, cxt):
         '''`!rand min max` - gera um número aleatório no intervalo [min, max]'''
