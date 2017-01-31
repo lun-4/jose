@@ -527,9 +527,14 @@ class Context:
                 await logger.info("Loading language database @ cxt.say")
                 await load_langdb()
 
-            if self.message.server.id not in langdb:
-                await self.client.send_message(channel, \
-                    ":warning: No Language has been defined for this server, use `!language` to set up :warning:")
+            if self.message.server is not None:
+                if self.message.server.id not in langdb:
+                    await self.client.send_message(channel, \
+                        ":warning: No Language has been defined for this server, use `!language` to set up :warning:")
+            else:
+                # in a DM
+                ret = await self.client.send_message(channel, string)
+                return ret
 
             # since 'default' doesn't exist in the language table
             # it will go back to fallback and just send the message already
