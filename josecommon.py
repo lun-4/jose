@@ -484,7 +484,7 @@ async def langdb_set(sid, lang):
 
 async def langdb_get(sid):
     global langdb
-    return langdb.get(sid, None)
+    return langdb.get(sid, 'default')
 
 async def save_langdb():
     global langdb
@@ -524,6 +524,7 @@ class Context:
             await self.client.send_message(channel, ":elephant: Mensagem muito grande :elephant:")
         else:
             if langdb is None:
+                await logger.info("Loading language database @ cxt.say")
                 await load_langdb()
 
             if self.message.server.id not in langdb:
