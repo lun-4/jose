@@ -479,16 +479,20 @@ langobjects = {
 
 # langdb stuff
 async def langdb_set(sid, lang):
+    global langdb
     langdb[sid] = lang
 
 async def langdb_get(sid):
+    global langdb
     return langdb.get(sid, None)
 
 async def save_langdb():
+    global langdb
     logger.info("Saving language database")
     json.dump(langdb, open(LANGUAGES_PATH, 'w'))
 
 async def load_langdb():
+    global langdb
     if not os.path.isfile(LANGUAGES_PATH):
         # recreate
         logger.info("Recreating language database")
@@ -512,6 +516,7 @@ class Context:
         self.client = client
 
     async def say(self, string, channel=None, **kwargs):
+        global langdb
         if channel is None:
             channel = self.message.channel
 
