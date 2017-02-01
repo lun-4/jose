@@ -511,7 +511,10 @@ async def get_translated(langid, string, **kwargs):
         return lang.gettext(string, **kwargs)
 
 class Context:
-    def __init__(self, client, message, t_creation):
+    def __init__(self, client, message, t_creation=None):
+        if t_creation is None:
+            t_creation = time.time()
+
         self.message = message
         self.client = client
         self.t_creation = t_creation
