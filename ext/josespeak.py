@@ -87,7 +87,7 @@ class Texter:
         while toHashKey(prevList) not in self.mapping:
             if len(prevList) == 0:
                 logger.error("Texter.next_word: len(prevList) == 0")
-                pass
+                return None
             else:
                 prevList.pop(0)
 
@@ -110,6 +110,11 @@ class Texter:
             if word_count > word_limit:
                 break
             curr = self.next_word(prevList)
+
+            if curr is None:
+                # fallback behavior
+                return 'None'
+
             prevList.append(curr)
 
             # if the prevList has gotten too long, trim it
