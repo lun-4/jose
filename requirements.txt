@@ -1,0 +1,6 @@
+uvloop
+discord.py[voice]
+Pillow
+wolframalpha
+pyowm
+psutil
