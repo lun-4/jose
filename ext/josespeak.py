@@ -230,6 +230,13 @@ class JoseSpeak(jcommon.Extension):
 
         await cxt.say(":ok_hand: Reloaded JoseSpeak Texters")
 
+    async def c_fuckreload(self, message, args, cxt):
+        '''`!fuckreload` - does !savedb and !forcereload at the same time'''
+        ecxt = jcommon.EmptyContext(self.client, message)
+        await self.c_savedb(message, args, ecxt)
+        await self.c_forcereload(message, args, ecxt)
+        await self.say(self.codeblock("", ecxt.getall()))
+
     async def e_on_message(self, message, cxt):
         if message.server is None:
             # ignore DMs here as well
