@@ -43,7 +43,6 @@ class JoseLanguage(jaux.Auxiliar):
         '''`!language lang` - sets language for a server'''
         if message.server is None:
             await cxt.say("Language support is not available for DMs")
-            #await cxt.sayt("jlang_no_lang")
 
         if len(args) < 2:
             await cxt.say(self.c_language.__doc__)
@@ -52,13 +51,11 @@ class JoseLanguage(jaux.Auxiliar):
         language = args[1]
 
         if language not in self.LANGLIST:
-            await cxt.say("%s: Language not found")
-            #await cxt.sayt("jlang_lang_404", language=language)
+            await cxt.say("%s: Language not found" % language)
             return
 
         await jcommon.langdb_set(message.server.id, language)
         await cxt.say(":speech_left: Set language to %s" % language)
-        #await cxt.sayt("jlang_set_lang", language=language)
         await self.savedb()
 
 
