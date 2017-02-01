@@ -235,7 +235,8 @@ class JoseSpeak(jcommon.Extension):
         ecxt = jcommon.EmptyContext(self.client, message)
         await self.c_savedb(message, args, ecxt)
         await self.c_forcereload(message, args, ecxt)
-        await self.say(self.codeblock("", ecxt.getall()))
+        res = await ecxt.getall()
+        await self.say(self.codeblock("", res))
 
     async def e_on_message(self, message, cxt):
         if message.server is None:
