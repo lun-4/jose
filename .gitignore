@@ -112,3 +112,6 @@ markov-database.json
 db/messages.json
 db/wordlength.json
 db/stats.json
+
+# backup file
+jose-backup*
