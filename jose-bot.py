@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 import asyncio
+import uvloop
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+
 import sys
 import os
 import ast
