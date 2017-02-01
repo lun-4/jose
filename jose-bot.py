@@ -306,15 +306,10 @@ async def on_message(message):
 
     # get command and push it to jose
     if message.content.startswith(JOSE_PREFIX):
-        #parse command
-        #rules:
-        # !{command} {args...}
-        k = message.content.find(" ")
-        command = message.content[1:k]
-        if k == -1:
-            command = message.content[1:]
-        args = message.content.split(' ')
-        method = "c_%s" % command
+        t_start = time.time()
+
+        # use jcommon.parse_command
+        command, args, method = parse_command(message)
 
         if command == 'help':
             # load helptext
@@ -369,7 +364,7 @@ async def on_message(message):
                 # if function can receive the Context, do it
                 # else just do it normally
                 if len(sig.parameters) == 3:
-                    cxt = Context(client, message)
+                    cxt = Context(client, message, t_start)
                     await jose_method(message, args, cxt)
                 else:
                     await jose_method(message, args)
@@ -381,11 +376,17 @@ async def on_message(message):
             except je.LimitError:
                 pass
 
+            del t_start
+
             end = time.time()
             delta = end - st
             if delta > 13:
                 await jose.say("Alguma coisa está demorando demais para responder(delta=%.4fs)..." % delta)
 
+            # signal python to clean this shit
+            del delta, st, end, jose_method
+
+            # kthxbye
             return
         except Exception as e:
             await jose.say("jose: py_err: ```%s```" % traceback.format_exc())

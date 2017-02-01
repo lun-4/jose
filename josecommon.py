@@ -511,9 +511,10 @@ async def get_translated(langid, string, **kwargs):
         return lang.gettext(string, **kwargs)
 
 class Context:
-    def __init__(self, client, message):
+    def __init__(self, client, message, t_creation):
         self.message = message
         self.client = client
+        self.t_creation = t_creation
 
     async def say(self, string, channel=None, **kwargs):
         global langdb
