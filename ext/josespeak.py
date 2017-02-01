@@ -13,6 +13,8 @@ import subprocess
 import json
 import io
 
+logger = None
+
 def fixCaps(word):
     if word.isupper() and (word != "I" or word != "Eu"):
         word = word.lower()
@@ -84,7 +86,7 @@ class Texter:
         # Shorten prevList until it's in mapping
         while toHashKey(prevList) not in self.mapping:
             if len(prevList) == 0:
-                self.logger.error("Texter.next_word: len(prevList) == 0")
+                logger.error("Texter.next_word: len(prevList) == 0")
                 pass
             else:
                 prevList.pop(0)
@@ -123,9 +125,11 @@ class Texter:
 
 class JoseSpeak(jcommon.Extension):
     def __init__(self, cl):
+        global logger
         jcommon.Extension.__init__(self, cl)
         self.cult_generator = Texter('jose-data.txt', 1)
         self.global_generator = Texter('zelao.txt', 1)
+        logger = self.logger
 
         self.flag = False
 
