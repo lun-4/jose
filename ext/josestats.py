@@ -191,6 +191,10 @@ A lista de possíveis dados está em https://github.com/lkmnds/jose/blob/master/
                 sizes[db] = '%.3f' % (sizes[db] / 1024)
             response = "\n".join(": ".join(_) + "KB" for _ in sizes.items())
         elif querytype == 'this':
+            if message.server.id is None:
+                await cxt.say("`!query this` not available for DMs")
+                return
+
             sid = message.server.id
             sdb = self.statistics[sid]
 
