@@ -164,7 +164,7 @@ class JoseSpeak(jcommon.Extension):
     async def c_savedb(self, message, args, cxt):
         """`!savedb` - saves all available databases(autosave for each 50 messages)"""
         await self.save_databases()
-        await cxt.say(":floppy_disk: saved database :floppy_disk:")
+        await cxt.say(":floppy_disk: saved messages database :floppy_disk:")
 
     async def c_speaktrigger(self, message, args, cxt):
         """`!speaktrigger` - trigger jose's speaking code"""
@@ -219,7 +219,7 @@ class JoseSpeak(jcommon.Extension):
         if not ok[0]:
             await cxt.say('ext_load :warning: ' % ok[1])
 
-        await cxt.say("done")
+        await cxt.say(":ok_hand: Reloaded JoseSpeak Texters")
 
     async def e_on_message(self, message, cxt):
         if message.server is None:
