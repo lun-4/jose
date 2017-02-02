@@ -5,18 +5,6 @@ import asyncio
 import sys
 import json
 
-'''from chatterbot import ChatBot
-chatbot = ChatBot(
-    "José",
-    storage_adapter='chatterbot.storage.JsonFileStorageAdapter',
-    logic_adapters=[
-        'chatterbot.logic.BestMatch'
-    ],
-    trainer='chatterbot.trainers.ChatterBotCorpusTrainer'
-)
-
-chatbot.train("chatterbot.corpus.portuguese.conversations")'''
-
 sys.path.append("..")
 import jauxiliar as jaux
 import josecommon as jcommon
@@ -24,9 +12,6 @@ import joseerror as je
 
 from random import SystemRandom
 random = SystemRandom()
-
-# 3 percent of all messages
-ARTIF_CHATINESS = .03
 
 class JoseArtif(jaux.Auxiliar):
     def __init__(self, cl):
@@ -40,23 +25,26 @@ class JoseArtif(jaux.Auxiliar):
     async def ext_unload(self):
         return True, ''
 
+    async def make_output(self, input):
+        return False, "Nothing available"
+
     async def e_on_message(self, message, cxt):
-        '''# give up on anything related, use chatterbot
-        if random.random() < ARTIF_CHATINESS or self.jose_mention in message.content:
-            self.current = message
+        if True:
+            # for now, disable this
+            return
+
+        if self.jose_mention in message.content:
             await self.client.send_typing(message.channel)
             msg = message.content.replace(self.jose_mention, "")
-            answer = chatbot.get_response(msg)
-            self.answers += 1
-            await self.say(answer)'''
-        pass
+            answer = await make_output(msg)
+            if not answer[0]:
+                await self.say(":warning: %s :warning:" % answer[1])
+            else:
+                self.answers += 1
+                await self.say(":speech_left: %s" % answer[1])
 
     async def c_chatstatus(self, message, args, cxt):
-        with open('database.db', 'r') as f:
-            dbjson = json.load(f)
-        len_entries = len(dbjson)
-        report_str = """Status Report: ```
+        report_str = """Chat Report: ```
 I made %d answers in this session
-I have %d entries in my database
 ```""" % (self.answers, len_entries)
         await cxt.say(report_str)

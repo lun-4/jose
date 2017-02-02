@@ -49,6 +49,7 @@ class JoseBot(jcommon.Extension):
                         self.logger.error("Error happened when ext_unload(%s): %s", modname, ok[1])
                     else:
                         self.logger.info("Unloaded %s", modname)
+                    del self.modules[modname]
                 except Exception as e:
                     self.logger.warn("Almost unloaded %s: %s", modname, repr(e))
             else:
