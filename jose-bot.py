@@ -3,6 +3,9 @@ import asyncio
 import uvloop
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
+# profiling
+from pympler import tracker
+
 import sys
 import os
 import ast
@@ -496,6 +499,8 @@ async def main_task():
     logger.info("José Starting")
     await client.start(jconfig.discord_token)
 
+tr = tracker.SummaryTracker()
+
 loop = asyncio.get_event_loop()
 try:
     print("main_task")
@@ -506,5 +511,7 @@ except:
     loop.run_until_complete(client.logout())
 finally:
     loop.close()
+
+tr.print_diff()
 
 logger.info("Exit")
