@@ -127,7 +127,12 @@ class joseXtra(jaux.Auxiliar):
 """ % ("google.com", g_rtt[0], g_rtt[1], g_rtt[2]))
 
     async def c_info(self, message, args, cxt):
-        await cxt.say("""José v%s, feito por Luna Mendes\nhttps://github.com/lkmnds/jose""" % (jcommon.JOSE_VERSION))
+        await cxt.say("""
+José v%s\n
+José Testing Enviroment, JTE: https://discord.gg/5ASwg4C\n
+José is open-source! see it in https://github.com/lkmnds/jose\n
+
+Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
 
     async def c_docs(self, message, args, cxt):
         '''`!docs <topic>` - Documentação do josé
