@@ -99,8 +99,11 @@ class JoseMath(jaux.Auxiliar):
 
     async def c_lewd(self, message, args, cxt):
         '''`!lewd n` - shows the `n` lewd numbers'''
+        if len(args) < 2:
+            await cxt.say(self.c_lewd.__doc__)
+
         try:
-            n = args[1]
+            n = int(args[1])
         except Exception as e:
             await cxt.say("Error parsing arguments: %r" % e)
             return
