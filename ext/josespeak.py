@@ -158,15 +158,17 @@ class JoseSpeak(jcommon.Extension):
 
     async def create_generators(self):
         total_messages = 0
+        t_start = time.time()
         for serverid in self.database:
             messages = self.database[serverid]
             total_messages += len(messages)
             self.text_generators[serverid] = Texter(None, 1, '\n'.join(messages))
 
-        self.logger.info("Generated %d texters, %d messages", len(self.text_generators), total_messages)
+        time_taken = (time.time() - t_start) * 1000
+        self.logger.info("Generated %d texters, %d messages in %.2fmsec", len(self.text_generators), total_messages, time_taken)
 
     async def save_databases(self):
-        self.logger.info("Saved josespeak database")
+        self.logger.info("Save josespeak database")
         json.dump(self.database, open(self.database_path, 'w'))
         json.dump(self.wlengths, open(self.db_length_path, 'w'))
         json.dump(self.messages, open(self.db_msg_path, 'w'))
