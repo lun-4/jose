@@ -84,7 +84,7 @@ class JoseMath(jaux.Auxiliar):
         '''`!therm location` - alias para `!temperature`'''
         await self.c_temperature(message, args, cxt)
 
-    def lewd(n):
+    def lewd(self, n):
         num = 3
         t = 0
         while t != n:
@@ -112,4 +112,4 @@ class JoseMath(jaux.Auxiliar):
             await cxt.say("nope")
             return
 
-        await cxt.say(self.codeblock("", list(lewd(n))))
+        await cxt.say(self.codeblock("", list(self.lewd(n))))
