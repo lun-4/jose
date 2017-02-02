@@ -29,13 +29,8 @@ class JoseBot(jcommon.Extension):
         jcommon.Extension.__init__(self, cl)
         self.nick = 'jose-bot'
         self.modules = {}
-        self.env = {
-            'spam': {},
-            'spamcl': {},
-        }
         self.start_time = time.time()
         self.command_lock = False
-        self.queue = []
 
     async def unload_all(self):
         # unload all modules
