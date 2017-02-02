@@ -108,7 +108,7 @@ class JoseMath(jaux.Auxiliar):
             await cxt.say("Error parsing arguments: %r" % e)
             return
 
-        if n > 100:
+        if n > 30:
             await cxt.say("nope")
             return
 
