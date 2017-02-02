@@ -39,6 +39,8 @@ class JoseBot(jcommon.Extension):
 
     async def unload_all(self):
         # unload all modules
+        to_remove = []
+
         for modname in self.modules:
             module = self.modules[modname]
             # if ext_unload exists
@@ -49,11 +51,18 @@ class JoseBot(jcommon.Extension):
                         self.logger.error("Error happened when ext_unload(%s): %s", modname, ok[1])
                     else:
                         self.logger.info("Unloaded %s", modname)
-                    del self.modules[modname]
+
+                    # it will be removed later
+                    to_remove.append(modname)
+
                 except Exception as e:
                     self.logger.warn("Almost unloaded %s: %s", modname, repr(e))
             else:
                 self.logger.info("%s doesn't have ext_unload", modname)
+
+        # avoid RuntimeError
+        for mod in to_remove:
+            del self.modules[mod]
 
         self.logger.info("Unloaded all modules")
 
