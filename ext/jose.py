@@ -305,10 +305,11 @@ class JoseBot(jcommon.Extension):
     async def c_ping(self, message, args, cxt):
         '''`!ping` - pong'''
         t_init = time.time()
-        pong = await cxt.say("pong, cmd_process: %.2fms" % (cxt.t_creation - time.time()))
+        t_cmdprocess = (time.time() - cxt.t_creation) * 1000
+        pong = await cxt.say("pong! took **%.2fms** to process the command" % (t_cmdprocess))
         t_end = time.time()
         delta = t_end - t_init
-        await self.client.edit_message(pong, pong.content + ", send: **%.2fms**" % (delta * 1000))
+        await self.client.edit_message(pong, pong.content + ", **%.2fms** to send it" % (delta * 1000))
 
     async def c_rand(self, message, args, cxt):
         '''`!rand min max` - gera um número aleatório no intervalo [min, max]'''
