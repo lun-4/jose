@@ -12,6 +12,7 @@ import random
 import subprocess
 import json
 import io
+import time
 
 logger = None
 
@@ -232,10 +233,16 @@ class JoseSpeak(jcommon.Extension):
 
     async def c_fuckreload(self, message, args, cxt):
         '''`!fuckreload` - does !savedb and !forcereload at the same time'''
+        t_start = time.time()
+
+        # reload stuff
         ecxt = jcommon.EmptyContext(self.client, message)
         await self.c_savedb(message, args, ecxt)
         await self.c_forcereload(message, args, ecxt)
         res = await ecxt.getall()
+
+        delta = (time.time() - t_start) * 1000
+        res += "\nI fucking took %.2fms to do this shit my fucking god" % delta
         await self.say(self.codeblock("", res))
 
     async def e_on_message(self, message, cxt):
