@@ -83,3 +83,30 @@ class JoseMath(jaux.Auxiliar):
     async def c_therm(self, message, args, cxt):
         '''`!therm location` - alias para `!temperature`'''
         await self.c_temperature(message, args, cxt)
+
+    def lewd(n):
+        num = 3
+        t = 0
+        while t != n:
+            lewd = num ** 2 - 2
+            for a in range(2, lewd):
+                if lewd % a == 0:
+                    break
+            else:
+                yield num
+                t += 1
+            num += 6
+
+    async def c_lewd(self, message, args, cxt):
+        '''`!lewd n` - shows the `n` lewd numbers'''
+        try:
+            n = args[1]
+        except Exception as e:
+            await cxt.say("Error parsing arguments: %r" % e)
+            return
+
+        if n > 100:
+            await cxt.say("nope")
+            return
+
+        await cxt.say(self.codeblock("", list(lewd(n))))
