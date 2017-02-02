@@ -42,8 +42,7 @@ jose = jose_bot.JoseBot(client)
 
 GAMBLING_LAST_BID = 0.0
 
-#enviroment thingies
-jose_env = jose.env
+# JASM enviroment
 jasm_env = {}
 
 if PARABENS_MODE:
