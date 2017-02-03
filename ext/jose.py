@@ -127,11 +127,11 @@ class JoseBot(jcommon.Extension):
                 if not ok[0]:
                     self.logger.error("Error happened on ext_load(%s): %s", name, ok[1])
                     sys.exit(0)
+                else:
+                    return instance
             except Exception as e:
                 self.logger.warn("Almost loaded %s: %s", name, repr(e))
                 return False
-
-        return instance
 
     async def register_mod(self, name, class_name, module, instance):
         instance_methods = (method for method in dir(instance)
@@ -196,22 +196,30 @@ class JoseBot(jcommon.Extension):
             del self.modules[name]
 
         # instiated with success, register all shit this module has
-        await self.register_mod(name, class_name, module, instance)
+        ok = await self.register_mod(name, class_name, module, instance)
+        if not ok:
+            self.logger.error("Error registering module")
+            return False
+
+        # finally
+        return True
 
     async def load_ext(self, name, class_name, cxt):
         # try
         ok = await self._load_ext(name, class_name, cxt)
-        if cxt:
-            if not ok:
-                await cxt.say(":poop:")
-            else:
+
+        if ok:
+            self.logger.info("Loaded %s", name)
+            try:
                 await cxt.say(":ok_hand:")
+            except:
+                pass
         else:
-            if not ok:
-                self.logger.error("Error loading %s", name)
+            self.logger.info("Error loading %s", name)
+            try:
+                await cxt.say(":poop:")
+            except:
                 sys.exit(0)
-            else:
-                self.logger.info("Loaded %s", name)
 
     async def mod_recv(self, message):
         await self.recv(message)
