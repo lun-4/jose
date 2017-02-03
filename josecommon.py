@@ -503,7 +503,7 @@ async def save_langdb():
     except Exception as e:
         return False, repr(e)
 
-    return True
+    return True, ''
 
 async def load_langdb():
     global langdb
@@ -519,7 +519,7 @@ async def load_langdb():
     except Exception as e:
         return False, repr(e)
 
-    return True
+    return True, ''
 
 
 async def get_translated(langid, string, **kwargs):
