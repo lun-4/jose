@@ -20,19 +20,12 @@ class JoseLanguage(jaux.Auxiliar):
         await jcommon.save_langdb()
 
     async def ext_load(self):
-        try:
-            await jcommon.load_langdb()
-
-            return True, ''
-        except Exception as e:
-            return False, str(e)
+        status = await self.load_langdb()
+        return status
 
     async def ext_unload(self):
-        try:
-            await self.savedb()
-            return True, ''
-        except Exception as e:
-            return False, str(e)
+        status = await self.save_langdb()
+        return status
 
     async def c_reloadlangdb(self, message, args, cxt):
         await self.savedb()

@@ -498,7 +498,12 @@ async def langdb_get(sid):
 async def save_langdb():
     global langdb
     logger.info("Saving language database")
-    json.dump(langdb, open(LANGUAGES_PATH, 'w'))
+    try:
+        json.dump(langdb, open(LANGUAGES_PATH, 'w'))
+    except Exception as e:
+        return False, repr(e)
+
+    return True
 
 async def load_langdb():
     global langdb
@@ -509,7 +514,13 @@ async def load_langdb():
             f.write('{}')
 
     logger.info("Loading language database")
-    langdb = json.load(open(LANGUAGES_PATH, 'r'))
+    try:
+        langdb = json.load(open(LANGUAGES_PATH, 'r'))
+    except Exception as e:
+        return False, repr(e)
+
+    return True
+
 
 async def get_translated(langid, string, **kwargs):
     lang = langobjects.get(langid, None)
