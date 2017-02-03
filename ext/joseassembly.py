@@ -257,7 +257,7 @@ async def execute(instructions, env):
             try:
                 reg, val = inst[1].split(',')
                 # stdout += '%r %r' % (reg, val)
-                val = yield from parse_value(val, env)
+                val = await parse_value(val, env)
 
                 if val is None:
                     return False, env, 'erro parseando valor'
