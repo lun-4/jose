@@ -122,7 +122,6 @@ async def learn_data(message):
     return
 
 async def main_status(message):
-    global jcommon.MAINTENANCE_MODE
     auth = await jcommon.check_roles(jcommon.MASTER_ROLE, message.author.roles)
     if auth:
         jcommon.MAINTENANCE_MODE = not jcommon.MAINTENANCE_MODE
