@@ -444,7 +444,7 @@ class JoseBot(jcommon.Extension):
         search_results = await future_re
 
         if len(search_results) < 2:
-            await client.send_message(message.channel, "!yt: Nenhum resultado encontrado.")
+            await cxt.say("!yt: Nenhum resultado encontrado.")
             return
 
         await cxt.say("http://www.youtube.com/watch?v=" + search_results[0])

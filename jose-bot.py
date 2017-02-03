@@ -123,7 +123,7 @@ async def learn_data(message):
 
 async def main_status(message):
     global MAINTENANCE_MODE
-    auth = await jcommon.check_roles(MASTER_ROLE, message.author.roles)
+    auth = await jcommon.check_roles(jcommon.MASTER_ROLE, message.author.roles)
     if auth:
         MAINTENANCE_MODE = not MAINTENANCE_MODE
         await jcommon.jose_debug(message, "Modo de construção: %s" % (MAINTENANCE_MODE))
