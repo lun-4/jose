@@ -118,6 +118,7 @@ class JoseBot(jcommon.Extension):
         mod_ext_load = getattr(instance, 'ext_load', False)
         if not mod_ext_load:
             # module not compatible with API
+            self.logger.error("Module not compatible with EAPI")
             return False
         else:
             # hey thats p good
@@ -173,6 +174,7 @@ class JoseBot(jcommon.Extension):
         # find/reload the module
         module = await self.get_module(name)
         if not module:
+            self.logger.error("module not found/error loading module")
             return False
 
         # get the class that represents the module
@@ -186,6 +188,7 @@ class JoseBot(jcommon.Extension):
         # instantiate and ext_load it
         instance = await self.mod_instance(name, module_class)
         if instance is None:
+            self.logger.error("instance is None")
             return False
 
         if name in self.modules:
