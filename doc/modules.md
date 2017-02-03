@@ -72,6 +72,8 @@ Each module is described in the form `class@file`.
 
 ### Making a Module
 
+**RECOMMENDED READING: (Extension API)[https://github.com/lkmnds/jose/blob/master/doc/extension_api.md]**
+
  * To make a module that goes in the `ext`(which is probably what you want), you need to copy the `ext/example_module.py` file into `ext/yourmodule.py`. this file already loads `joseauxiliar` and loads some useful methods like `self.say` and `self.is_admin`
  * Change `JoseExtension` to the name of yourmodule
  * Use the templates for `ext_load`, `ext_unload` and `c_command` to make your own things
