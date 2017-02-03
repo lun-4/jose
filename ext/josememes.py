@@ -490,7 +490,7 @@ class JoseMemes(jcommon.Extension):
 
         self.logger.info("Wiki request: %s", wiki_api_url)
         try:
-            response = await asyncio.wait_for(aiohttp.request('GET', wiki_api_url), 8)
+            response = await asyncio.wait_for(aiohttp.request('GET', wiki_api_url), 4)
         except asyncio.TimeoutError:
             await cxt.say("`[wiki:%s] Timeout reached`" % wiki_methodname)
             return

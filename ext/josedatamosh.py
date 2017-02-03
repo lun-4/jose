@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-import discord
-import asyncio
 import aiohttp
 import sys
 import io

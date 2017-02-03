@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-import asyncio
-import discord
 import cmath as math
 import time
 
@@ -55,8 +53,7 @@ def empty_env():
         },
     }
 
-@asyncio.coroutine
-def parse(text):
+async def parse(text):
     insts = []
     for line in text.split('\n'):
         print(line)
@@ -68,7 +65,7 @@ def parse(text):
         insts.append(inst)
     return insts
 
-def is_numeric(lit):
+async def is_numeric(lit):
     'Return value of numeric literal string or ValueError exception'
 
     # Handle '0'
@@ -97,8 +94,7 @@ def is_numeric(lit):
         pass
     return complex(lit)
 
-@asyncio.coroutine
-def parse_value(val, env):
+async def parse_value(val, env):
     if val[0] == '$':
         reg = val[val.find('(')+1:val.find(')')]
         return env['registers'][reg]
@@ -229,8 +225,7 @@ def op3_calc(opstr, inst, env):
     except Exception as e:
         return False, env, 'pyerr: %s' % str(e)
 
-@asyncio.coroutine
-def execute(instructions, env):
+async def execute(instructions, env):
     stdout = ''
     pc = 0 # program counter
     lp = 0 # loop counter

@@ -1,18 +1,14 @@
 #!/usr/bin/env python3
 
-import sys
-sys.path.append("..")
-
-import discord
-import asyncio
 import decimal
+import sys
+from random import SystemRandom
+random = SystemRandom()
 
+sys.path.append("..")
 import josecommon as jcommon
 import joseerror as je
 import jcoin.josecoin as jcoin
-
-from random import SystemRandom
-random = SystemRandom()
 
 class JoseGambling(jcommon.Extension):
     def __init__(self, cl):

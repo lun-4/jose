@@ -1,14 +1,9 @@
 #!/usr/bin/env python3
 
-import discord
-import asyncio
 import sys
-import json
-
 sys.path.append("..")
 import jauxiliar as jaux
 import josecommon as jcommon
-import joseerror as je
 
 from random import SystemRandom
 random = SystemRandom()

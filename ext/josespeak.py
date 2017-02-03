@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import discord
 import asyncio
 import sys
 sys.path.append("..")
@@ -152,6 +151,7 @@ class JoseSpeak(jcommon.Extension):
 
         # load timers in async context
         asyncio.async(self._load_timer(), loop=self.loop)
+        # TODO: await self.api.set_callback(self.textertimer, 900)
 
     async def _load_timer(self):
         await self.textertimer()
