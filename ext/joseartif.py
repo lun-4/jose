@@ -31,7 +31,7 @@ class JoseArtif(jaux.Auxiliar):
         if self.jose_mention in message.content:
             await self.client.send_typing(message.channel)
             msg = message.content.replace(self.jose_mention, "")
-            answer = await make_output(msg)
+            answer = await self.make_output(msg)
             if not answer[0]:
                 await self.say(":warning: %s :warning:" % answer[1])
             else:

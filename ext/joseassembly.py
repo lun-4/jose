@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import cmath as math
-import time
 
 JASM_VERSION = '0.2.1'
 MAX_LOOP = 50

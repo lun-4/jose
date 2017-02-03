@@ -1,3 +1,6 @@
+import discord
+import asyncio
+
 import sys
 import time
 from random import SystemRandom
@@ -101,7 +104,7 @@ class JoseBot(jcommon.Extension):
                     self.logger.error("Error on ext_unload(%s): %s", name, ok[1])
                     sys.exit(0)
             except Exception as e:
-                self.logger.warn("Almost unloaded %s: %s", n, repr(e))
+                self.logger.warn("Almost unloaded %s: %s", name, repr(e))
                 return False
 
             # import new code

@@ -9,8 +9,8 @@ import joseerror as je
 
 JOSECOIN_VERSION = '0.6'
 
-from decimal import *
-getcontext().prec = 3
+import decimal
+decimal.getcontext().prec = 3
 
 JOSECOIN_HELP_TEXT = '''JoseCoin(%s) é a melhor moeda que o josé pode te oferecer!
 
@@ -42,7 +42,7 @@ def empty_acc(name, amnt):
 def new_acc(id_acc, name, init_amnt=None):
     if init_amnt is None:
         # the readjust gave so little prices I need to lower this
-        init_amnt = Decimal('3')
+        init_amnt = decimal.Decimal('3')
 
     if id_acc in data:
         return False, 'conta já existe'
@@ -61,7 +61,7 @@ def gen():
         yield (acc_id, acc['name'], acc['amount'])
 
 def transfer(id_from, id_to, amnt, file_name):
-    amnt = Decimal(str(amnt))
+    amnt = decimal.Decimal(str(amnt))
 
     if amnt < 0:
         return False, "valores menores do que zero não são permitidos"
@@ -100,7 +100,7 @@ def load(fname):
     except Exception as e:
         return False, str(e)
 
-    data[jose_id] = empty_acc('jose-bot', Decimal('1000000'))
+    data[jose_id] = empty_acc('jose-bot', decimal.Decimal('1000000'))
     #ledger_data(fname.replace('db', 'journal'), '%f;LOAD;%r\n' % (time.time(), data))
     return True, "load %s" % fname
 
@@ -174,7 +174,7 @@ class JoseCoin(jcommon.Extension):
         await self.is_admin(message.author.id)
 
         id_from = await jcommon.parse_id(args[1], message)
-        new_amount = Decimal(args[2])
+        new_amount = decimal.Decimal(args[2])
 
         data[id_from]['amount'] = new_amount
         await cxt.say("<@%s> tem %.2fJC agora" % (id_from, data[id_from]['amount']))
@@ -188,7 +188,7 @@ class JoseCoin(jcommon.Extension):
 
         id_to = args[1]
         try:
-            amount = Decimal(args[2])
+            amount = decimal.Decimal(args[2])
         except ValueError:
             await cxt.say("ValueError: erro parseando o valor")
             return
