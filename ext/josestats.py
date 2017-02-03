@@ -48,7 +48,9 @@ class JoseStats(jaux.Auxiliar):
         jaux.Auxiliar.__init__(self, cl)
         self.statistics = {}
         self.db_stats_path = jcommon.STAT_DATABASE_PATH
-        self.counter = 0
+
+        # every 2 minutes, save databases
+        self.cbk_new('jstats.savedb', self.savedb, 120)
 
     async def savedb(self):
         self.logger.info("Saving statistics database")
@@ -122,9 +124,6 @@ class JoseStats(jaux.Auxiliar):
         if authorid not in serverdb['messages']:
             self.statistics[serverid]['messages'][authorid] = 0
 
-        if self.counter % 50 == 0:
-            await self.savedb()
-
         command, args, method = jcommon.parse_command(message.content)
 
         if command:
@@ -141,8 +140,6 @@ class JoseStats(jaux.Auxiliar):
             # serverdb['messages'][authorid] => number of messages
             self.statistics[serverid]['messages'][authorid] += 1
             self.statistics['gl_messages'] += 1
-
-        self.counter += 1
 
     async def c_rawquery(self, message, args, cxt):
         '''`!rawquery string` - Fazer pedidos ao banco de dados de estatísticas do josé'''
