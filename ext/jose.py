@@ -1,11 +1,8 @@
-import discord
-import asyncio
-
 import sys
 import time
-import os
 from random import SystemRandom
 random = SystemRandom()
+
 import base64
 import subprocess
 
@@ -321,34 +318,9 @@ class JoseBot(jcommon.Extension):
         await self.client.logout()
         sys.exit(0)
 
-    async def reboot(self, cxt):
-        await jcoin.JoseCoin(self.client).josecoin_save(self.current, True)
-        await self.unload_all()
-        await self.client.logout()
-        os.system("./reload_jose.sh &")
-        sys.exit(0)
-
-    async def update(self, cxt):
-        banner = "atualizando josé para nova versão(versão antiga: %s)" % (jcommon.JOSE_VERSION)
-        await self.debug(banner)
-        await jcoin.JoseCoin(self.client).josecoin_save(self.current, True)
-        await self.client.logout()
-        os.system("./reload_jose.sh &")
-        sys.exit(0)
-
     async def c_shutdown(self, message, args, cxt):
         '''`!shutdown` - desliga o josé'''
         await self.sec_auth(self.turnoff, cxt)
-
-    async def c_reboot(self, message, args, cxt):
-        '''`!reboot` - reinicia o josé'''
-        #await self.sec_auth(self.reboot)
-        pass
-
-    async def c_update(self, message, args, cxt):
-        '''`!update` - atualiza o josé'''
-        #await self.sec_auth(self.update)
-        pass
 
     async def c_ping(self, message, args, cxt):
         '''`!ping` - pong'''
