@@ -489,16 +489,16 @@ class Extension:
         return "```%s\n%s```" % (lang, string)
 
     def noasync(self, func, args):
-        asyncio.ensure_future(func(*args), loop=self.loop)
+        return asyncio.ensure_future(func(*args), loop=self.loop)
 
     def is_owner(self):
         return self.current.id in ADMIN_IDS
 
-    async def cbk_new(self, callback_id, func, timer_sec):
+    def cbk_new(self, callback_id, func, timer_sec):
         logger.info("New callback %s every %d seconds", callback_id, timer_sec)
 
-        self._callbacks[callback_id] = Callback(func, timer_sec)
-        ok = await run_callback(callback_id, self._my_callbacks[callback_id])
+        self._callbacks[callback_id] = Callback(callback_id, func, timer_sec)
+        ok = self.noasync(run_callback, [callback_id, self._callbacks[callback_id]])
         if ok is None:
             logger.error("Error happened in callback %s", callback_id)
 

@@ -149,11 +149,8 @@ class JoseSpeak(jcommon.Extension):
         self.db_msg_path = jcommon.MARKOV_MESSAGES_PATH
 
         # load timers in async context
-        asyncio.async(self._load_timer(), loop=self.loop)
-        # TODO: await self.cbk_new(self.textertimer, 900)
-
-    async def _load_timer(self):
-        await self.textertimer()
+        #asyncio.async(self._load_timer(), loop=self.loop)
+        self.cbk_new('jspeak.reload_texter', self.textertimer, 900)
 
     async def create_generators(self):
         total_messages = 0
