@@ -46,5 +46,5 @@ class JoseArtif(jaux.Auxiliar):
     async def c_chatstatus(self, message, args, cxt):
         report_str = """Chat Report: ```
 I made %d answers in this session
-```""" % (self.answers, len_entries)
+```""" % (self.answers)
         await cxt.say(report_str)

@@ -12,8 +12,6 @@ sys.path.append("..")
 import josecommon as jcommon
 import joseerror as je
 
-import itertools
-import collections
 import re
 import io
 import aiohttp
@@ -275,10 +273,13 @@ class JoseMemes(jcommon.Extension):
         elif command == 'rename':
             args_s = ' '.join(args[2:])
             args_sp = args_s.split(';')
-            oldname = args_sp[0]
-            newname = args_sp[1]
+            try:
+                oldname = args_sp[0]
+                newname = args_sp[1]
+            except Exception as e:
+                await cxt.say("Error parsing arguments: %r" % e)
 
-            if not oldname in self.memes:
+            if oldname not in self.memes:
                 await cxt.say("%s: meme não encontrado" % oldname)
                 return
 

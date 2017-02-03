@@ -8,7 +8,6 @@ import io
 sys.path.append("..")
 
 from PIL import Image
-import os
 from random import SystemRandom
 randint = SystemRandom().randint
 

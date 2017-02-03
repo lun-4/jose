@@ -1,4 +1,3 @@
-import random
 import time
 import asyncio
 import pickle
@@ -221,7 +220,6 @@ class JoseCoin(jcommon.Extension):
         if len(args) > 1:
             range_max = int(args[1]) + 1
 
-        res = 'Top %d pessoas que tem mais JC$\n' % (range_max - 1)
         maior = {
             'id': 0,
             'name': '',

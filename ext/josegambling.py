@@ -85,7 +85,7 @@ class JoseGambling(jcommon.Extension):
         if res[0]:
             await cxt.say(res[1])
             # use jenv
-            if not id_from in self.gambling_env:
+            if id_from not in self.gambling_env:
                 self.gambling_env[id_from] = decimal.Decimal(0)
 
             self.gambling_env[id_from] += decimal.Decimal(amount)

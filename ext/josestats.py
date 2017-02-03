@@ -159,7 +159,7 @@ class JoseStats(jaux.Auxiliar):
         if len(response) > 1999: # 1 9 9 9
             await cxt.say(":elephant: Resultado muito grande :elephant:")
         else:
-            await cxt.say(self.codeblock("", reponse))
+            await cxt.say(self.codeblock("", response))
 
     async def c_query(self, message, args, cxt):
         '''`!query data` - Fazer pedidos ao banco de dados de estatísticas do josé

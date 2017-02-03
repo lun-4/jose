@@ -122,7 +122,7 @@ class joseXtra(jaux.Auxiliar):
         matcher = re.compile("rtt min/avg/max/mdev = (\d+.\d+)/(\d+.\d+)/(\d+.\d+)/(\d+.\d+)")
         g_rtt = matcher.search(g_out.decode('utf-8')).groups()
 
-        edit2 = await self.client.edit_message(edit1, edit1.content + """
+        await self.client.edit_message(edit1, edit1.content + """
 %s : min %sms avg %sms max %sms
 """ % ("google.com", g_rtt[0], g_rtt[1], g_rtt[2]))
 
@@ -152,17 +152,17 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             else:
                 await cxt.say("%s: tópico não encontrado" % topic)
 
-    async def mkresponse(message, fmt, phrases):
+    async def mkresponse(message, fmt, phrases, cxt):
         d = message.content.split(' ')
         user_use = d[1]
         response = random.choice(phrases)
         await cxt.say(fmt.format(user_use, response))
 
     async def c_xingar(self, message, args, cxt):
-        await self.mkresponse(message, '{}, {}', jcommon.xingamentos)
+        await self.mkresponse(message, '{}, {}', jcommon.xingamentos, cxt)
 
     async def c_elogio(self, message, args, cxt):
-        await self.mkresponse(message, '{}, {}', jcommon.elogios)
+        await self.mkresponse(message, '{}, {}', jcommon.elogios, cxt)
 
     async def c_cantada(self, message, args, cxt):
-        await self.mkresponse(message, 'Ei {}, {}', jcommon.cantadas)
+        await self.mkresponse(message, 'Ei {}, {}', jcommon.cantadas, cxt)
