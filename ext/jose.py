@@ -133,7 +133,7 @@ class JoseBot(jcommon.Extension):
         return instance
 
     async def register_mod(self, name, class_name, module, instance):
-        instance_methods = (method if callable(getattr(instance, method))
+        instance_methods = (method if callable(getattr(instance, method)) \
             for method in dir(instance))
 
         # create module in the... module table... yaaaaay...
