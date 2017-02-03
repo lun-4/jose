@@ -387,6 +387,12 @@ def speak_filter(message):
 
 class Extension:
     def __init__(self, cl):
+        '''
+        Extension - A general extension used by josé
+
+        The Extension class defines the API for josé's modules, all modules inherit
+        from this class.
+        '''
         self.client = cl
         self.current = None
         self.loop = cl.loop
@@ -434,6 +440,9 @@ class Extension:
 
     def is_owner(self):
         return self.current.id in ADMIN_IDS
+
+    async def set_callback(self, callback_id, func, timer_sec):
+        pass # TODO
 
 class WaitingQueue:
     def __init__(self):

@@ -15,6 +15,7 @@ import urllib.request
 import re
 import json
 import importlib
+import copy
 
 sys.path.append("..")
 import josecommon as jcommon
@@ -92,91 +93,122 @@ class JoseBot(jcommon.Extension):
         self.logger.info("Loaded gext %s", n)
         return True
 
-    async def load_ext(self, n, n_cl, cxt):
-        loaded_success = False
-        loaded_almost = False
+    async def get_module(self, name):
+        if name in self.modules:
+            # Already loaded module, unload it
 
-        self.logger.info("load_ext: %s@%s", n_cl, n)
-        module = None
-        if n in self.modules: #already loaded
+            mod = self.modules[name]
             try:
-                ok = await self.modules[n]['inst'].ext_unload()
+                ok = await mod['inst'].ext_unload()
                 if not ok[0]:
-                    self.logger.error("Error happened on ext_unload(%s): %s", n, ok[1])
+                    self.logger.error("Error on ext_unload(%s): %s", name, ok[1])
                     sys.exit(0)
             except Exception as e:
                 self.logger.warn("Almost unloaded %s: %s", n, repr(e))
-                loaded_almost = True
-
-            # reimport
-            module = importlib.reload(self.modules[n]['module'])
-        else:
-            module = importlib.import_module('ext.%s' % n)
-
-        # instantiate from module
-        cl_inst = getattr(module, n_cl, None)
-        if cl_inst is None:
-            if self.current is not None:
-                await cxt.say(":train:")
-            self.logger.error("cl_inst = None")
-            loaded_success = False
-            loaded_almost = True
-
-        inst = None
-        if cl_inst is not None:
-            inst = cl_inst(self.client)
-
-        try:
-            # try to ext_load it
-            ok = await inst.ext_load()
-            if not ok[0]:
-                self.logger.error("Error happened on ext_load(%s): %s", n, ok[1])
-                sys.exit(0)
-        except Exception as e:
-            self.logger.warn("Almost loaded %s: %s", n, repr(e))
-            loaded_almost = True
-
-        # if instantiated, register the commands and events
-        if inst is not None:
-            methods = (method for method in dir(inst) if callable(getattr(inst, method)))
-            self.modules[n] = {
-                'inst': inst,
-                'methods': [],
-                'class': n_cl,
-                'module': module,
-                'handlers': []
-            }
-
-            for method in methods:
-                if method.startswith('c_'):
-                    self.logger.debug("add %s", method)
-                    setattr(self, method, getattr(inst, method))
-                    self.modules[n]['methods'].append(method)
-                    loaded_success = True
-                elif method.startswith('e_'):
-                    self.logger.debug("handler %s" % method)
-                    self.modules[n]['handlers'].append(method)
-                    loaded_success = True
-
-        if cxt is not None:
-            if loaded_success:
-                await cxt.say(":ok_hand:")
-                return True
-            elif loaded_almost:
-                await cxt.say(":train:")
                 return False
-            else:
+
+            # import new code
+            return importlib.reload(mod['module'])
+        else:
+            # import
+            return importlib.import_module('ext.%s' % n)
+
+    async def mod_instance(self, name, classobj):
+        instance = classobj(self.client)
+        mod_ext_load = getattr(instance, 'ext_load', False)
+        if not mod_ext_load:
+            # module not compatible with API
+            return False
+        else:
+            # hey thats p good
+            try:
+                ok = await instance.ext_load()
+                if not ok[0]:
+                    self.logger.error("Error happened on ext_load(%s): %s", name, ok[1])
+                    sys.exit(0)
+            except Exception as e:
+                self.logger.warn("Almost loaded %s: %s", n, repr(e))
+                return False
+
+        return instance
+
+    async def register_mod(self, name, class_name, module, instance):
+        instance_methods = (method if callable(getattr(instance, method))
+            for method in dir(instance))
+
+        # create module in the... module table... yaaaaay...
+        self.modules[name] = ref = {
+            'inst': inst,
+            'class': class_name,
+            'module': module,
+        }
+
+        methods = []
+        handlers = []
+
+        for method in instance_methods:
+            stw = str.startswith
+            if stw(method, 'c_'):
+                # command
+                self.logger.debug("EAPI command %s", method)
+                setattr(self, method, getattr(instance, method))
+                methods.append(method)
+
+            elif stw(method, 'e_'):
+                # Event handler
+                self.logger.debug("EAPI ev handler %s", method)
+                handlers.append(method)
+
+        # copy them and kill them
+        ref['methods'] = copy.copy(methods)
+        ref['handlers'] = copy.copy(handlers)
+        del methods, handlers
+
+        # done
+        return True
+
+    async def _load_ext(self, name, class_name, cxt):
+        self.logger.info("load_ext: %s@%s", n_cl, n)
+
+        # find/reload the module
+        module = await self.get_module(name)
+        if not module:
+            return False
+
+        # get the class that represents the module
+        module_class = getattr(module, class_name, None)
+        if module_class is None:
+            if cxt is not None:
+                await cxt.say(":train:")
+            self.logger.error("class instance is None")
+            return False
+
+        # instantiate and ext_load it
+        instance = await self.mod_instance(name, module_class)
+        if instance is None:
+            return False
+
+        if name in self.modules:
+            # delete old one
+            del self.modules[name]
+
+        # instiated with success, register all shit this module has
+        self.register_mod(name, class_name, module, instance)
+
+    async def load_ext(self, name, class_name, cxt):
+        # try
+        ok = await self.load_ext(name, class_name, cxt):
+        if cxt:
+            if not ok:
                 await cxt.say(":poop:")
-                return False
+            else:
+                await cxt.say(":ok_hand:")
         else:
-            if not loaded_success:
-                self.logger.error("Error loading %s", n)
+            if not ok:
+                self.logger.error("Error loading %s", name)
                 sys.exit(0)
-
-            if loaded_almost:
-                self.logger.error("Almost loaded %s", n)
-                sys.exit(0)
-            self.logger.info("Loaded %s" % n)
+            else:
+                self.logger.info("Loaded %s", name)
 
     async def mod_recv(self, message):
         await self.recv(message)
