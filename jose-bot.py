@@ -122,11 +122,11 @@ async def learn_data(message):
     return
 
 async def main_status(message):
-    global MAINTENANCE_MODE
+    global jcommon.MAINTENANCE_MODE
     auth = await jcommon.check_roles(jcommon.MASTER_ROLE, message.author.roles)
     if auth:
-        MAINTENANCE_MODE = not MAINTENANCE_MODE
-        await jcommon.jose_debug(message, "Modo de construção: %s" % (MAINTENANCE_MODE))
+        jcommon.MAINTENANCE_MODE = not jcommon.MAINTENANCE_MODE
+        await jcommon.jose_debug(message, "Modo de construção: %s" % (jcommon.MAINTENANCE_MODE))
     else:
         raise je.PermissionError()
 
@@ -349,7 +349,7 @@ async def on_message(message):
             return
 
         try:
-            if MAINTENANCE_MODE:
+            if jcommon.MAINTENANCE_MODE:
                 await show_maintenance(message)
                 return
 
@@ -395,7 +395,7 @@ async def on_message(message):
             # return
 
     if message.content in exact_commands:
-        if MAINTENANCE_MODE:
+        if jcommon.MAINTENANCE_MODE:
             await show_maintenance(message)
             return
         func = exact_commands[message.content]
@@ -404,7 +404,7 @@ async def on_message(message):
 
     for command in commands_match:
         if command in message.content:
-            if MAINTENANCE_MODE:
+            if jcommon.MAINTENANCE_MODE:
                 await show_maintenance(message)
                 return
             func = commands_match[command]
@@ -412,7 +412,7 @@ async def on_message(message):
             return
 
     if message.content.startswith('$jasm'):
-        if MAINTENANCE_MODE:
+        if jcommon.MAINTENANCE_MODE:
             await show_maintenance(message)
             return
         await jose.say('Bem vindo ao REPL do JoseAssembly!\nPara sair, digite "exit"')
@@ -459,7 +459,7 @@ async def on_message(message):
                 if message.server.id != "271378126234320897":
                     return
 
-                if MAINTENANCE_MODE:
+                if jcommon.MAINTENANCE_MODE:
                     return
 
                 author_id = str(message.author.id)
