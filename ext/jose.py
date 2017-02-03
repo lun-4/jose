@@ -111,7 +111,7 @@ class JoseBot(jcommon.Extension):
             return importlib.reload(mod['module'])
         else:
             # import
-            return importlib.import_module('ext.%s' % n)
+            return importlib.import_module('ext.%s' % name)
 
     async def mod_instance(self, name, classobj):
         instance = classobj(self.client)
@@ -127,7 +127,7 @@ class JoseBot(jcommon.Extension):
                     self.logger.error("Error happened on ext_load(%s): %s", name, ok[1])
                     sys.exit(0)
             except Exception as e:
-                self.logger.warn("Almost loaded %s: %s", n, repr(e))
+                self.logger.warn("Almost loaded %s: %s", name, repr(e))
                 return False
 
         return instance
@@ -138,7 +138,7 @@ class JoseBot(jcommon.Extension):
 
         # create module in the... module table... yaaaaay...
         self.modules[name] = ref = {
-            'inst': inst,
+            'inst': instance,
             'class': class_name,
             'module': module,
         }
@@ -168,7 +168,7 @@ class JoseBot(jcommon.Extension):
         return True
 
     async def _load_ext(self, name, class_name, cxt):
-        self.logger.info("load_ext: %s@%s", n_cl, n)
+        self.logger.info("load_ext: %s@%s", class_name, name)
 
         # find/reload the module
         module = await self.get_module(name)
@@ -193,11 +193,11 @@ class JoseBot(jcommon.Extension):
             del self.modules[name]
 
         # instiated with success, register all shit this module has
-        self.register_mod(name, class_name, module, instance)
+        await self.register_mod(name, class_name, module, instance)
 
     async def load_ext(self, name, class_name, cxt):
         # try
-        ok = await self.load_ext(name, class_name, cxt)
+        ok = await self._load_ext(name, class_name, cxt)
         if cxt:
             if not ok:
                 await cxt.say(":poop:")
