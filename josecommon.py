@@ -385,6 +385,58 @@ def speak_filter(message):
 
     return filtered_message
 
+# Callbacks
+
+# one table to have the relationship ID => Function
+callbacks = {}
+
+class Callback:
+    def __init__(self, cid, func, sec):
+        self.func = func
+        self.sec = sec
+        self.run = False
+        self.cid = cid
+
+    async def do(self):
+        logger.debug("%s: running", self.cid)
+        while self.run:
+            logger.info("%s: called", self.cid)
+            await self.func()
+            await asyncio.sleep(self.sec)
+        logger.debug("%s: ended", self.cid)
+
+    def stop(self):
+        self.run = False
+
+    def start(self):
+        self.run = True
+
+async def run_callback(callback_id, c):
+    if callback_id in callbacks:
+        return None
+
+    callbacks[callback_id] = c
+    c.start()
+    await c.do()
+    return True
+
+async def cbk_call(callback_id):
+    if callback_id not in callbacks:
+        return None
+
+    c = callbacks[callback_id]
+    res = await c.func()
+    return res
+
+async def cbk_remove(callback_id):
+    if callback_id not in callbacks:
+        return None
+
+    c = callbacks[callback_id]
+    c.stop()
+    del callbacks[callback_id]
+    return True
+
 class Extension:
     def __init__(self, cl):
         '''
@@ -397,6 +449,7 @@ class Extension:
         self.current = None
         self.loop = cl.loop
         self.logger = logger
+        self._callbacks = {}
 
     async def say(self, msg, channel=None):
         if channel is None:
@@ -441,7 +494,31 @@ class Extension:
     def is_owner(self):
         return self.current.id in ADMIN_IDS
 
-    async def set_callback(self, callback_id, func, timer_sec):
+    async def cbk_new(self, callback_id, func, timer_sec):
+        logger.info("New callback %s every %d seconds", callback_id, timer_sec)
+
+        self._callbacks[callback_id] = Callback(func, timer_sec)
+        ok = await run_callback(callback_id, self._my_callbacks[callback_id])
+        if ok is None:
+            logger.error("Error happened in callback %s", callback_id)
+
+        logger.info("Callback %s ended", callback_id)
+
+    async def cbk_call(self, callback_id):
+        ok = await cbk_call(callback_id)
+        if ok is None:
+            logger.error("Error calling callback %s", callback_id)
+            return
+
+    async def cbk_remove(self, callback_id):
+        ok = await cbk_remove(callback_id)
+        if ok is None:
+            logger.error("Error removing callback %s", callback_id)
+            return
+
+        del self._callbacks[callback_id]
+
+    async def cbk_reload(self, callback_id):
         pass # TODO
 
 class WaitingQueue:
