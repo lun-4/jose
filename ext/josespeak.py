@@ -149,8 +149,10 @@ class JoseSpeak(jcommon.Extension):
         self.db_msg_path = jcommon.MARKOV_MESSAGES_PATH
 
         # load timers in async context
-        #asyncio.async(self._load_timer(), loop=self.loop)
-        self.cbk_new('jspeak.reload_texter', self.textertimer, 900)
+        # every 15 minutes
+        self.cbk_new('jspeak.reload_texter', self.create_generators, 900)
+        # every 2 minutes
+        self.cbk_new('jspeak.savedb', self.save_databases, 120)
 
     async def create_generators(self):
         total_messages = 0
@@ -208,14 +210,6 @@ class JoseSpeak(jcommon.Extension):
             return True, ''
         except Exception as e:
             return False, str(e)
-
-    async def textertimer(self):
-        while True:
-            # wait 15 minutes to generate texters
-            await asyncio.sleep(900)
-
-            # should work
-            await self.create_generators()
 
     async def c_forcereload(self, message, args, cxt):
         """`!forcereload` - save and load josespeak module"""
@@ -278,12 +272,6 @@ class JoseSpeak(jcommon.Extension):
                 self.logger.debug("add line %s", filtered_line)
                 # print("add line %r" % filtered_line)
                 self.database[message.server.id].append(filtered_line)
-
-        # save everyone
-        if (self.counter % 50) == 0:
-            await self.save_databases()
-
-        self.counter += 1
 
         if random.random() < 0.03 or self.flag:
             self.flag = False
