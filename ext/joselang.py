@@ -4,7 +4,6 @@ import sys
 
 sys.path.append("..")
 import jauxiliar as jaux
-import joseerror as je
 import josecommon as jcommon
 
 class JoseLanguage(jaux.Auxiliar):

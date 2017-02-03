@@ -3,7 +3,6 @@
 import sys
 sys.path.append("..")
 import jauxiliar as jaux
-import joseerror as je
 
 import json
 

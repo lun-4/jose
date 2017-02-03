@@ -7,7 +7,6 @@ random = SystemRandom()
 
 sys.path.append("..")
 import josecommon as jcommon
-import joseerror as je
 import jcoin.josecoin as jcoin
 
 class JoseGambling(jcommon.Extension):

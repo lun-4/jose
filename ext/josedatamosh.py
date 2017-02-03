@@ -10,7 +10,6 @@ from random import SystemRandom
 randint = SystemRandom().randint
 
 import jauxiliar as jaux
-import joseerror as je
 
 class JoseDatamosh(jaux.Auxiliar):
     def __init__(self, cl):
