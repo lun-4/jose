@@ -264,7 +264,6 @@ for modname in jose.modules:
 async def on_message(message):
     global jose
     global counter
-    global help_helptext
 
     if message.content == '!construção': #override maintenance mode
         await main_status(message)
