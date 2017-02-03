@@ -133,8 +133,8 @@ class JoseBot(jcommon.Extension):
         return instance
 
     async def register_mod(self, name, class_name, module, instance):
-        instance_methods = (method if callable(getattr(instance, method)) \
-            for method in dir(instance))
+        instance_methods = (method for method in dir(instance)
+            if callable(getattr(instance, method)))
 
         # create module in the... module table... yaaaaay...
         self.modules[name] = ref = {
@@ -197,7 +197,7 @@ class JoseBot(jcommon.Extension):
 
     async def load_ext(self, name, class_name, cxt):
         # try
-        ok = await self.load_ext(name, class_name, cxt):
+        ok = await self.load_ext(name, class_name, cxt)
         if cxt:
             if not ok:
                 await cxt.say(":poop:")
