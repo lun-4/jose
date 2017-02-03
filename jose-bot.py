@@ -15,9 +15,9 @@ random = SystemRandom()
 
 import discord
 
+import josecommon as jcommon
 import ext.jose as jose_bot
 import ext.joseassembly as jasm
-from josecommon import *
 import jcoin.josecoin as jcoin
 import joseconfig as jconfig
 import joseerror as je
@@ -32,7 +32,7 @@ start_time = time.time()
 
 #default stuff
 client = discord.Client()
-set_client(client) # to jcommon
+jcommon.set_client(client) # to jcommon
 
 # initialize jose instance
 jose = jose_bot.JoseBot(client)
@@ -42,7 +42,7 @@ GAMBLING_LAST_BID = 0.0
 # JASM enviroment
 jasm_env = {}
 
-if PARABENS_MODE:
+if jcommon.PARABENS_MODE:
     old_send = client.send_message
 
     async def newsend(ch, d):
@@ -54,7 +54,7 @@ async def new_debug(message):
     args = message.content.split(' ')
     dbg = ' '.join(args[1:])
 
-    await jose_debug(message, dbg)
+    await jcommon.jose_debug(message, dbg)
 
 causos = [
     '{} foi no matinho com {}',
@@ -70,7 +70,7 @@ async def make_causo(message):
 
     await jose.say(causo.format(x, y))
 
-help_josecoin = make_func(jcoin.JOSECOIN_HELP_TEXT)
+help_josecoin = jcommon.make_func(jcoin.JOSECOIN_HELP_TEXT)
 
 async def jcoin_control(id_user, amnt):
     '''
@@ -88,21 +88,21 @@ def sanitize_data(data):
 async def add_sentence(content, author):
     data = content
     sd = sanitize_data(data)
-    logger.debug("write %r from %s" % (sd, author))
+    jcommon.logger.debug("write %r from %s" % (sd, author))
     if len(sd.strip()) > 1:
         with open('jose-data.txt', 'a') as f:
             f.write(sd+'\n')
     else:
-        logger.debug("add_sentence: ignoring len(sd.strip) < 1")
+        jcommon.logger.debug("add_sentence: ignoring len(sd.strip) < 1")
 
 async def learn_data(message):
-    res = await jcoin_control(message.author.id, LEARN_PRICE)
+    res = await jcoin_control(message.author.id, jcommon.LEARN_PRICE)
     if not res[0]:
         await client.send_message(message.channel,
             "PermError: %s" % res[1])
         raise je.PermissionError()
 
-    auth = await check_roles(LEARN_ROLE, message.author.roles)
+    auth = await jcommon.check_roles(jcommon.LEARN_ROLE, message.author.roles)
     if not auth:
         await client.send_message(message.channel,
             "JCError: usuário não autorizado a usar o !learn")
@@ -123,10 +123,10 @@ async def learn_data(message):
 
 async def main_status(message):
     global MAINTENANCE_MODE
-    auth = await check_roles(MASTER_ROLE, message.author.roles)
+    auth = await jcommon.check_roles(MASTER_ROLE, message.author.roles)
     if auth:
         MAINTENANCE_MODE = not MAINTENANCE_MODE
-        await jose_debug(message, "Modo de construção: %s" % (MAINTENANCE_MODE))
+        await jcommon.jose_debug(message, "Modo de construção: %s" % (MAINTENANCE_MODE))
     else:
         raise je.PermissionError()
 
@@ -136,14 +136,14 @@ async def show_maintenance(message):
 async def show_price(message):
     res = ''
 
-    for k in PRICE_TABLE:
-        d = PRICE_TABLE[k]
+    for k in jcommon.PRICE_TABLE:
+        d = jcommon.PRICE_TABLE[k]
         res += "categoria %r: %s > %.2f\n" % (k, d[0], d[1])
 
     await jose.say(res)
     return
 
-show_pior_bot = make_func("me tree :christmas_tree: me spam :christmas_tree: no oxygen :christmas_tree:  if ban\n" * 4)
+show_pior_bot = jcommon.make_func("me tree :christmas_tree: me spam :christmas_tree: no oxygen :christmas_tree:  if ban\n" * 4)
 
 '''
     RMV : removed(or marked to remove)
@@ -152,8 +152,8 @@ show_pior_bot = make_func("me tree :christmas_tree: me spam :christmas_tree: no 
 '''
 
 exact_commands = {
-    'jose': show_help,
-    'melhor bot': show_shit,
+    'jose': jcommon.show_help,
+    'melhor bot': jcommon.show_shit,
     'pior bot': show_pior_bot,
 }
 
@@ -167,34 +167,34 @@ commands_start = {
     '!causar': make_causo,
     '!learn': learn_data,
     '!josecoin': help_josecoin,
-    '!jasm': make_func(jasm.JASM_HELP_TEXT),
-    '!ahelp': show_gambling_full,
-    '!adummy': show_gambling,
-    '!awoo': make_func("https://cdn.discordapp.com/attachments/202055538773721099/257717450135568394/awooo.gif"),
+    '!jasm': jcommon.make_func(jasm.JASM_HELP_TEXT),
+    '!ahelp': jcommon.show_gambling_full,
+    '!adummy': jcommon.show_gambling,
+    '!awoo': jcommon.make_func("https://cdn.discordapp.com/attachments/202055538773721099/257717450135568394/awooo.gif"),
     '!price': show_price,
 }
 
 commands_match = {
-    'baladinha top': show_top,
+    'baladinha top':    jcommon.show_top,
 
-    'que tampa': show_tampa,
+    'que tampa':        jcommon.show_tampa,
 
-    "me abraça, josé": show_noabraco,
-    'tijolo': show_tijolo,
-    "mc gorila": show_mc,
-    'frozen 2': show_frozen_2,
-    'emule': show_emule,
-    'vinheta': show_vinheta,
+    "me abraça, josé":  jcommon.show_noabraco,
+    'tijolo':           jcommon.show_tijolo,
+    "mc gorila":        jcommon.show_mc,
+    'frozen 2':         jcommon.show_frozen_2,
+    'emule':            jcommon.show_emule,
+    'vinheta':          jcommon.show_vinheta,
 
-    "vtnc jose": show_vtnc,
-    'que rodeio': rodei_teu_cu,
-    'anal giratorio': show_agira,
+    "vtnc jose":        jcommon.show_vtnc,
+    'que rodeio':       jcommon.rodei_teu_cu,
+    'anal giratorio':   jcommon.show_agira,
 
-    'lenny face': make_func("( ͡° ͜ʖ ͡°)"),
-    'janela': show_casa,
-    'frozen3': make_func("https://thumbs.dreamstime.com/t/construo-refletiu-nas-janelas-do-prdio-de-escritrios-moderno-contra-47148949.jpg"),
-    'q fita': make_func("http://i.imgur.com/DQ3YnI0.jpg"),
-    'compiuter': make_func("https://i.ytimg.com/vi/cU3330gwoh8/hqdefault.jpg\nhttp://puu.sh/qcVi0/04d58f422d.JPG"),
+    'lenny face':       jcommon.make_func("( ͡° ͜ʖ ͡°)"),
+    'janela':           jcommon.show_casa,
+    'frozen3':          jcommon.make_func("https://thumbs.dreamstime.com/t/construo-refletiu-nas-janelas-do-prdio-de-escritrios-moderno-contra-47148949.jpg"),
+    'q fita':           jcommon.make_func("http://i.imgur.com/DQ3YnI0.jpg"),
+    'compiuter':        jcommon.make_func("https://i.ytimg.com/vi/cU3330gwoh8/hqdefault.jpg\nhttp://puu.sh/qcVi0/04d58f422d.JPG"),
 }
 
 counter = 0
@@ -256,7 +256,7 @@ for modname in jose.modules:
     for method in module['handlers']:
         if method.startswith("e_"):
             evname = method[method.find("_")+1:]
-            logger.info("Register Event %s@%s:%s", method, modname, evname)
+            jcommon.logger.info("Register Event %s@%s:%s", method, modname, evname)
             if evname in event_table:
                 handler = getattr(modinst, method)
                 event_table[evname].append(handler)
@@ -284,7 +284,7 @@ async def on_message(message):
             try:
                 jcoin.data[message.author.id]['name'] = message.author.name
             except Exception as e:
-                await jose_debug(message, "aid.jc: pyerr: ```%s```" % traceback.format_exc())
+                await jcommon.jose_debug(message, "aid.jc: pyerr: ```%s```" % traceback.format_exc())
 
     # we do not want the bot to reply to itself
     if message.author == client.user:
@@ -304,14 +304,14 @@ async def on_message(message):
 
     # any_message event
     for handler in event_table['any_message']:
-        await handler(message, Context(client, message))
+        await handler(message, jcommon.Context(client, message))
 
     # get command and push it to jose
-    if message.content.startswith(JOSE_PREFIX):
+    if message.content.startswith(jcommon.JOSE_PREFIX):
         t_start = time.time()
 
         # use jcommon.parse_command
-        command, args, method = parse_command(message)
+        command, args, method = jcommon.parse_command(message)
 
         if command == 'help':
             # load helptext
@@ -366,7 +366,7 @@ async def on_message(message):
                 # if function can receive the Context, do it
                 # else just do it normally
                 if len(sig.parameters) == 3:
-                    cxt = Context(client, message, t_start)
+                    cxt = jcommon.Context(client, message, t_start)
                     await jose_method(message, args, cxt)
                 else:
                     await jose_method(message, args)
@@ -436,26 +436,26 @@ async def on_message(message):
                     else:
                         await jose.say(res[2])
                 else:
-                    await jose_debug(message, "jasm error: %s" % res[2])
+                    await jcommon.jose_debug(message, "jasm error: %s" % res[2])
                 pointer = res[1]
         return
 
     # a normal message, spy it
     if not message.author.bot:
         with open("zelao.txt", 'a') as f:
-            f.write('%s\n' % speak_filter(message.content))
+            f.write('%s\n' % jcommon.speak_filter(message.content))
 
     # handle e_on_message
     for handler in event_table['on_message']:
-        await handler(message, Context(client, message))
+        await handler(message, jcommon.Context(client, message))
 
-    if random.random() < jc_probabiblity:
+    if random.random() < jcommon.jc_probabiblity:
         if not message.channel.is_private:
 
             # only if author has account
             if str(message.author.id) in jcoin.data:
                 # if it is on the wrong server, return
-                logger.debug("%s %s", message.server.id, message.server.id != "271378126234320897")
+                jcommon.logger.debug("%s %s", message.server.id, message.server.id != "271378126234320897")
                 if message.server.id != "271378126234320897":
                     return
 
@@ -463,7 +463,7 @@ async def on_message(message):
                     return
 
                 author_id = str(message.author.id)
-                amount = random.choice(JC_REWARDS)
+                amount = random.choice(jcommon.JC_REWARDS)
                 acc_to = jcoin.get(author_id)[1]
 
                 if amount == 0:
@@ -472,27 +472,27 @@ async def on_message(message):
                     res = jcoin.transfer(jcoin.jose_id, author_id, amount, jcoin.LEDGER_PATH)
                     await josecoin_save(message, False)
                     if res[0]:
-                        emoji_res = await random_emoji(3)
+                        emoji_res = await jcommon.random_emoji(3)
                         await jose.say('%s %.2fJC > %s' % (emoji_res, amount, acc_to['name']))
                     else:
-                        await jose_debug(message, 'jc_error: %s' % res[1])
+                        await jcommon.jose_debug(message, 'jc_error: %s' % res[1])
         else:
             return
 
-    await gorila_routine(message.channel)
+    await jcommon.gorila_routine(message.channel)
 
 @client.event
 async def on_ready():
     print("="*25)
-    logger.info("josé ready, name = %s, id = %s", client.user.name, client.user.id)
+    jcommon.logger.info("josé ready, name = %s, id = %s", client.user.name, client.user.id)
     print('='*25)
 
 
 async def main_task():
     global client
     startupdelta = time.time() - jose.start_time
-    logger.info("took %.2f seconds on startup", startupdelta)
-    logger.info("José Starting")
+    jcommon.logger.info("took %.2f seconds on startup", startupdelta)
+    jcommon.logger.info("José Starting")
     await client.start(jconfig.discord_token)
 
 tr = tracker.SummaryTracker()
@@ -510,4 +510,4 @@ finally:
 
 tr.print_diff()
 
-logger.info("Exit")
+jcommon.logger.info("Exit")

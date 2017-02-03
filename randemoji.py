@@ -10,7 +10,7 @@ from bisect import bisect
 from random import SystemRandom
 r = SystemRandom()
 randrange = r.randrange
-from unicodedata import name as unicode_name
+#from unicodedata import name as unicode_name
 
 # Set the unicode version.
 # Your system may not support Unicode 7.0 charecters just yet! So hipster.
