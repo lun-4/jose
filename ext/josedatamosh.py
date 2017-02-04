@@ -11,6 +11,64 @@ randint = SystemRandom().randint
 
 import jauxiliar as jaux
 
+async def get_data(url):
+    data = io.BytesIO()
+    with aiohttp.ClientSession() as session:
+        async with session.get(url) as resp:
+            data_read = await resp.read()
+            data.write(data_read)
+
+    return data
+
+def read_chunks(fh):
+    while True:
+        chunk = fh.read(4096)
+        if not chunk:
+            break
+        yield chunk
+
+async def datamosh_jpg(source_image):
+    output_image = io.BytesIO()
+    for chunk in read_chunks(source_image):
+        output_image.write(chunk)
+
+    # herald the destroyer
+    iters = 0
+    steps = 0
+    block_start = 100
+    block_end = len(source_image.getvalue()) - 400
+    replacements = randint(1, 30)
+
+    source_image.close()
+
+    while iters <= iterations:
+        while steps <= replacements:
+            pos_a = randint(block_start, block_end)
+            pos_b = randint(block_start, block_end)
+
+            output_image.seek(pos_a)
+            content_from_pos_a = output_image.read(1)
+            output_image.seek(0)
+
+            output_image.seek(pos_b)
+            content_from_pos_b = output_image.read(1)
+            output_image.seek(0)
+
+            # overwrite A with B
+            output_image.seek(pos_a)
+            output_image.write(content_from_pos_b)
+            output_image.seek(0)
+
+            # overwrite B with A
+            output_image.seek(pos_b)
+            output_image.write(content_from_pos_a)
+            output_image.seek(0)
+
+            steps += 1
+        iters += 1
+
+    return output_image
+
 class JoseDatamosh(jaux.Auxiliar):
     def __init__(self, cl):
         jaux.Auxiliar.__init__(self, cl)
@@ -35,11 +93,6 @@ Resultados de fotos jogadas ao !datamosh:
         ```
         '''
 
-        '''auth = await self.jc_control(message.author.id, 3)
-        if not auth:
-            await cxt.say("jc.auth: não autorizado")
-            return'''
-
         iterations = 10
         if len(args) > 2:
             try:
@@ -52,18 +105,7 @@ Resultados de fotos jogadas ao !datamosh:
             await cxt.say("*engracadinho*")
             return
 
-        data = io.BytesIO()
-        with aiohttp.ClientSession() as session:
-            async with session.get(args[1]) as resp:
-                data_read = await resp.read()
-                data.write(data_read)
-
-        def read_chunks(fh):
-            while True:
-                chunk = fh.read(4096)
-                if not chunk:
-                    break
-                yield chunk
+        data = await get_data(args[1])
 
         source_image = io.BytesIO(data.getvalue())
         try:
@@ -80,51 +122,17 @@ Resultados de fotos jogadas ao !datamosh:
                 await cxt.say("Resolução muito grande(largura > 1280 ou altura > 720 pixels)")
                 return
 
-            output_image = io.BytesIO()
-            for chunk in read_chunks(source_image):
-                output_image.write(chunk)
+            output_image = await datamosh_jpg(source_image)
 
-            # herald the destroyer
-            iters = 0
-            steps = 0
-            block_start = 100
-            block_end = len(source_image.getvalue()) - 400
-            replacements = randint(1, 30)
+            # send file
+            await self.client.send_file(message.channel, \
+                output_image, filename='datamosh.jpg', content='*Datamoshed*')
 
-            source_image.close()
-
-            while iters <= iterations:
-                while steps <= replacements:
-                    pos_a = randint(block_start, block_end)
-                    pos_b = randint(block_start, block_end)
-
-                    output_image.seek(pos_a)
-                    content_from_pos_a = output_image.read(1)
-                    output_image.seek(0)
-
-                    output_image.seek(pos_b)
-                    content_from_pos_b = output_image.read(1)
-                    output_image.seek(0)
-
-                    # overwrite A with B
-                    output_image.seek(pos_a)
-                    output_image.write(content_from_pos_b)
-                    output_image.seek(0)
-
-                    # overwrite B with A
-                    output_image.seek(pos_b)
-                    output_image.write(content_from_pos_a)
-                    output_image.seek(0)
-
-                    steps += 1
-                iters += 1
-
-            await self.client.send_file(message.channel, output_image, filename='datamosh.jpg', content='*Datamoshed*')
-
+            # done
             output_image.close()
         elif img.format in ['PNG']:
             await cxt.say("*não tenho algoritmo pra PNG*\n*espera porra*\n é sério porra")
         elif img.format in ['GIF']:
             await cxt.say("*o sr esta de brincando comigo NAO VAI TE GIF NO DATAMOSH* é muito caro em relação a processamento NAO")
         else:
-            await cxt.say("Formato desconhecido(%s)" % img.format)
+            await cxt.say("Formato %s: desconhecido" % img.format)
