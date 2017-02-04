@@ -260,6 +260,10 @@ for modname in jose.modules:
                 handler = getattr(modinst, method)
                 event_table[evname].append(handler)
 
+async def do_event(event_name, message):
+    for handler in event_table['any_message']:
+        await handler(message, jcommon.Context(client, message))
+
 async def check_message(message):
     # we do not want the bot to reply to itself
     if message.author == client.user:
@@ -309,8 +313,7 @@ async def on_message(message):
     await jose.recv(message) # at least
 
     # any_message event
-    for handler in event_table['any_message']:
-        await handler(message, jcommon.Context(client, message))
+    await do_event('any_message', message)
 
     # get command and push it to jose
     if message.content.startswith(jcommon.JOSE_PREFIX):
@@ -452,8 +455,7 @@ async def on_message(message):
             f.write('%s\n' % jcommon.speak_filter(message.content))
 
     # handle e_on_message
-    for handler in event_table['on_message']:
-        await handler(message, jcommon.Context(client, message))
+    await do_event('on_message', message)
 
     if random.random() < jcommon.jc_probabiblity:
         if not message.channel.is_private:
@@ -461,7 +463,6 @@ async def on_message(message):
             # only if author has account
             if str(message.author.id) in jcoin.data:
                 # if it is on the wrong server, return
-                jcommon.logger.debug("%s %s", message.server.id, message.server.id != "271378126234320897")
                 if message.server.id != "271378126234320897":
                     return
 
