@@ -379,7 +379,7 @@ async def on_message(message):
                 return
 
             try:
-                docstring = jose_method.__doc__
+                docstring = cmd_method.__doc__
                 if docstring is None:
                     await cxt.say("Docstring not found")
                 else:
