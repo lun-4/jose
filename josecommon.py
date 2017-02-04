@@ -1,4 +1,3 @@
-import discord
 import asyncio
 import time
 import re

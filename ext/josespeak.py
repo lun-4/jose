@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import asyncio
 import sys
 sys.path.append("..")
 import josecommon as jcommon
@@ -149,10 +148,10 @@ class JoseSpeak(jcommon.Extension):
         self.db_msg_path = jcommon.MARKOV_MESSAGES_PATH
 
         # load timers in async context
-        # every 15 minutes
-        self.cbk_new('jspeak.reload_texter', self.create_generators, 900)
-        # every 2 minutes
-        self.cbk_new('jspeak.savedb', self.save_databases, 120)
+        # every 10 minutes
+        self.cbk_new('jspeak.reload_texter', self.create_generators, 600)
+        # every 3 minutes
+        self.cbk_new('jspeak.savedb', self.save_databases, 180)
 
     async def create_generators(self):
         total_messages = 0

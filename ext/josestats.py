@@ -50,7 +50,7 @@ class JoseStats(jaux.Auxiliar):
         self.db_stats_path = jcommon.STAT_DATABASE_PATH
 
         # every 2 minutes, save databases
-        self.cbk_new('jstats.savedb', self.savedb, 120)
+        self.cbk_new('jstats.savedb', self.savedb, 180)
 
     async def savedb(self):
         self.logger.info("Saving statistics database")
