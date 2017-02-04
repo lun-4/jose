@@ -282,6 +282,20 @@ async def check_message(message):
 
     return True
 
+async def do_command_table(message):
+    if message.content in exact_commands:
+        func = exact_commands[message.content]
+        await func(message)
+        return True
+
+    for command in commands_match:
+        if command in message.content:
+            func = commands_match[command]
+            await func(message)
+            return True
+
+    return False
+
 @client.event
 async def on_message(message):
     global jose
@@ -403,22 +417,9 @@ async def on_message(message):
             await jose.say("jose: py_err: ```%s```" % traceback.format_exc())
             # return
 
-    if message.content in exact_commands:
-        if jcommon.MAINTENANCE_MODE:
-            await show_maintenance(message)
-            return
-        func = exact_commands[message.content]
-        await func(message)
+    should_stop = await do_command_table(message)
+    if should_stop:
         return
-
-    for command in commands_match:
-        if command in message.content:
-            if jcommon.MAINTENANCE_MODE:
-                await show_maintenance(message)
-                return
-            func = commands_match[command]
-            await func(message)
-            return
 
     if message.content.startswith('$jasm'):
         if jcommon.MAINTENANCE_MODE:
