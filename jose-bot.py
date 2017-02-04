@@ -306,16 +306,7 @@ async def on_message(message):
         return
 
     if message.author.id in jcoin.data:
-        if hasattr(message.author, 'nick'):
-            if message.author.nick is not None:
-                jcoin.data[message.author.id]['name'] = message.author.nick
-            else:
-                jcoin.data[message.author.id]['name'] = str(message.author)
-        else:
-            try:
-                jcoin.data[message.author.id]['name'] = message.author.name
-            except Exception as e:
-                await jcommon.jose_debug(message, "aid.jc: pyerr: ```%s```" % traceback.format_exc())
+        jcoin.data[message.author.id]['name'] = str(message.author)
 
     counter += 1
     if counter > 11:
@@ -340,35 +331,36 @@ async def on_message(message):
             # load helptext
             await jose.recv(message) # default
 
+            cxt = jcommon.Context(client, message, t_start)
+
             cmd_ht = 'help'
             try:
                 if args[1] == 'help':
-                    await jose.say(help_helptext)
+                    await cxt.say(help_helptext)
                     return
                 else:
                     cmd_ht = args[1]
             except:
                 pass
 
-            try:
-                if cmd_ht == 'help':
-                    await jose.say(help_helptext)
-                    return
+            if cmd_ht == 'help':
+                await cxt.say(help_helptext)
+                return
 
-                jose_method = getattr(jose, 'c_%s' % cmd_ht)
-
-                if jose_method is None:
-                    await jose.say("%s: Command not found" % cmd_ht)
-                    return
-
-            except Exception as e:
-                await jose.say("help.%s: %r" % (cmd_ht, e))
+            cmd_method = getattr(jose, 'c_%s' % cmd_ht, None)
+            if cmd_method is None:
+                await cxt.say("%s: Command not found" % cmd_ht)
                 return
 
             try:
-                await jose.say(jose_method.__doc__)
+                docstring = jose_method.__doc__
+                if docstring is None:
+                    await cxt.say("Docstring not found")
+                else:
+                    await cxt.say(docstring)
             except Exception as e:
-                await jose.say("error getting helptext for %s: %r" % (command, repr(e)))
+                await cxt.say("error getting helptext for %s: %r" % (command, repr(e)))
+
             return
 
         try:
