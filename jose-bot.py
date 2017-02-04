@@ -296,6 +296,32 @@ async def do_command_table(message):
 
     return False
 
+async def do_jasm(message, cxt):
+    await cxt.say('Bem vindo ao REPL do JoseAssembly!\nPara sair, digite "exit"')
+
+    if not (message.author.id in jasm_env):
+        jasm_env[message.author.id] = jasm.empty_env()
+
+    pointer = jasm_env[message.author.id]
+
+    while True:
+        data = await client.wait_for_message(author=message.author)
+        if data.content == 'exit':
+            await cxt.say('saindo do REPL')
+            break
+        else:
+            insts = await jasm.parse(data.content)
+            res = await jasm.execute(insts, pointer)
+            if res[0] == True:
+                if len(res[2]) < 1:
+                    await cxt.say("**debug: nenhum resultado**")
+                else:
+                    await cxt.say(res[2])
+            else:
+                await cxt.say("jasm error: %s" % res[2])
+            pointer = res[1]
+    return
+
 @client.event
 async def on_message(message):
     global jose
@@ -364,11 +390,8 @@ async def on_message(message):
             return
 
         try:
-            if jcommon.MAINTENANCE_MODE:
-                await show_maintenance(message)
-                return
-
             # call c_ bullshit
+            # use try/except, looks like it is faster than if/else
             try:
                 jose_method = getattr(jose, method)
             except AttributeError:
@@ -413,36 +436,10 @@ async def on_message(message):
     if should_stop:
         return
 
-    if message.content.startswith('$jasm'):
-        if jcommon.MAINTENANCE_MODE:
-            await show_maintenance(message)
-            return
-        await jose.say('Bem vindo ao REPL do JoseAssembly!\nPara sair, digite "exit"')
+    if message.content.startswith('!jasm'):
+        await do_jasm(message)
 
-        if not (message.author.id in jasm_env):
-            jasm_env[message.author.id] = jasm.empty_env()
-
-        pointer = jasm_env[message.author.id]
-
-        while True:
-            data = await client.wait_for_message(author=message.author)
-            if data.content == 'exit':
-                await jose.say('saindo do REPL')
-                break
-            else:
-                insts = await jasm.parse(data.content)
-                res = await jasm.execute(insts, pointer)
-                if res[0] == True:
-                    if len(res[2]) < 1:
-                        await jose.say("**debug: nenhum resultado**")
-                    else:
-                        await jose.say(res[2])
-                else:
-                    await jcommon.jose_debug(message, "jasm error: %s" % res[2])
-                pointer = res[1]
-        return
-
-    # a normal message, spy it
+    # a normal message, put it in the global text
     if not message.author.bot:
         with open("zelao.txt", 'a') as f:
             f.write('%s\n' % jcommon.speak_filter(message.content))
