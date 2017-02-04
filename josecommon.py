@@ -399,7 +399,7 @@ class Callback:
     async def do(self):
         logger.debug("%s: running", self.cid)
         while self.run:
-            logger.info("%s: called", self.cid)
+            logger.debug("%s: called", self.cid)
             await self.func()
             await asyncio.sleep(self.sec)
         logger.debug("%s: ended", self.cid)
