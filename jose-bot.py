@@ -260,16 +260,31 @@ for modname in jose.modules:
                 handler = getattr(modinst, method)
                 event_table[evname].append(handler)
 
+async def check_message(message):
+    # we do not want the bot to reply to itself
+    if message.author == client.user:
+        return False
+
+    # override maintenance mode
+    if message.content == '!construção':
+        await main_status(message)
+        return False
+
+    if jose.command_lock:
+        return False
+
+    if len(message.content) <= 0:
+        return False
+
+    return True
+
 @client.event
 async def on_message(message):
     global jose
     global counter
 
-    if message.content == '!construção': #override maintenance mode
-        await main_status(message)
-        return
-
-    if jose.command_lock:
+    is_good = await check_message(message)
+    if not is_good:
         return
 
     if message.author.id in jcoin.data:
@@ -283,13 +298,6 @@ async def on_message(message):
                 jcoin.data[message.author.id]['name'] = message.author.name
             except Exception as e:
                 await jcommon.jose_debug(message, "aid.jc: pyerr: ```%s```" % traceback.format_exc())
-
-    # we do not want the bot to reply to itself
-    if message.author == client.user:
-        return
-
-    if len(message.content) < 0:
-        return
 
     counter += 1
     if counter > 11:

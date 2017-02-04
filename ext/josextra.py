@@ -15,11 +15,15 @@ import josecommon as jcommon
 from random import SystemRandom
 random = SystemRandom()
 
+JOSE_URL = 'https://github.com/lkmnds/jose/blob/master'
+
 docsdict = {
-    "modules": "https://github.com/lkmnds/jose/blob/master/doc/modules.md",
-    "events": "https://github.com/lkmnds/jose/blob/master/doc/events.md",
-    "queries": "https://github.com/lkmnds/jose/blob/master/doc/queries.md",
-    "queries-pt": "https://github.com/lkmnds/jose/blob/master/doc/queries.md",
+    "modules": "{}/doc/modules.md".format(JOSE_URL),
+    "events": "{}/doc/events.md".format(JOSE_URL),
+    "queries": "{}/doc/queries.md".format(JOSE_URL),
+    "queries-pt": "{}/doc/queries.md".format(JOSE_URL),
+    "manual": "{}/doc/manual.md".format(JOSE_URL),
+    "eapi": "{}/doc/extension_api.md".format(JOSE_URL),
 }
 
 class joseXtra(jaux.Auxiliar):
@@ -66,7 +70,7 @@ class joseXtra(jaux.Auxiliar):
                 r = await aiohttp.request('GET', url)
                 content = await r.text()
                 info = json.loads(content)
-            await cxt.say('xkcd número %s : %s' % (n, info['img']))
+            await cxt.say('xkcd %s : %s' % (n, info['img']))
 
         except Exception as e:
             await cxt.say("err: %r" % e)
