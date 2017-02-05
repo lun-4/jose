@@ -27,24 +27,18 @@ The EAPI is a set of methods given to extensions by `jaux.Auxiliar` and `jcommon
   * Just like `self.is_admin`, but checks the author of the current message
   * **Returns** `bool`
 
-### Planned features in the EAPI
+  * `self.cbk_new(callback_id, function, sec)`
+   * `callback_id`: `str`, the string that represents that callback
+   * `function`: any function that is a **coroutine**
+   * `sec`: `int`
+   * Sets a function to be called every `sec` seconds
+   * Made for functions that need to save stuff by every length of time, example:
+   ```python
+   # save databases every 5 minutes
+   await self.set_callback('mydatabase', self.save_database, 300)
+   ```
 
-Those are most in the `TODO`s
+### Planned features/features to be documented in the EAPI
 
- * `self.cbk_new(callback_id, function, sec)`
-  * This function will be a *coroutine*
-  * `callback_id`: `str`, the string that represents that callback
-  * `function`: any function that is a **coroutine**
-  * `sec`: `int`
-  * Sets a function to be called every `sec` seconds
-  * Made for functions that need to save stuff by every length of time, example:
-  ```python
-  # save databases every 5 minutes
-  await self.set_callback('mydatabase', self.save_database, 300)
-  ```
-
-Other functions for the callbacks:
  * `self.cbk_call(callback_id)`
  * `self.cbk_remove(callback_id)`
- * `self.cbk_reload(callback_id)`
- * `self.cbk_reload_all()`
