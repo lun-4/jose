@@ -317,7 +317,6 @@ class JoseMemes(jcommon.Extension):
             copy = dict(self.memes)
 
             inconsistency = False
-            i = 1
             for k in copy:
                 inconsistency_report = ''
                 if 'uses' not in copy[k]:
@@ -328,9 +327,11 @@ class JoseMemes(jcommon.Extension):
                 await cxt.say("INCONSISTENCY: `%s`" % inconsistency_report)
                 return
 
+            i = 1
             for key in sorted(copy, key=lambda key: -copy[key]['uses'])[:10]:
                 stat += '%d lugar: %s com %d usos\n' % (i, \
                     key, copy[key]['uses'])
+                i += 1
 
             await cxt.say(self.codeblock('', stat))
             return
