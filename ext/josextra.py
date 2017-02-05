@@ -6,6 +6,7 @@ import subprocess
 import re
 import psutil
 import os
+import gc
 
 import sys
 sys.path.append("..")
@@ -168,3 +169,8 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
 
     async def c_cantada(self, message, args, cxt):
         await self.mkresponse(message, 'Ei {}, {}', jcommon.cantadas, cxt)
+
+    async def c_gcollect(self, message, args, cxt):
+        await self.is_admin(message.author.id)
+        obj = gc.collect()
+        await cxt.say("Collected %d objects!" % obj)
