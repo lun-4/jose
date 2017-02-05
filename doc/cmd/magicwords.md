@@ -1,7 +1,7 @@
 Magic Words
 ==================
 
-*Documentação em Português:* (magicwords-pt.md)[https://github.com/lkmnds/jose/blob/master/doc/cmd/magicwords-pt.md]
+*Documentação em Português:* [magicwords-pt.md](https://github.com/lkmnds/jose/blob/master/doc/cmd/magicwords-pt.md)
 
 Magic Words are words, configurable per server, that, when said, makes José
 say something, for example when someone says "good night", José responds "Good dreams!"

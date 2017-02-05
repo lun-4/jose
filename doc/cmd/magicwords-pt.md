@@ -1,7 +1,7 @@
 Magic Words/Palavras Mágicas
 ==================
 
-*English documentation:* (magicwords.md)[https://github.com/lkmnds/jose/blob/master/doc/cmd/magicwords.md]
+*English documentation:* [magicwords.md](https://github.com/lkmnds/jose/blob/master/doc/cmd/magicwords.md)
 
 Magic Words são palavras, configuradas por servidor, que, quando faladas, ou estiverem dentro de uma mensagem, fazem com que o josé fale algo pre-determinado, por exemplo, quando alguém falar "boa noite", josé fala "bons sonhos"
 
