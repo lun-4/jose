@@ -31,12 +31,23 @@ class joseXtra(jaux.Auxiliar):
     def __init__(self, cl):
         jaux.Auxiliar.__init__(self, cl)
         self.docs = docsdict
+        self.msgcount = 0
+
+        # every minute, show josé's usage
+        self.cbk_new("jxtra.msgcount", self.message_count, 60)
 
     async def ext_load(self):
         return True, ''
 
     async def ext_unload(self):
         return True, ''
+
+    async def message_count(self):
+        self.logger.info("%d messages/30sec" % (self.msgcount / 2))
+        self.msgcount = 0
+
+    async def e_any_message(self, message):
+        self.msgcount += 1
 
     async def c_xkcd(self, message, args, cxt):
         '''`!xkcd` - procura tirinhas do XKCD
