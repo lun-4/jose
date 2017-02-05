@@ -174,7 +174,10 @@ A lista de possíveis dados está em https://github.com/lkmnds/jose/blob/master/
         self.statistics['gl_queries'] += 1
 
         if querytype == 'summary':
-            response += "Mensagens recebidas: %d\n" % self.statistics['gl_messages']
+            # Because `josestats` came AFTER `josespeak`, the Texter calculation
+            # was off by 7931 messages from the `josestats` calculation
+            # this fixes it, i suppose
+            response += "Mensagens recebidas: %d\n" % (self.statistics['gl_messages'] + 7931)
             response += "Comandos recebidos: %d\n" % sum(self.statistics['gl_commands'].values())
             response += "Pedidos recebidos(queries): %d\n" % self.statistics['gl_queries']
 
