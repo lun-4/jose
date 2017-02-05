@@ -46,7 +46,7 @@ class joseXtra(jaux.Auxiliar):
         self.logger.info("%d messages/30sec" % (self.msgcount / 2))
         self.msgcount = 0
 
-    async def e_any_message(self, message):
+    async def e_any_message(self, message, cxt):
         self.msgcount += 1
 
     async def c_xkcd(self, message, args, cxt):
