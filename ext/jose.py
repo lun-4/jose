@@ -598,8 +598,8 @@ class JoseBot(jcommon.Extension):
         minutes = int((sec % HOUR) / MINUTE)
         seconds = int(sec % MINUTE)
 
-        fmt = "uptime: %d dias, %d horas, %d minutos, %d segundos"
-        await self.debug(fmt % (days, hours, minutes, seconds))
+        fmt = "`Uptime: %d dias, %d horas, %d minutos, %d segundos`"
+        await cxt.say(fmt % (days, hours, minutes, seconds))
 
     async def c_eval(self, message, args, cxt):
         # eval expr
