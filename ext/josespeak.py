@@ -16,7 +16,7 @@ logger = None
 def fixCaps(word):
     if word.isupper() and (word != "I" or word != "Eu"):
         word = word.lower()
-    elif word [0].isupper():
+    elif word[0].isupper():
         word = word.lower().capitalize()
     else:
         word = word.lower()
@@ -126,6 +126,10 @@ class Texter:
             word_count += 1
         return sent
 
+    async def clear(self):
+        # clear the stuff, or at least signal Python to remove them
+        del self.tempMapping, self.mapping, self.starts
+
 class JoseSpeak(jcommon.Extension):
     def __init__(self, cl):
         global logger
@@ -154,15 +158,23 @@ class JoseSpeak(jcommon.Extension):
         self.cbk_new('jspeak.savedb', self.save_databases, 180)
 
     async def create_generators(self):
+        # create the Texters for each server in the database
         total_messages = 0
         t_start = time.time()
+
         for serverid in self.database:
             messages = self.database[serverid]
             total_messages += len(messages)
+
+            if serverid in self.text_generators:
+                # delet this
+                await self.text_generators[serverid].clear()
+
+            # create it
             self.text_generators[serverid] = Texter(None, 1, '\n'.join(messages))
 
         time_taken = (time.time() - t_start) * 1000
-        self.logger.info("Generated %d texters, %d messages in %.2fmsec", len(self.text_generators), total_messages, time_taken)
+        self.logger.info("Made %d Texters, total of %d messages in %.2fmsec", len(self.text_generators), total_messages, time_taken)
 
     async def save_databases(self):
         self.logger.info("Save josespeak database")
