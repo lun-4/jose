@@ -21,10 +21,13 @@ JOSE_URL = 'https://github.com/lkmnds/jose/blob/master'
 docsdict = {
     "modules": "{}/doc/modules.md".format(JOSE_URL),
     "events": "{}/doc/events.md".format(JOSE_URL),
-    "queries": "{}/doc/queries.md".format(JOSE_URL),
-    "queries-pt": "{}/doc/queries.md".format(JOSE_URL),
+    "queries": "{}/doc/cmd/queries.md".format(JOSE_URL),
+    "queries-pt": "{}/doc/cmd/queries-pt.md".format(JOSE_URL),
     "manual": "{}/doc/manual.md".format(JOSE_URL),
     "eapi": "{}/doc/extension_api.md".format(JOSE_URL),
+
+    "magicwords": "{}/doc/cmd/magicwords.md".format(JOSE_URL),
+    "magicwords-pt": "{}/doc/cmd/magicwords-pt.md".format(JOSE_URL),
 }
 
 class joseXtra(jaux.Auxiliar):
