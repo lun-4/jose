@@ -67,7 +67,8 @@ class JoseStats(jaux.Auxiliar):
             self.statistics = json.load(open(self.db_stats_path, 'r'))
 
             # make sure i'm making sane things
-            # also make the checks in ext_load so it doesn't fry the cpu
+            # also make the checks in ext_load (instead of any_message)
+            # so it doesn't fry the cpu
             if 'gl_messages' not in self.statistics:
                 self.statistics['gl_messages'] = 0
 
@@ -83,7 +84,12 @@ class JoseStats(jaux.Auxiliar):
 
     async def ext_unload(self):
         try:
+            # save databases
             await self.savedb()
+
+            # Remove the callback
+            await self.cbk_remove('jstats.savedb')
+
             return True, ''
         except Exception as e:
             return False, str(e)
