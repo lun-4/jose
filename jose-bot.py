@@ -151,7 +151,7 @@ show_pior_bot = jcommon.make_func("me tree :christmas_tree: me spam :christmas_t
 '''
 
 exact_commands = {
-    'jose': jcommon.show_help,
+    '!jose': jcommon.show_help,
     'melhor bot': jcommon.show_shit,
     'pior bot': show_pior_bot,
 }
