@@ -215,8 +215,15 @@ class JoseSpeak(jcommon.Extension):
 
     async def ext_unload(self):
         try:
+            # save DB
             await self.save_databases()
+
+            # clear the dict full of shit (it rhymes)
             self.text_generators.clear()
+
+            # Remove the callbacks
+            await self.cbk_remove('jspeak.reload_texter')
+            await self.cbk_remove('jspeak.savedb')
 
             return True, ''
         except Exception as e:
