@@ -261,7 +261,7 @@ for modname in jose.modules:
                 event_table[evname].append(handler)
 
 async def do_event(event_name, message):
-    for handler in event_table[event_table]:
+    for handler in event_table[event_name]:
         await handler(message, jcommon.Context(client, message))
 
 async def check_message(message):
