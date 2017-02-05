@@ -35,10 +35,30 @@ The EAPI is a set of methods given to extensions by `jaux.Auxiliar` and `jcommon
   * Made for functions that need to save stuff by every length of time, example:
   ```python
   # save databases every 5 minutes
-  await self.set_callback('mydatabase', self.save_database, 300)
+  await self.cbk_new('mydatabase', self.save_database, 300)
+  ```
+
+ * `self.cbk_call(callback_id)`
+  * This function is a *coroutine*
+  * `callback_id`: `str`
+  * Calls a callback independent of the time needed to execute it
+  * Example:
+  ```python
+  async def c_savedb(self, message, args, cxt):
+      await self.cbk_call('mydatabase')
+  ```
+
+ * `self.cbk_remove(callback_id)`
+  * This function is a *coroutine*
+  * `callback_id`: `str`
+  * Removes a callback from the callback dict, not immediately.
+  * Example:
+  ```python
+  async def ext_unload(self, message, args, cxt):
+      # remove callbacks on unload
+      await self.cbk_remove('mydatabase')
   ```
 
 ### Planned features/features to be documented in the EAPI
 
- * `self.cbk_call(callback_id)`
- * `self.cbk_remove(callback_id)`
+None, as of now
