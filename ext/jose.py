@@ -382,7 +382,7 @@ class JoseBot(jcommon.Extension):
         return
 
     async def c_money(self, message, args, cxt):
-        '''`!money quantity from to` - converte dinheiro usando cotações etc
+        '''`!money quantity base to` - converte dinheiro usando cotações etc
         `!money list` - lista todas as moedas disponíveis'''
 
         if len(args) > 1:
@@ -412,8 +412,11 @@ class JoseBot(jcommon.Extension):
         data = json.loads(content)
 
         if 'error' in data:
-            await self.debug("!money: %s" % data['error'])
+            await cxt.say("!money: %s" % data['error'])
             return
+
+        if currency_to not in data['rates']:
+            await cxt.say("Invalid currency to convert to")
 
         rate = data['rates'][currency_to]
         res = amount * rate
