@@ -483,6 +483,12 @@ async def on_ready():
     jcommon.logger.info("josé ready, name = %s, id = %s", client.user.name, client.user.id)
     print('='*25)
 
+    # Setup Playing message
+    playing_name = 'José v%s | %d guilds | %sjose' % (jcommon.JOSE_VERSION, \
+        len(client.servers), jcommon.JOSE_PREFIX)
+    g = discord.Game(name = playing_name, url = playing_name)
+    await client.change_presence(game = g)
+
 
 async def main_task():
     global client
