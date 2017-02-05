@@ -262,7 +262,7 @@ for modname in jose.modules:
 
 async def do_event(event_name, message):
     for handler in event_table[event_name]:
-        await handler(message, jcommon.Context(client, message))
+        await handler(message, jcommon.Context(client, message, time.time(), jose))
 
 async def check_message(message):
     # we do not want the bot to reply to itself
@@ -327,6 +327,8 @@ async def on_message(message):
     global jose
     global counter
 
+    t_start = time.time()
+
     is_good = await check_message(message)
     if not is_good:
         return
@@ -348,8 +350,6 @@ async def on_message(message):
 
     # get command and push it to jose
     if message.content.startswith(jcommon.JOSE_PREFIX):
-        t_start = time.time()
-
         # use jcommon.parse_command
         command, args, method = jcommon.parse_command(message)
 
@@ -357,7 +357,7 @@ async def on_message(message):
             # load helptext
             await jose.recv(message) # default
 
-            cxt = jcommon.Context(client, message, t_start)
+            cxt = jcommon.Context(client, message, t_start, jose)
 
             cmd_ht = 'help'
             try:
@@ -404,7 +404,7 @@ async def on_message(message):
                 # if function can receive the Context, do it
                 # else just do it normally
                 if len(sig.parameters) == 3:
-                    cxt = jcommon.Context(client, message, t_start)
+                    cxt = jcommon.Context(client, message, t_start, jose)
                     await jose_method(message, args, cxt)
                 else:
                     await jose_method(message, args)
