@@ -417,6 +417,7 @@ class JoseBot(jcommon.Extension):
 
         if currency_to not in data['rates']:
             await cxt.say("Invalid currency to convert to")
+            return
 
         rate = data['rates'][currency_to]
         res = amount * rate
