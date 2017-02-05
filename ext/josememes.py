@@ -354,6 +354,7 @@ class JoseMemes(jcommon.Extension):
                 page = int(page)
             except Exception as e:
                 await cxt.say("jmemes: %r" % e)
+                return
 
             if page < 0:
                 await cxt.say("EI EI EI EI CALMAI CUZAO")
