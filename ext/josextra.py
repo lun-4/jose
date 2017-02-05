@@ -185,3 +185,6 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
         await self.is_admin(message.author.id)
         obj = gc.collect()
         await cxt.say("Collected %d objects!" % obj)
+
+    async def c_jose(self, message, args, cxt):
+        await jcommon.show_help(message)
