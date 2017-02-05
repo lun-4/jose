@@ -323,18 +323,17 @@ class JoseMemes(jcommon.Extension):
                 if 'uses' not in copy[k]:
                     inconsistency_report += "%s, " % k
                     inconsistency = True
-                await cxt.say("`%s`" % inconsistency_report)
 
             if inconsistency:
-                await cxt.say("INCONSISTENCY entries detected.")
+                await cxt.say("INCONSISTENCY: `%s`" % inconsistency_report)
                 return
 
-            for key in sorted(copy, key=lambda key: -copy[key]['uses']):
-                if i > 10: break
+            for key in sorted(copy, key=lambda key: -copy[key]['uses'])[:10]:
                 stat += '%d lugar: %s com %d usos\n' % (i, \
                     key, copy[key]['uses'])
-                i += 1
+
             await cxt.say(self.codeblock('', stat))
+            return
 
         elif command == 'istat':
             meme = ' '.join(args[2:])
