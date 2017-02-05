@@ -517,9 +517,6 @@ class Extension:
 
         del self._callbacks[callback_id]
 
-    async def cbk_reload(self, callback_id):
-        pass # TODO
-
 class WaitingQueue:
     def __init__(self):
         self.queue = []
