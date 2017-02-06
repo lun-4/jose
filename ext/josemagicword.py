@@ -70,7 +70,7 @@ class JoseMagicWord(jaux.Auxiliar):
         except Exception as e:
             return False, str(e)
 
-    async def e_any_message(self, message, cxt):
+    async def e_on_message(self, message, cxt):
         if self.counter % 25 == 0:
             await self.savedb()
 
@@ -86,6 +86,8 @@ class JoseMagicWord(jaux.Auxiliar):
                 if match:
                     response = await mw_response(mw, message)
                     await cxt.say(response, channel=message.channel)
+                    # No other magicwords should be done
+                    return
 
         self.counter += 1
 
