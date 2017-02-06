@@ -306,7 +306,7 @@ class JoseBot(jcommon.Extension):
             await f(cxt)
             self.command_lock = False
         else:
-            await self.debug("*PermError*: sem permissão")
+            raise je.PermissionError()
 
     async def turnoff(self, cxt):
         await jcoin.JoseCoin(self.client).josecoin_save(self.current, True)
