@@ -619,8 +619,8 @@ class JoseBot(jcommon.Extension):
 
         # do the same thing again
         playing_phrase = random.choice(jcommon.JOSE_PLAYING_PHRASES)
-        self.logger.info("Chose %s as playing phrase", playing_phrase)
         playing_name = '%s | v%s | %d guilds | %shjose' % (playing_phrase, jcommon.JOSE_VERSION, \
             len(self.client.servers), jcommon.JOSE_PREFIX)
+        jcommon.logger.info("Playing %s", playing_name)
         g = discord.Game(name = playing_name, url = playing_name)
         await self.client.change_presence(game = g)
