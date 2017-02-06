@@ -30,6 +30,7 @@ docsdict = {
     "magicwords-pt": "{}/doc/cmd/magicwords-pt.md".format(JOSE_URL),
 
     "commands": "{}/doc/cmd/listcmd.md".format(JOSE_URL),
+    "josespeak": "{}/doc/josespeak.md".format(JOSE_URL),
 }
 
 class joseXtra(jaux.Auxiliar):
