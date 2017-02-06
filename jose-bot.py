@@ -488,7 +488,7 @@ async def on_ready():
     playing_name = '%s | v%s | %d guilds | %shjose' % (playing_phrase, jcommon.JOSE_VERSION, \
         len(client.servers), jcommon.JOSE_PREFIX)
     g = discord.Game(name = playing_name, url = playing_name)
-    await client.change_presence(game = g)
+    # await client.change_presence(game = g)
 
     print('='*25)
 

@@ -457,13 +457,14 @@ class Extension:
         if ok is None:
             logger.error("Error happened in callback %s", callback_id)
 
-        logger.info("Callback %s ended", callback_id)
+        logger.info("Callback %s finished", callback_id)
 
     async def cbk_call(self, callback_id):
         ok = await cbk_call(callback_id)
         if ok is None:
             logger.error("Error calling callback %s", callback_id)
             return
+        logger.info("called callback %s", callback_id)
 
     async def cbk_remove(self, callback_id):
         ok = await cbk_remove(callback_id)
@@ -472,6 +473,7 @@ class Extension:
             return
 
         del self._callbacks[callback_id]
+        logger.info("Callback %s removed", callback_id)
 
 class WaitingQueue:
     def __init__(self):
