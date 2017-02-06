@@ -1,8 +1,7 @@
 # Phrases that will be shown randomly when jose starts
 JOSE_PLAYING_PHRASES = [
     'I Sexually Identify as an Attack Helicopter',
-    'Whyyy?',
-    'Memes!',
+    'Memes',
     'Discord > Skype',
     'I\'d love to make profit',
     'Features coming Soon™',
@@ -54,5 +53,21 @@ JOSE_PLAYING_PHRASES = [
     'Capitalism',
     'Philosophy with IBM Watson',
     'Skynet 2.0',
-    'Daft Punk'
+    'Daft Punk',
+    'Night Tempo センパイ - Night Cruising',
+    'YouTube',
+    'Westworld with Dolores',
+    'Saint Pepsi',
+    'マクロスMACROSS 82-99 x Night Tempo - Cherry (ft. punipunidenki)',
+    'with bots, my only friends',
+    'NSFW Fanfics',
+    'my keyboard layout keeps changing',
+    'Linux',
+    'Apple fanboys',
+    'Lady GaGa',
+    'Burzum',
+    'CSI: NY',
+    'Michael Jackson',
+    'Bazinga',
+    'Yiff',
 ]
