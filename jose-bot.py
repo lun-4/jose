@@ -484,7 +484,8 @@ async def on_ready():
     print('='*25)
 
     # Setup Playing message
-    playing_name = 'José v%s | %d guilds | %shjose' % (jcommon.JOSE_VERSION, \
+    playing_phrase = random.choice(jcommon.JOSE_PLAYING_PHRASES)
+    playing_name = '%s | v%s | %d guilds | %shjose' % (playing_phrase, jcommon.JOSE_VERSION, \
         len(client.servers), jcommon.JOSE_PREFIX)
     g = discord.Game(name = playing_name, url = playing_name)
     await client.change_presence(game = g)

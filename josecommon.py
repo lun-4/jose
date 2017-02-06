@@ -97,6 +97,48 @@ def set_client(cl):
 # Language database
 langdb = None
 
+# Phrases that will be shown randomly when jose starts
+JOSE_PLAYING_PHRASES = [
+    'I Sexually Identify as an Attack Helicopter',
+    'Whyyy?',
+    'Memes!',
+    'Discord > Skype',
+    'I\'d love to make profit',
+    'Features coming Soon™',
+    'Use Python 3.x, please',
+    'What are you doing in my swamp™',
+    '7 GRAND DAD?!?',
+    'The game who nobody asks about',
+    'Nice meme\'d mister.',
+    '2 2 2',
+    'with myself',
+    'nothing',
+    'with destiny',
+    'with your feelings'
+    'I wanna be the bot',
+    'and TASing chess',
+    'with humans',
+    'playing',
+    '4chan',
+    'Imgur',
+    'Reddit',
+    'Dump Random Stuff And They\'ll Call Me Sentient™',
+    'Favela in Brazil',
+    'Politics',
+    'I\'ve seen it on tumblr',
+    'Expand Dong',
+    'Bonzi Buddy',
+    'Debugging',
+    'db',
+    'Guitar',
+    'MACINTOSH PLUS - リサフランク420 / 現代のコンピュー',
+    'Blank Banshee',
+    'KSP',
+    'with your heart',
+    'Dance Dance Revolution',
+    'PRANKS ON YOU BRO',
+]
+
 JOSE_GENERAL_HTEXT = '''
 Recommended *top notch* Reading, the command list:
 ---
