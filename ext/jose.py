@@ -517,7 +517,11 @@ class JoseBot(jcommon.Extension):
 
         escolhas = (' '.join(args[1:])).split(';')
         choice = random.choice(escolhas)
-        await cxt.say("Eu escolho %s" % choice)
+        await cxt.say(">%s" % choice)
+
+    async def c_pick(self, message, args, cxt):
+        '''`!pick` - alias for `!escolha`'''
+        await self.c_escolha(message, args, cxt)
 
     async def c_nick(self, message, args, cxt):
         '''`!nick [nick]` - [SOMENTE ADMIN]'''

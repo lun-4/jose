@@ -144,15 +144,13 @@ Apostas:
 **ADMIN**:
 !shutdown - desligar o jose
 
-%s
-
 Developers:
 !uptime - mostra o uptime do jose
 !josetxt - mostra quantas mensagens o José tem na memória dele(data.txt)
 
 (não inclui comandos que o josé responde dependendo das mensagens)
 (nem como funciona a JoseCoin, use !josecoin pra isso)
-''' % (JOSE_VERSION, JOSE_PORN_HTEXT)
+''' % (JOSE_VERSION)
 
 GAMBLING_HELP_TEXT = '''O que é: Função que permite dois (ou mais) usuários apostarem josecoins por esporte.
 
