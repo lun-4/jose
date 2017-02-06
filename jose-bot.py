@@ -484,7 +484,7 @@ async def on_ready():
 
     # Setup Playing message
     playing_phrase = random.choice(jcommon.JOSE_PLAYING_PHRASES)
-    jcommon.logger.info("chose %s as playing phrase" % playing_phrase)
+    jcommon.logger.info("chose %s as playing phrase", playing_phrase)
     playing_name = '%s | v%s | %d guilds | %shjose' % (playing_phrase, jcommon.JOSE_VERSION, \
         len(client.servers), jcommon.JOSE_PREFIX)
     g = discord.Game(name = playing_name, url = playing_name)
