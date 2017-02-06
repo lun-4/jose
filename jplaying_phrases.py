@@ -69,4 +69,7 @@ JOSE_PLAYING_PHRASES = [
     'Michael Jackson',
     'Bazinga',
     'Yiff',
+    'Club Penguin',
+    'Club Penguin Server Administration',
+    'Big Tyrone Simulator'
 ]
