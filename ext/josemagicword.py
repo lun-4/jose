@@ -108,9 +108,18 @@ class JoseMagicWord(jaux.Auxiliar):
         magicwords, mwresponse = mwstr.split(';')
         magicwords = magicwords.split(',')
 
-        if len(magicwords) > 10:
-            await cxt.say(":warning: Maximum of 10 magic words allowed in each set.")
+        if len(magicwords) > 6:
+            await cxt.say(":warning: Maximum of 6 magic words allowed in each set.")
             return
+
+        for magicword in magicwords:
+            if len(magicword) < 2:
+                await cxt.say(":warning: One of the magic words is less than 2 characters, remove or use another")
+                return
+
+            if len(magicword) >= 100:
+                await cxt.say(":warning: One of the magic words is more than 100 characters, remove or use another")
+                return
 
         if message.server.id not in self.magicwords:
             self.logger.info("New MW Database for %s", message.server.id)
@@ -122,8 +131,8 @@ class JoseMagicWord(jaux.Auxiliar):
 
         # check limits
         serverdb = self.magicwords[message.server.id]
-        if len(serverdb) > 10:
-            await cxt.say("This server reached the limit of 10 Magic Words.")
+        if len(serverdb) >= 10:
+            await cxt.say(":elephant: Server reached the limit of 10 Magic Words.")
             return
 
         # check duplicates
