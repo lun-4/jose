@@ -16,10 +16,10 @@ There are 2 extra `Texter`s after the server ones, one is the "cult" generator, 
 
 ### List of commands
 
-| Command | Description | Example | Alias |
-| :------------- | :------------- | :------------- |
-| `!speaktrigger` | Triggers your server's `Texter` to generate text | | `!spt` |
-| `!falar [wordmax]` | Triggers the "cult" generator to generate text(wordmax default is 10) | `!falar 30` | |
-| `!sfalar [wordmax]` | Triggers your server's `Texter` to generate text(wordmax default is 10) | `!sfalar 40` | |
-| `!gfalar [wordmax]` | Triggers the global `Texter` to generate text(wordmax default is 10) | `!gfalar 20` | |
-| `!jwormhole` | Uses your server's `Texter` to send messages through Septapus Wormhole | | `!jw` |
+Command | Description | Example | Alias
+------------- | ------------- | ------------- | -------------
+`!speaktrigger` | Triggers your server's `Texter` to generate text | | `!spt`
+`!falar [wordmax]` | Triggers the "cult" generator to generate text(wordmax default is 10) | `!falar 30` |
+`!sfalar [wordmax]` | Triggers your server's `Texter` to generate text(wordmax default is 10) | `!sfalar 40` |
+`!gfalar [wordmax]` | Triggers the global `Texter` to generate text(wordmax default is 10) | `!gfalar 20` |
+`!jwormhole` | Uses your server's `Texter` to send messages through Septapus Wormhole | | `!jw`
