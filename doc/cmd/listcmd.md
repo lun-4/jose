@@ -1,9 +1,9 @@
 List of Commands
 =================
 
-### `jose` Module
+### `jose`
 
-| Command | Help | Example | Alias |
+| Command | Description | Example | Alias |
 | :------------- | :------------- | :------------- |
 | `!ping`       | Pings José | `!ping` | |
 | `!rand min max` | Generates a Random Number from `min` to `max` | `!rand 0 10` | |
@@ -17,6 +17,51 @@ List of Commands
 | `!clist` | List commands that a module creates | | |
 | `!uptime` | Shows uptime | | | |
 
+### `josedatamosh`
+
+| Command | Description | Example | Alias |
+| :------------- | :------------- | :------------- |
+| `!datamosh url` | Datamoshes a file | `!datamosh https://discordapp.com/api/users/202587271679967232/avatars/93ac51b863fde7c38578693947dab6bc.jpg` | |
+
+### `joselang`
+
+| Command | Description | Example | Alias |
+| :------------- | :------------- | :------------- |
+| `!language lang` | Sets a language for a server | `!language en` | |
+| `!listlang` | Shows all available languages for josé | | |
+
 ### `josemagicword`
 
-The docs for `josemagicword` are in [magicwords.md](https://github.com/lkmnds/jose/blob/master/doc/cmd/magicwords.md)
+[Documentation for `josemagicword`](https://github.com/lkmnds/jose/blob/master/doc/cmd/magicwords.md)
+
+### `josemath`
+
+| Command | Description | Example | Alias |
+| :------------- | :------------- | :------------- |
+| `!wolframalpha terms` | Sends a request to [WolframAlpha](http://wolframalpha.com/) | `!wolframalpha average dick size` | `!wa` |
+| `!temperature location` | Requests current temperature of a place using [OpenWeatherMap](openweathermap.org) | `!temperature Sydney, Australia` | `!temp`, `!therm` |
+
+### `josememes`
+
+| Command | Description | Example | Alias |
+| :------------- | :------------- | :------------- |
+| `!aprovado` | Approved! | | |
+| `!htmpr` | Help when `!meme` breaks up(portuguese text) | | |
+| `!meme` | MEMES, use `!meme` to see possible uses(portuguese text) | | `!m` |
+| `!emoji [n]` | Shows `n` emoji, default is a random number from 1 to 5 | `!emoji 10` | |
+| `!blackmiror` | SHOWS VERY BLACK MIRROR STUFF | | |
+| `!wiki search_terms` | Searches Wikipedia | `!wiki Discord (software)` | |
+| `!deswiki search_terms` | Searches desciclopédia | `!deswiki Pinto` | |
+
+### `josespeak`
+
+[Documentation for the whole `josespeak` thing, it is complicated](https://github.com/lkmnds/jose/blob/master/doc/josespeak.md)
+
+### `josestats`
+
+[Documentation for the `!query` command](https://github.com/lkmnds/jose/blob/master/doc/queries.md)
+
+### `josextra`
+
+| Command | Description | Example | Alias |
+| :------------- | :------------- | :------------- |

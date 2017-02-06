@@ -227,7 +227,3 @@ A lista de possíveis dados está em https://github.com/lkmnds/jose/blob/master/
             await cxt.say(":elephant: Resultado muito grande :elephant:")
         else:
             await cxt.say(self.codeblock("", response))
-
-    async def c_session(self, message, args, cxt):
-        '''`!session` - Dados interessantes sobre essa sessão'''
-        # uptime etc
