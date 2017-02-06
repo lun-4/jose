@@ -98,12 +98,11 @@ def set_client(cl):
 langdb = None
 
 JOSE_GENERAL_HTEXT = '''
-Recommended *top notch* Reading:
-https://github.com/lkmnds/jose/blob/master/doc/cmd/listcmd.md
-
+Recommended *top notch* Reading, the command list:
+---
+Recomenado a leitura da lista de comandos, em inglês:
 ---
 
-Recomenado a leitura da lista de comandos, em inglês:
 https://github.com/lkmnds/jose/blob/master/doc/cmd/listcmd.md
 '''
 
