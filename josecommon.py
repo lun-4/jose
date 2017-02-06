@@ -97,60 +97,15 @@ def set_client(cl):
 # Language database
 langdb = None
 
-JOSE_PORN_HTEXT = '''Pornô(Tudo tem preço de %.2fJC):
-!hypno <termos | :latest> - busca por termos no Hypnohub
-!e621 <termos | :latest> - busca por tags no e621
-!yandere <termos | :latest> - busca no yande.re
-''' % (PORN_PRICE)
-
 JOSE_GENERAL_HTEXT = '''
-jose - mostra essa ajuda
-!xkcd [number|rand] - mostra ou o xkcd de número tal ou o mais recente se nenhum é dado
-!yt pesquisa - pesquisar no youtube e mostrar o primeiro resultado
-!money amount from to - conversão entre moedas
-!version - mostra a versão do jose-bot
-!pstatus jogo - muda o jogo que o josé está jogando
-!fw mensagem - converte texto para fullwidth
-!escolha escolha1;escolha2;escolha3... - José escolhe por você!
-!learn <texto> - josé aprende textos!
-!ping - pong
-!sndc termos - pesquisa no SoundCloud
-!meme - meme!
-!falar - forçar o josé a falar alguma coisa
+Recommended *top notch* Reading:
+https://github.com/lkmnds/jose/blob/master/doc/cmd/listcmd.md
+
+---
+
+Recomenado a leitura da lista de comandos, em inglês:
+https://github.com/lkmnds/jose/blob/master/doc/cmd/listcmd.md
 '''
-
-JOSE_TECH_HTEXT = '''Comandos relacionados a coisas *TECNOLÓGICAS*
-
-!enc texto - encripta um texto usando OvoCrypt
-!dec texto - desencripta um texto encriptado com OvoCrypt
-$jasm - JoseAssembly
-
-'''
-
-JOSE_HELP_TEXT = '''Oi, eu sou o josé %s, sou um bot trabalhadô!
-Eu tenho mais de 8000 comandos somente para você do grande serverzao!
-
-!htgeral - abre o texto de comandos gerais(o mais recomendado)
-!htech - texto de ajuda para comandos *NERDS*
-
-Jose faz coisas pra pessoas:
-!xingar @mention - xinga a pessoa
-!elogiar @mention - elogia a pessoa
-!causar @mention @mention - faz um causo entre pessoas
-
-Apostas:
-!ahelp e !adummy irão te mostrar os textos de ajuda para apostadores
-
-**ADMIN**:
-!shutdown - desligar o jose
-
-Developers:
-!uptime - mostra o uptime do jose
-!josetxt - mostra quantas mensagens o José tem na memória dele(data.txt)
-
-(não inclui comandos que o josé responde dependendo das mensagens)
-(nem como funciona a JoseCoin, use !josecoin pra isso)
-''' % (JOSE_VERSION)
 
 GAMBLING_HELP_TEXT = '''O que é: Função que permite dois (ou mais) usuários apostarem josecoins por esporte.
 
@@ -274,7 +229,7 @@ aviaos = [
 ]
 
 async def show_help(message):
-    await client.send_message(message.author, JOSE_HELP_TEXT)
+    pass
 
 async def show_gambling_full(message):
     await client.send_message(message.author, GAMBLING_HELP_TEXT)

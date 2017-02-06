@@ -296,14 +296,8 @@ class JoseBot(jcommon.Extension):
         # calls self.say but in an non-async context
         asyncio.ensure_future(self.say(msg), loop=self.loop)
 
-    async def c_htjose(self, message, args, cxt):
-        await cxt.say(jcommon.JOSE_HELP_TEXT, channel=message.author)
-
-    async def c_htgeral(self, message, args, cxt):
+    async def c_hjose(self, message, args, cxt):
         await cxt.say(jcommon.JOSE_GENERAL_HTEXT, channel=message.author)
-
-    async def c_httech(self, message, args, cxt):
-        await cxt.say(jcommon.JOSE_TECH_HTEXT, channel=message.author)
 
     async def sec_auth(self, f, cxt):
         auth = await self.is_admin(self.current.author.id)
