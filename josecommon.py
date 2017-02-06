@@ -129,7 +129,7 @@ JOSE_PLAYING_PHRASES = [
     'Expand Dong',
     'Bonzi Buddy',
     'Debugging',
-    'db',
+    'Databases',
     'Guitar',
     'MACINTOSH PLUS - リサフランク420 / 現代のコンピュー',
     'Blank Banshee',
@@ -137,6 +137,23 @@ JOSE_PLAYING_PHRASES = [
     'with your heart',
     'Dance Dance Revolution',
     'PRANKS ON YOU BRO',
+    'Really Makes Me Think™',
+    'Black Mirror',
+    'Netflix',
+    '™',
+    'Bot Dev Tycoon',
+    'Hell',
+    'Overwatch',
+    'コンシャスTHOUGHTS - オンリーワン',
+    'Night Tempo - エアポートLady!',
+    'Poker with Satan',
+    'Anime',
+    'TV',
+    'Communism',
+    'Capitalism',
+    'Philosophy with IBM Watson',
+    'Skynet 2.0',
+    'Daft Punk'
 ]
 
 JOSE_GENERAL_HTEXT = '''

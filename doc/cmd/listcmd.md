@@ -5,6 +5,7 @@ List of Commands
 
 Command | Description | Example | Alias
 ------------- | ------------- | ------------- | -------------
+`!info`       | Shows Info | |
 `!ping`       | Pings José | `!ping` |
 `!rand min max` | Generates a Random Number from `min` to `max` | `!rand 0 10` |
 `!money quantity base to` | Converts currency, use `!money list` to see available currencies | `!money 1 AUD USD` |
@@ -66,3 +67,7 @@ Command | Description | Example | Alias
 Command | Description | Example | Alias
 ------------- | ------------- | ------------- | -------------
 `!xkcd [num]` | XKCD. (num can be any number or "rand" for a random comic) | `!xkcd 1000` |
+`!tm text` | Transform a Text In A Trademark™ | `!tm Hell` |
+`!status` | Status of josé, with results from pings to Discord and Google | |
+`!report` | José Report | |
+`!docs [topic]` | Shows documentation for josé | |
