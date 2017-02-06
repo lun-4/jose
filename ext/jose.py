@@ -613,3 +613,13 @@ class JoseBot(jcommon.Extension):
 
         res = eval(eval_cmd)
         await cxt.say("```%s``` -> `%s`" % (eval_cmd, res))
+
+    async def c_rplaying(self, message, args, cxt):
+        await self.is_admin(message.author.id)
+
+        # do the same thing again
+        playing_phrase = random.choice(jcommon.JOSE_PLAYING_PHRASES)
+        playing_name = '%s | v%s | %d guilds | %shjose' % (playing_phrase, jcommon.JOSE_VERSION, \
+            len(self.client.servers), jcommon.JOSE_PREFIX)
+        g = discord.Game(name = playing_name, url = playing_name)
+        await self.client.change_presence(game = g)
