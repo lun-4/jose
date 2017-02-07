@@ -50,26 +50,6 @@ if jcommon.PARABENS_MODE:
 
     client.send_message = newsend
 
-async def new_debug(message):
-    args = message.content.split(' ')
-    dbg = ' '.join(args[1:])
-
-    await jcommon.jose_debug(message, dbg)
-
-causos = [
-    '{} foi no matinho com {}',
-    '{} inventou de fumar com {} e deu merda',
-]
-
-async def make_causo(message):
-    args = message.content.split(' ')
-    x = args[1]
-    y = args[2]
-
-    causo = random.choice(causos)
-
-    await jose.say(causo.format(x, y))
-
 help_josecoin = jcommon.make_func(jcoin.JOSECOIN_HELP_TEXT)
 
 async def jcoin_control(id_user, amnt):
@@ -171,20 +151,15 @@ commands_start = {
 
 commands_match = {
     'baladinha top':    jcommon.show_top,
-
     'que tampa':        jcommon.show_tampa,
-
-    "me abraça, josé":  jcommon.show_noabraco,
     'tijolo':           jcommon.show_tijolo,
     "mc gorila":        jcommon.show_mc,
     'frozen 2':         jcommon.show_frozen_2,
     'emule':            jcommon.show_emule,
     'vinheta':          jcommon.show_vinheta,
-
     "vtnc jose":        jcommon.show_vtnc,
     'que rodeio':       jcommon.rodei_teu_cu,
     'anal giratorio':   jcommon.show_agira,
-
     'lenny face':       jcommon.make_func("( ͡° ͜ʖ ͡°)"),
     'janela':           jcommon.show_casa,
     'frozen3':          jcommon.make_func("https://thumbs.dreamstime.com/t/construo-refletiu-nas-janelas-do-prdio-de-escritrios-moderno-contra-47148949.jpg"),

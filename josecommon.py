@@ -205,19 +205,6 @@ xingamentos = [
     'HIJO DE PUTA',
 ]
 
-demon_videos = [
-    'https://www.youtube.com/watch?v=-y73eXfQU6c',
-    'https://www.youtube.com/watch?v=1GhFj54x1iM',
-    'https://www.youtube.com/watch?v=cXzT3IDNwEw',
-    'https://www.youtube.com/watch?v=WDKcod-mOIE',
-    'https://www.youtube.com/watch?v=br3KwhALEvw',
-    'https://www.youtube.com/watch?v=MzRDZpyOMFM',
-    'https://www.youtube.com/watch?v=LHJC41YP5ec',
-    'https://www.youtube.com/watch?v=ae9GEf7K8DM',
-    'https://www.youtube.com/watch?v=03KHCQZ6Faw',
-    'https://www.youtube.com/watch?v=9NCWKd8lL3o',
-]
-
 aviaos = [
     'https://www.aboutcar.com/car-advice/wp-content/uploads/2011/02/Spoiler.jpg',
     'http://i.imgur.com/eL2hUyd.jpg',
@@ -230,9 +217,6 @@ aviaos = [
     'http://i.imgur.com/9Jq6oo6.jpg',
     'http://i.imgur.com/AIbjvX7.jpg',
 ]
-
-async def show_help(message):
-    pass
 
 async def show_gambling_full(message):
     await client.send_message(message.author, GAMBLING_HELP_TEXT)
@@ -269,13 +253,11 @@ def make_func(res):
     return response
 
 rodei_teu_cu = make_func("RODEI MEU PAU NO TEU CU")
-show_noabraco = make_func("não vou abraçar")
 show_tampa = make_func("A DO TEU CU\nHÁ, TROLEI")
 show_vtnc = make_func("OQ VC DISSE?\nhttp://i.imgur.com/Otky963.jpg")
 show_shit = make_func("tbm amo vc humano <3")
 show_emule = make_func("http://i.imgur.com/GO90sEv.png")
 show_frozen_2 = make_func('http://i.imgur.com/HIcjyoW.jpg')
-pong = make_func('pong')
 
 show_tijolo = make_func("http://www.ceramicabelem.com.br/produtos/TIJOLO%20DE%2006%20FUROS.%209X14X19.gif")
 show_mc = make_func("https://cdn.discordapp.com/attachments/202055538773721099/203989039504687104/unknown.png")
