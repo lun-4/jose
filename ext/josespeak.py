@@ -151,12 +151,11 @@ class JoseSpeak(jcommon.Extension):
         self.db_length_path = jcommon.MARKOV_LENGTH_PATH
         self.db_msg_path = jcommon.MARKOV_MESSAGES_PATH
 
-        # if database api ever exists
-        #self.database.register("markovdb", """CREATE TABLE IF NOT EXISTS markovdb (
-        #   serverid varchar(255),
-        #   messageid varchar(255),
-        #   message varchar(2050)
-        #);""")
+        self.database.register("markovdb", """CREATE TABLE IF NOT EXISTS markovdb (
+            serverid varchar(255),
+            messageid varchar(255),
+            message varchar(2050)
+        );""")
 
         # load timers in async context
         # every 10 minutes
@@ -294,12 +293,12 @@ class JoseSpeak(jcommon.Extension):
             filtered_line = jcommon.speak_filter(line)
             if len(filtered_line) > 0:
                 # no issues, add it
-                self.logger.debug("add line %s", filtered_line)
-                # print("add line %r" % filtered_line)
-                self.database[message.server.id].append(filtered_line)
-                # self.cur.execute("INSERT INTO TABLE markovdb (SERVERID, MESSAGEID, MESSAGE)
-                #    VALUES (%s, %s, %s)" % ())
-                # self.cur.commit()
+                #self.database[message.server.id].append(filtered_line)
+
+                # Add into SQL database
+                await self.database.do("INSERT INTO TABLE markovdb (SERVERID, MESSAGEID, MESSAGE) \
+                    VALUES (%s, %s, %s)" % (message.server.id, \
+                        message.id, message.content))
 
         if random.random() < 0.03 or self.flag:
             self.flag = False
