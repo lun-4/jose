@@ -375,10 +375,13 @@ async def cbk_remove(callback_id):
 conn = None
 
 async def init_db(client):
+    global conn
+    logger.info("Initialize jose SQL database")
     conn = sqlite3.connect("jose.db")
 
 async def register_table(tableid, table_stmt):
     global conn
+    logger.info("Regiter table %s", tableid)
     cur = conn.cursor()
     cur.execute(table_stmt)
     cur.commit()
