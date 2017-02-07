@@ -386,10 +386,10 @@ async def register_table(tableid, table_stmt):
     cur.execute(table_stmt)
     conn.commit()
 
-async def do_stmt(stmt):
+async def do_stmt(stmt, params=None):
     global conn
     cur = conn.cursor()
-    conn.execute(stmt)
+    conn.execute(stmt, params)
     r = cur.fetchall()
     conn.commit()
     return r
@@ -407,8 +407,8 @@ class DatabaseAPI:
     def _register(self, tablename, tablestmt):
         asyncio.ensure_future(self.register(tablename, tablestmt), loop=self.client.loop)
 
-    async def do(self, stmt):
-        await do_stmt(stmt)
+    async def do(self, stmt, params=None):
+        await do_stmt(stmt, params)
 
 class Extension:
     def __init__(self, cl):

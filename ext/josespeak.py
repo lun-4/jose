@@ -297,7 +297,7 @@ class JoseSpeak(jcommon.Extension):
 
                 # Add into SQL database
                 await self.dbapi.do("INSERT INTO markovdb (serverid, messageid, message) \
-                    VALUES (%s, %s, %r)" % (message.server.id, \
+                    VALUES (?, ?, ?)", (message.server.id, \
                         message.id, message.content))
 
         if random.random() < 0.03 or self.flag:
