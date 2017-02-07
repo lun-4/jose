@@ -17,6 +17,7 @@ class JoseLanguage(jaux.Auxiliar):
         await jcommon.save_langdb()
 
     async def ext_load(self):
+        await self.database.initializedb()
         status = await jcommon.load_langdb()
         return status
 
