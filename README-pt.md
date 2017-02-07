@@ -11,12 +11,15 @@ você terá que configurar manualmente(`git clone`) e rodar ele separadamente
 
 **Python 3.5+ é necessário**
 
-Instruções(Linux):
+Instruções para Linuxes baseados no Debian:
 ```bash
 $ git clone https://github.com/lkmnds/jose.git
 $ cd jose
 $ nano joseconfig.py
-$ pip install install -U -r requirements.txt
+$ sudo apt-get install unixodbc unixodbc-dev
+
+# Tenha certeza que o pip referencia python 3.5+
+$ sudo pip install install -U -r requirements.txt
 ```
 
 `joseconfig.py` de exemplo:
