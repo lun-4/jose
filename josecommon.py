@@ -369,6 +369,33 @@ async def cbk_remove(callback_id):
     del callbacks[callback_id]
     return True
 
+# === DATABASE API ===
+
+dsn = 'Driver=SQLite;Database=sqlite.db'
+conn = await aioodbc.connect(dsn=dsn, loop=cl.loop)
+
+async def register_table(tableid, table_stmt):
+    cur = await conn.cursor()
+    await cur.execute(table_stmt)
+    await cur.commit()
+    await cur.close()
+
+async def do_stmt(stmt):
+    cur = await conn.cursor()
+    r = await cur.fetchall()
+    await cur.close()
+    return r
+
+class DatabaseAPI:
+    def __init__(self):
+        pass
+
+    async def register(tablename, tablestmt):
+        await register_table(tablename, tablestmt)
+
+    async def do(stmt):
+        await do_stmt(stmt)
+
 class Extension:
     def __init__(self, cl):
         '''
@@ -382,6 +409,7 @@ class Extension:
         self.loop = cl.loop
         self.logger = logger
         self._callbacks = {}
+        self.database = DatabaseAPI()
 
     async def say(self, msg, channel=None):
         if channel is None:
@@ -572,5 +600,3 @@ class EmptyContext:
 
     async def getall(self):
         return '\n'.join(self.messages)
-
-# TODO: An API for Database management
