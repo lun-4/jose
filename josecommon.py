@@ -373,23 +373,31 @@ async def cbk_remove(callback_id):
 # === DATABASE API ===
 
 dsn = 'Driver=SQLite;Database=sqlite.db'
-conn = asyncio.ensure_future(aioodbc.connect(dsn=dsn, loop=client.loop), loop=client.loop)
+conn = None
+
+async def init_db(client):
+    conn = await aioodbc.connect(dsn=dsn, loop=client.loop)
 
 async def register_table(tableid, table_stmt):
+    global conn
     cur = await conn.cursor()
     await cur.execute(table_stmt)
     await cur.commit()
     await cur.close()
 
 async def do_stmt(stmt):
+    global conn
     cur = await conn.cursor()
     r = await cur.fetchall()
     await cur.close()
     return r
 
 class DatabaseAPI:
-    def __init__(self):
-        pass
+    def __init__(self, cl):
+        self.client = cl
+
+    async def initializedb():
+        await init_db(self.client)
 
     async def register(tablename, tablestmt):
         await register_table(tablename, tablestmt)
@@ -410,7 +418,7 @@ class Extension:
         self.loop = cl.loop
         self.logger = logger
         self._callbacks = {}
-        self.database = DatabaseAPI()
+        self.database = DatabaseAPI(self.client)
 
     async def say(self, msg, channel=None):
         if channel is None:
@@ -419,7 +427,7 @@ class Extension:
         if len(msg) > 2000:
             await self.client.send_message(channel, ":elephant: Mensagem muito grande :elephant:")
         else:
-            await self.client.send_message(channel, msg)
+            await self.client.send_message(channel, ":warning: This message is using a deprecated API!! :warning:")
 
     async def debug(self, msg, flag=True):
         await jose_debug(self.current, msg, flag)

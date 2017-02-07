@@ -32,6 +32,7 @@ class JoseBot(jcommon.Extension):
         self.modules = {}
         self.start_time = time.time()
         self.command_lock = False
+        await self.database.initializedb()
 
     async def unload_all(self):
         # unload all modules
