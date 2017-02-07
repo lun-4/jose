@@ -39,19 +39,16 @@ MARKOV_MESSAGES_PATH = 'db/messages.json'
 STAT_DATABASE_PATH = 'db/stats.json'
 LANGUAGES_PATH = 'db/languages.json'
 
-APP_CLIENT_ID = '202587271679967232'
-OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=103988231' % APP_CLIENT_ID
+JOSE_ID = '202587271679967232'
+OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=103988231' % JOSE_ID
 
 #configuration things
 chattiness = .25
-MASTER_ROLE = 'mestra'
 LEARN_ROLE = 'cult'
-JOSE_ANIMATION_LIMIT = 1 # 2 animações simultaneamente
 ADMIN_IDS = ['162819866682851329', '144377237997748224']
 
 #just for 0.6.6.6 and 6.6.6 or any demon version
 DEMON_MODE = False
-PARABENS_MODE = False
 
 #mode changes
 MAINTENANCE_MODE = False
@@ -86,8 +83,6 @@ PRICE_TABLE = {
 
 ascii_to_wide = dict((i, chr(i + 0xfee0)) for i in range(0x21, 0x7f))
 ascii_to_wide.update({0x20: u'\u3000', 0x2D: u'\u2212'})  # space and minus
-
-JOSE_ID = '202587271679967232'
 
 client = None
 

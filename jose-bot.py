@@ -42,14 +42,6 @@ GAMBLING_LAST_BID = 0.0
 # JASM enviroment
 jasm_env = {}
 
-if jcommon.PARABENS_MODE:
-    old_send = client.send_message
-
-    async def newsend(ch, d):
-        return old_send(ch, 'Parabéns %s' % d)
-
-    client.send_message = newsend
-
 help_josecoin = jcommon.make_func(jcoin.JOSECOIN_HELP_TEXT)
 
 async def jcoin_control(id_user, amnt):
