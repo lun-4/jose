@@ -152,9 +152,9 @@ class JoseSpeak(jcommon.Extension):
         self.db_msg_path = jcommon.MARKOV_MESSAGES_PATH
 
         self.dbapi._register("markovdb", """CREATE TABLE IF NOT EXISTS markovdb (
-            serverid varchar(255),
-            messageid varchar(255),
-            message varchar(2050)
+            serverid nvarchar(255),
+            messageid nvarchar(255),
+            message nvarchar(2050)
         );""")
 
         # load timers in async context
