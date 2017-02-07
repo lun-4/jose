@@ -372,24 +372,24 @@ async def cbk_remove(callback_id):
 
 # === DATABASE API ===
 
-dsn = 'Driver=SQLite;Database=sqlite.db'
 conn = None
 
 async def init_db(client):
-    conn = await aioodbc.connect(dsn=dsn, loop=client.loop)
+    conn = sqlite3.connect("jose.db")
 
 async def register_table(tableid, table_stmt):
     global conn
-    cur = await conn.cursor()
-    await cur.execute(table_stmt)
-    await cur.commit()
-    await cur.close()
+    cur = conn.cursor()
+    cur.execute(table_stmt)
+    cur.commit()
+    cur.close()
 
 async def do_stmt(stmt):
     global conn
-    cur = await conn.cursor()
-    r = await cur.fetchall()
-    await cur.close()
+    cur = conn.cursor()
+    conn.execute(stmt)
+    r = cur.fetchall()
+    cur.close()
     return r
 
 class DatabaseAPI:
@@ -418,7 +418,7 @@ class Extension:
         self.loop = cl.loop
         self.logger = logger
         self._callbacks = {}
-        self.database = DatabaseAPI(self.client)
+        self.dbapi = DatabaseAPI(self.client)
 
     async def say(self, msg, channel=None):
         if channel is None:
