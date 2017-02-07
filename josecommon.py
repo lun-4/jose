@@ -4,6 +4,7 @@ import re
 import gettext
 import json
 import os
+import aioodbc
 
 import randemoji as emoji
 
