@@ -396,13 +396,13 @@ class DatabaseAPI:
     def __init__(self, cl):
         self.client = cl
 
-    async def initializedb():
+    async def initializedb(self):
         await init_db(self.client)
 
-    async def register(tablename, tablestmt):
+    async def register(self, tablename, tablestmt):
         await register_table(tablename, tablestmt)
 
-    async def do(stmt):
+    async def do(self, stmt):
         await do_stmt(stmt)
 
 class Extension:
