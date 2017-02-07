@@ -104,12 +104,16 @@ jcoin/*.journal
 # config data
 joseconfig.py
 
+# Profiles from Python
 *.profile
-ext/*.db
-zelao.txt
-database.db
-markov-database.json
+
+# Databases from extensions
 db/*.json
+ext/*.db
+database.db
+jose.db
+zelao.txt
+markov-database.json
 
 # backup file
 jose-backup*
