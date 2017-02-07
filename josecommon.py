@@ -384,15 +384,14 @@ async def register_table(tableid, table_stmt):
     logger.info("Regiter table %s", tableid)
     cur = conn.cursor()
     cur.execute(table_stmt)
-    cur.commit()
-    cur.close()
+    conn.commit()
 
 async def do_stmt(stmt):
     global conn
     cur = conn.cursor()
     conn.execute(stmt)
     r = cur.fetchall()
-    cur.close()
+    conn.commit()
     return r
 
 class DatabaseAPI:
