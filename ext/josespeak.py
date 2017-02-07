@@ -151,7 +151,7 @@ class JoseSpeak(jcommon.Extension):
         self.db_length_path = jcommon.MARKOV_LENGTH_PATH
         self.db_msg_path = jcommon.MARKOV_MESSAGES_PATH
 
-        self.dbapi.register("markovdb", """CREATE TABLE IF NOT EXISTS markovdb (
+        self.dbapi._register("markovdb", """CREATE TABLE IF NOT EXISTS markovdb (
             serverid varchar(255),
             messageid varchar(255),
             message varchar(2050)

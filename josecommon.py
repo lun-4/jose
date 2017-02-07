@@ -405,6 +405,9 @@ class DatabaseAPI:
     async def register(self, tablename, tablestmt):
         await register_table(tablename, tablestmt)
 
+    def _register(self, tablename, tablestmt):
+        asyncio.ensure_future(self.register(tablename, tablestmt), loop=self.client.loop)
+
     async def do(self, stmt):
         await do_stmt(stmt)
 
