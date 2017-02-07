@@ -373,7 +373,7 @@ async def cbk_remove(callback_id):
 # === DATABASE API ===
 
 dsn = 'Driver=SQLite;Database=sqlite.db'
-conn = asyncio.ensure_future(aioodbc.connect(dsn=dsn, loop=cl.loop), loop=cl.loop)
+conn = asyncio.ensure_future(aioodbc.connect(dsn=dsn, loop=client.loop), loop=client.loop)
 
 async def register_table(tableid, table_stmt):
     cur = await conn.cursor()
