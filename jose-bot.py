@@ -162,10 +162,7 @@ josecoin_save = jc.josecoin_save
 josecoin_load = jc.josecoin_load
 
 commands_start = {
-    '!causar': make_causo,
     '!learn': learn_data,
-    '!josecoin': help_josecoin,
-    '!jasm': jcommon.make_func(jasm.JASM_HELP_TEXT),
     '!ahelp': jcommon.show_gambling_full,
     '!adummy': jcommon.show_gambling,
     '!awoo': jcommon.make_func("https://cdn.discordapp.com/attachments/202055538773721099/257717450135568394/awooo.gif"),
