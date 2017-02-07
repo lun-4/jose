@@ -422,18 +422,20 @@ async def on_message(message):
                 if jcommon.MAINTENANCE_MODE:
                     return
 
+                cxt = jcommon.Context(client, message, t_start, jose)
+
                 author_id = str(message.author.id)
                 amount = random.choice(jcommon.JC_REWARDS)
                 acc_to = jcoin.get(author_id)[1]
 
                 if amount == 0:
-                    await jose.say("0JC > %s" % (acc_to['name']))
+                    await cxt.say("0JC > %s" % (acc_to['name']))
                 else:
                     res = jcoin.transfer(jcoin.jose_id, author_id, amount, jcoin.LEDGER_PATH)
                     await josecoin_save(message, False)
                     if res[0]:
                         emoji_res = await jcommon.random_emoji(3)
-                        await jose.say('%s %.2fJC > %s' % (emoji_res, amount, acc_to['name']))
+                        await cxt.say('%s %.2fJC > %s' % (emoji_res, amount, acc_to['name']))
                     else:
                         await jcommon.jose_debug(message, 'jc_error: %s' % res[1])
         else:
