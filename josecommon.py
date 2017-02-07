@@ -39,7 +39,7 @@ MARKOV_MESSAGES_PATH = 'db/messages.json'
 STAT_DATABASE_PATH = 'db/stats.json'
 LANGUAGES_PATH = 'db/languages.json'
 
-APP_CLIENT_ID = 'ID DO JOSE AQUI'
+APP_CLIENT_ID = '202587271679967232'
 OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=103988231' % APP_CLIENT_ID
 
 #configuration things
@@ -113,14 +113,14 @@ https://github.com/lkmnds/jose/blob/master/doc/cmd/listcmd.md
 GAMBLING_HELP_TEXT = '''O que é: Função que permite dois (ou mais) usuários apostarem josecoins por esporte.
 
 Como funciona:
--Primeiro, ativar o "modo aposta" do jose-bot com o comando: !aposta (qualquer um pode começar uma aposta)
--jose-bot printa a mensagem "Modo aposta ativado. Joguem suas granas!" ou algo do tipo
--Enquanto o "modo aposta" estiver ativado, qualquer um que !ap josecoins para o jose-bot entra na aposta, o jose-bot grava o nome da pessoa
+ * Primeiro, ativar o "modo aposta" do jose-bot com o comando: !aposta (qualquer um pode começar uma aposta)
+ * jose-bot printa a mensagem "Modo aposta ativado. Joguem suas granas!" ou algo do tipo
+ * Enquanto o "modo aposta" estiver ativado, qualquer um que !ap josecoins para o jose-bot entra na aposta, o jose-bot grava o nome da pessoa
 temporariamente como se fosse um "acesso a memória RAM"
--As apostas são cumulativas, ou seja, se uma mesma pessoa !enviar 20 e depois !enviar 40, é como se ela apostasse 60 josecoins de uma vez
--Quando todos tiverem feito suas apostas, inserir o comando !rolar (ou outro nome sla), o que fará com que o jose-bot sorteie aleatoriamente uma pessoa com base na fórmula: n = 1/x (x sendo o número de pessoas que entraram na aposta)
--A pessoa sorteada ganha a aposta, recebendo 76.54% do montante, e os outros apostadores ficam com o que sobrou, que será dividido igualmente.
--Após o pagamento, o modo aposta se desativa automaticamente(editado)
+ * As apostas são cumulativas, ou seja, se uma mesma pessoa !enviar 20 e depois !enviar 40, é como se ela apostasse 60 josecoins de uma vez
+ * Quando todos tiverem feito suas apostas, inserir o comando !rolar (ou outro nome sla), o que fará com que o jose-bot sorteie aleatoriamente uma pessoa com base na fórmula: n = 1/x (x sendo o número de pessoas que entraram na aposta)
+ * A pessoa sorteada ganha a aposta, recebendo 76.54% do montante, e os outros apostadores ficam com o que sobrou, que será dividido igualmente.
+ * Após o pagamento, o modo aposta se desativa automaticamente(editado)
 
 Exemplo:
 Número de apostadores = 3 (pessoas A, B e C, respectivamente)
@@ -457,22 +457,6 @@ class Extension:
         del self._callbacks[callback_id]
         logger.info("Callback %s removed", callback_id)
 
-class WaitingQueue:
-    def __init__(self):
-        self.queue = []
-        self.length = 0
-
-    async def push(self, message):
-        self.length += 1
-        self.queue.append(message)
-
-    async def pop(self):
-        if self.length < 1:
-            while not (self.length > 0):
-                pass
-        self.length -= 1
-        return self.queue.pop()
-
 def parse_command(message):
     if not isinstance(message, str):
         message = message.content
@@ -593,3 +577,5 @@ class EmptyContext:
 
     async def getall(self):
         return '\n'.join(self.messages)
+
+# TODO: An API for Database management

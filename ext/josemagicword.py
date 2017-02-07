@@ -93,7 +93,7 @@ class JoseMagicWord(jaux.Auxiliar):
 
     async def c_setmw(self, message, args, cxt):
         '''`!setmw magicword1,magicword2,magicword3;response` - Magic Words
-        docs: https://github.com/lkmnds/jose/blob/master/doc/magicwords.md'''
+        docs: https://github.com/lkmnds/jose/blob/master/doc/cmd/magicwords.md'''
 
         if len(args) < 2:
             await cxt.say(self.c_setmw.__doc__)
