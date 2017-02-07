@@ -303,10 +303,6 @@ class JoseSpeak(jcommon.Extension):
 
     async def speak(self, texter, length_words, cxt):
         res = await texter.gen_sentence(1, length_words)
-        if jcommon.DEMON_MODE:
-            res = res[::-1]
-        elif jcommon.PARABENS_MODE:
-            res = 'Parabéns %s' % res
         await cxt.say(res)
 
     async def c_falar(self, message, args, cxt):
