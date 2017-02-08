@@ -452,7 +452,7 @@ async def _timer_playing():
 
     jcommon.logger.info("Playing %r", playing_name)
     g = discord.Game(name = playing_name, url = playing_name)
-    await self.client.change_presence(game = g)
+    await client.change_presence(game = g)
 
 async def timer_playing():
     if t_allowed:
