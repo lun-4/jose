@@ -134,8 +134,8 @@ class JoseSpeak(jcommon.Extension):
     def __init__(self, cl):
         global logger
         jcommon.Extension.__init__(self, cl)
-        self.cult_generator = Texter('jose-data.txt', 1)
-        self.global_generator = Texter('zelao.txt', 1)
+        self.cult_generator = Texter('db/jose-data.txt', 1)
+        self.global_generator = Texter('db/zelao.txt', 1)
         logger = self.logger
 
         self.flag = False
