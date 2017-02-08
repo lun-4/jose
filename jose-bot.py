@@ -443,20 +443,31 @@ async def on_message(message):
 
     await jcommon.gorila_routine(message.channel)
 
-@client.event
-async def on_ready():
-    print("="*25)
-    jcommon.logger.info("josé ready, name = %s, id = %s", client.user.name, client.user.id)
+t_allowed = True
 
-    # Setup Playing message
+async def _timer_playing(self):
     playing_phrase = random.choice(jcommon.JOSE_PLAYING_PHRASES)
     playing_name = '%s | v%s | %d guilds | %shjose' % (playing_phrase, jcommon.JOSE_VERSION, \
         len(client.servers), jcommon.JOSE_PREFIX)
-    jcommon.logger.info("Playing %s", playing_name)
+    jcommon.logger.info("Playing %r", playing_name)
     g = discord.Game(name = playing_name, url = playing_name)
-    await client.change_presence(game = g)
+    await self.client.change_presence(game = g)
 
+async def timer_playing():
+    if t_allowed:
+        while True:
+            await self._timer_playing()
+            await asyncio.sleep(random.randint(2 * 60, 10 * 60))
+
+@client.event
+async def on_ready():
+    global t_allowed
+    print("="*25)
+    jcommon.logger.info("josé ready, name = %s, id = %s", client.user.name, client.user.id)
     print('='*25)
+
+    await timer_playing()
+    t_allowed = False
 
 
 async def main_task():
