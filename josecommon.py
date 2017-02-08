@@ -389,10 +389,9 @@ async def register_table(tableid, table_stmt):
 async def do_stmt(stmt, params=None):
     global conn
     cur = conn.cursor()
-    conn.execute(stmt, params)
-    r = cur.fetchall()
+    cur.execute(stmt, params)
     conn.commit()
-    return r
+    return cur
 
 class DatabaseAPI:
     def __init__(self, cl):

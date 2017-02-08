@@ -162,13 +162,22 @@ class JoseSpeak(jcommon.Extension):
         # every 3 minutes
         self.cbk_new('jspeak.savedb', self.save_databases, 180)
 
+    async def server_messages(self, serverid):
+        cur = self.dbapi.do('SELECT message FROM markovdb WHERE serverid=?', (serverid,))
+        return [row[0] for row in cur.fetchall()]
+
+    async def server_messages_string(self, serverid):
+        cur = self.dbapi.do('SELECT message FROM markovdb WHERE serverid=?', (serverid,))
+        gen_messages = (row[0] for row in cur.fetchall())
+        return '\n'.join(gen_messages)
+
     async def create_generators(self):
         # create the Texters for each server in the database
         total_messages = 0
         t_start = time.time()
 
-        for serverid in self.database:
-            messages = self.database[serverid]
+        for serverid in self.messages:
+            messages = await self.server_messages(serverid)
             total_messages += len(messages)
 
             if serverid in self.text_generators:
@@ -178,8 +187,9 @@ class JoseSpeak(jcommon.Extension):
             # create it
             self.text_generators[serverid] = Texter(None, 1, '\n'.join(messages))
 
-        time_taken = (time.time() - t_start) * 1000
-        self.logger.info("Made %d Texters, total of %d messages in %.2fmsec", len(self.text_generators), total_messages, time_taken)
+        time_taken_ms = (time.time() - t_start) * 1000
+        self.logger.info("Made %d Texters, total of %d messages in %.2fmsec", \
+            len(self.text_generators), total_messages, time_taken_ms)
 
     async def save_databases(self):
         self.logger.info("Save josespeak database")
