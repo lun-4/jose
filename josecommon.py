@@ -404,10 +404,12 @@ class DatabaseAPI:
         await register_table(tablename, tablestmt)
 
     def _register(self, tablename, tablestmt):
-        asyncio.ensure_future(self.register(tablename, tablestmt), loop=self.client.loop)
+        return asyncio.ensure_future(self.register(tablename, tablestmt), \
+            loop=self.client.loop)
 
     async def do(self, stmt, params=None):
-        await do_stmt(stmt, params)
+        cur = await do_stmt(stmt, params)
+        return cur
 
 class Extension:
     def __init__(self, cl):
