@@ -161,11 +161,11 @@ class JoseSpeak(jcommon.Extension):
         self.cbk_new('jspeak.savedb', self.save_databases, 180)
 
     async def server_messages(self, serverid):
-        cur = self.dbapi.do('SELECT message FROM markovdb WHERE serverid=?', (serverid,))
+        cur = await self.dbapi.do('SELECT message FROM markovdb WHERE serverid=?', (serverid,))
         return [row[0] for row in cur.fetchall()]
 
     async def server_messages_string(self, serverid):
-        cur = self.dbapi.do('SELECT message FROM markovdb WHERE serverid=?', (serverid,))
+        cur = await self.dbapi.do('SELECT message FROM markovdb WHERE serverid=?', (serverid,))
         gen_messages = (row[0] for row in cur.fetchall())
         return '\n'.join(gen_messages)
 
