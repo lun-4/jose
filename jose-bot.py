@@ -445,10 +445,11 @@ async def on_message(message):
 
 t_allowed = True
 
-async def _timer_playing(self):
+async def _timer_playing():
     playing_phrase = random.choice(jcommon.JOSE_PLAYING_PHRASES)
     playing_name = '%s | v%s | %d guilds | %shjose' % (playing_phrase, jcommon.JOSE_VERSION, \
         len(client.servers), jcommon.JOSE_PREFIX)
+
     jcommon.logger.info("Playing %r", playing_name)
     g = discord.Game(name = playing_name, url = playing_name)
     await self.client.change_presence(game = g)
@@ -456,7 +457,7 @@ async def _timer_playing(self):
 async def timer_playing():
     if t_allowed:
         while True:
-            await self._timer_playing()
+            await _timer_playing()
             await asyncio.sleep(random.randint(2 * 60, 10 * 60))
 
 @client.event
