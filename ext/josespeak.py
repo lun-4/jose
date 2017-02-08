@@ -152,8 +152,7 @@ class JoseSpeak(jcommon.Extension):
         self.db_msg_path = jcommon.MARKOV_MESSAGES_PATH
 
         self.dbapi._register("markovdb", """CREATE TABLE IF NOT EXISTS markovdb (
-            serverid nvarchar(255),
-            messageid nvarchar(255),
+            serverid nvarchar(90),
             message nvarchar(2050)
         );""")
 
@@ -296,9 +295,8 @@ class JoseSpeak(jcommon.Extension):
                 #self.database[message.server.id].append(filtered_line)
 
                 # Add into SQL database
-                await self.dbapi.do("INSERT INTO markovdb (serverid, messageid, message) \
-                    VALUES (?, ?, ?)", (message.server.id, \
-                        message.id, message.content))
+                await self.dbapi.do("INSERT INTO markovdb (serverid, message) \
+                    VALUES (?, ?, ?)", (message.server.id, filtered_line))
 
         if random.random() < 0.03 or self.flag:
             self.flag = False
