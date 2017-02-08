@@ -10,12 +10,11 @@ The bot talks in portuguese and only that, no translation module is available fo
 
 **Python 3.5+ is needed**
 
-Instructions for Debian-based Linuxes:
+Instructions for Linuxes:
 ```bash
 $ git clone https://github.com/lkmnds/jose.git
 $ cd jose
 $ nano joseconfig.py
-$ sudo apt-get install unixodbc unixodbc-dev
 
 # Make sure pip references python 3.5+
 $ sudo pip install install -U -r requirements.txt

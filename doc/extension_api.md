@@ -49,7 +49,6 @@ The EAPI is a set of methods given to extensions by `jaux.Auxiliar` and `jcommon
   ```
 
  * `self.cbk_remove(callback_id)`
-  * This function is a *coroutine*
   * `callback_id`: `str`
   * Removes a callback from the callback dict, not immediately.
   * Example:

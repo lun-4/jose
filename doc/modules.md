@@ -28,9 +28,6 @@ Each module is described in the form `class@file`.
   * Things related to math! `!wolframalpha` lives there.
  * `JoseMemes@josememes`
   * Implements the `!meme` command and other things memes like `!fullwidth`
- * **[DEPRECATED MODULE]** `JoseMusic@josemusic`
-  * Implemented music commands
-  * Deprecated because it was buggy and other bots did it better
  * `JoseNSFW@josensfw`
   * just NSFW commands
  * `JoseSpeak@josespeak`
