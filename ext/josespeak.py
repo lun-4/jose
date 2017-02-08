@@ -144,6 +144,7 @@ class JoseSpeak(jcommon.Extension):
         self.wlengths = {}
         self.messages = {}
         self.text_lengths = {}
+        self.msgcount = {}
         self.counter = 0
 
         self.db_length_path = jcommon.MARKOV_LENGTH_PATH
@@ -169,23 +170,29 @@ class JoseSpeak(jcommon.Extension):
         gen_messages = (row[0] for row in cur.fetchall())
         return '\n'.join(gen_messages)
 
+    async def new_generator(self, serverid):
+        # create one Texter, for one server
+        messages = await self.server_messages(serverid)
+        self.msgcount[serverid] = len(messages)
+
+        if serverid in self.text_generators:
+            # delet this
+            await self.text_generators[serverid].clear()
+
+        # create it
+        self.text_generators[serverid] = Texter(None, 1, '\n'.join(messages))
+
     async def create_generators(self):
         # create the Texters for each server in the database
         total_messages = 0
         t_start = time.time()
 
         for serverid in self.messages:
-            messages = await self.server_messages(serverid)
-            total_messages += len(messages)
-
-            if serverid in self.text_generators:
-                # delet this
-                await self.text_generators[serverid].clear()
-
-            # create it
-            self.text_generators[serverid] = Texter(None, 1, '\n'.join(messages))
+            await self.new_generator(serverid)
 
         time_taken_ms = (time.time() - t_start) * 1000
+        total_messages = sum(self.msgcount.values())
+
         self.logger.info("Made %d Texters, total of %d messages in %.2fmsec", \
             len(self.text_generators), total_messages, time_taken_ms)
 
@@ -195,7 +202,7 @@ class JoseSpeak(jcommon.Extension):
         json.dump(self.messages, open(self.db_msg_path, 'w'))
 
     async def c_savedb(self, message, args, cxt):
-        """`!savedb` - saves all available databases(autosave for each 50 messages)"""
+        """`!savedb` - saves all available databases(autosaves every 3 minutes)"""
         await self.save_databases()
         await cxt.say(":floppy_disk: saved messages database :floppy_disk:")
 
