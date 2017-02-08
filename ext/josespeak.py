@@ -282,10 +282,12 @@ class JoseSpeak(jcommon.Extension):
         filtered_msg = jcommon.speak_filter(message.content)
 
         if message.server.id not in self.wlengths:
+            # average wordlength
             self.wlengths[message.server.id] = 5
 
         if message.server.id not in self.messages:
-            self.messages[message.server.id] = 1 # the message being received now
+            # the message being received now
+            self.messages[message.server.id] = 1
 
         # get word count
         self.wlengths[message.server.id] += len(filtered_msg.split())
@@ -306,12 +308,14 @@ class JoseSpeak(jcommon.Extension):
         if random.random() < 0.03 or self.flag:
             self.flag = False
             # ensure the server already has its database
-            if message.server.id in self.text_generators:
-                self.current = message
-                await self.client.send_typing(message.channel)
+            if message.server.id not in self.text_generators:
+                await self.new_generator(message.server.id)
 
-                length = int(self.text_lengths[message.server.id])
-                await self.speak(self.text_generators[message.server.id], length, cxt)
+            self.current = message
+            await self.client.send_typing(message.channel)
+
+            length = int(self.text_lengths[message.server.id])
+            await self.speak(self.text_generators[message.server.id], length, cxt)
 
     async def speak(self, texter, length_words, cxt):
         res = await texter.gen_sentence(1, length_words)
