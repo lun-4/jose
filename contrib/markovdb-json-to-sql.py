@@ -10,7 +10,7 @@ def main(args):
     for serverid in jobj:
         serverobj = jobj[serverid]
         for message in serverobj:
-            res.append("INSERT INTO markovdb (serverid, message) VALUES (%s, %r);" % (serverid, message))
+            res.append("INSERT INTO markovdb (serverid, message) VALUES (%s, %r);" % (serverid, json.dumps(message)))
 
     print('\n'.join(res))
 
