@@ -240,8 +240,8 @@ class JoseSpeak(jcommon.Extension):
             self.text_generators.clear()
 
             # Remove the callbacks
-            await self.cbk_remove('jspeak.reload_texter')
-            await self.cbk_remove('jspeak.savedb')
+            self.cbk_remove('jspeak.reload_texter')
+            self.cbk_remove('jspeak.savedb')
 
             return True, ''
         except Exception as e:
@@ -307,7 +307,7 @@ class JoseSpeak(jcommon.Extension):
 
         if random.random() < 0.03 or self.flag:
             self.flag = False
-            # ensure the server already has its database
+            # ensure the server already has its texter loaded up
             if message.server.id not in self.text_generators:
                 await self.new_generator(message.server.id)
 

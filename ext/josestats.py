@@ -88,7 +88,7 @@ class JoseStats(jaux.Auxiliar):
             await self.savedb()
 
             # Remove the callback
-            await self.cbk_remove('jstats.savedb')
+            self.cbk_remove('jstats.savedb')
 
             return True, ''
         except Exception as e:

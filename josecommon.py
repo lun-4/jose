@@ -486,8 +486,8 @@ class Extension:
             return
         logger.info("called callback %s", callback_id)
 
-    async def cbk_remove(self, callback_id):
-        ok = await cbk_remove(callback_id)
+    def cbk_remove(self, callback_id):
+        ok = self.noasync(cbk_remove, [callback_id])
         if ok is None:
             logger.error("Error removing callback %s", callback_id)
             return
