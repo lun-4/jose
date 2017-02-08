@@ -264,7 +264,7 @@ class JoseSpeak(jcommon.Extension):
 
         delta = (time.time() - t_start) * 1000
         res += "\nI fucking took %.2fms to do this shit my fucking god" % delta
-        await self.say(self.codeblock("", res))
+        await cxt.say(self.codeblock("", res))
 
     async def e_on_message(self, message, cxt):
         if message.server is None:
