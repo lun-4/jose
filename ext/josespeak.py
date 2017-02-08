@@ -140,14 +140,12 @@ class JoseSpeak(jcommon.Extension):
 
         self.flag = False
 
-        self.database = {}
         self.text_generators = {}
         self.wlengths = {}
         self.messages = {}
         self.text_lengths = {}
         self.counter = 0
 
-        self.database_path = jcommon.MARKOV_DB_PATH
         self.db_length_path = jcommon.MARKOV_LENGTH_PATH
         self.db_msg_path = jcommon.MARKOV_MESSAGES_PATH
 
@@ -193,7 +191,6 @@ class JoseSpeak(jcommon.Extension):
 
     async def save_databases(self):
         self.logger.info("Save josespeak database")
-        json.dump(self.database, open(self.database_path, 'w'))
         json.dump(self.wlengths, open(self.db_length_path, 'w'))
         json.dump(self.messages, open(self.db_msg_path, 'w'))
 
@@ -217,7 +214,6 @@ class JoseSpeak(jcommon.Extension):
             self.text_lengths = {}
 
             # load things in files
-            self.database = json.load(open(self.database_path, 'r'))
             self.wlengths = json.load(open(self.db_length_path, 'r'))
             self.messages = json.load(open(self.db_msg_path, 'r'))
 
@@ -275,11 +271,6 @@ class JoseSpeak(jcommon.Extension):
             # ignore DMs here as well
             return
 
-        # store message in json database
-        if message.server.id not in self.database:
-            self.logger.info("New server in database: %s", message.server.id)
-            self.database[message.server.id] = []
-
         # filter message before adding
         filtered_msg = jcommon.speak_filter(message.content)
 
@@ -302,9 +293,6 @@ class JoseSpeak(jcommon.Extension):
             filtered_line = jcommon.speak_filter(line)
             if len(filtered_line) > 0:
                 # no issues, add it
-                #self.database[message.server.id].append(filtered_line)
-
-                # Add into SQL database
                 await self.dbapi.do("INSERT INTO markovdb (serverid, message) \
                     VALUES (?, ?)", (message.server.id, filtered_line))
 
