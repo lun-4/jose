@@ -482,6 +482,11 @@ class JoseMemes(jcommon.Extension):
     async def wikimedia_api(self, params, cxt):
         using_query = False
         wiki_searchterm = ' '.join(params['args'][1:])
+
+        if len(wiki_searchterm.strip()) < 1:
+            await cxt.say("Empty search query")
+            return
+
         wiki_methodname = params['name']
 
         wiki_api_endpoint = params['endpoint']
