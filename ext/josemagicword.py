@@ -115,8 +115,8 @@ class JoseMagicWord(jaux.Auxiliar):
             return
 
         for magicword in magicwords:
-            if len(magicword) < 2:
-                await cxt.say(":warning: One of the magic words is less than 2 characters, remove or use another")
+            if len(magicword) < 4:
+                await cxt.say(":warning: One of the magic words is less than 4 characters, remove or use another")
                 return
 
             if len(magicword) >= 100:
