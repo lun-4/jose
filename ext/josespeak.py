@@ -251,11 +251,11 @@ class JoseSpeak(jcommon.Extension):
         """`!forcereload` - save and load josespeak module"""
         ok = await self.ext_unload()
         if not ok[0]:
-            await cxt.say('ext_unload :warning: ' % ok[1])
+            await cxt.say('ext_unload :warning: %s' % ok[1])
 
         ok = await self.ext_load()
         if not ok[0]:
-            await cxt.say('ext_load :warning: ' % ok[1])
+            await cxt.say('ext_load :warning: %s ' % ok[1])
 
         await cxt.say(":ok_hand: Reloaded JoseSpeak Texters")
 
