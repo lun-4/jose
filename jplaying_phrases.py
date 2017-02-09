@@ -62,7 +62,7 @@ JOSE_PLAYING_PHRASES = [
     '♬ Michael Jackson',
     'Bazinga',
     'Artificial Intelligence',
-    'a server beep boop'
+    'a server beep boop',
     'Club Penguin Server Administration',
     'Big Tyrone Simulator',
     '♬ MACINTOSH PLUS - リサフランク420 / 現代のコンピュー',
