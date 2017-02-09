@@ -289,6 +289,10 @@ class JoseMemes(jcommon.Extension):
             if old_meme['owner'] != message.author.id:
                 raise je.PermissionError()
 
+            if newname in self.memes:
+                await cxt.say("`%s`: meme já existe" % newname)
+                return
+
             self.memes[newname] = {
                 'owner': message.author.id,
                 'data': old_meme['data'],

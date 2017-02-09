@@ -316,11 +316,11 @@ async def on_message(message):
         # use jcommon.parse_command
         command, args, method = jcommon.parse_command(message)
 
+        cxt = jcommon.Context(client, message, t_start, jose)
+
         if command == 'help':
             # load helptext
             await jose.recv(message) # default
-
-            cxt = jcommon.Context(client, message, t_start, jose)
 
             cmd_ht = 'help'
             try:
@@ -367,15 +367,14 @@ async def on_message(message):
                 # if function can receive the Context, do it
                 # else just do it normally
                 if len(sig.parameters) == 3:
-                    cxt = jcommon.Context(client, message, t_start, jose)
                     await jose_method(message, args, cxt)
                 else:
                     await jose_method(message, args)
 
             except je.PermissionError:
-                await jose.say("permissão ¯\_(ツ)_/¯ 💠 ¯\_(ツ)_/¯ negada")
+                await cxt.say("Permission ¯\_(ツ)_/¯ 💠 ¯\_(ツ)_/¯ Error")
             except RuntimeError as e:
-                await jose.say('jose: py_rt_err: %s' % repr(e))
+                await cxt.say('jose: py_rt_err: %s' % repr(e))
             except je.LimitError:
                 pass
 
@@ -384,7 +383,7 @@ async def on_message(message):
             end = time.time()
             delta = end - st
             if delta > 13:
-                await jose.say("Alguma coisa está demorando demais para responder(delta=%.4fs)..." % delta)
+                await cxt.say("Alguma coisa está demorando demais para responder(delta=%.4fs)..." % delta)
 
             # signal python to clean this shit
             del delta, st, end, jose_method
@@ -392,7 +391,7 @@ async def on_message(message):
             # kthxbye
             return
         except Exception as e:
-            await jose.say("jose: py_err: ```%s```" % traceback.format_exc())
+            await cxt.say("jose: py_err: ```%s```" % traceback.format_exc())
             # return
 
     should_stop = await do_command_table(message)
