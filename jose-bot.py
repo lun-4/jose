@@ -178,7 +178,7 @@ def load_module(n, n_cl):
     loop.run_until_complete(jose.load_ext(n, n_cl, None))
 
     time_taken_ms = (t_start - time.time()) * 1000
-    logger.info("%s took %.3fms", n, time_taken_ms)
+    jcommon.logger.info("%s took %.3fms", n, time_taken_ms)
 
 # essential stuff
 load_module('joselang', 'JoseLanguage')
