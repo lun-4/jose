@@ -25,9 +25,6 @@ from inspect import signature
 
 logging.basicConfig(level=logging.INFO)
 
-if not discord.opus.is_loaded():
-    discord.opus.load_opus('opus')
-
 start_time = time.time()
 
 #default stuff
