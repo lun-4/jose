@@ -38,6 +38,7 @@ class Texter:
         self.tempMapping = {}
         self.mapping = {}
         self.starts = []
+        self.refcount = 1
 
         if textpath is None:
             text_object = io.StringIO(text)
@@ -124,6 +125,8 @@ class Texter:
 
             sent += curr
             word_count += 1
+
+        self.refcount += 1
         return sent
 
     async def clear(self):
@@ -145,7 +148,7 @@ class JoseSpeak(jcommon.Extension):
         self.messages = {}
         self.text_lengths = {}
         self.msgcount = {}
-        self.counter = 0
+        self.txcleaned = -1
 
         self.db_length_path = jcommon.MARKOV_LENGTH_PATH
         self.db_msg_path = jcommon.MARKOV_MESSAGES_PATH
@@ -157,9 +160,13 @@ class JoseSpeak(jcommon.Extension):
 
         # load timers in async context
         # every 10 minutes
-        self.cbk_new('jspeak.reload_texter', self.create_generators, 600)
+        #self.cbk_new('jspeak.reload_texter', self.create_generators, 600)
+
         # every 3 minutes
         self.cbk_new('jspeak.savedb', self.save_databases, 180)
+
+        # every minute
+        self.cbk_new('jspeak.texter_collection', self.texter_collection, 60)
 
     async def server_messages(self, serverid):
         cur = await self.dbapi.do('SELECT message FROM markovdb WHERE serverid=?', (serverid,))
@@ -181,6 +188,37 @@ class JoseSpeak(jcommon.Extension):
 
         # create it
         self.text_generators[serverid] = Texter(None, 1, '\n'.join(messages))
+
+    async def texter_collection(self):
+
+        if len(self.text_generators) < 0:
+            logger.debug("no texters available")
+            return
+
+        t_start = time.time()
+        sid_to_clear = []
+
+        for serverid in self.text_generators:
+            texter = self.text_generators[serverid]
+            if texter.refcount < 0:
+                await texter.clear()
+                sid_to_clear.append(serverid)
+            else:
+                texter.refcount -= 1
+
+        deadtexters = len(sid_to_clear)
+        if deadtexters > 0:
+            self.txcleaned = deadtexters
+            logger.info("Cleaning %d dead Texters, was %d", deadtexters, \
+                len(self.text_generators))
+
+        for serverid in sid_to_clear:
+            del self.text_generators[serverid]
+
+        time_taken_ms = (time.time() - t_start) * 1000
+        logger.info("Texter cleaning took %.2fms", time_taken_ms)
+
+        del sid_to_clear, t_start, time_taken_ms
 
     async def create_generators(self):
         # create the Texters for each server in the database
@@ -225,7 +263,7 @@ class JoseSpeak(jcommon.Extension):
             self.messages = json.load(open(self.db_msg_path, 'r'))
 
             # make generators
-            await self.create_generators()
+            #await self.create_generators()
 
             return True, ''
         except Exception as e:
@@ -261,6 +299,7 @@ class JoseSpeak(jcommon.Extension):
 
     async def c_fuckreload(self, message, args, cxt):
         '''`!fuckreload` - does !savedb and !forcereload at the same time'''
+        await self.is_admin(message.author.id)
         t_start = time.time()
 
         # reload stuff
@@ -272,6 +311,18 @@ class JoseSpeak(jcommon.Extension):
         delta = (time.time() - t_start) * 1000
         res += "\nI fucking took %.2fms to do this shit my fucking god" % delta
         await cxt.say(self.codeblock("", res))
+
+    async def c_texclean(self, message, args, cxt):
+        await self.is_admin(message.author.id)
+
+        oldamount = len(self.text_generators)
+
+        t_start = time.time()
+        await self.texter_collection()
+        t_taken = time.time() - t_start
+
+        await cxt.say("`Took %.2fms cleaning %d Texters, was %d`" % (t_taken,\
+            self.txcleaned, oldamount))
 
     async def e_on_message(self, message, cxt):
         if message.server is None:
