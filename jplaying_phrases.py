@@ -21,7 +21,6 @@ JOSE_PLAYING_PHRASES = [
     'Imgur',
     'Reddit',
     'Sentience™',
-    'Mass Shootings',
     'Politics',
     'I\'ve seen it on tumblr',
     'Expand Dong',
@@ -94,4 +93,5 @@ JOSE_PLAYING_PHRASES = [
     'PREGANANACY',
     'Tinder',
     'Richard Stallman Simulator',
+    ''
 ]

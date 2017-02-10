@@ -223,14 +223,27 @@ for modname in jose.modules:
     for method in module['handlers']:
         if method.startswith("e_"):
             evname = method[method.find("_")+1:]
-            jcommon.logger.info("Register Event %s@%s:%s", method, modname, evname)
+            jcommon.logger.info("Register Event %s@%s:%s", \
+                method, modname, evname)
+
+            # check if event exists
             if evname in event_table:
-                handler = getattr(modinst, method)
+                handler = getattr(modinst, method, None)
+                if handler is None:
+                    # ????
+                    jcommon.logger.error("Event handler %s@%s:%s doesn't... exist????", \
+                        method, modname, evname)
+                    sys.exit(0)
+
                 event_table[evname].append(handler)
+            else:
+                jcommon.logger.warning("Event %s@%s:%s doesn't exist in Event Table", \
+                    method, modname, evname)
 
 async def do_event(event_name, message):
     for handler in event_table[event_name]:
-        await handler(message, jcommon.Context(client, message, time.time(), jose))
+        cxt = jcommon.Context(client, message, time.time(), jose)
+        await handler(message, cxt)
 
 async def check_message(message):
     # we do not want the bot to reply to itself
