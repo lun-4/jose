@@ -402,6 +402,11 @@ class JoseSpeak(jcommon.Extension):
         output = subprocess.Popen(['wc', 'db/jose-data.txt'], stdout=subprocess.PIPE).communicate()[0]
         await cxt.say(output)
 
+    async def c_zelaotxt(self, message, args, cxt):
+        '''`!zelaotxt` - Mostra a quantidade de linhas, palavras e bytes no db/zelao.txt'''
+        output = subprocess.Popen(['wc', 'db/zelao.txt'], stdout=subprocess.PIPE).communicate()[0]
+        await cxt.say(output)
+
     async def c_jwormhole(self, message, args, cxt):
         '''`!jwormhole` - Envia mensagens do !speaktrigger para o Wormhole do Septapus!'''
         if message.server is None:
