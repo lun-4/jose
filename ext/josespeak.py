@@ -191,7 +191,7 @@ class JoseSpeak(jcommon.Extension):
 
     async def texter_collection(self):
 
-        if len(self.text_generators) < 0:
+        if len(self.text_generators) <= 0:
             logger.debug("no texters available")
             return
 
@@ -216,7 +216,7 @@ class JoseSpeak(jcommon.Extension):
             del self.text_generators[serverid]
 
         time_taken_ms = (time.time() - t_start) * 1000
-        logger.info("Texter cleaning took %.2fms", time_taken_ms)
+        logger.info("Texter cleaning took %.4fms", time_taken_ms)
 
         del sid_to_clear, t_start, time_taken_ms
 
@@ -321,8 +321,10 @@ class JoseSpeak(jcommon.Extension):
         await self.texter_collection()
         t_taken = time.time() - t_start
 
-        await cxt.say("`Took %.2fms cleaning %d Texters, was %d`" % (t_taken,\
-            self.txcleaned, oldamount))
+        newamount = len(self.text_generators)
+
+        await cxt.say("`Took %.5fms cleaning %d Texters, was %d, delta to new %d`" % \
+            (t_taken, self.txcleaned, oldamount, oldamount - newamount))
 
     async def e_on_message(self, message, cxt):
         if message.server is None:
