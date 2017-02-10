@@ -16,8 +16,11 @@ $ git clone https://github.com/lkmnds/jose.git
 $ cd jose
 $ nano joseconfig.py
 
+# For Ubuntu-based Linuxes
+$ sudo apt-get intall gettext
+
 # Make sure pip references python 3.5+
-$ sudo pip install install -U -r requirements.txt
+$ sudo pip install -U -r requirements.txt
 ```
 
 Example `joseconfig.py` file:

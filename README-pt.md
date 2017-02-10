@@ -17,8 +17,11 @@ $ git clone https://github.com/lkmnds/jose.git
 $ cd jose
 $ nano joseconfig.py
 
-# Tenha certeza que o pip referencia python 3.5+
-$ sudo pip install install -U -r requirements.txt
+# para Linuxes baseados no Ubuntu
+$ sudo apt-get intall gettext
+
+# tenha certeza que o Pip é do python 3.5+
+$ sudo pip install -U -r requirements.txt
 ```
 
 `joseconfig.py` de exemplo:
