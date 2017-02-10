@@ -67,5 +67,5 @@ class JoseIBC(jaux.Auxiliar):
             await cxt.say("syscall->json_data.callnumber: `%r`" % e)
             return
 
-        await syscall_functions[syscall_number](self, json_data['arguments'])
+        await syscall_functions[syscall_number](self, json_data['arguments'], cxt)
         return
