@@ -161,9 +161,7 @@ class JoseSpeak(jcommon.Extension):
             message nvarchar(2050)
         );""")
 
-        # load timers in async context
-        # every 10 minutes
-        #self.cbk_new('jspeak.reload_texter', self.create_generators, 600)
+        # load timers
 
         # every 3 minutes
         self.cbk_new('jspeak.savedb', self.save_databases, 180)
@@ -223,20 +221,6 @@ class JoseSpeak(jcommon.Extension):
 
         del sid_to_clear, t_start, time_taken_ms
 
-    async def create_generators(self):
-        # create the Texters for each server in the database
-        total_messages = 0
-        t_start = time.time()
-
-        for serverid in self.messages:
-            await self.new_generator(serverid)
-
-        time_taken_ms = (time.time() - t_start) * 1000
-        total_messages = sum(self.msgcount.values())
-
-        self.logger.info("Made %d Texters, total of %d messages in %.2fmsec", \
-            len(self.text_generators), total_messages, time_taken_ms)
-
     async def save_databases(self):
         self.logger.info("Save josespeak database")
         json.dump(self.wlengths, open(self.db_length_path, 'w'))
@@ -264,9 +248,6 @@ class JoseSpeak(jcommon.Extension):
             # load things in files
             self.wlengths = json.load(open(self.db_length_path, 'r'))
             self.messages = json.load(open(self.db_msg_path, 'r'))
-
-            # make generators
-            #await self.create_generators()
 
             return True, ''
         except Exception as e:
