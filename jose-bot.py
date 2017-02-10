@@ -177,7 +177,7 @@ def load_module(n, n_cl):
     loop = asyncio.get_event_loop()
     loop.run_until_complete(jose.load_ext(n, n_cl, None))
 
-    time_taken_ms = (t_start - time.time()) * 1000
+    time_taken_ms = (time.time() - t_start) * 1000
     jcommon.logger.info("%s took %.3fms", n, time_taken_ms)
 
 # essential stuff
