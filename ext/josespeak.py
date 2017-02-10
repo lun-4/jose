@@ -398,8 +398,8 @@ class JoseSpeak(jcommon.Extension):
         await self.speak(self.global_generator, wordlength, cxt)
 
     async def c_josetxt(self, message, args, cxt):
-        '''`!josetxt` - Mostra a quantidade de linhas, palavras e bytes no jose-data.txt'''
-        output = subprocess.Popen(['wc', 'jose-data.txt'], stdout=subprocess.PIPE).communicate()[0]
+        '''`!josetxt` - Mostra a quantidade de linhas, palavras e bytes no db/jose-data.txt'''
+        output = subprocess.Popen(['wc', 'db/jose-data.txt'], stdout=subprocess.PIPE).communicate()[0]
         await cxt.say(output)
 
     async def c_jwormhole(self, message, args, cxt):
