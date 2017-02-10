@@ -126,7 +126,10 @@ class Texter:
             sent += curr
             word_count += 1
 
-        self.refcount += 1
+        if self.refcount <= 2:
+            # max value refcount can be is 3
+            self.refcount += 1
+
         return sent
 
     async def clear(self):
