@@ -203,7 +203,7 @@ class JoseSpeak(jcommon.Extension):
 
         for serverid in self.text_generators:
             texter = self.text_generators[serverid]
-            if texter.refcount < 0:
+            if texter.refcount <= 0:
                 await texter.clear()
                 sid_to_clear.append(serverid)
             else:
