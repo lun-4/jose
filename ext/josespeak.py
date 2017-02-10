@@ -46,6 +46,9 @@ class Texter:
         else:
             self.build_mapping(wordlist(textpath), markov_length)
 
+    def __repr__(self):
+        return 'Texters(refcount=%d)' % self.refcount
+
     def add_temp_mapping(self, history, word):
         while len(history) > 0:
             first = toHashKey(history)
