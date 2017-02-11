@@ -582,7 +582,7 @@ class JoseBot(jcommon.Extension):
         modname = args[1]
 
         if modname not in self.modules:
-            await cxt.say("`%s`: Módulo não encontrado")
+            await cxt.say("`%s`: Not found" % modname)
             return
 
         res = ' '.join(self.modules[modname]['methods'])
