@@ -232,6 +232,8 @@ class JoseSpeak(jcommon.Extension):
 
     async def c_savedb(self, message, args, cxt):
         """`!savedb` - saves all available databases(autosaves every 3 minutes)"""
+        await self.is_admin(message.author.id)
+
         await self.save_databases()
         await cxt.say(":floppy_disk: saved messages database :floppy_disk:")
 
@@ -288,7 +290,7 @@ class JoseSpeak(jcommon.Extension):
         t_taken = (time.time() - t_start) * 1000
 
         if ok:
-            await cxt.say("`Created Texter for SID %s. Took %.2fms`" % \
+            await cxt.say("`Created Texter for %s. Took %.2fms`" % \
                 (serverid, t_taken))
         else:
             await cxt.say(":poop: Error creating Texter for %s" % serverid)
