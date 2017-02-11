@@ -81,6 +81,9 @@ PRICE_TABLE = {
     'operational': ("Taxa operacional de alguns comandos(normalmente relacionados a muito processamento)", OP_TAX_PRICE)
 }
 
+PL_MIN_MINUTES = 2
+PL_MAX_MINUTES = 7
+
 ascii_to_wide = dict((i, chr(i + 0xfee0)) for i in range(0x21, 0x7f))
 ascii_to_wide.update({0x20: u'\u3000', 0x2D: u'\u2212'})  # space and minus
 

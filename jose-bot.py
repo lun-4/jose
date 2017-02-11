@@ -472,7 +472,8 @@ async def timer_playing():
     if t_allowed:
         while True:
             await _timer_playing()
-            sec = random.randint(2 * 60, 10 * 60)
+            sec = random.randint(jcommon.PL_MIN_MINUTES * 60, \
+                jcommon.PL_MAX_MINUTES * 60)
             jcommon.logger.info("Playing for %.2f minutes", (sec / 60))
             await asyncio.sleep(sec)
 
