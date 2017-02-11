@@ -31,7 +31,7 @@ class JoseLanguage(jaux.Auxiliar):
         await cxt.say(":speech_left: langdb reloaded")
 
     async def c_language(self, message, args, cxt):
-        '''`!language lang` - sets language for a server'''
+        '''`!language lang` - sets language for a server(use `!listlang` for available languages)'''
         if message.server is None:
             await cxt.say("Language support is not available for DMs")
             return

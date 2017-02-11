@@ -174,7 +174,7 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             else:
                 await cxt.say("%s: tópico não encontrado" % topic)
 
-    async def mkresponse(message, fmt, phrases, cxt):
+    async def mkresponse(self, message, fmt, phrases, cxt):
         d = message.content.split(' ')
         user_use = d[1]
         response = random.choice(phrases)
