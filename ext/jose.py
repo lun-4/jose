@@ -281,16 +281,17 @@ class JoseBot(jcommon.Extension):
 
     async def c_modlist(self, message, args, cxt):
         '''`!modlist` - Módulos do josé'''
-        mod_gen = (key for key in self.modules)
-        mod_generator = []
-        for key in mod_gen:
+        mod_list = []
+        for key in self.modules:
             if 'module' in self.modules[key]:
                 # normally loaded ext, can use !reload on it
-                mod_generator.append('ext:%s' % key)
+                mod_list.append(key)
             else:
                 # externally loaded ext, can't reload
-                mod_generator.append('gext:%s' % key)
-        await cxt.say("módulos carregados: %s" % (" ".join(mod_generator)))
+                mod_list.append('gext:%s' % key)
+
+        # show everyone in a nice codeblock
+        await cxt.say(self.codeblock("", " ".join(mod_list)))
 
     def says(self, msg):
         # calls self.say but in an non-async context
