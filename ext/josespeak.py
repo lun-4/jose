@@ -300,8 +300,14 @@ class JoseSpeak(jcommon.Extension):
 
         newamount = len(self.text_generators)
 
-        await cxt.say("`Took %.5fms cleaning %d Texters, was %d, delta to new %d`" % \
-            (t_taken, self.txcleaned, oldamount, oldamount - newamount))
+        await cxt.say("`Took %.5fms cleaning %d Texters, had %d`" % \
+            (t_taken, oldamount - newamount, oldamount))
+
+    async def c_texstat(self, message, args, cxt):
+        '''`!texstat` - Texter Stats'''
+        svcount = len(self.client.servers)
+        await cxt.say("`%d/%d Texters loaded`" % \
+            (len(self.text_generators), svcount))
 
     async def e_on_message(self, message, cxt):
         if message.server is None:
