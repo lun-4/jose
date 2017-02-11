@@ -385,6 +385,10 @@ class JoseSpeak(jcommon.Extension):
             else:
                 wordlength = int(args[1])
 
+        # ensure Texter exists
+        if message.server.id not in self.text_generators:
+            await self.new_generator(message.server.id)
+
         await self.speak(self.text_generators[message.server.id], wordlength, cxt)
 
     async def c_gfalar(self, message, args, cxt):
