@@ -34,6 +34,7 @@ class JoseLanguage(jaux.Auxiliar):
         '''`!language lang` - sets language for a server'''
         if message.server is None:
             await cxt.say("Language support is not available for DMs")
+            return
 
         if len(args) < 2:
             await cxt.say(self.c_language.__doc__)
@@ -52,6 +53,10 @@ class JoseLanguage(jaux.Auxiliar):
 
     async def c_listlang(self, message, args, cxt):
         '''`!listlang` - lists all available languages'''
+        if message.server is None:
+            await cxt.say("Language support is not available for DMs")
+            return
+
         llist = self.codeblock("", " ".join(self.LANGLIST))
         serverlang = await jcommon.langdb_get(message.server.id)
         await cxt.say("This server's language: `%s`\nAvailable languages: %s" % \
