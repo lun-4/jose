@@ -296,11 +296,11 @@ class JoseSpeak(jcommon.Extension):
 
         t_start = time.time()
         await self.texter_collection()
-        t_taken = time.time() - t_start
+        t_taken = (time.time() - t_start) * 1000
 
         newamount = len(self.text_generators)
 
-        await cxt.say("`Took %.5fms cleaning %d Texters, had %d`" % \
+        await cxt.say("`Took %.5fms cleaning %d Texters out of %d`" % \
             (t_taken, oldamount - newamount, oldamount))
 
     async def c_texstat(self, message, args, cxt):
