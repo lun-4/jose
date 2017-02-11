@@ -150,9 +150,10 @@ class joseXtra(jaux.Auxiliar):
 
     async def c_info(self, message, args, cxt):
         await cxt.say("""
-José v%s\n
-José Testing Enviroment, JTE: https://discord.gg/5ASwg4C\n
-José is open-source! see it in https://github.com/lkmnds/jose\n
+José v%s
+JTE, José Testing Enviroment: https://discord.gg/5ASwg4C
+José is Licensed through the Don't Be a Dick Public License.
+See the source at https://github.com/lkmnds/jose
 
 Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
 
