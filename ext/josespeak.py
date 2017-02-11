@@ -38,7 +38,7 @@ class Texter:
         self.tempMapping = {}
         self.mapping = {}
         self.starts = []
-        self.refcount = 1
+        self.refcount = 0
 
         if textpath is None:
             text_object = io.StringIO(text)
