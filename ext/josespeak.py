@@ -283,9 +283,13 @@ class JoseSpeak(jcommon.Extension):
             await cxt.say(self.c_ntexter.__doc__)
             return
 
+        t_start = time.time()
         ok = await self.new_generator(serverid)
+        t_taken = (time.time() - t_start) * 1000
+
         if ok:
-            await cxt.say("Created Texter for %s!" % serverid)
+            await cxt.say("`Created Texter for SID %s. Took %.2fms`" % \
+                (serverid, t_taken))
         else:
             await cxt.say(":poop: Error creating Texter for %s" % serverid)
 
