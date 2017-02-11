@@ -272,32 +272,12 @@ class JoseSpeak(jcommon.Extension):
         except Exception as e:
             return False, str(e)
 
-    async def c_forcereload(self, message, args, cxt):
-        """`!forcereload` - save and load josespeak module"""
-        ok = await self.ext_unload()
-        if not ok[0]:
-            await cxt.say('ext_unload :warning: %s' % ok[1])
-
-        ok = await self.ext_load()
-        if not ok[0]:
-            await cxt.say('ext_load :warning: %s ' % ok[1])
-
-        await cxt.say(":ok_hand: Reloaded JoseSpeak Texters")
-
-    async def c_fuckreload(self, message, args, cxt):
-        '''`!fuckreload` - does !savedb and !forcereload at the same time'''
+    async def c_ntexter(self, message, args, cxt):
+        '''`!ntexter serverid` - Create a Texter for a Server **[ADMIN COMMAND]**'''
         await self.is_admin(message.author.id)
-        t_start = time.time()
 
-        # reload stuff
-        ecxt = jcommon.EmptyContext(self.client, message)
-        await self.c_savedb(message, args, ecxt)
-        await self.c_forcereload(message, args, ecxt)
-        res = await ecxt.getall()
-
-        delta = (time.time() - t_start) * 1000
-        res += "\nI fucking took %.2fms to do this shit my fucking god" % delta
-        await cxt.say(self.codeblock("", res))
+        serverid = args[1]
+        await self.new_generator(serverid)
 
     async def c_texclean(self, message, args, cxt):
         await self.is_admin(message.author.id)
