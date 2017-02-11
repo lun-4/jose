@@ -53,6 +53,6 @@ class JoseLanguage(jaux.Auxiliar):
     async def c_listlang(self, message, args, cxt):
         '''`!listlang` - lists all available languages'''
         llist = self.codeblock("", " ".join(self.LANGLIST))
-        serverlang = jcommon.langdb_get(message.server.id)
+        serverlang = await jcommon.langdb_get(message.server.id)
         await cxt.say("This server's language: `%s`\nAvailable languages: %s" % \
             (serverlang, llist))
