@@ -452,6 +452,9 @@ class JoseMemes(jcommon.Extension):
         '''`!fullwidth texto` - converte texto para fullwidth'''
         # looks like discord made fullwidth suppoert available again :D
         text = ' '.join(args[1:])
+        if len(text.strip()) < 0:
+            return
+
         await cxt.say(text.translate(self.WIDE_MAP))
 
     async def c_fw(self, message, args, cxt):
