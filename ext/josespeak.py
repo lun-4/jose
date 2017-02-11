@@ -192,6 +192,7 @@ class JoseSpeak(jcommon.Extension):
 
         # create it
         self.text_generators[serverid] = Texter(None, 1, '\n'.join(messages))
+        return True
 
     async def texter_collection(self):
 
@@ -276,8 +277,17 @@ class JoseSpeak(jcommon.Extension):
         '''`!ntexter serverid` - Create a Texter for a Server **[ADMIN COMMAND]**'''
         await self.is_admin(message.author.id)
 
-        serverid = args[1]
-        await self.new_generator(serverid)
+        try:
+            serverid = args[1]
+        except:
+            await cxt.say(self.c_ntexter.__doc__)
+            return
+
+        ok = await self.new_generator(serverid)
+        if ok:
+            await cxt.say("Created Texter for %s!" % serverid)
+        else:
+            await cxt.say(":poop: Error creating Texter for %s" % serverid)
 
     async def c_texclean(self, message, args, cxt):
         await self.is_admin(message.author.id)
