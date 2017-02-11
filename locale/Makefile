@@ -2,6 +2,8 @@ messages:
 	xgettext --files-from=POTFILES.in -d jose --from-code=UTF-8 \
 		--keyword=say --directory=..
 
+	python3 po2json.py jose.po > jose.json
+
 pofiles:
 	mkdir -p pt/LC_MESSAGES
 	msginit --locale=pt --input=jose.po -o pt/LC_MESSAGES/pt.po
@@ -15,7 +17,6 @@ mofiles:
 
 poclear:
 	rm *.po
-	rm */*.po
 
 moclear:
 	rm */*.mo
@@ -24,3 +25,4 @@ clearall:
 	rm -f *.po
 	rm -f */LC_MESSAGES/*.po
 	rm -f */LC_MESSAGES/*.mo
+	rm jose.json
