@@ -276,24 +276,26 @@ class JoseSpeak(jcommon.Extension):
             return False, str(e)
 
     async def c_ntexter(self, message, args, cxt):
-        '''`!ntexter serverid` - Create a Texter for a Server **[ADMIN COMMAND]**'''
+        '''`!ntexter serverid1 serverid2 ...` - Create Texters **[ADMIN COMMAND]**'''
         await self.is_admin(message.author.id)
 
         try:
-            serverid = args[1]
+            servers = args[1:]
         except:
             await cxt.say(self.c_ntexter.__doc__)
             return
 
         t_start = time.time()
-        ok = await self.new_generator(serverid)
+        for serverid in servers:
+            ok = await self.new_generator(serverid)
+            if not ok:
+                await cxt.say(":poop: Error creating Texter for %s" % serverid)
+                return
+
         t_taken = (time.time() - t_start) * 1000
 
-        if ok:
-            await cxt.say("`Created Texter for %s. Took %.2fms`" % \
-                (serverid, t_taken))
-        else:
-            await cxt.say(":poop: Error creating Texter for %s" % serverid)
+        await cxt.say("`Created %d Texters. Took %.2fms`" % \
+            (len(servers), t_taken))
 
     async def c_texclean(self, message, args, cxt):
         await self.is_admin(message.author.id)
