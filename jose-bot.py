@@ -474,7 +474,11 @@ async def timer_playing():
             await _timer_playing()
             sec = random.randint(jcommon.PL_MIN_MINUTES * 60, \
                 jcommon.PL_MAX_MINUTES * 60)
-            jcommon.logger.info("Playing for %.2f minutes", (sec / 60))
+
+            minutes = int((sec % (60 * 60)) / 60)
+            seconds = int(sec % 60)
+
+            jcommon.logger.info("Playing for %dmin:%dsec", minutes, seconds)
             await asyncio.sleep(sec)
 
 @client.event
