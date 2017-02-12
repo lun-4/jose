@@ -514,13 +514,24 @@ def parse_command(message):
 
 # === LANGUAGE STUFF ===
 
-EN_LANGUAGE_PATH = './locale/en/LC_MESSAGES/en.mo'
-PT_LANGUAGE_PATH = './locale/pt/LC_MESSAGES/pt.mo'
+EN_LANGUAGE_PATH = './locale/jose.en.json'
+PT_LANGUAGE_PATH = './locale/jose.pt.json'
+
+class LangObject:
+    def __init__(self, fpath):
+        self.db = json.load(open(fpath, 'r'))
+
+    def gettext(self, msgid):
+        res = self.db.get(msgid, None)
+        if len(res) == 0:
+            return msgid
+        else:
+            return res
 
 # initialize language object for each language
 langobjects = {
-    'en': gettext.GNUTranslations(open(EN_LANGUAGE_PATH, 'rb')),
-    'pt': gettext.GNUTranslations(open(PT_LANGUAGE_PATH, 'rb')),
+    'en': LangObject(EN_LANGUAGE_PATH),
+    'pt': LangObject(PT_LANGUAGE_PATH),
 }
 
 # langdb stuff
@@ -565,7 +576,7 @@ async def get_translated(langid, string, **kwargs):
         # fallback, just return the same string
         return string
     else:
-        return lang.gettext(string, **kwargs)
+        return lang.gettext(string)
 
 class Context:
     def __init__(self, client, message, t_creation=None, jose=None):
