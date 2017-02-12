@@ -1,7 +1,6 @@
 import asyncio
 import time
 import re
-import gettext
 import json
 import os
 import sqlite3
