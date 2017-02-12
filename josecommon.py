@@ -521,7 +521,7 @@ class LangObject:
         self.db = json.load(open(fpath, 'r'))
 
     def gettext(self, msgid):
-        res = self.db.get(msgid)
+        res = self.db.get(msgid, "")
         if len(res) == 0:
             return msgid
         else:
