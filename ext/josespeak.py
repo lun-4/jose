@@ -287,10 +287,10 @@ class JoseSpeak(jcommon.Extension):
             serverid = args[1]
             amount = args[2]
         except:
-            await cxt.say(self.c_ntexter.__doc__)
+            await cxt.say(self.c_getmsg.__doc__)
             return
 
-        msg = await self.server_messages(self, serverid, amount)
+        msg = await self.server_messages(serverid, amount)
         await cxt.say(self.codeblock("python", repr(msg)))
 
     async def c_ntexter(self, message, args, cxt):
