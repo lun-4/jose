@@ -177,7 +177,8 @@ class JoseSpeak(jcommon.Extension):
         cur = await self.dbapi.do('SELECT message FROM markovdb WHERE serverid=?', (serverid,))
         r = [row[0] for row in cur.fetchall()]
         if limit is not None:
-            r = r[:limit]
+            pos = len(r) - limit
+            r = r[pos:]
 
         return r
 
