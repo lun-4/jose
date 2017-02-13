@@ -285,7 +285,7 @@ class JoseSpeak(jcommon.Extension):
 
         try:
             serverid = args[1]
-            amount = args[2]
+            amount = int(args[2])
         except:
             await cxt.say(self.c_getmsg.__doc__)
             return
