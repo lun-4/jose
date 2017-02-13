@@ -12,6 +12,7 @@ import io
 import time
 
 logger = None
+MESSAGE_LIMIT = 10000 # 10k messages
 
 def fixCaps(word):
     if word.isupper() and (word != "I" or word != "Eu"):
@@ -184,9 +185,9 @@ class JoseSpeak(jcommon.Extension):
         r = await self.server_messages(serverid, limit)
         return '\n'.join(r)
 
-    async def new_generator(self, serverid):
+    async def new_generator(self, serverid, limit=None):
         # create one Texter, for one server
-        messages = await self.server_messages(serverid)
+        messages = await self.server_messages(serverid, limit)
         self.msgcount[serverid] = len(messages)
 
         if serverid in self.text_generators:
@@ -290,7 +291,7 @@ class JoseSpeak(jcommon.Extension):
 
         t_start = time.time()
         for serverid in servers:
-            ok = await self.new_generator(serverid)
+            ok = await self.new_generator(serverid, MESSAGE_LIMIT)
             if not ok:
                 await cxt.say(":poop: Error creating Texter for %s" % serverid)
                 return
@@ -356,7 +357,7 @@ class JoseSpeak(jcommon.Extension):
             self.flag = False
             # ensure the server already has its texter loaded up
             if message.server.id not in self.text_generators:
-                await self.new_generator(message.server.id)
+                await self.new_generator(message.server.id, MESSAGE_LIMIT)
 
             self.current = message
             await self.client.send_typing(message.channel)
@@ -394,7 +395,7 @@ class JoseSpeak(jcommon.Extension):
 
         # ensure Texter exists
         if message.server.id not in self.text_generators:
-            await self.new_generator(message.server.id)
+            await self.new_generator(message.server.id, MESSAGE_LIMIT)
 
         await self.speak(self.text_generators[message.server.id], wordlength, cxt)
 
