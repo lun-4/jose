@@ -279,6 +279,20 @@ class JoseSpeak(jcommon.Extension):
         except Exception as e:
             return False, str(e)
 
+    async def c_getmsg(self, message, args, cxt):
+        '''`!getmsg serverid amount`'''
+        await self.is_admin(message.author.id)
+
+        try:
+            serverid = args[1]
+            amount = args[2]
+        except:
+            await cxt.say(self.c_ntexter.__doc__)
+            return
+
+        msg = await self.server_messages(self, serverid, amount)
+        await cxt.say(self.codeblock("python", repr(msg)))
+
     async def c_ntexter(self, message, args, cxt):
         '''`!ntexter serverid1 serverid2 ...` - Create Texters **[ADMIN COMMAND]**'''
         await self.is_admin(message.author.id)
