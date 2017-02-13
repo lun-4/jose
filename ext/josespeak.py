@@ -172,14 +172,17 @@ class JoseSpeak(jcommon.Extension):
         # every minute
         self.cbk_new('jspeak.texter_collection', self.texter_collection, 60)
 
-    async def server_messages(self, serverid):
+    async def server_messages(self, serverid, limit=None):
         cur = await self.dbapi.do('SELECT message FROM markovdb WHERE serverid=?', (serverid,))
-        return [row[0] for row in cur.fetchall()]
+        r = [row[0] for row in cur.fetchall()]
+        if limit is not None:
+            r = r[:limit]
 
-    async def server_messages_string(self, serverid):
-        cur = await self.dbapi.do('SELECT message FROM markovdb WHERE serverid=?', (serverid,))
-        gen_messages = (row[0] for row in cur.fetchall())
-        return '\n'.join(gen_messages)
+        return r
+
+    async def server_messages_string(self, serverid, limit=None):
+        r = await self.server_messages(serverid, limit)
+        return '\n'.join(r)
 
     async def new_generator(self, serverid):
         # create one Texter, for one server
