@@ -362,7 +362,11 @@ class JoseSpeak(jcommon.Extension):
             self.current = message
             await self.client.send_typing(message.channel)
 
-            length = int(self.text_lengths[message.server.id])
+            # default 5 words
+            length = 5
+            if message.server.id in self.text_lengths:
+                length = int(self.text_lengths[message.server.id])
+
             await self.speak(self.text_generators[message.server.id], length, cxt)
 
     async def speak(self, texter, length_words, cxt):
