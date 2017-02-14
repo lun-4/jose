@@ -157,6 +157,9 @@ class JoseSpeak(jcommon.Extension):
         self.msgcount = {}
         self.txcleaned = -1
 
+        self.last_texter_mcount = -1
+        self.last_texter_time = -1
+
         self.db_length_path = jcommon.MARKOV_LENGTH_PATH
         self.db_msg_path = jcommon.MARKOV_MESSAGES_PATH
 
@@ -188,6 +191,8 @@ class JoseSpeak(jcommon.Extension):
 
     async def new_generator(self, serverid, limit=None):
         # create one Texter, for one server
+        t_start = time.time()
+
         messages = await self.server_messages(serverid, limit)
         self.msgcount[serverid] = len(messages)
 
@@ -197,6 +202,10 @@ class JoseSpeak(jcommon.Extension):
 
         # create it
         self.text_generators[serverid] = Texter(None, 1, '\n'.join(messages))
+
+        last_texter_mcount = self.msgcount[serverid]
+        last_texter_time = (time.time() - t_start)
+
         return True
 
     async def texter_collection(self):
@@ -333,8 +342,12 @@ class JoseSpeak(jcommon.Extension):
     async def c_texstat(self, message, args, cxt):
         '''`!texstat` - Texter Stats'''
         svcount = len(self.client.servers)
-        await cxt.say("`%d/%d Texters loaded`" % \
-            (len(self.text_generators), svcount))
+        report = """
+        %d/%d Texters loaded
+        Last Texter made had %d lines, took %.2fms to load it
+        """
+        await cxt.say(report % (len(self.text_generators), svcount \
+            self.last_texter_mcount, (self.last_texter_time * 1000)))
 
     async def e_on_message(self, message, cxt):
         if message.server is None:
