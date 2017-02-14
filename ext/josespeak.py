@@ -41,11 +41,16 @@ class Texter:
         self.starts = []
         self.refcount = 0
 
+        t_start = time.time()
+
         if textpath is None:
             text_object = io.StringIO(text)
             self.build_mapping(wordlist(None, text_object), markov_length)
         else:
             self.build_mapping(wordlist(textpath), markov_length)
+
+        t_taken = (time.time() - t_start) * 1000
+        logger.info("Texter: build_mapping took %.2fms" % t_taken)
 
     def __repr__(self):
         return 'Texter(refcount=%d)' % self.refcount
@@ -342,12 +347,13 @@ class JoseSpeak(jcommon.Extension):
     async def c_texstat(self, message, args, cxt):
         '''`!texstat` - Texter Stats'''
         svcount = len(self.client.servers)
-        report = """
-        %d/%d Texters loaded
-        Last Texter made had %d lines, took %.2fms to load it
-        """
-        await cxt.say(report % (len(self.text_generators), svcount, \
-            self.last_texter_mcount, (self.last_texter_time * 1000)))
+        report = """%d/%d Texters loaded
+ * Last Texter made had %d lines, took %.2fms to load it"""
+
+        res = report % (len(self.text_generators), svcount, \
+            self.last_texter_mcount, (self.last_texter_time * 1000))
+
+        await cxt.say(self.codeblock("", res))
 
     async def e_on_message(self, message, cxt):
         if message.server is None:
