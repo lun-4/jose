@@ -50,7 +50,10 @@ class Texter:
             self.build_mapping(wordlist(textpath), markov_length)
 
         t_taken = (time.time() - t_start) * 1000
-        logger.info("Texter: build_mapping took %.2fms" % t_taken)
+        if logger:
+            logger.info("Texter: build_mapping took %.2fms" % t_taken)
+        else:
+            print("Texter: build_mapping took %.2fms" % t_taken)
 
     def __repr__(self):
         return 'Texter(refcount=%d)' % self.refcount
@@ -94,7 +97,10 @@ class Texter:
         # Shorten prevList until it's in mapping
         while toHashKey(prevList) not in self.mapping:
             if len(prevList) == 0:
-                logger.error("Texter.next_word: len(prevList) == 0")
+                if logger:
+                    logger.error("Texter.next_word: len(prevList) == 0")
+                else:
+                    print("Texter.next_word: len(prevList) == 0")
                 return None
             else:
                 prevList.pop(0)
