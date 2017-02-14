@@ -569,7 +569,7 @@ async def load_langdb():
     return True, ''
 
 
-async def get_translated(langid, string, **kwargs):
+async def get_translated(langid, string):
     lang = langobjects.get(langid, None)
     if lang is None:
         # fallback, just return the same string
@@ -616,7 +616,7 @@ class Context:
             # since 'default' doesn't exist in the language table
             # it will go back to fallback and just send the message already
             lang = await langdb_get(self.message.server.id)
-            translated = await get_translated(lang, string, **kwargs)
+            translated = await get_translated(lang, string)
 
             ret = await self.client.send_message(channel, translated)
             if tup is not None:

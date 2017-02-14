@@ -4,11 +4,6 @@ import json
 
 def main(args):
     infile = args[1]
-    try:
-        outfile = args[2]
-    except:
-        outfile = '%s.json' % infile
-
     po = polib.pofile(infile)
     print('{')
     for entry in po:
