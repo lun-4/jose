@@ -587,16 +587,15 @@ class Context:
         self.t_creation = t_creation
         self.jose = jose
 
-    async def say(self, string, channel=None, tup=None):
+    async def say(self, string, _channel=None, tup=None):
         global langdb
 
         channel = None
-        if isinstance(channel, tuple):
+        if isinstance(_channel, tuple):
+            tup = _channel
             channel = self.message.channel
-            tup = channel
         else:
-            channel = channel
-
+            channel = _channel
 
         if channel is None:
             channel = self.message.channel
