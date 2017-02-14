@@ -618,11 +618,15 @@ class Context:
             lang = await langdb_get(self.message.server.id)
             translated = await get_translated(lang, string)
 
-            ret = await self.client.send_message(channel, translated)
+
+            if channel is None:
+                channel = self.message.channel
+
             if tup is not None:
-                return ret % tup
-            else:
-                return ret
+                translated = translated % tup
+
+            ret = await self.client.send_message(channel, translated)
+            return ret
 
 class EmptyContext:
     def __init__(self, client, message):
