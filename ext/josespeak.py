@@ -395,10 +395,6 @@ class JoseSpeak(jcommon.Extension):
 
         if random.random() < 0.03 or self.flag:
             self.flag = False
-            # ensure the server already has its texter loaded up
-            if message.server.id not in self.text_generators:
-                await self.new_generator(message.server.id, MESSAGE_LIMIT)
-
             self.current = message
             await self.client.send_typing(message.channel)
 
@@ -406,6 +402,10 @@ class JoseSpeak(jcommon.Extension):
             length = 5
             if message.server.id in self.text_lengths:
                 length = int(self.text_lengths[message.server.id])
+
+            # ensure the server already has its texter loaded up
+            if message.server.id not in self.text_generators:
+                await self.new_generator(message.server.id, MESSAGE_LIMIT)
 
             await self.speak(self.text_generators[message.server.id], length, cxt)
 
