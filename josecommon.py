@@ -587,10 +587,15 @@ class Context:
         self.t_creation = t_creation
         self.jose = jose
 
-    async def say(self, string, channel=None, **kwargs):
+    async def say(self, string, tup=None, rest=None):
         global langdb
-        if channel is None:
+
+        channel = None
+        if isinstance(tup, tuple):
             channel = self.message.channel
+        else:
+            channel = tup
+            tup = rest
 
         if len(string) > 2000:
             await self.client.send_message(channel, ":elephant: Mensagem muito grande :elephant:")
@@ -614,7 +619,10 @@ class Context:
             translated = await get_translated(lang, string, **kwargs)
 
             ret = await self.client.send_message(channel, translated)
-            return ret
+            if tup is not None:
+                return ret % tup
+            else:
+                return ret
 
 class EmptyContext:
     def __init__(self, client, message):

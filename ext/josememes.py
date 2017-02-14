@@ -307,13 +307,13 @@ class JoseMemes(jcommon.Extension):
             meme = ' '.join(args[2:])
             if meme in self.memes:
                 u = discord.utils.get(message.server.members, id=self.memes[meme]['owner'])
-                await cxt.say("%s foi criado por %s" % (meme, u))
+                await cxt.say("%s foi criado por %s", (meme, u))
             else:
                 await cxt.say("%s: meme não encontrado" % meme)
             return
 
         elif command == 'count':
-            await cxt.say("quantidade de memes: %s" % len(self.memes))
+            await cxt.say("quantidade de memes: %d", None, (len(self.memes),))
 
         elif command == 'stat':
             stat = ''
