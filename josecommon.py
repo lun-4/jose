@@ -587,15 +587,15 @@ class Context:
         self.t_creation = t_creation
         self.jose = jose
 
-    async def say(self, string, tup=None, rest=None):
+    async def say(self, string, channel=None, tup=None):
         global langdb
 
         channel = None
-        if isinstance(tup, tuple):
+        if isinstance(channel, tuple):
             channel = self.message.channel
+            tup = channel
         else:
-            channel = tup
-            tup = rest
+            channel = channel
 
         if len(string) > 2000:
             await self.client.send_message(channel, ":elephant: Mensagem muito grande :elephant:")
