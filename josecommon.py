@@ -597,6 +597,10 @@ class Context:
         else:
             channel = channel
 
+
+        if channel is None:
+            channel = self.message.channel
+
         if len(string) > 2000:
             await self.client.send_message(channel, ":elephant: Mensagem muito grande :elephant:")
         else:
@@ -617,10 +621,6 @@ class Context:
             # it will go back to fallback and just send the message already
             lang = await langdb_get(self.message.server.id)
             translated = await get_translated(lang, string)
-
-
-            if channel is None:
-                channel = self.message.channel
 
             if tup is not None:
                 translated = translated % tup
