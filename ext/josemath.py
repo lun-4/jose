@@ -6,16 +6,13 @@ import jauxiliar as jaux
 import joseconfig as jconfig
 
 import wolframalpha
-wac = wolframalpha.Client(jconfig.WOLFRAMALPHA_APP_ID)
-
 import pyowm
-owm = pyowm.OWM(jconfig.OWM_APIKEY)
 
 class JoseMath(jaux.Auxiliar):
     def __init__(self, cl):
         jaux.Auxiliar.__init__(self, cl)
-        self.wac = wac
-        self.owm = owm
+        self.wac = wolframalpha.Client(jconfig.WOLFRAMALPHA_APP_ID)
+        self.owm = pyowm.OWM(jconfig.OWM_APIKEY)
 
     async def ext_load(self):
         return True, ''
@@ -59,7 +56,7 @@ class JoseMath(jaux.Auxiliar):
         location = ' '.join(args[1:])
 
         try:
-            observation = owm.weather_at_place(location)
+            observation = self.owm.weather_at_place(location)
         except:
             await cxt.say("Erro tentando conseguir a temperatura para esse local")
             return
