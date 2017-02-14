@@ -39,7 +39,7 @@ class Texter:
         self.tempMapping = {}
         self.mapping = {}
         self.starts = []
-        self.refcount = 0
+        self.refcount = 1
 
         t_start = time.time()
 
