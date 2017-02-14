@@ -4,15 +4,10 @@ José Manual v0.0.1
 # How to Install in new server??????????
 
  * Make sure you have Python 3.5+ installed
- * Make sure you have `gettext` installed
 ```bash
 git clone https://github.com/lkmnds/jose.git
 cd jose
 pip3 install install -U -r requirements.txt
-
-# generate language files
-cd po
-make mofiles
 ```
 
 ### Configuration

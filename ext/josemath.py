@@ -110,3 +110,7 @@ class JoseMath(jaux.Auxiliar):
             return
 
         await cxt.say(self.codeblock("", list(self.lewd(n))))
+
+    async def c_plot(self, message, args, cxt):
+        '''`!plot func` - plot f(x) functions'''
+        pass
