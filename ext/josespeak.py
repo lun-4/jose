@@ -346,7 +346,7 @@ class JoseSpeak(jcommon.Extension):
         %d/%d Texters loaded
         Last Texter made had %d lines, took %.2fms to load it
         """
-        await cxt.say(report % (len(self.text_generators), svcount \
+        await cxt.say(report % (len(self.text_generators), svcount, \
             self.last_texter_mcount, (self.last_texter_time * 1000)))
 
     async def e_on_message(self, message, cxt):
