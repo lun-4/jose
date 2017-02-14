@@ -203,8 +203,8 @@ class JoseSpeak(jcommon.Extension):
         # create it
         self.text_generators[serverid] = Texter(None, 1, '\n'.join(messages))
 
-        last_texter_mcount = self.msgcount[serverid]
-        last_texter_time = (time.time() - t_start)
+        self.last_texter_mcount = self.msgcount[serverid]
+        self.last_texter_time = (time.time() - t_start)
 
         return True
 
