@@ -576,7 +576,7 @@ class JoseBot(jcommon.Extension):
             return
 
         res = ' '.join(self.modules[modname]['methods'])
-        res = res.replace('c_', '!')
+        res = res.replace('c_', jcommon.JOSE_PREFIX)
         await cxt.say(self.codeblock('', res))
 
     async def c_uptime(self, message, args, cxt):
@@ -631,3 +631,14 @@ class JoseBot(jcommon.Extension):
             await cxt.say("Added `%r` as temporary admin!" % userid)
         else:
             await cxt.say(":poop: Error adding user as temporary admin")
+
+    async def c_username(self, message, args, cxt):
+        '''`!username` - change josé username'''
+        await self.is_admin(message.author.id)
+
+        try:
+            name = str(args[1])
+            await self.client.edit_profile(username=name)
+            await cxt.say("done!!!!1!!1 i am now %s" % name)
+        except Exception as e:
+            await cxt.say("err hapnnd!!!!!!!! %r" % e)
