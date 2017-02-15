@@ -22,3 +22,8 @@ When the user isn't on the `ADMIN_IDS` list, josé will throw a `joseerror.Permi
    for latency
  * `!eval code`
   * Evaluates Python code
+ * `!rplaying`
+  * Rotates the playing status
+ * `!tempadmin userid`
+  * Makes a user a temporary admin
+  * Temporary admins have all admin permissions until josé restarts.
