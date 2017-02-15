@@ -469,7 +469,7 @@ class JoseBot(jcommon.Extension):
             response = await aiohttp.request('GET', url)
 
             if response.status != 200:
-                await self.debug("!sndc: error: status code != 200(st = %d)" % response.status)
+                await cxt.say("!sndc: error: status code != 200(st = %d)" % response.status)
                 return
 
             try:
