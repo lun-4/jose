@@ -492,6 +492,12 @@ async def on_ready():
     await timer_playing()
     t_allowed = False
 
+@client.event
+async def on_server_join(server):
+    for channel in server.channels:
+        if channel.is_default:
+            jcommon.logger("New server: %s" % server.id)
+            await client.send_message(channel, jcommon.WELCOME_MESSAGE)
 
 async def main_task():
     global client

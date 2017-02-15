@@ -99,6 +99,16 @@ langdb = None
 # Phrases that will be shown randomly when jose starts
 JOSE_PLAYING_PHRASES = playing_phrases.JOSE_PLAYING_PHRASES
 
+WELCOME_MESSAGE = '''
+Thanks for implementing José v{} into your server!
+Jose is a bot that learns to speak based on conversations that happen in your server.
+See `!docs josespeak` to learn more about this.
+To start off, you need to generate at least 100 messages, just talk and watch the magic happen!
+When he's ready, you can use `!speaktrigger` or `!spt` to hear what he has to say.
+
+Use `!language en` to set your language to English or `!language pt` to set your language to Portuguese.
+'''.format(JOSE_VERSION)
+
 JOSE_GENERAL_HTEXT = '''
 Recommended *top notch* Reading, the command list:
 Also `!info` has the José Testing Enviroment invite if you have any problems.
