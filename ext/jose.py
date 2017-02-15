@@ -336,15 +336,15 @@ class JoseBot(jcommon.Extension):
             n_min = int(args[1])
             n_max = int(args[2])
         except:
-            await self.debug("erro parseando os números para a função.")
+            await cxt.say("Error parsing numbers")
             return
 
         if n_min > n_max:
-            await self.debug("minimo > máximo, intervalo não permitido")
+            await self.debug("`min` > `max`, sorry")
             return
 
         n_rand = random.randint(n_min, n_max)
-        await cxt.say("Número aleatório de %d a %d: %d" % (n_min, n_max, n_rand))
+        await cxt.say("random number from %d to %d: %d" % (n_min, n_max, n_rand))
         return
 
     async def c_enc(self, message, args, cxt):
