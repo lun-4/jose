@@ -30,7 +30,7 @@ If it is a bug you need to define the severity of it when issuing.
     - Performance issues(Things taking longer than expected)
       * [#3 - Handle commands in an asynchronous way](https://github.com/lkmnds/jose/issues/3)
 
- * **Major** bugs: Security vulnerabilities, Database integrity,
+ * **Major** bugs: Security vulnerabilities, Database integrity.
   * They **shouldn't** be issued while no fixes have been done. **Report Major bugs through a private/more direct channel.**
     * My Discord ID is `Luna#4677`. Feel free to talk about it.
     * You can send emails to `jose.lkmnds@mailhero.io` if that's more your thing.
