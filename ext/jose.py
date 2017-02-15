@@ -340,7 +340,7 @@ class JoseBot(jcommon.Extension):
             return
 
         if n_min > n_max:
-            await self.debug("`min` > `max`, sorry")
+            await cxt.say("`min` > `max`, sorry")
             return
 
         n_rand = random.randint(n_min, n_max)
