@@ -14,7 +14,7 @@ import time
 logger = None
 MESSAGE_LIMIT = 10000 # 10k messages
 
-def fixCaps(word):
+def fix_caps(word):
     if word.isupper() and (word != "I" or word != "Eu"):
         word = word.lower()
     elif word[0].isupper():
@@ -30,7 +30,7 @@ def wordlist(filename, file_object=None):
     if file_object is None:
         file_object = open(filename, 'r')
 
-    wordlist = [fixCaps(w) for w in re.findall(r"[\w']+|[.,!?;]", file_object.read())]
+    wordlist = [fix_caps(w) for w in re.findall(r"[\w']+|[.,!?;]", file_object.read())]
     file_object.close()
     return wordlist
 
