@@ -101,8 +101,10 @@ JOSE_PLAYING_PHRASES = playing_phrases.JOSE_PLAYING_PHRASES
 
 JOSE_GENERAL_HTEXT = '''
 Recommended *top notch* Reading, the command list:
+Also `!info` has the José Testing Enviroment invite if you have any problems.
 ---
 Recomenado a leitura da lista de comandos, em inglês:
+`!info` tem o invite para o José Testing Enviroment se você tiver algum problema.
 ---
 
 https://github.com/lkmnds/jose/blob/master/doc/cmd/listcmd.md
