@@ -615,3 +615,16 @@ class JoseBot(jcommon.Extension):
         jcommon.logger.info("Playing %s", playing_name)
         g = discord.Game(name = playing_name, url = playing_name)
         await self.client.change_presence(game = g)
+
+    async def c_tempadmin(self, message, args, cxt):
+        '''`!tempadmin userID` - maka a user an admin until josé restarts'''
+        await self.is_admin(message.author.id)
+
+        try:
+            userid = args[1]
+        except Exception as e:
+            await cxt.say(repr(e))
+            return
+
+        jcommon.ADMIN_IDS.append(userid)
+        await cxt.say("Added `%r` as temporary admin!" % userid)
