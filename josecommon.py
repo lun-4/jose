@@ -39,7 +39,8 @@ STAT_DATABASE_PATH = 'db/stats.json'
 LANGUAGES_PATH = 'db/languages.json'
 
 JOSE_ID = '202587271679967232'
-OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot' % JOSE_ID
+JOSE_APP_ID = '202586824013643777'
+OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot' % JOSE_APP_ID
 
 #configuration things
 chattiness = .25
