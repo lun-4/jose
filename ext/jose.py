@@ -494,16 +494,6 @@ class JoseBot(jcommon.Extension):
         g = discord.Game(name=playing_name, url=playing_name)
         await self.client.change_presence(game=g)
 
-    async def c_fullwidth(self, message, args, cxt):
-        '''`!fullwidth text` - ｆｕｌｌｗｉｄｔｈ　ｃｈａｒａｃｔｅｒｓ'''
-        if len(args) < 2:
-            await cxt.say("Nada de mensagem vazia")
-            return
-
-        ascii_text = ' '.join(args[1:])
-        res = ascii_text.translate(jcommon.ascii_to_wide)
-        await cxt.say(res)
-
     async def c_escolha(self, message, args, cxt):
         '''`!escolha elemento1;elemento2;elemento3;...;elementon` - escolha.'''
         if len(args) < 2:
