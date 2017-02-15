@@ -368,21 +368,23 @@ class JoseSpeak(jcommon.Extension):
 
         # filter message before adding
         filtered_msg = jcommon.speak_filter(message.content)
+        sid = message.server.id
 
         if message.server.id not in self.wlengths:
             # average wordlength
-            self.wlengths[message.server.id] = 5
+            self.wlengths[sid] = 5
 
         if message.server.id not in self.messages:
             # the message being received now
-            self.messages[message.server.id] = 1
+            self.messages[sid] = 1
 
         # get word count
-        self.wlengths[message.server.id] += len(filtered_msg.split())
-        self.messages[message.server.id] += 1
+        self.wlengths[sid] += len(filtered_msg.split())
+        self.messages[sid] += 1
 
         # recalc
-        self.text_lengths[message.server.id] = self.wlengths[message.server.id] / self.messages[message.server.id]
+        self.text_lengths[sid] = \
+            self.wlengths[sid] / self.messages[sid]
 
         for line in filtered_msg.split('\n'):
             # append every line to the database
@@ -391,7 +393,7 @@ class JoseSpeak(jcommon.Extension):
             if len(filtered_line) > 0:
                 # no issues, add it
                 await self.dbapi.do("INSERT INTO markovdb (serverid, message) \
-                    VALUES (?, ?)", (message.server.id, filtered_line))
+                    VALUES (?, ?)", (sid, filtered_line))
 
         if random.random() < 0.03 or self.flag:
             self.flag = False
@@ -400,14 +402,14 @@ class JoseSpeak(jcommon.Extension):
 
             # default 5 words
             length = 5
-            if message.server.id in self.text_lengths:
-                length = int(self.text_lengths[message.server.id])
+            if sid in self.text_lengths:
+                length = int(self.text_lengths[sid])
 
             # ensure the server already has its texter loaded up
-            if message.server.id not in self.text_generators:
-                await self.new_generator(message.server.id, MESSAGE_LIMIT)
+            if sid not in self.text_generators:
+                await self.new_generator(sid, MESSAGE_LIMIT)
 
-            await self.speak(self.text_generators[message.server.id], length, cxt)
+            await self.speak(self.text_generators[sid], length, cxt)
 
     async def speak(self, texter, length_words, cxt):
         res = await texter.gen_sentence(1, length_words)

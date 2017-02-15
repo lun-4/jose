@@ -313,7 +313,7 @@ class JoseMemes(jcommon.Extension):
             return
 
         elif command == 'count':
-            await cxt.say("quantidade de memes: %d", None, (len(self.memes),))
+            await cxt.say("quantidade de memes: %d", (len(self.memes),))
 
         elif command == 'stat':
             stat = ''
@@ -333,7 +333,7 @@ class JoseMemes(jcommon.Extension):
 
             i = 1
             for key in sorted(copy, key=lambda key: -copy[key]['uses'])[:10]:
-                stat += '%d lugar: %s com %d usos\n' % (i, \
+                stat += '%d. %s com %d usos\n' % (i, \
                     key, copy[key]['uses'])
                 i += 1
 
