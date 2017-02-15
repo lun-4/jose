@@ -627,4 +627,7 @@ class JoseBot(jcommon.Extension):
             return
 
         jcommon.ADMIN_IDS.append(userid)
-        await cxt.say("Added `%r` as temporary admin!" % userid)
+        if userid in jcommon.ADMIN_IDS:
+            await cxt.say("Added `%r` as temporary admin!" % userid)
+        else:
+            await cxt.say(":poop: Error adding user as temporary admin")
