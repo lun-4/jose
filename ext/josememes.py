@@ -170,7 +170,7 @@ class JoseMemes(jcommon.Extension):
             meme = ' '.join(args[2:])
             if meme in self.memes:
                 meme_data = self.memes[meme]
-                is_admin = await self.b_isowner()
+                is_admin = await self.b_isowner(cxt)
 
                 if (message.author.id == meme_data['owner']) or is_admin:
                     del self.memes[meme]
