@@ -461,6 +461,9 @@ class Extension:
         except je.PermissionError:
             return False
 
+    async def b_isowner(self, cxt):
+        return cxt.message.author.id in ADMIN_IDS
+
     def codeblock(self, lang, string):
         return "```%s\n%s```" % (lang, string)
 
