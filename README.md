@@ -23,6 +23,11 @@ $ sudo apt-get intall gettext
 $ sudo pip install -U -r requirements.txt
 ```
 
+Setup a cron job to make backups every 30 minutes:
+```
+*/30 * * * * /path/to/jose/backup.bash
+```
+
 Example `joseconfig.py` file:
 ```python
 discord_token = 'DISCORD OAUTH2 BOT TOKEN'

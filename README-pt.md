@@ -24,6 +24,11 @@ $ sudo apt-get intall gettext
 $ sudo pip install -U -r requirements.txt
 ```
 
+Coloque um trabalho no cron para um backup a cada meia hora:
+```
+*/30 * * * * /path/to/jose/backup.bash
+```
+
 `joseconfig.py` de exemplo:
 ```python
 discord_token = 'DISCORD OAUTH2 BOT TOKEN'
