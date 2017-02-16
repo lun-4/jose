@@ -30,6 +30,9 @@ class JoseBot(jcommon.Extension):
         jcommon.Extension.__init__(self, cl)
         self.nick = 'jose-bot'
         self.modules = {}
+        self.env = {
+            'cooldowns': {},
+        }
         self.start_time = time.time()
         self.command_lock = False
 

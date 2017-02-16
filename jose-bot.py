@@ -34,6 +34,7 @@ jcommon.set_client(client) # to jcommon
 
 # initialize jose instance
 jose = jose_bot.JoseBot(client)
+env = jose.env
 
 GAMBLING_LAST_BID = 0.0
 
