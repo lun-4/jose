@@ -30,7 +30,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 
-JOSE_PREFIX = "!"
+JOSE_PREFIX = "j!"
 JOSE_VERSION = '1.3.5'
 
 MARKOV_LENGTH_PATH = 'db/wordlength.json'
