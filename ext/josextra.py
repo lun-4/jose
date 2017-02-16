@@ -60,10 +60,10 @@ class joseXtra(jaux.Auxiliar):
         self.msgcount += 1
 
     async def c_xkcd(self, message, args, cxt):
-        '''`!xkcd` - procura tirinhas do XKCD
-        `!xkcd` - mostra a tirinha mais recente
-        `!xkcd [num]` - mostra a tirinha de número `num`
-        `!xkcd rand` - tirinha aleatória
+        '''`j!xkcd` - procura tirinhas do XKCD
+        `j!xkcd` - mostra a tirinha mais recente
+        `j!xkcd [num]` - mostra a tirinha de número `num`
+        `j!xkcd rand` - tirinha aleatória
         '''
         n = False
         if len(args) > 1:
@@ -166,8 +166,8 @@ See the source at https://github.com/lkmnds/jose
 Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
 
     async def c_docs(self, message, args, cxt):
-        '''`!docs <topic>` - Documentação do josé
-        `!docs list` lista todos os tópicos disponíveis'''
+        '''`j!docs <topic>` - Documentação do josé
+        `j!docs list` lista todos os tópicos disponíveis'''
         if len(args) < 2:
             await cxt.say(self.c_docs.__doc__)
             return

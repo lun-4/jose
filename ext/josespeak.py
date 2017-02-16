@@ -256,19 +256,19 @@ class JoseSpeak(jcommon.Extension):
         json.dump(self.messages, open(self.db_msg_path, 'w'))
 
     async def c_savedb(self, message, args, cxt):
-        """`!savedb` - saves all available databases(autosaves every 3 minutes)"""
+        """`j!savedb` - saves all available databases(autosaves every 3 minutes)"""
         await self.is_admin(message.author.id)
 
         await self.save_databases()
         await cxt.say(":floppy_disk: saved messages database :floppy_disk:")
 
     async def c_speaktrigger(self, message, args, cxt):
-        """`!speaktrigger` - trigger jose's speaking code"""
+        """`j!speaktrigger` - trigger jose's speaking code"""
         self.flag = True
         await self.e_on_message(message, cxt)
 
     async def c_spt(self, message, args, cxt):
-        '''`!spt` - alias para `!speaktrigger`'''
+        '''`j!spt` - alias para `!speaktrigger`'''
         await self.c_speaktrigger(message, args, cxt)
 
     async def ext_load(self):
@@ -301,7 +301,7 @@ class JoseSpeak(jcommon.Extension):
             return False, str(e)
 
     async def c_getmsg(self, message, args, cxt):
-        '''`!getmsg serverid amount`'''
+        '''`j!getmsg serverid amount`'''
         await self.is_admin(message.author.id)
 
         try:
@@ -315,7 +315,7 @@ class JoseSpeak(jcommon.Extension):
         await cxt.say(self.codeblock("python", repr(msg)))
 
     async def c_ntexter(self, message, args, cxt):
-        '''`!ntexter serverid1 serverid2 ...` - Create Texters **[ADMIN COMMAND]**'''
+        '''`j!ntexter serverid1 serverid2 ...` - Create Texters **[ADMIN COMMAND]**'''
         await self.is_admin(message.author.id)
 
         try:
@@ -351,7 +351,7 @@ class JoseSpeak(jcommon.Extension):
             (t_taken, oldamount - newamount, oldamount))
 
     async def c_texstat(self, message, args, cxt):
-        '''`!texstat` - Texter Stats'''
+        '''`j!texstat` - Texter Stats'''
         svcount = len(self.client.servers)
         report = """%d/%d Texters loaded
  * Last Texter made had %d lines, took %.2fms to load it"""
@@ -416,7 +416,7 @@ class JoseSpeak(jcommon.Extension):
         await cxt.say(res)
 
     async def c_falar(self, message, args, cxt):
-        """`!falar [wordmax]` - josé fala(wordmax default 10)"""
+        """`j!falar [wordmax]` - josé fala(wordmax default 10)"""
         wordlength = 10
 
         if len(args) > 2:
@@ -429,7 +429,7 @@ class JoseSpeak(jcommon.Extension):
         await self.speak(self.cult_generator, wordlength, cxt)
 
     async def c_sfalar(self, message, args, cxt):
-        """`!sfalar [wordmax]` - falar usando textos do seu servidor atual(wordmax default 10)"""
+        """`j!sfalar [wordmax]` - falar usando textos do seu servidor atual(wordmax default 10)"""
         wordlength = 10
 
         if len(args) > 2:
@@ -446,7 +446,7 @@ class JoseSpeak(jcommon.Extension):
         await self.speak(self.text_generators[message.server.id], wordlength, cxt)
 
     async def c_gfalar(self, message, args, cxt):
-        """`!gfalar [wordmax]` - falar usando o texto global(wordmax default 10)"""
+        """`j!gfalar [wordmax]` - falar usando o texto global(wordmax default 10)"""
         wordlength = 10
 
         if len(args) > 2:
@@ -459,17 +459,17 @@ class JoseSpeak(jcommon.Extension):
         await self.speak(self.global_generator, wordlength, cxt)
 
     async def c_josetxt(self, message, args, cxt):
-        '''`!josetxt` - Mostra a quantidade de linhas, palavras e bytes no db/jose-data.txt'''
+        '''`j!josetxt` - Mostra a quantidade de linhas, palavras e bytes no db/jose-data.txt'''
         output = subprocess.Popen(['wc', 'db/jose-data.txt'], stdout=subprocess.PIPE).communicate()[0]
         await cxt.say(output)
 
     async def c_zelaotxt(self, message, args, cxt):
-        '''`!zelaotxt` - Mostra a quantidade de linhas, palavras e bytes no db/zelao.txt'''
+        '''`j!zelaotxt` - Mostra a quantidade de linhas, palavras e bytes no db/zelao.txt'''
         output = subprocess.Popen(['wc', 'db/zelao.txt'], stdout=subprocess.PIPE).communicate()[0]
         await cxt.say(output)
 
     async def c_jwormhole(self, message, args, cxt):
-        '''`!jwormhole` - Envia mensagens do !speaktrigger para o Wormhole do Septapus!'''
+        '''`j!jwormhole` - Envia mensagens do !speaktrigger para o Wormhole do Septapus!'''
         if message.server is None:
             await cxt.say("Esse comando não está disponível em DMs")
             return
@@ -480,5 +480,5 @@ class JoseSpeak(jcommon.Extension):
         await cxt.say("<@127296623779774464> wormhole send %s" % res)
 
     async def c_jw(self, message, args, cxt):
-        '''`!jw` - alias para `!jwormhole`'''
+        '''`j!jw` - alias para `!jwormhole`'''
         await self.c_jwormhole(message, args, cxt)

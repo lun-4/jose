@@ -92,7 +92,7 @@ class JoseMagicWord(jaux.Auxiliar):
         self.counter += 1
 
     async def c_setmw(self, message, args, cxt):
-        '''`!setmw magicword1,magicword2,magicword3;response` - Magic Words
+        '''`j!setmw magicword1,magicword2,magicword3;response` - Magic Words
         docs: https://github.com/lkmnds/jose/blob/master/doc/cmd/magicwords.md'''
 
         if len(args) < 2:
@@ -161,7 +161,7 @@ class JoseMagicWord(jaux.Auxiliar):
 
 
     async def c_listmw(self, message, args, cxt):
-        '''`!listmw [set]` - lists available magic words'''
+        '''`j!listmw [set]` - lists available magic words'''
 
         if message.server.id not in self.magicwords:
             await cxt.say(":warning: Database not created")
@@ -189,7 +189,7 @@ class JoseMagicWord(jaux.Auxiliar):
 
 
     async def c_delmw(self, message, args, cxt):
-        '''`!delmw set` - deletes a magic word set'''
+        '''`j!delmw set` - deletes a magic word set'''
 
         if len(args) < 2:
             await cxt.say(self.c_delmw.__doc__)

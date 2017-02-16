@@ -19,13 +19,13 @@ import urllib
 import json
 
 MEMES_TECH_HELP = '''
-Então você teve problemas usando `!m stat` ou `!m get` ou alguma merda assim?
+Então você teve problemas usando `j!m stat` ou `j!m get` ou alguma merda assim?
 Siga esses passos:
-    1) Rode um `!m check` no josé
-        O `!m check` irá checar meme por meme e ver se ele faz sentido, tipo ter um
+    1) Rode um `j!m check` no josé
+        O `j!m check` irá checar meme por meme e ver se ele faz sentido, tipo ter um
         número de usos, se não, ele irá corrigir automaticamente
 
-        Outra coisa que o `!m check` faz é procurar por duplicatas, ou seja, 2 memes que
+        Outra coisa que o `j!m check` faz é procurar por duplicatas, ou seja, 2 memes que
         vão pro mesmo resultado, ele te mostra quem tem duplicata e você remove manualmente
     2) Se o problema persiste, fale com lunão.
 '''
@@ -85,7 +85,7 @@ class JoseMemes(jcommon.Extension):
             return False
 
     async def c_aprovado(self, message, args, cxt):
-        '''`!aprovado` - O Melhor Sean Anthony®'''
+        '''`j!aprovado` - O Melhor Sean Anthony®'''
         await cxt.say('http://gaveta.com.br/images/Aprovacao-Sean-Anthony.png')
 
     async def c_htmpr(self, message, args, cxt):
@@ -93,25 +93,25 @@ class JoseMemes(jcommon.Extension):
 
     async def c_meme(self, message, args, cxt):
         '''
-        !meme: Adicione e mostre memes com o josé!
+        j!meme: Adicione e mostre memes com o josé!
         **RECOMENDADO**: use `!htmpr` para descobrir problemas técnicos.
-        *alias*: !m
+        *alias*: j!m
 
         Subcomandos:
-        `!meme add <trigger>;<meme>` - toda vez que alguém mandar um `!meme get <trigger>`, josé falará `<meme>`(limite de <trigger> é 96 chars)
-        `!meme get <trigger>` - josé falará o que estiver programado para falar de acordo com `<trigger>`
-        `!meme search <termo>` - procura o banco de dados de memes por um meme específico
-        `!meme rm <meme>` - remove um meme
-        `!meme rename <nome antigo>;<nome novo>` - altera o `<trigger>` de um meme
-        `!meme owner <meme>` - mostra quem "criou" o `<meme>`
-        `!meme count` - mostra a quantidade de memes
-        `!meme stat` - estatísticas sobre o uso dos memes
-        `!meme istat <meme>` - estatísticas individuais sobre um meme
-        `!meme page <página>` - mostra a página tal de todos os memes disponíveis(inicia de 1, não do 0)
-        `!meme see @user <página>` - mostra todos os memes que a @pessoa fez(`página` inicia de 0, não de 1)
-        `!meme check` - checa o banco de dados de memes
-        `!meme rand` - meme aleatório
-        `!meme searchc <termos>` - procura o DB de meme qual o valor do meme que bate com os termos
+        `j!meme add <trigger>;<meme>` - toda vez que alguém mandar um `!meme get <trigger>`, josé falará `<meme>`(limite de <trigger> é 96 chars)
+        `j!meme get <trigger>` - josé falará o que estiver programado para falar de acordo com `<trigger>`
+        `j!meme search <termo>` - procura o banco de dados de memes por um meme específico
+        `j!meme rm <meme>` - remove um meme
+        `j!meme rename <nome antigo>;<nome novo>` - altera o `<trigger>` de um meme
+        `j!meme owner <meme>` - mostra quem "criou" o `<meme>`
+        `j!meme count` - mostra a quantidade de memes
+        `j!meme stat` - estatísticas sobre o uso dos memes
+        `j!meme istat <meme>` - estatísticas individuais sobre um meme
+        `j!meme page <página>` - mostra a página tal de todos os memes disponíveis(inicia de 1, não do 0)
+        `j!meme see @user <página>` - mostra todos os memes que a @pessoa fez(`página` inicia de 0, não de 1)
+        `j!meme check` - checa o banco de dados de memes
+        `j!meme rand` - meme aleatório
+        `j!meme searchc <termos>` - procura o DB de meme qual o valor do meme que bate com os termos
 
         Tenha cuidado ao adicionar coisas NSFW.
         '''
@@ -445,11 +445,11 @@ class JoseMemes(jcommon.Extension):
         return
 
     async def c_m(self, message, args, cxt):
-        '''`!m` - alias para `!meme`'''
+        '''`j!m` - alias para `!meme`'''
         await self.c_meme(message, args, cxt)
 
     async def c_fullwidth(self, message, args, cxt):
-        '''`!fullwidth texto` - converte texto para fullwidth'''
+        '''`j!fullwidth texto` - converte texto para fullwidth'''
         # looks like discord made fullwidth suppoert available again :D
         text = ' '.join(args[1:])
         if len(text.strip()) <= 0:
@@ -458,11 +458,11 @@ class JoseMemes(jcommon.Extension):
         await cxt.say(text.translate(self.WIDE_MAP))
 
     async def c_fw(self, message, args, cxt):
-        '''`!fw` - alias para `!fullwidth`'''
+        '''`j!fw` - alias para `!fullwidth`'''
         await self.c_fullwidth(message, args, cxt)
 
     async def c_emoji(self, message, args, cxt):
-        '''`!emoji [qt]` - gera de 1 a 5(ou `qt`(máx. 512)) emojis aleatórios'''
+        '''`j!emoji [qt]` - gera de 1 a 5(ou `qt`(máx. 512)) emojis aleatórios'''
         res = ''
         if len(args) < 2:
             res = await jcommon.random_emoji(random.randint(1,5))
@@ -478,7 +478,7 @@ class JoseMemes(jcommon.Extension):
         await cxt.say(res)
 
     async def c_blackmirror(self, message, args, cxt):
-        '''`!blackmirror` - COISAS MUITO BLACK MIRROR, MEU'''
+        '''`j!blackmirror` - COISAS MUITO BLACK MIRROR, MEU'''
         mensagem_muito_blackmirror = random.choice(BLACK_MIRROR_MESSAGES)
         await cxt.say(mensagem_muito_blackmirror)
 
@@ -550,7 +550,7 @@ class JoseMemes(jcommon.Extension):
             return
 
     async def c_wiki(self, message, args, cxt):
-        '''`!wiki [terms]` - procurar na WIKIPEDIA!!!'''
+        '''`j!wiki [terms]` - procurar na WIKIPEDIA!!!'''
         wikipedia_params = {
             'name': 'en.wikipedia',
             'args': args,
@@ -568,7 +568,7 @@ class JoseMemes(jcommon.Extension):
             await self.wikimedia_api(wikipedia_params, cxt)
 
     async def c_deswiki(self, message, args, cxt):
-        '''`!deswiki [terms]` - procurar na DESCICLOPEDIA!!!'''
+        '''`j!deswiki [terms]` - procurar na DESCICLOPEDIA!!!'''
         await self.wikimedia_api(
             {
                 'name': 'desciclopedia',

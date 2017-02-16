@@ -148,7 +148,7 @@ class JoseStats(jaux.Auxiliar):
             self.statistics['gl_messages'] += 1
 
     async def c_rawquery(self, message, args, cxt):
-        '''`!rawquery string` - Fazer pedidos ao banco de dados de estatísticas do josé'''
+        '''`j!rawquery string` - Fazer pedidos ao banco de dados de estatísticas do josé'''
         query_string = ' '.join(args[1:])
         if True:
             await cxt.say("raw queries not available for now")
@@ -162,7 +162,7 @@ class JoseStats(jaux.Auxiliar):
             await cxt.say(self.codeblock("", response))
 
     async def c_query(self, message, args, cxt):
-        '''`!query data` - Fazer pedidos ao banco de dados de estatísticas do josé
+        '''`j!query data` - Fazer pedidos ao banco de dados de estatísticas do josé
 A lista de possíveis dados está em https://github.com/lkmnds/jose/blob/master/doc/queries-pt.md'''
 
         if len(args) < 2:

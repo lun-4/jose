@@ -21,7 +21,7 @@ class JoseMath(jaux.Auxiliar):
         return True, ''
 
     async def c_wolframalpha(self, message, args, cxt):
-        '''`!wolframalpha terms` - make a request to Wolfram|Alpha
+        '''`j!wolframalpha terms` - make a request to Wolfram|Alpha
         **ratelimit GLOBAL: 2 chamadas por hora**'''
         if len(args) < 2:
             await cxt.say(self.c_wolframalpha.__doc__)
@@ -42,11 +42,11 @@ class JoseMath(jaux.Auxiliar):
             return
 
     async def c_wa(self, message, args, cxt):
-        '''`!wa terms` - alias para `!wolframalpha`'''
+        '''`j!wa terms` - alias para `!wolframalpha`'''
         await self.c_wolframalpha(message, args, cxt)
 
     async def c_temperature(self, message, args, cxt):
-        '''`!temperature location` - Temperatura de um local, usando OpenWeatherMap
+        '''`j!temperature location` - Temperatura de um local, usando OpenWeatherMap
         mostra tanto em Celsius quanto em Fahrenheit
         **ratelimit GLOBAL: 60 chamadas / minuto**'''
         if len(args) < 2:
@@ -71,11 +71,11 @@ class JoseMath(jaux.Auxiliar):
         await cxt.say("%s °C, %s °F" % (celsiusnow, fahnow))
 
     async def c_temp(self, message, args, cxt):
-        '''`!temp location` - alias para `!temperature`'''
+        '''`j!temp location` - alias para `!temperature`'''
         await self.c_temperature(message, args, cxt)
 
     async def c_therm(self, message, args, cxt):
-        '''`!therm location` - alias para `!temperature`'''
+        '''`j!therm location` - alias para `!temperature`'''
         await self.c_temperature(message, args, cxt)
 
     def lewd(self, n):
@@ -92,7 +92,7 @@ class JoseMath(jaux.Auxiliar):
             num += 6
 
     async def c_lewd(self, message, args, cxt):
-        '''`!lewd n` - shows the `n` lewd numbers'''
+        '''`j!lewd n` - shows the `n` lewd numbers'''
         if len(args) < 2:
             await cxt.say(self.c_lewd.__doc__)
 
@@ -109,5 +109,5 @@ class JoseMath(jaux.Auxiliar):
         await cxt.say(self.codeblock("", list(self.lewd(n))))
 
     async def c_plot(self, message, args, cxt):
-        '''`!plot func` - plot f(x) functions'''
+        '''`j!plot func` - plot f(x) functions'''
         pass
