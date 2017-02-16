@@ -227,7 +227,7 @@ class JoseBot(jcommon.Extension):
             await module['inst'].recv(message)
 
     async def c_reload(self, message, args, cxt):
-        '''`!reload module` - recarrega um módulo do josé'''
+        '''`j!reload module` - recarrega um módulo do josé'''
         await self.is_admin(message.author.id)
 
         if len(args) < 2:
@@ -241,7 +241,7 @@ class JoseBot(jcommon.Extension):
             await cxt.say("%s: module not found/loaded" % n)
 
     async def c_unload(self, message, args, cxt):
-        '''`!unload module` - desrecarrega um módulo do josé'''
+        '''`j!unload module` - desrecarrega um módulo do josé'''
         await self.is_admin(message.author.id)
 
         if len(args) < 2:
@@ -262,7 +262,7 @@ class JoseBot(jcommon.Extension):
                 await cxt.say(":warning: Error happened: %s" % res[1])
 
     async def c_loadmod(self, message, args, cxt):
-        '''`!loadmod class@module` - carrega um módulo do josé'''
+        '''`j!loadmod class@module` - carrega um módulo do josé'''
         await self.is_admin(message.author.id)
 
         if len(args) < 2:
@@ -280,7 +280,7 @@ class JoseBot(jcommon.Extension):
             await cxt.say(":warning: Error loading `%s` :warning:" % modname)
 
     async def c_modlist(self, message, args, cxt):
-        '''`!modlist` - Módulos do josé'''
+        '''`j!modlist` - Módulos do josé'''
         mod_list = []
         for key in self.modules:
             if 'module' in self.modules[key]:
@@ -317,11 +317,11 @@ class JoseBot(jcommon.Extension):
         sys.exit(0)
 
     async def c_shutdown(self, message, args, cxt):
-        '''`!shutdown` - desliga o josé'''
+        '''`j!shutdown` - desliga o josé'''
         await self.sec_auth(self.turnoff, cxt)
 
     async def c_ping(self, message, args, cxt):
-        '''`!ping` - pong'''
+        '''`j!ping` - pong'''
         t_init = time.time()
         t_cmdprocess = (time.time() - cxt.t_creation) * 1000
         pong = await cxt.say("pong! took **%.2fms** to process the command" % (t_cmdprocess))
@@ -330,7 +330,7 @@ class JoseBot(jcommon.Extension):
         await self.client.edit_message(pong, pong.content + ", **%.2fms** to send it" % (delta * 1000))
 
     async def c_rand(self, message, args, cxt):
-        '''`!rand min max` - gera um número aleatório no intervalo [min, max]'''
+        '''`j!rand min max` - gera um número aleatório no intervalo [min, max]'''
         n_min, n_max = 0,0
         try:
             n_min = int(args[1])
@@ -348,7 +348,7 @@ class JoseBot(jcommon.Extension):
         return
 
     async def c_enc(self, message, args, cxt):
-        '''`!enc text` - encriptar'''
+        '''`j!enc text` - encriptar'''
         if len(args) < 2:
             await cxt.say(self.c_enc.__doc__)
             return
@@ -360,7 +360,7 @@ class JoseBot(jcommon.Extension):
         return
 
     async def c_dec(self, message, args, cxt):
-        '''`!dec text` - desencriptar'''
+        '''`j!dec text` - desencriptar'''
         if len(args) < 2:
             await cxt.say(self.c_dec.__doc__)
             return
@@ -377,7 +377,7 @@ class JoseBot(jcommon.Extension):
         return
 
     async def c_money(self, message, args, cxt):
-        '''`!money quantity base to` - converte dinheiro usando cotações etc
+        '''`j!money quantity base to` - converte dinheiro usando cotações etc
         `!money list` - lista todas as moedas disponíveis'''
 
         if len(args) > 1:
@@ -422,7 +422,7 @@ class JoseBot(jcommon.Extension):
         ))
 
     async def c_yt(self, message, args, cxt):
-        '''`!yt [termo 1] [termo 2]...` - procura no youtube'''
+        '''`j!yt [termo 1] [termo 2]...` - procura no youtube'''
         if len(args) < 2:
             await cxt.say(self.c_yt.__doc__)
             return
@@ -449,7 +449,7 @@ class JoseBot(jcommon.Extension):
         await cxt.say("http://www.youtube.com/watch?v=" + search_results[0])
 
     async def c_sndc(self, message, args, cxt):
-        '''`!sndc [termo 1] [termo 2]...` - procura no soundcloud'''
+        '''`j!sndc [termo 1] [termo 2]...` - procura no soundcloud'''
         if len(args) < 2:
             await cxt.say(self.c_sndc.__doc__)
             return
@@ -487,7 +487,7 @@ class JoseBot(jcommon.Extension):
             return
 
     async def c_pstatus(self, message, args, cxt):
-        '''`!pstatus` - muda o status do josé'''
+        '''`j!pstatus` - muda o status do josé'''
         await self.is_admin(message.author.id)
 
         playing_name = ' '.join(args[1:])
@@ -495,7 +495,7 @@ class JoseBot(jcommon.Extension):
         await self.client.change_presence(game=g)
 
     async def c_escolha(self, message, args, cxt):
-        '''`!escolha elemento1;elemento2;elemento3;...;elementon` - escolha.'''
+        '''`j!escolha elemento1;elemento2;elemento3;...;elementon` - escolha.'''
         if len(args) < 2:
             await cxt.say(self.c_escolha.__doc__)
             return
@@ -505,11 +505,11 @@ class JoseBot(jcommon.Extension):
         await cxt.say(">%s" % choice)
 
     async def c_pick(self, message, args, cxt):
-        '''`!pick` - alias for `!escolha`'''
+        '''`j!pick` - alias for `!escolha`'''
         await self.c_escolha(message, args, cxt)
 
     async def c_nick(self, message, args, cxt):
-        '''`!nick [nick]` - [SOMENTE ADMIN]'''
+        '''`j!nick [nick]` - [SOMENTE ADMIN]'''
         await self.is_admin(message.author.id)
 
         if len(args) < 2:
@@ -528,7 +528,7 @@ class JoseBot(jcommon.Extension):
         return
 
     async def c_distatus(self, message, args, cxt):
-        '''`!distatus` - mostra alguns dados para mostrar se o Discord está funcionando corretamente'''
+        '''`j!distatus` - mostra alguns dados para mostrar se o Discord está funcionando corretamente'''
         await self.is_admin(message.author.id)
 
         host = "discordapp.com"
@@ -555,7 +555,7 @@ class JoseBot(jcommon.Extension):
         await cxt.say(fmt % (host, rtt[0], rtt[1], rtt[2], rtt[3], looks_like))
 
     async def c_version(self, message, args, cxt):
-        '''`!version` - mostra a versão do jose'''
+        '''`j!version` - mostra a versão do jose'''
         pyver = '%d.%d.%d' % (sys.version_info[:3])
         await cxt.say("`José v%s py:%s discord.py:%s`" % (jcommon.JOSE_VERSION
             , pyver, discord.__version__))
@@ -564,7 +564,7 @@ class JoseBot(jcommon.Extension):
         await cxt.say("José pode ser adicionado para outro servidor usando este link:\n```%s```" % jcommon.OAUTH_URL)
 
     async def c_clist(self, message, args, cxt):
-        '''`!clist module` - mostra todos os comandos de tal módulo'''
+        '''`j!clist module` - mostra todos os comandos de tal módulo'''
         if len(args) < 2:
             await cxt.say(self.c_clist.__doc__)
             return
@@ -580,7 +580,7 @@ class JoseBot(jcommon.Extension):
         await cxt.say(self.codeblock('', res))
 
     async def c_uptime(self, message, args, cxt):
-        '''`!uptime` - mostra o uptime do josé'''
+        '''`j!uptime` - mostra o uptime do josé'''
         sec = (time.time() - self.start_time)
         MINUTE  = 60
         HOUR    = MINUTE * 60
@@ -617,7 +617,7 @@ class JoseBot(jcommon.Extension):
         await self.client.change_presence(game = g)
 
     async def c_tempadmin(self, message, args, cxt):
-        '''`!tempadmin userID` - maka a user an admin until josé restarts'''
+        '''`j!tempadmin userID` - maka a user an admin until josé restarts'''
         await self.is_admin(message.author.id)
 
         try:
@@ -633,7 +633,7 @@ class JoseBot(jcommon.Extension):
             await cxt.say(":poop: Error adding user as temporary admin")
 
     async def c_username(self, message, args, cxt):
-        '''`!username` - change josé username'''
+        '''`j!username` - change josé username'''
         await self.is_admin(message.author.id)
 
         try:
@@ -644,7 +644,7 @@ class JoseBot(jcommon.Extension):
             await cxt.say("err hapnnd!!!!!!!! %r" % e)
 
     async def c_announce(self, message, args, cxt):
-        '''`!announce` - announce stuff'''
+        '''`j!announce` - announce stuff'''
         await self.is_admin(message.author.id)
 
         announcement = ' '.join(args[1:])

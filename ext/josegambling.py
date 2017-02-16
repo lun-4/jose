@@ -23,7 +23,7 @@ class JoseGambling(jcommon.Extension):
         return True, ''
 
     async def c_aposta(self, message, args, cxt):
-        '''`!aposta` - inicia o modo aposta se ainda não foi ativado'''
+        '''`j!aposta` - inicia o modo aposta se ainda não foi ativado'''
 
         if message.channel.is_private:
             await cxt.say("Nenhum canal privado é autorizado a iniciar o modo de aposta")
@@ -38,7 +38,7 @@ class JoseGambling(jcommon.Extension):
             return
 
     async def c_ap(self, message, args, cxt):
-        '''`!ap valor` - apostar no sistema de apostas do josé'''
+        '''`j!ap valor` - apostar no sistema de apostas do josé'''
 
         if len(args) != 2:
             await cxt.say(self.c_ap.__doc__)
@@ -92,7 +92,7 @@ class JoseGambling(jcommon.Extension):
             await cxt.say('jc->error: %s' % res[1])
 
     async def c_rolar(self, message, args, cxt):
-        '''`!rolar` - rola e mostra quem é o vencedor'''
+        '''`j!rolar` - rola e mostra quem é o vencedor'''
 
         PORCENTAGEM_GANHADOR = 76.54
         PORCENTAGEM_OUTROS = 100 - PORCENTAGEM_GANHADOR
@@ -144,7 +144,7 @@ class JoseGambling(jcommon.Extension):
         return
 
     async def c_areport(self, message, args, cxt):
-        '''`!areport` - relatório da aposta'''
+        '''`j!areport` - relatório da aposta'''
         res = ''
         total = decimal.Decimal(0)
         for apostador in self.gambling_env:
@@ -155,11 +155,11 @@ class JoseGambling(jcommon.Extension):
         await cxt.say(res)
 
     async def c_acheck(self, message, args, cxt):
-        '''`!acheck` - mostra se o modo aposta tá ligado ou não'''
+        '''`j!acheck` - mostra se o modo aposta tá ligado ou não'''
         await cxt.say("Modo aposta: %s" % ["desligado", "ligado"][self.gambling_mode])
 
     async def c_flip(self, message, args, cxt):
-        '''`!flip` - joga uma moeda(49%, 49% 2%)'''
+        '''`j!flip` - joga uma moeda(49%, 49% 2%)'''
         p = random.random()
         if p < 0.49:
             await cxt.say('http://i.imgur.com/GtTQvaM.jpg') # cara
