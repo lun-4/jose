@@ -494,9 +494,9 @@ async def on_server_join(server):
             await client.send_message(channel, jcommon.WELCOME_MESSAGE)
 
 @client.event
-async def on_error(event):
+async def on_error(event, *args, **kwargs):
     err = traceback.format_exc()
-    jcommon.logger.error("Error at %s, %s" % (str(event), err))
+    jcommon.logger.error("Error at %s(%s, %s), %s" % (str(event), args, kwargs, err))
 
 async def main_task():
     global client
