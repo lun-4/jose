@@ -642,3 +642,23 @@ class JoseBot(jcommon.Extension):
             await cxt.say("done!!!!1!!1 i am now %s" % name)
         except Exception as e:
             await cxt.say("err hapnnd!!!!!!!! %r" % e)
+
+    async def c_announce(self, message, args, cxt):
+        '''`!announce` - announce stuff'''
+        await self.is_admin(message.author.id)
+
+        announcement = ' '.join(args[1:])
+        await cxt.say("I'm gonna say `%r` to all servers I'm in, are you sure about that, pretty admin? (y/n)")
+        yesno = await self.client.wait_for_message(author=message.author)
+
+        if yesno.content == 'y':
+            svcount, chcount = 0
+            for server in self.client.servers:
+                for channel in server:
+                    if channel.is_default:
+                        await self.client.send_message(channel, announcement)
+                        chcount += 1
+                svcount += 1
+            await cxt.say("Sent announcement to %d servers, %d channels".format(svcount, chcount))
+        else:
+            await cxt.say("jk I'm not gonna do what you don't want (unless I'm skynet)")
