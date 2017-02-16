@@ -32,6 +32,7 @@ class JoseBot(jcommon.Extension):
         self.modules = {}
         self.env = {
             'cooldowns': {},
+            'stcmd': {},
         }
         self.start_time = time.time()
         self.command_lock = False

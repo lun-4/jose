@@ -334,24 +334,30 @@ async def on_message(message):
         # Check for cooldowns from the author of the command
         authorid = message.author.id
         now = time.time()
-        if authorid not in env['cooldowns']:
-            env['cooldowns'][authorid] = now + jcommon.COOLDOWN_SECONDS
+        if authorid in env['stcmd']:
+            if authorid not in env['cooldowns']:
+                env['cooldowns'][authorid] = now + jcommon.COOLDOWN_SECONDS
+        else:
+            env['stcmd'][authorid] = True
 
         # timestamp to terminate the cooldown
-        cdown_term_time = env['cooldowns'][authorid]
-        if now < cdown_term_time:
-            secleft = now - cdown_term_time
-            m = await cxt.say("Please cool down!(%d seconds left)", (secleft,))
-            await asyncio.sleep(secleft)
-            await client.delete_message(m)
+        if authorid in env['cooldowns']
+            cdown_term_time = env['cooldowns'][authorid]
+            if now < cdown_term_time:
+                secleft = cdown_term_time - now
+                m = await cxt.say("Please cool down!(%d seconds left)", (secleft,))
+                await asyncio.sleep(secleft)
+                await client.delete_message(m)
 
-            # don't go more than here, just remove the cooldown and return
-            try:
-                del env['cooldowns'][authorid]
-            except Exception as e:
-                pass
+                # don't go more than here, just remove the cooldown and return
+                try:
+                    del env['cooldowns'][authorid]
+                except Exception as e:
+                    pass
 
-            return
+                return
+        else:
+            pass
 
         if command == 'help':
             # load helptext
