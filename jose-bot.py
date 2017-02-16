@@ -132,11 +132,11 @@ josecoin_save = jc.josecoin_save
 josecoin_load = jc.josecoin_load
 
 commands_start = {
-    '!learn': learn_data,
-    '!ahelp': jcommon.show_gambling_full,
-    '!adummy': jcommon.show_gambling,
-    '!awoo': jcommon.make_func("https://cdn.discordapp.com/attachments/202055538773721099/257717450135568394/awooo.gif"),
-    '!price': show_price,
+    'j!learn': learn_data,
+    'j!ahelp': jcommon.show_gambling_full,
+    'j!adummy': jcommon.show_gambling,
+    'j!awoo': jcommon.make_func("https://cdn.discordapp.com/attachments/202055538773721099/257717450135568394/awooo.gif"),
+    'j!price': show_price,
 }
 
 commands_match = {
@@ -197,9 +197,9 @@ load_module('joseartif', 'JoseArtif')
 load_module('josemath', 'JoseMath')
 
 help_helptext = """
-`!help` - achar ajuda para outros comandos
-`!help <comando>` - procura algum texto de ajuda para o comando dado
-Exemplos: `!help help`, `!help pstatus`, `!help ap`, `!help wa`, etc.
+`j!help` - achar ajuda para outros comandos
+`j!help <comando>` - procura algum texto de ajuda para o comando dado
+Exemplos: `j!help help`, `j!help pstatus`, `j!help ap`, `j!help wa`, etc.
 """
 
 event_table = {

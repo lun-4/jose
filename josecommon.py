@@ -102,19 +102,19 @@ JOSE_PLAYING_PHRASES = playing_phrases.JOSE_PLAYING_PHRASES
 WELCOME_MESSAGE = '''
 Thanks for implementing José v{} into your server!
 Jose is a bot that learns to speak based on conversations that happen in your server.
-See `!docs josespeak` to learn more about this.
+**See `j!docs josespeak` to learn more about this.**
 To start off, you need to generate at least 100 messages, just talk and watch the magic happen!
-When he's ready, you can use `!speaktrigger` or `!spt` to hear what he has to say.
+When he's ready, you can use `j!speaktrigger` or `j!spt` to hear what he has to say.
 
-Use `!language en` to set your language to English or `!language pt` to set your language to Portuguese.
+Use `j!language en` to set your language to English or `j!language pt` to set your language to Portuguese.
 '''.format(JOSE_VERSION)
 
 JOSE_GENERAL_HTEXT = '''
 Recommended *top notch* Reading, the command list:
-Also `!info` has the José Testing Enviroment invite if you have any problems.
+Also `j!info` has the José Testing Enviroment invite if you have any problems.
 ---
 Recomenado a leitura da lista de comandos, em inglês:
-`!info` tem o invite para o José Testing Enviroment se você tiver algum problema.
+`j!info` tem o invite para o José Testing Enviroment se você tiver algum problema.
 ---
 
 https://github.com/lkmnds/jose/blob/master/doc/cmd/listcmd.md
@@ -134,12 +134,12 @@ temporariamente como se fosse um "acesso a memória RAM"
 
 Exemplo:
 Número de apostadores = 3 (pessoas A, B e C, respectivamente)
-Inserindo o comando ---> !aposta
+Inserindo o comando ---> j!aposta
 jose-bot printa: "Modo aposta ativado. Joguem suas granas!"
-A pessoa A aposta 50 josecoins ---> !ap 50
-A pessoa B aposta 30 josecoins ---> !ap 30
-A pessoa C aposta 20 josecoins ---> !ap 20
-"Rolando o dado" ---> !rolar
+A pessoa A aposta 50 josecoins ---> j!ap 50
+A pessoa B aposta 30 josecoins ---> j!ap 30
+A pessoa C aposta 20 josecoins ---> j!ap 20
+"Rolando o dado" ---> j!rolar
 
 Cálculo do prêmio:
 M = montante acumulado de todas as apostas
@@ -155,9 +155,9 @@ Desses 23.46 josecoins, as pessoas A e C vão receber, cada uma, 11.73 josecoins
 '''
 
 GAMBLING_HELP_TEXT_SMALL = '''Aposta for Dummies:
-!aposta - inicia modo de aposta do jose
-!ap <quantidade> - aposta propiamente dita
-!rolar - quando você já está pronto pra ver quem é o ganhador
+j!aposta - inicia modo de aposta do jose
+j!ap <quantidade> - aposta propiamente dita
+j!rolar - quando você já está pronto pra ver quem é o ganhador
 '''
 
 debug_logs = []
@@ -395,7 +395,7 @@ async def init_db(client):
 
 async def register_table(tableid, table_stmt):
     global conn
-    logger.info("Regiter table %s", tableid)
+    logger.info("Register table %s", tableid)
     cur = conn.cursor()
     cur.execute(table_stmt)
     conn.commit()
