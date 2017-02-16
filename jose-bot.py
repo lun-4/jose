@@ -496,7 +496,7 @@ async def on_server_join(server):
 @client.event
 async def on_error(event):
     err = traceback.format_exc()
-    logger.error("Error at %s, %s" % (str(event), err))
+    jcommon.logger.error("Error at %s, %s" % (str(event), err))
 
 async def main_task():
     global client
