@@ -661,7 +661,7 @@ sure about that, pretty admin? (y/n)" % announcement)
                         chcount += 1
                 svcount += 1
             await cxt.say("Sent announcement to \
-%d servers, %d channels".format(svcount, chcount))
+%d servers, %d channels" % (svcount, chcount))
         else:
             await cxt.say("jk I'm not gonna do what you \
 don't want (unless I'm skynet)")
