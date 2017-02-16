@@ -345,6 +345,8 @@ async def on_message(message):
             cdown_term_time = env['cooldowns'][authorid]
             if now < cdown_term_time:
                 secleft = cdown_term_time - now
+
+                # say to the user they're being a shit person
                 m = await cxt.say("Please cool down!(%d seconds left)", (secleft,))
                 await asyncio.sleep(secleft)
                 await client.delete_message(m)
@@ -352,6 +354,7 @@ async def on_message(message):
                 # don't go more than here, just remove the cooldown and return
                 try:
                     del env['cooldowns'][authorid]
+                    del env['stcmd'][authorid]
                 except Exception as e:
                     pass
 
