@@ -641,8 +641,11 @@ class Context:
             if tup is not None:
                 translated = translated % tup
 
-            ret = await self.client.send_message(channel, translated)
-            return ret
+            try:
+                ret = await self.client.send_message(channel, translated)
+                return ret
+            except discord.Forbidden:
+                logger.info("discord.Forbidden: %r %r %r" % (channel, channel.server.id, channel.server.name))
 
 class EmptyContext:
     def __init__(self, client, message):
