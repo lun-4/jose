@@ -334,7 +334,7 @@ async def on_message(message):
         # Check for cooldowns from the author of the command
         authorid = message.author.id
         now = time.time()
-        if authorid in env['cooldowns']:
+        if authorid not in env['cooldowns']:
             env['cooldowns'][authorid] = now + jcommon.COOLDOWN_SECONDS
 
         # timestamp to terminate the cooldown
@@ -345,7 +345,12 @@ async def on_message(message):
             await asyncio.sleep(secleft)
             await client.delete_message(m)
 
-            # don't go more than here, just return
+            # don't go more than here, just remove the cooldown and return
+            try:
+                del env['cooldowns'][authorid]
+            except Exception as e:
+                pass
+
             return
 
         if command == 'help':
