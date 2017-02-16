@@ -96,7 +96,7 @@ class JoseStats(jaux.Auxiliar):
 
     async def db_fsizes(self):
         return {
-            'jspeak:markovdb': os.path.getsize(jcommon.MARKOV_DB_PATH),
+            'jspeak:database': os.path.getsize(jcommon.JOSE_DATABASE_PATH),
             'jspeak:word_length': os.path.getsize(jcommon.MARKOV_LENGTH_PATH),
             'jspeak:message_count': os.path.getsize(jcommon.MARKOV_MESSAGES_PATH),
             'jstats:statistics': os.path.getsize(jcommon.STAT_DATABASE_PATH),

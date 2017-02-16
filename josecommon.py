@@ -387,11 +387,12 @@ async def cbk_remove(callback_id):
 # === DATABASE API ===
 
 conn = None
+JOSE_DATABASE_PATH = "jose.db"
 
 async def init_db(client):
     global conn
     logger.info("Initialize jose SQL database")
-    conn = sqlite3.connect("jose.db")
+    conn = sqlite3.connect(JOSE_DATABASE_PATH)
 
 async def register_table(tableid, table_stmt):
     global conn
