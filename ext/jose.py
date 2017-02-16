@@ -653,7 +653,7 @@ sure about that, pretty admin? (y/n)" % announcement)
         yesno = await self.client.wait_for_message(author=message.author)
 
         if yesno.content == 'y':
-            svcount, chcount = 0
+            svcount, chcount = 0, 0
             for server in self.client.servers:
                 for channel in server:
                     if channel.is_default:
