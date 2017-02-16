@@ -93,5 +93,6 @@ JOSE_PLAYING_PHRASES = [
     'PREGANANACY',
     'Tinder',
     'Richard Stallman Simulator',
-    ''
+    '',
+    'good bye fellow ! prefix',
 ]
