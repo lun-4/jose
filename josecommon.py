@@ -518,9 +518,9 @@ def parse_command(message):
 
     if message.startswith(JOSE_PREFIX):
         k = message.find(" ")
-        command = message[1:k]
+        command = message[len(JOSE_PREFIX):k]
         if k == -1:
-            command = message[1:]
+            command = message[len(JOSE_PREFIX):]
         args = message.split(' ')
         method = "c_%s" % command
         return command, args, method
