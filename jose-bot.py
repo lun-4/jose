@@ -517,6 +517,7 @@ async def on_error(event, *args, **kwargs):
     err = traceback.format_exc()
     jcommon.logger.error("Error at %s(%s, %s), %s" % (str(event), args, kwargs, err))
     if str(event) == 'on_message':
+        message = args[0]
         jcommon.logger.error("Message error at ServerID %s name %s" % (message.server.id, message.server.name))
 
 async def main_task():
