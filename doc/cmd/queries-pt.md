@@ -1,4 +1,4 @@
-Tipos de pedidos para o comando `!query`
+Tipos de pedidos para o comando `j!query`
 =========================================
 
 *English documentation: [queries.md](https://github.com/lkmnds/jose/blob/master/doc/queries.md)*
@@ -7,18 +7,18 @@ Tipos de pedidos para o comando `!query`
 
 *local/localmente*: aplicado somente em um servidor específico, normalmente no servidor em que uma mensagem/comando se originou
 
- * `!query summary`
+ * `j!query summary`
   * Sumário: todas as mensagens e comandos recebidos, e também o comando mais usado globalmente
 
- * `!query dbsize`
+ * `j!query dbsize`
   * Mostra o tamanho dos 4 bancos de dados que o josé usa
    * `markovdb`: o banco de dados para o gerador de textos de Markov, normalmente é o maior banco de dados pois possui todas as mensagens recebidas
    * `messages`: contador de mensagens por servidor
    * `itself`: o banco de dados de estatísticas
    * `wlength`: o banco de dados do tamanho de palavras(usado pelo `josespeak`)
 
- * `!query this`
+ * `j!query this`
   * Mostra as mesmas informações que o `!query summary`, mas informações locais
 
- * `!query topcmd`
+ * `j!query topcmd`
   * Mostra os comandos mais usados

@@ -13,9 +13,9 @@ say something, for example when someone says "good night", José responds "Good 
 
 ## Setup a magicword
 
- * Use the `!setmw` command, like this:
+ * Use the `j!setmw` command, like this:
   ```
-  !setmw myword1,myword2,myword3,my word 4;you said a word
+  j!setmw myword1,myword2,myword3,my word 4;you said a word
   ```
   * When anyone says a text that contains `"myword1", "myword2", "myword3"` or `"my word 4"`,
    José will respond "you said a word"
@@ -39,12 +39,12 @@ say something, for example when someone says "good night", José responds "Good 
 
 ## Formatting responses with Magic Words
  * The responses José gives can be a little different based on the formatting of the response
-  * Taking for example a magicword set up like `!setmw hello,hi;hello %a`
+  * Taking for example a magicword set up like `j!setmw hello,hi;hello %a`
   * Every time someone says or their message contains `"hello"` or `"hi"`, josé will respond `"hello @mention"`, with `"@mention"` being a mention to the author of the message
   * If you want a plain `%`, use `%%` in your response, it will become `%`
 
 ## Delete a magicword set
- * `!delmw setid`, with `setid` being the ID number of the set
+ * `j!delmw setid`, with `setid` being the ID number of the set
 
 ## List sets in a server
- * `!listmw [setid]`, if you use `setid`, it will only show that set
+ * `j!listmw [setid]`, if you use `setid`, it will only show that set

@@ -1,4 +1,4 @@
-Query types for the `!query` command
+Query types for the `j!query` command
 =====================================
 
 *Para a documentação em português, veja [queries-pt.md](https://github.com/lkmnds/jose/blob/master/doc/queries-pt.md)*
@@ -7,18 +7,18 @@ Query types for the `!query` command
 
 *local/locally*: Applied only in a specific server, usually the server where the message/command originated from.
 
- * `!query summary`
+ * `j!query summary`
   * Summary of global data: total messages, total commands received, and the most used command
 
- * `!query dbsize`
+ * `j!query dbsize`
   * Shows the size of the 4 main databases jose uses
    * `markovdb`: the markov database, and normally the biggest, it has all messages from the servers
    * `messages`: the message count database
    * `itself`: the statistics database
    * `wlength`: the word length database
 
- * `!query this`
+ * `j!query this`
   * Queries the server where the command originated and shows (almost) the same things as `!query summary`, but using a local database
 
- * `!query topcmd`
+ * `j!query topcmd`
   * Shows the most used commands in josé
