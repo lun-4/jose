@@ -113,7 +113,13 @@ class joseXtra(jaux.Auxiliar):
         res.append("Memory Usage: %.2f MB" % mem_mb)
 
         # get num of servers
-        res.append("Guilds: %d" % (len(self.client.servers)))
+        res.append("Guilds: %d" % len(self.client.servers))
+
+        # num of channels
+        res.append("Channels: %s" % len(list(self.client.get_all_channels())))
+
+        # num of users
+        res.append("Members: %s" % len(list(self.client.get_all_members())))
 
         await cxt.say(self.codeblock("", '\n'.join(res)))
 
