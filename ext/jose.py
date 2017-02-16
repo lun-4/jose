@@ -655,7 +655,7 @@ sure about that, pretty admin? (y/n)" % announcement)
         if yesno.content == 'y':
             svcount, chcount = 0, 0
             for server in self.client.servers:
-                for channel in server:
+                for channel in server.channels:
                     if channel.is_default:
                         await self.client.send_message(channel, announcement)
                         chcount += 1
