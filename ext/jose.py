@@ -648,7 +648,8 @@ class JoseBot(jcommon.Extension):
         await self.is_admin(message.author.id)
 
         announcement = ' '.join(args[1:])
-        await cxt.say("I'm gonna say `%r` to all servers I'm in, are you sure about that, pretty admin? (y/n)")
+        await cxt.say("I'm gonna say `%r` to all servers I'm in, are you \
+            sure about that, pretty admin? (y/n)" % announcement)
         yesno = await self.client.wait_for_message(author=message.author)
 
         if yesno.content == 'y':
@@ -659,6 +660,8 @@ class JoseBot(jcommon.Extension):
                         await self.client.send_message(channel, announcement)
                         chcount += 1
                 svcount += 1
-            await cxt.say("Sent announcement to %d servers, %d channels".format(svcount, chcount))
+            await cxt.say("Sent announcement to \
+                %d servers, %d channels".format(svcount, chcount))
         else:
-            await cxt.say("jk I'm not gonna do what you don't want (unless I'm skynet)")
+            await cxt.say("jk I'm not gonna do what you \
+                don't want (unless I'm skynet)")
