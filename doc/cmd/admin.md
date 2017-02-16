@@ -5,25 +5,25 @@ Admin commands in josé can only be invoked by admin accounts, the list of those
 
 When the user isn't on the `ADMIN_IDS` list, josé will throw a `joseerror.PermissionError` Exception
 
- * `!reload modpath`
+ * `j!reload modpath`
   * Reloads a module, usually used when minor updates happen
- * `!unload modpath`
+ * `j!unload modpath`
   * Completly unloads a module
- * `!loadmod class@modpath`
+ * `j!loadmod class@modpath`
   * Loads a module in `/ext/modpath.py` with the class representing it
 
 
- * `!shutdown`
+ * `j!shutdown`
   * Pretty self explanatory
- * `!pstatus`
+ * `j!pstatus`
   * Change *Playing* status
- * `!distatus`
+ * `j!distatus`
   * Shows pings to the `discordapp.com` server, and some additional checking
    for latency
- * `!eval code`
+ * `j!eval code`
   * Evaluates Python code
- * `!rplaying`
+ * `j!rplaying`
   * Rotates the playing status
- * `!tempadmin userid`
+ * `j!tempadmin userid`
   * Makes a user a temporary admin
   * Temporary admins have all admin permissions until josé restarts.
