@@ -341,7 +341,7 @@ async def on_message(message):
             env['stcmd'][authorid] = True
 
         # timestamp to terminate the cooldown
-        if authorid in env['cooldowns']
+        if authorid in env['cooldowns']:
             cdown_term_time = env['cooldowns'][authorid]
             if now < cdown_term_time:
                 secleft = cdown_term_time - now
