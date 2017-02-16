@@ -24,9 +24,9 @@ $ sudo apt-get intall gettext
 $ sudo pip install -U -r requirements.txt
 ```
 
-Coloque um trabalho no cron para um backup a cada meia hora:
+Coloque um trabalho no cron para um backup a cada hora:
 ```
-*/30 * * * * /path/to/jose/backup.bash
+0 * * * * /path/to/jose/backup.bash
 ```
 
 `joseconfig.py` de exemplo:

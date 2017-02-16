@@ -23,9 +23,9 @@ $ sudo apt-get intall gettext
 $ sudo pip install -U -r requirements.txt
 ```
 
-Setup a cron job to make backups every 30 minutes:
+Setup a cron job to make backups every hour:
 ```
-*/30 * * * * /path/to/jose/backup.bash
+0 * * * * /path/to/jose/backup.bash
 ```
 
 Example `joseconfig.py` file:
