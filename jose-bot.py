@@ -329,16 +329,13 @@ async def on_message(message):
 
         cxt = jcommon.Context(client, message, t_start, jose)
 
+        if command == '':
+            return
 
         # cooldown system top notch :ok_hand:
         # Check for cooldowns from the author of the command
         authorid = message.author.id
         now = time.time()
-        if authorid in env['stcmd']:
-            if authorid not in env['cooldowns']:
-                env['cooldowns'][authorid] = now + jcommon.COOLDOWN_SECONDS
-        else:
-            env['stcmd'][authorid] = True
 
         # timestamp to terminate the cooldown
         if authorid in env['cooldowns']:
@@ -347,20 +344,21 @@ async def on_message(message):
                 secleft = cdown_term_time - now
 
                 # say to the user they're being a shit person
-                m = await cxt.say("Please cool down!(%d seconds left)", (secleft,))
+                m = await cxt.say("Please cool down!(**%d** seconds left)", (secleft,))
+                # wait secleft before deleting and removing cooldown from user
                 await asyncio.sleep(secleft)
                 await client.delete_message(m)
 
                 # don't go more than here, just remove the cooldown and return
                 try:
                     del env['cooldowns'][authorid]
-                    del env['stcmd'][authorid]
                 except Exception as e:
                     pass
 
                 return
-        else:
-            pass
+
+        # always update user's cooldown
+        env['cooldowns'][authorid] = now + jcommon.COOLDOWN_SECONDS
 
         if command == 'help':
             # load helptext
