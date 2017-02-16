@@ -10,12 +10,6 @@ import jauxiliar as jaux
 import josecommon as jcommon
 import joseconfig as jconfig
 
-# TODO: query language
-QUERIES = {
-    "topmsg": "loc[msg].sort",
-    "gltopcmd": "db[cmd].sort"
-}
-
 DEFAULT_STATS_FILE = '''{
     "gl_queries": 0,
     "gl_messages": 0,
@@ -146,20 +140,6 @@ class JoseStats(jaux.Auxiliar):
             # serverdb['messages'][authorid] => number of messages
             self.statistics[serverid]['messages'][authorid] += 1
             self.statistics['gl_messages'] += 1
-
-    async def c_rawquery(self, message, args, cxt):
-        '''`j!rawquery string` - Fazer pedidos ao banco de dados de estatísticas do josé'''
-        query_string = ' '.join(args[1:])
-        if True:
-            await cxt.say("raw queries not available for now")
-            return
-
-        # TODO: make_query
-        response = await self.make_raw_query(query_string)
-        if len(response) > 1999: # 1 9 9 9
-            await cxt.say(":elephant: Resultado muito grande :elephant:")
-        else:
-            await cxt.say(self.codeblock("", response))
 
     async def c_query(self, message, args, cxt):
         '''`j!query data` - Fazer pedidos ao banco de dados de estatísticas do josé

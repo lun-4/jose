@@ -114,12 +114,6 @@ async def show_price(message):
 
 show_pior_bot = jcommon.make_func("me tree :christmas_tree: me spam :christmas_tree: no oxygen :christmas_tree:  if ban\n" * 4)
 
-'''
-    RMV : removed(or marked to remove)
-    DEAC : deactivated until better solution
-    MOV : moved to new protocol/anything else
-'''
-
 exact_commands = {
     'melhor bot': jcommon.show_shit,
     'pior bot': show_pior_bot,
