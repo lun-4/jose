@@ -493,6 +493,12 @@ async def on_server_join(server):
             jcommon.logger.info("New server: %s" % server.id)
             await client.send_message(channel, jcommon.WELCOME_MESSAGE)
 
+@client.event
+async def on_error(event):
+    err = traceback.format_exc()
+    logger.error(err)
+    print(err)
+
 async def main_task():
     global client
     startupdelta = time.time() - jose.start_time
