@@ -40,7 +40,7 @@ LANGUAGES_PATH = 'db/languages.json'
 
 JOSE_ID = '202587271679967232'
 JOSE_APP_ID = '202586824013643777'
-OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot' % JOSE_APP_ID
+OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=67259457' % JOSE_APP_ID
 
 #configuration things
 chattiness = .25
