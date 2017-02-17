@@ -296,6 +296,38 @@ async def do_jasm(message, cxt):
             pointer = res[1]
     return
 
+async def do_josecoin(message):
+    if random.random() < jcommon.jc_probabiblity:
+        if not message.channel.is_private:
+
+            # only if author has account
+            if str(message.author.id) in jcoin.data:
+                # if it is on the wrong server, return
+                if message.server.id != "271378126234320897":
+                    return True
+
+                if jcommon.MAINTENANCE_MODE:
+                    return True
+
+                cxt = jcommon.Context(client, message, t_start, jose)
+
+                author_id = str(message.author.id)
+                amount = random.choice(jcommon.JC_REWARDS)
+                acc_to = jcoin.get(author_id)[1]
+
+                if amount == 0:
+                    await cxt.say("0JC > %s" % (acc_to['name']))
+                else:
+                    res = jcoin.transfer(jcoin.jose_id, author_id, amount, jcoin.LEDGER_PATH)
+                    await josecoin_save(message, False)
+                    if res[0]:
+                        emoji_res = await jcommon.random_emoji(3)
+                        await cxt.say('%s %.2fJC > %s' % (emoji_res, amount, acc_to['name']))
+                    else:
+                        await jcommon.jose_debug(message, 'jc_error: %s' % res[1])
+        else:
+            return True
+
 @client.event
 async def on_message(message):
     global jose
@@ -451,36 +483,9 @@ async def on_message(message):
     # handle e_on_message
     await do_event('on_message', message)
 
-    if random.random() < jcommon.jc_probabiblity:
-        if not message.channel.is_private:
-
-            # only if author has account
-            if str(message.author.id) in jcoin.data:
-                # if it is on the wrong server, return
-                if message.server.id != "271378126234320897":
-                    return
-
-                if jcommon.MAINTENANCE_MODE:
-                    return
-
-                cxt = jcommon.Context(client, message, t_start, jose)
-
-                author_id = str(message.author.id)
-                amount = random.choice(jcommon.JC_REWARDS)
-                acc_to = jcoin.get(author_id)[1]
-
-                if amount == 0:
-                    await cxt.say("0JC > %s" % (acc_to['name']))
-                else:
-                    res = jcoin.transfer(jcoin.jose_id, author_id, amount, jcoin.LEDGER_PATH)
-                    await josecoin_save(message, False)
-                    if res[0]:
-                        emoji_res = await jcommon.random_emoji(3)
-                        await cxt.say('%s %.2fJC > %s' % (emoji_res, amount, acc_to['name']))
-                    else:
-                        await jcommon.jose_debug(message, 'jc_error: %s' % res[1])
-        else:
-            return
+    jcstop = await do_josecoin(message)
+    if jcstop:
+        return
 
     await jcommon.gorila_routine(message.channel)
 
