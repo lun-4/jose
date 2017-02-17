@@ -1,11 +1,9 @@
 import time
-import asyncio
 import pickle
 
 import sys
 sys.path.append("..")
 import josecommon as jcommon
-import joseerror as je
 
 JOSECOIN_VERSION = '0.6'
 

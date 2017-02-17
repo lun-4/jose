@@ -69,9 +69,9 @@ class JoseImages(jcommon.Extension):
 
         post = None
         if rspec:
-            post = random.choice(r[rspec])
+            post = random.choice(response[rspec])
         elif random_flag:
-            most_recent_id = r[0]['id']
+            most_recent_id = response[0]['id']
             random_id = random.randint(1, most_recent_id)
             if not show_url:
                 await cxt.say("`[img.json] API doesn't support individual posts`")
@@ -79,10 +79,10 @@ class JoseImages(jcommon.Extension):
             random_post_url = '%s?id=%s' % (show_url, random_id)
             post = await self.get_json(random_post_url)
         else:
-            if len(r) < 1:
+            if len(response) < 1:
                 await cxt.say("`[img.json] No results found.`")
                 return
-            post = random.choice(r)
+            post = random.choice(response)
 
         post_url = post[post_key]
         if 'hypnohub' in post_url:
@@ -128,7 +128,6 @@ class JoseImages(jcommon.Extension):
             })
 
     async def c_derpibooru(self, message, args, cxt):
-        'derpibooru.org/search.json?limit=14&q=clothes'
         access = await self.porn_routine()
         if access:
             await self.json_api(cxt, {
