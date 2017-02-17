@@ -41,7 +41,9 @@ class JoseImages(jcommon.Extension):
             'post_key': where to get the post image URL,
             'limit_key': what is the tag to limit results,
             'search_key': what is the tag to search in search_url,
+
             'list_key': where are the array of posts,
+            'search_key': same thing as list_key but in search,
         }
         '''
         search_term = config.get('search_term')
@@ -53,6 +55,7 @@ class JoseImages(jcommon.Extension):
         limit_key = config.get('limit_key', 'limit')
         search_key = config.get('search_key', 'tags')
         list_key = config.get('list_key', None)
+        search_key = config.get('search_key', None)
         random_flag = False
 
         if search_term == '-latest':
@@ -69,6 +72,8 @@ class JoseImages(jcommon.Extension):
             await cxt.say('`[img.json] tags: %r`' % search_term)
             url = '%s?%s=%s&%s=%s' % (search_url, limit_key, IMAGE_LIMIT,\
                 search_key, search_term)
+            if search_key:
+                list_key = search_key
 
         self.logger.info("image: json_api: %r", url)
         response = await self.get_json(url)
@@ -148,6 +153,7 @@ class JoseImages(jcommon.Extension):
                 'limit_key': 'page',
                 'search_key': 'q',
                 'list_key': 'images',
+                'search_key': 'search',
             })
 
     async def c_urban(self, message, args, cxt):
