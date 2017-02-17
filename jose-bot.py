@@ -192,9 +192,9 @@ load_module('joseartif', 'JoseArtif')
 load_module('josemath', 'JoseMath')
 
 help_helptext = """
-`j!help` - achar ajuda para outros comandos
-`j!help <comando>` - procura algum texto de ajuda para o comando dado
-Exemplos: `j!help help`, `j!help pstatus`, `j!help ap`, `j!help wa`, etc.
+`j!docstring` - docsrings for commands
+`j!docstring command` - get docstring for a command
+Exemplos: `j!docstring docstring`, `j!docstring pstatus`, `j!docstring ap`, `j!docstring wa`, etc.
 """
 
 event_table = {
@@ -329,6 +329,38 @@ async def do_josecoin(message, t_start):
         else:
             return True
 
+async def do_docstring(message, args, cxt):
+    # load helptext
+    cmd_ht = 'docstring'
+    try:
+        if args[1] == 'docstring':
+            await cxt.say(help_helptext)
+            return True
+        else:
+            cmd_ht = args[1]
+    except:
+        pass
+
+    if cmd_ht == 'docstring':
+        await cxt.say(help_helptext)
+        return True
+
+    cmd_method = getattr(jose, 'c_%s' % cmd_ht, None)
+    if cmd_method is None:
+        await cxt.say("%s: Command not found" % cmd_ht)
+        return True
+
+    try:
+        docstring = cmd_method.__doc__
+        if docstring is None:
+            await cxt.say("Docstring not found")
+        else:
+            await cxt.say(docstring)
+    except Exception as e:
+        await cxt.say("error getting docstring for %s: %r" % (command, repr(e)))
+
+    return True
+
 @client.event
 async def on_message(message):
     global jose
@@ -393,39 +425,10 @@ async def on_message(message):
         # always update user's cooldown
         env['cooldowns'][authorid] = now + jcommon.COOLDOWN_SECONDS
 
-        if command == 'help':
-            # load helptext
-            await jose.recv(message) # default
-
-            cmd_ht = 'help'
-            try:
-                if args[1] == 'help':
-                    await cxt.say(help_helptext)
-                    return
-                else:
-                    cmd_ht = args[1]
-            except:
-                pass
-
-            if cmd_ht == 'help':
-                await cxt.say(help_helptext)
+        if command == 'docstring':
+            needs_stop = await do_docstring(message)
+            if needs_stop:
                 return
-
-            cmd_method = getattr(jose, 'c_%s' % cmd_ht, None)
-            if cmd_method is None:
-                await cxt.say("%s: Command not found" % cmd_ht)
-                return
-
-            try:
-                docstring = cmd_method.__doc__
-                if docstring is None:
-                    await cxt.say("Docstring not found")
-                else:
-                    await cxt.say(docstring)
-            except Exception as e:
-                await cxt.say("error getting helptext for %s: %r" % (command, repr(e)))
-
-            return
 
         try:
             # call c_ bullshit
