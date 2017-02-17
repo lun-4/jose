@@ -17,7 +17,7 @@ random = SystemRandom()
 
 PORN_LIMIT = 14
 
-class JoseNSFW(jcommon.Extension):
+class JoseImages(jcommon.Extension):
     def __init__(self, cl):
         jcommon.Extension.__init__(self, cl)
 

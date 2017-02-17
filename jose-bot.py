@@ -181,7 +181,7 @@ load_module('josemagicword', 'JoseMagicWord')
 
 # fun stuff
 load_module('josememes', 'JoseMemes')
-load_module('josensfw', 'JoseNSFW')
+load_module('joseimages', 'JoseImages')
 load_module('josedatamosh', 'JoseDatamosh')
 load_module('josextra', 'joseXtra')
 load_module('josegambling', 'JoseGambling')
