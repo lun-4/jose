@@ -103,7 +103,7 @@ class JoseImages(jcommon.Extension):
             post_url = post_url.replace('//', '/')
             post_url = 'http:/%s' % post_url
 
-        await cxt.say('ID: %d, URL: %s' % (post['id'], post_url))
+        await cxt.say('ID: %s, URL: %s' % (str(post['id']), str(post_url)))
         return
 
     async def porn_routine(self, cxt):
