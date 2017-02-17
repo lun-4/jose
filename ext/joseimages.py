@@ -99,7 +99,7 @@ class JoseImages(jcommon.Extension):
             post = random.choice(response)
 
         post_url = post[post_key]
-        if 'hypnohub' in post_url:
+        if ('hypnohub' in post_url) or ('derpi' in post_url):
             post_url = post_url.replace('//', '/')
             post_url = 'http:/%s' % post_url
 
