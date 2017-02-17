@@ -22,6 +22,9 @@ class JoseImages(jcommon.Extension):
     async def ext_load(self):
         return True, ''
 
+    async def ext_unload(self):
+        return True, ''
+
     async def get_json(self, url):
         r = await aiohttp.request('GET', url)
         r = await r.text()
