@@ -329,7 +329,7 @@ async def do_josecoin(message, t_start):
         else:
             return True
 
-async def do_docstring(message, args, cxt):
+async def do_docstring(message, args, cxt, command):
     # load helptext
     cmd_ht = 'docstring'
     try:
@@ -360,6 +360,46 @@ async def do_docstring(message, args, cxt):
         await cxt.say("error getting docstring for %s: %r" % (command, repr(e)))
 
     return True
+
+async def do_command(method, message, args, cxt):
+    # try/except is WAY FASTER than checking if/else
+    try:
+        jose_method = getattr(jose, method)
+    except AttributeError:
+        return
+
+    # but first, repeat the recv steps
+    await jose.mod_recv(message)
+    try:
+        sig = signature(jose_method)
+        # if function can receive the Context, do it
+        # else just do it normally
+        if len(sig.parameters) == 3:
+            await jose_method(message, args, cxt)
+        else:
+            jcommon.logger.warning("%r is not using Context protocol", \
+                jose_method)
+            await jose_method(message, args)
+
+    except je.PermissionError:
+        await cxt.say("Permission ¯\_(ツ)_/¯ 💠 ¯\_(ツ)_/¯ Error")
+    except RuntimeError as e:
+        await cxt.say('jose: py_rt_err: %s' % repr(e))
+    except je.LimitError:
+        pass
+
+    del t_start
+
+    end = time.time()
+    delta = end - st
+    if delta > 13:
+        await cxt.say("Alguma coisa está demorando demais para responder(delta=%.4fs)..." % delta)
+
+    # signal python to clean this shit
+    del delta, st, end, jose_method
+
+    # kthxbye
+    return
 
 @client.event
 async def on_message(message):
@@ -426,51 +466,18 @@ async def on_message(message):
         env['cooldowns'][authorid] = now + jcommon.COOLDOWN_SECONDS
 
         if command == 'docstring':
-            needs_stop = await do_docstring(message)
+            needs_stop = await do_docstring(message, args, cxt, command)
             if needs_stop:
                 return
 
         try:
-            # call c_ bullshit
-            # use try/except, looks like it is faster than if/else
-            try:
-                jose_method = getattr(jose, method)
-            except AttributeError:
-                return
-
-            # but first, repeat the recv steps
-            await jose.mod_recv(message)
-            try:
-                sig = signature(jose_method)
-                # if function can receive the Context, do it
-                # else just do it normally
-                if len(sig.parameters) == 3:
-                    await jose_method(message, args, cxt)
-                else:
-                    await jose_method(message, args)
-
-            except je.PermissionError:
-                await cxt.say("Permission ¯\_(ツ)_/¯ 💠 ¯\_(ツ)_/¯ Error")
-            except RuntimeError as e:
-                await cxt.say('jose: py_rt_err: %s' % repr(e))
-            except je.LimitError:
-                pass
-
-            del t_start
-
-            end = time.time()
-            delta = end - st
-            if delta > 13:
-                await cxt.say("Alguma coisa está demorando demais para responder(delta=%.4fs)..." % delta)
-
-            # signal python to clean this shit
-            del delta, st, end, jose_method
-
-            # kthxbye
+            # do a barrel roll
+            await do_command(message, args, cxt)
             return
         except Exception as e:
-            await cxt.say("jose: py_err: ```%s```" % traceback.format_exc())
-            # return
+            await cxt.say("jose.py_err: ```%s```" % traceback.format_exc())
+
+        return
 
     should_stop = await do_command_table(message)
     if should_stop:
