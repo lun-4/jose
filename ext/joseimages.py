@@ -156,6 +156,9 @@ class JoseImages(jcommon.Extension):
                 'search_url_key': 'search',
             })
 
+    async def c_derpi(self, message, args, cxt):
+        await self.c_derpibooru(message, args, cxt)
+
     async def c_urban(self, message, args, cxt):
         term = ' '.join(args[1:])
 
