@@ -136,8 +136,8 @@ class JoseImages(jcommon.Extension):
         if access:
             await self.json_api(cxt, {
                 'search_term': ' '.join(args[1:]),
-                'search_url': 'derpibooru.org/search.json',
-                'index_url': 'derpibooru.org/images.json',
+                'search_url': 'http://derpibooru.org/search.json',
+                'index_url': 'http://derpibooru.org/images.json',
                 # 'show_url': 'derpibooru.org/%d.json',
                 'post_key': 'image',
                 'limit_key': 'page',
