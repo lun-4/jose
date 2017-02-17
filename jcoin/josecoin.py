@@ -221,6 +221,9 @@ class JoseCoin(jcommon.Extension):
         if range_max >= 16:
             await cxt.say("LimitError: values higher than 16 aren't valid")
             return
+        elif range_max <= 0:
+            await cxt.say("haha no")
+            return
 
         order = []
 
@@ -247,3 +250,4 @@ class JoseCoin(jcommon.Extension):
             }
 
         await cxt.say('\n'.join(order))
+        return
