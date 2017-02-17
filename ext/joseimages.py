@@ -53,12 +53,12 @@ class JoseImages(jcommon.Extension):
         if search_term == '-latest':
             # get latest
             await cxt.say('`[img.json] most recent posts`')
-            url = '%s?limit=%s' % (index_url, IMAGE_LIMIT)
+            url = '%s?%s=%s' % (index_url, limit_key, IMAGE_LIMIT)
         elif search_term == '-random':
             # random id
             await cxt.say('`[img.json] random ID`')
             random_flag = True
-            url = '%s?limit=%s' % (index_url, 1)
+            url = '%s?%s=%s' % (index_url, limit_key, 1)
         else:
             # normally, search tags
             await cxt.say('`[img.json] tags: %r`' % search_term)
