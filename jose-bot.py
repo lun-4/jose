@@ -361,7 +361,7 @@ async def do_docstring(message, args, cxt, command):
 
     return True
 
-async def do_command(method, message, args, cxt):
+async def do_command(method, message, args, cxt, t_start, st):
     # try/except is WAY FASTER than checking if/else
     try:
         jose_method = getattr(jose, method)
@@ -472,7 +472,7 @@ async def on_message(message):
 
         try:
             # do a barrel roll
-            await do_command(message, args, cxt)
+            await do_command(method, message, args, cxt, t_start, st)
             return
         except Exception as e:
             await cxt.say("jose.py_err: ```%s```" % traceback.format_exc())
