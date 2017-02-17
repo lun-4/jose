@@ -65,6 +65,7 @@ class JoseImages(jcommon.Extension):
             url = '%s?%s=%s&%s=%s' % (search_url, limit_key, IMAGE_LIMIT,\
                 search_key, search_term)
 
+        self.logger.info("image: json_api: %r", url)
         response = await self.get_json(url)
 
         post = None
@@ -134,7 +135,7 @@ class JoseImages(jcommon.Extension):
                 'search_term': ' '.join(args[1:]),
                 'search_url': 'derpibooru.org/search.json',
                 'index_url': 'derpibooru.org/images.json',
-                'show_url': 'derpibooru.org/%d.json',
+                # 'show_url': 'derpibooru.org/%d.json',
                 'post_key': 'image',
                 'limit_key': 'page',
                 'search_key': 'q',
