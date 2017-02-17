@@ -13,9 +13,7 @@ import traceback
 from random import SystemRandom
 random = SystemRandom()
 
-# from xml.etree import ElementTree
-
-PORN_LIMIT = 14
+IMAGE_LIMIT = 14
 
 class JoseImages(jcommon.Extension):
     def __init__(self, cl):
@@ -30,21 +28,44 @@ class JoseImages(jcommon.Extension):
         r = json.loads(r)
         return r
 
-    async def json_api(self, cxt, index_url, show_url, search_term, post_key, rspec=False, hypnohub_flag=False):
-        url = ''
+    async def json_api(self, cxt, config):
+        '''
+        {
+            'search_term': stuff to search,
+            'index_url': where are the latest posts,
+            'search_url': search for stuff(defaults to index_url),
+            'show_url': get individual posts,
+            'post_key': where to get the post image URL,
+            'limit_key': what is the tag to limit results,
+            'search_key': what is the tag to search in search_url,
+        }
+        '''
+        search_term = config.get('search_term')
+        index_url = config.get('index_url')
+        search_url = config.get('search_url', index_url)
+        show_url = config.get('show_url')
+        post_key = config.get('post_key')
+        rspec = config.get('rspec')
+        limit_key = config.get('limit_key', 'limit')
+        search_key = config.get('search_key', 'tags')
         random_flag = False
-        if search_term == ':latest':
-            await cxt.say('`[nsfw.json] procurando nos posts mais recentes`')
-            url = '%s?limit=%s' % (index_url, PORN_LIMIT)
-        elif search_term == ':random':
-            await cxt.say('`[nsfw.json] procurando um ID aleatório`')
+
+        if search_term == '-latest':
+            # get latest
+            await cxt.say('`[img.json] most recent posts`')
+            url = '%s?limit=%s' % (index_url, IMAGE_LIMIT)
+        elif search_term == '-random':
+            # random id
+            await cxt.say('`[img.json] random ID`')
             random_flag = True
             url = '%s?limit=%s' % (index_url, 1)
         else:
-            await cxt.say('`[nsfw.json] procurando por %r`' % search_term)
-            url = '%s?limit=%s&tags=%s' % (index_url, PORN_LIMIT, search_term)
+            # normally, search tags
+            await cxt.say('`[img.json] tags: %r`' % search_term)
+            url = '%s?%s=%s&%s=%s' % (search_url, limit_key, IMAGE_LIMIT,\
+                search_key, search_term)
 
-        r = await self.get_json(url)
+        response = await self.get_json(url)
 
         post = None
         if rspec:
@@ -53,20 +74,21 @@ class JoseImages(jcommon.Extension):
             most_recent_id = r[0]['id']
             random_id = random.randint(1, most_recent_id)
             if not show_url:
-                await cxt.say("`[nsfw.json] API não suporta posts individuais`")
+                await cxt.say("`[img.json] API doesn't support individual posts`")
                 return
             random_post_url = '%s?id=%s' % (show_url, random_id)
             post = await self.get_json(random_post_url)
         else:
             if len(r) < 1:
-                await cxt.say("`[nsfw.json] Nenhum resultado encontrado.`")
+                await cxt.say("`[img.json] No results found.`")
                 return
             post = random.choice(r)
 
         post_url = post[post_key]
-        if hypnohub_flag:
+        if 'hypnohub' in post_url:
             post_url = post_url.replace('//', '/')
             post_url = 'http:/%s' % post_url
+
         await cxt.say('ID: %d, URL: %s' % (post['id'], post_url))
         return
 
@@ -80,27 +102,44 @@ class JoseImages(jcommon.Extension):
     async def c_hypno(self, message, args, cxt):
         access = await self.porn_routine(cxt)
         if access:
-            # ¯\_(ツ)_/¯
-            await self.json_api(cxt, 'http://hypnohub.net/post/index.json', '',
-                ' '.join(args[1:]), 'file_url', None, True)
+            await self.json_api(cxt, {
+                'search_term': ' '.join(args[1:]),
+                'index_url': 'http://hypnohub.net/post/index.json',
+                'post_key': 'image',
+            })
 
     async def c_yandere(self, message, args, cxt):
         access = await self.porn_routine(cxt)
         if access:
-            await self.json_api(cxt, 'https://yande.re/post.json', '',
-                ' '.join(args[1:]), 'file_url')
+            await self.json_api(cxt, {
+                'search_term': ' '.join(args[1:]),
+                'index_url': 'https://yande.re/post.json',
+                'post_key': 'file_url',
+            })
 
     async def c_e621(self, message, args, cxt):
         access = await self.porn_routine(cxt)
         if access:
-            await self.json_api(cxt, 'https://e621.net/post/index.json', 'https://e621.net/post/show.json',
-                ' '.join(args[1:]), 'file_url')
+            await self.json_api(cxt, {
+                'search_term': ' '.join(args[1:]),
+                'index_url': 'https://e621.net/post/index.json',
+                'show_url': 'https://e621.net/post/show.json',
+                'post_key': 'file_url',
+            })
 
-    async def c_porn(self, message, args, cxt):
+    async def c_derpibooru(self, message, args, cxt):
+        'derpibooru.org/search.json?limit=14&q=clothes'
         access = await self.porn_routine()
         if access:
-            await self.json_api(cxt, 'http://api.porn.com/videos/find.json', '',
-                ' '.join(args[1:]), 'url', 'result')
+            await self.json_api(cxt, {
+                'search_term': ' '.join(args[1:]),
+                'search_url': 'derpibooru.org/search.json',
+                'index_url': 'derpibooru.org/images.json',
+                'show_url': 'derpibooru.org/%d.json',
+                'post_key': 'image',
+                'limit_key': 'page',
+                'search_key': 'q',
+            })
 
     async def c_urban(self, message, args, cxt):
         term = ' '.join(args[1:])
@@ -112,7 +151,7 @@ class JoseImages(jcommon.Extension):
 
         try:
             if len(r['list']) < 1:
-                await cxt.say("*não tem definição grátis*")
+                await cxt.say("*no free definitions*")
                 return
             await cxt.say(self.codeblock('', '%s:\n%s' % (term, r['list'][0]['definition'])))
         except Exception as e:
