@@ -296,7 +296,7 @@ async def do_jasm(message, cxt):
             pointer = res[1]
     return
 
-async def do_josecoin(message):
+async def do_josecoin(message, t_start):
     if random.random() < jcommon.jc_probabiblity:
         if not message.channel.is_private:
 
@@ -483,7 +483,7 @@ async def on_message(message):
     # handle e_on_message
     await do_event('on_message', message)
 
-    jcstop = await do_josecoin(message)
+    jcstop = await do_josecoin(message, t_start)
     if jcstop:
         return
 
