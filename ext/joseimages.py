@@ -105,7 +105,7 @@ class JoseImages(jcommon.Extension):
             await self.json_api(cxt, {
                 'search_term': ' '.join(args[1:]),
                 'index_url': 'http://hypnohub.net/post/index.json',
-                'post_key': 'image',
+                'post_key': 'file_url',
             })
 
     async def c_yandere(self, message, args, cxt):
@@ -128,7 +128,7 @@ class JoseImages(jcommon.Extension):
             })
 
     async def c_derpibooru(self, message, args, cxt):
-        access = await self.porn_routine()
+        access = await self.porn_routine(cxt)
         if access:
             await self.json_api(cxt, {
                 'search_term': ' '.join(args[1:]),
