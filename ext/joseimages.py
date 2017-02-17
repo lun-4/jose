@@ -55,7 +55,7 @@ class JoseImages(jcommon.Extension):
         limit_key = config.get('limit_key', 'limit')
         search_key = config.get('search_key', 'tags')
         list_key = config.get('list_key', None)
-        search_key = config.get('search_key', None)
+        search_url_key = config.get('search_url_key', None)
         random_flag = False
 
         if search_term == '-latest':
@@ -73,7 +73,7 @@ class JoseImages(jcommon.Extension):
             url = '%s?%s=%s&%s=%s' % (search_url, limit_key, IMAGE_LIMIT,\
                 search_key, search_term)
             if search_key:
-                list_key = search_key
+                list_key = search_url_key
 
         self.logger.info("image: json_api: %r", url)
         response = await self.get_json(url)
@@ -153,7 +153,7 @@ class JoseImages(jcommon.Extension):
                 'limit_key': 'page',
                 'search_key': 'q',
                 'list_key': 'images',
-                'search_key': 'search',
+                'search_url_key': 'search',
             })
 
     async def c_urban(self, message, args, cxt):
