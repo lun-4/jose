@@ -34,7 +34,7 @@ class JoseImages(jcommon.Extension):
             return None
         return r
 
-    async def json_api(self, cxt, config):
+    async def json_api(self, cxt, boardid, config):
         '''
         {
             'search_term': stuff to search,
@@ -46,7 +46,7 @@ class JoseImages(jcommon.Extension):
             'search_key': what is the tag to search in search_url,
 
             'list_key': where are the array of posts,
-            'search_key': same thing as list_key but in search,
+            'search_url_key': same thing as list_key but in search,
         }
         '''
         search_term = config.get('search_term')
@@ -63,26 +63,26 @@ class JoseImages(jcommon.Extension):
 
         if search_term == '-latest':
             # get latest
-            await cxt.say('`[img.json] most recent posts`')
+            await cxt.say('`[img.%s] most recent posts`' % boardid)
             url = '%s?%s=%s' % (index_url, limit_key, IMAGE_LIMIT)
         elif search_term == '-random':
             # random id
-            await cxt.say('`[img.json] random ID`')
+            await cxt.say('`[img.%s] random ID`' % boardid)
             random_flag = True
             url = '%s?%s=%s' % (index_url, limit_key, 1)
         else:
             # normally, search tags
-            await cxt.say('`[img.json] tags: %r`' % search_term)
+            await cxt.say('`[img.%s] tags: %r`' % (boardid, search_term))
             url = '%s?%s=%s&%s=%s' % (search_url, limit_key, IMAGE_LIMIT,\
                 search_key, search_term)
             if search_key:
                 list_key = search_url_key
 
-        self.logger.info("image: json_api: %r", url)
+        self.logger.info("image: json_api->%s: %r", boardid, url)
         response = await self.get_json(url)
 
         if not response:
-            await cxt.say("`[img.json] Error parsing JSON response`")
+            await cxt.say("`[img.%s] Error parsing JSON response`" % boardid)
             return
 
         if list_key:
@@ -93,7 +93,7 @@ class JoseImages(jcommon.Extension):
             post = random.choice(response[rspec])
         elif random_flag:
             if not show_url:
-                await cxt.say("`[img.json] API doesn't support individual posts`")
+                await cxt.say("`[img.%s] API doesn't support individual posts`" % boardid)
                 return
 
             most_recent_id = response[0]['id']
@@ -108,7 +108,7 @@ class JoseImages(jcommon.Extension):
             post = await self.get_json(random_post_url)
         else:
             if len(response) < 1:
-                await cxt.say("`[img.json] No results found.`")
+                await cxt.say("`[img.%s] No results found.`" % boardid)
                 return
             post = random.choice(response)
 
@@ -120,35 +120,35 @@ class JoseImages(jcommon.Extension):
         await cxt.say('ID: %s, URL: %s' % (str(post['id']), str(post_url)))
         return
 
-    async def porn_routine(self, cxt):
-        res = await jcoin.jcoin_control(self.current.author.id, jcommon.PORN_PRICE)
+    async def img_routine(self, cxt):
+        res = await jcoin.jcoin_control(self.current.author.id, jcommon.IMG_PRICE)
         if not res[0]:
             await cxt.say("PermError: %s" % res[1])
             return False
         return True
 
     async def c_hypno(self, message, args, cxt):
-        access = await self.porn_routine(cxt)
+        access = await self.img_routine(cxt)
         if access:
-            await self.json_api(cxt, {
+            await self.json_api(cxt, 'hypnohub' {
                 'search_term': ' '.join(args[1:]),
                 'index_url': 'http://hypnohub.net/post/index.json',
                 'post_key': 'file_url',
             })
 
     async def c_yandere(self, message, args, cxt):
-        access = await self.porn_routine(cxt)
+        access = await self.img_routine(cxt)
         if access:
-            await self.json_api(cxt, {
+            await self.json_api(cxt, 'yandere' {
                 'search_term': ' '.join(args[1:]),
                 'index_url': 'https://yande.re/post.json',
                 'post_key': 'file_url',
             })
 
     async def c_e621(self, message, args, cxt):
-        access = await self.porn_routine(cxt)
+        access = await self.img_routine(cxt)
         if access:
-            await self.json_api(cxt, {
+            await self.json_api(cxt, 'e621' {
                 'search_term': ' '.join(args[1:]),
                 'index_url': 'https://e621.net/post/index.json',
                 'show_url': 'https://e621.net/post/show.json',
@@ -156,9 +156,9 @@ class JoseImages(jcommon.Extension):
             })
 
     async def c_derpibooru(self, message, args, cxt):
-        access = await self.porn_routine(cxt)
+        access = await self.img_routine(cxt)
         if access:
-            await self.json_api(cxt, {
+            await self.json_api(cxt, 'derpibooru' {
                 'search_term': ' '.join(args[1:]),
                 'search_url': 'http://derpibooru.org/search.json',
                 'index_url': 'http://derpibooru.org/images.json',
