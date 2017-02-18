@@ -415,7 +415,7 @@ async def do_cooldown(message, cxt):
             secleft = cdown_term_time - now
 
             # say to the user they're being a shit person
-            m = await cxt.say("Please cool down!(**%d** seconds left)", (secleft,))
+            m = await cxt.say("Please cool down!(**%.1f** seconds left)", (secleft,))
             # wait secleft before deleting and removing cooldown from user
             await asyncio.sleep(secleft)
             await client.delete_message(m)
