@@ -92,6 +92,10 @@ class JoseImages(jcommon.Extension):
         if rspec:
             post = random.choice(response[rspec])
         elif random_flag:
+            if not show_url:
+                await cxt.say("`[img.json] API doesn't support individual posts`")
+                return
+
             most_recent_id = response[0]['id']
 
             try:
@@ -100,9 +104,6 @@ class JoseImages(jcommon.Extension):
                 await cxt.say("`%r`" % e)
                 return
 
-            if not show_url:
-                await cxt.say("`[img.json] API doesn't support individual posts`")
-                return
             random_post_url = '%s?id=%s' % (show_url, random_id)
             post = await self.get_json(random_post_url)
         else:
