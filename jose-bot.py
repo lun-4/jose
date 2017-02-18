@@ -467,7 +467,7 @@ async def on_message(message):
         if command == '':
             return
 
-        stop = await do_cooldown(message)
+        stop = await do_cooldown(message, cxt)
         if stop:
             return
 
