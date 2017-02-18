@@ -93,7 +93,13 @@ class JoseImages(jcommon.Extension):
             post = random.choice(response[rspec])
         elif random_flag:
             most_recent_id = response[0]['id']
-            random_id = random.randint(1, most_recent_id)
+
+            try:
+                random_id = random.randint(1, int(most_recent_id))
+            except Exception as e:
+                await cxt.say("`%r`" % e)
+                return
+
             if not show_url:
                 await cxt.say("`[img.json] API doesn't support individual posts`")
                 return
