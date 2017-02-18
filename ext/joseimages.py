@@ -130,7 +130,7 @@ class JoseImages(jcommon.Extension):
     async def c_hypno(self, message, args, cxt):
         access = await self.img_routine(cxt)
         if access:
-            await self.json_api(cxt, 'hypnohub' {
+            await self.json_api(cxt, 'hypnohub', {
                 'search_term': ' '.join(args[1:]),
                 'index_url': 'http://hypnohub.net/post/index.json',
                 'post_key': 'file_url',
@@ -139,7 +139,7 @@ class JoseImages(jcommon.Extension):
     async def c_yandere(self, message, args, cxt):
         access = await self.img_routine(cxt)
         if access:
-            await self.json_api(cxt, 'yandere' {
+            await self.json_api(cxt, 'yandere', {
                 'search_term': ' '.join(args[1:]),
                 'index_url': 'https://yande.re/post.json',
                 'post_key': 'file_url',
@@ -148,7 +148,7 @@ class JoseImages(jcommon.Extension):
     async def c_e621(self, message, args, cxt):
         access = await self.img_routine(cxt)
         if access:
-            await self.json_api(cxt, 'e621' {
+            await self.json_api(cxt, 'e621', {
                 'search_term': ' '.join(args[1:]),
                 'index_url': 'https://e621.net/post/index.json',
                 'show_url': 'https://e621.net/post/show.json',
@@ -158,7 +158,7 @@ class JoseImages(jcommon.Extension):
     async def c_derpibooru(self, message, args, cxt):
         access = await self.img_routine(cxt)
         if access:
-            await self.json_api(cxt, 'derpibooru' {
+            await self.json_api(cxt, 'derpibooru', {
                 'search_term': ' '.join(args[1:]),
                 'search_url': 'http://derpibooru.org/search.json',
                 'index_url': 'http://derpibooru.org/images.json',
