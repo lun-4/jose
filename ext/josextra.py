@@ -121,6 +121,9 @@ class joseXtra(jaux.Auxiliar):
         # num of users
         res.append("Members: %s" % len(list(self.client.get_all_members())))
 
+        # num of actual numbers that aren't bots
+        res.append("Users: %s" % len([m for m in self.client.get_all_members() if not m.bot]))
+
         await cxt.say(self.codeblock("", '\n'.join(res)))
 
     async def c_status(self, message, args, cxt):
