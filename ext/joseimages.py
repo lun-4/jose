@@ -28,7 +28,10 @@ class JoseImages(jcommon.Extension):
     async def get_json(self, url):
         r = await aiohttp.request('GET', url)
         r = await r.text()
-        r = json.loads(r)
+        try:
+            r = json.loads(r)
+        except:
+            return None
         return r
 
     async def json_api(self, cxt, config):
@@ -77,6 +80,10 @@ class JoseImages(jcommon.Extension):
 
         self.logger.info("image: json_api: %r", url)
         response = await self.get_json(url)
+
+        if not response:
+            await cxt.say("`[img.json] Error parsing JSON response`")
+            return
 
         if list_key:
             response = response[list_key]
