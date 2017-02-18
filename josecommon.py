@@ -46,7 +46,8 @@ OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&perm
 #configuration things
 chattiness = .25
 LEARN_ROLE = 'cult'
-ADMIN_IDS = ['162819866682851329', '144377237997748224', '191334773744992256']
+ADMIN_IDS = ['162819866682851329', '144377237997748224', \
+    '191334773744992256', '142781100152848384']
 
 #just for 0.6.6.6 and 6.6.6 or any demon version
 DEMON_MODE = False
