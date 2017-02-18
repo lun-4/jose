@@ -63,7 +63,7 @@ JC_REWARDS = [0, 0, 0.2, 0.6, 1, 1.2, 1.5]
 PORN_LIMIT = 14
 GAMBLING_FEE = 5 # 5 percent
 TOTAL = 10.0
-PORN_MEMBERS = 0.3
+IMAGE_MEMBERS = 0.3
 LEARN_MEMBERS = 1.0
 
 # prices
@@ -72,7 +72,7 @@ P = len_recompensas * (recompensa * prob) / TOTAL
 '''
 BASE_PRICE = 3 * ((len(JC_REWARDS) * (JC_REWARDS[len(JC_REWARDS)-1] * jc_probabiblity)) / TOTAL)
 
-PORN_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / PORN_MEMBERS)
+IMG_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / IMAGE_MEMBERS)
 LEARN_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / LEARN_MEMBERS)
 OP_TAX_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / TOTAL)
 
