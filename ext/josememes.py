@@ -578,3 +578,9 @@ class JoseMemes(jcommon.Extension):
                 #'queryparams': '?format=json&action=query&list=search&srsearch='
             }, cxt
         )
+
+    async def c_ri(self, message, args, cxt):
+        res = (' '.join([':regional_indicator_{}:'.format(c) for c in ' '.\
+            join(args[1:])])).replace(':regional_indicator_ :', ' ')
+
+        await cxt.say(res)
