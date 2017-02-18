@@ -313,8 +313,7 @@ async def do_josecoin(message, t_start):
 
                 if amount == 0:
                     # if it is on the wrong server, return
-                    if message.server.id == "271378126234320897":
-                        await cxt.say("0JC > %s" % (acc_to['name']))
+                    await client.add_reaction(message, '💰')
                 else:
                     res = jcoin.transfer(jcoin.jose_id, author_id,\
                         amount, jcoin.LEDGER_PATH)
@@ -324,6 +323,8 @@ async def do_josecoin(message, t_start):
                         if message.server.id == "271378126234320897":
                             await cxt.say('%s %.2fJC > %s' % (emoji_res, \
                                 amount, acc_to['name']))
+
+                        await client.add_reaction(message, '💰')
                     else:
                         await jcommon.jose_debug(message, 'josecoin_error: %s' % res[1])
         else:
