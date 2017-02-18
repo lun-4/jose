@@ -490,8 +490,8 @@ async def on_message(message):
     if should_stop:
         return
 
-    if message.content.startswith('!jasm'):
-        await do_jasm(message)
+    if message.content.startswith('%sjasm' % jcommon.JOSE_PREFIX):
+        await do_jasm(message, cxt)
 
     # a normal message, put it in the global text
     if not message.author.bot:
