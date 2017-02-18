@@ -580,7 +580,8 @@ class JoseMemes(jcommon.Extension):
         )
 
     async def c_ri(self, message, args, cxt):
-        res = (' '.join([':regional_indicator_{}:'.format(c) for c in ' '.\
-            join(args[1:])])).replace(':regional_indicator_ :', ' ')
+        inputstr = ' '.join(args[1:]).lower()
+        res = (' '.join([':regional_indicator_{}:'.format(c) for c in inputstr]))\
+            .replace(':regional_indicator_ :', ' ')
 
         await cxt.say(res)
