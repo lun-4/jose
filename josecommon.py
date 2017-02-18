@@ -77,7 +77,7 @@ LEARN_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / LEARN_MEMBERS)
 OP_TAX_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / TOTAL)
 
 PRICE_TABLE = {
-    'porn': ("Comandos relacionados a pornografia", PORN_PRICE),
+    'img': ("Imagens", IMG_PRICE),
     'learn': ("Comandos relacionados ao josé aprender textos", LEARN_PRICE),
     'operational': ("Taxa operacional de alguns comandos(normalmente relacionados a muito processamento)", OP_TAX_PRICE)
 }
