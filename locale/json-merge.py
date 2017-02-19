@@ -21,10 +21,12 @@ def main(args):
     print('{')
     for key in langjson:
         val = langjson[key]
+        dk = json.dumps(key).replace('\n', '\\n')
+        dv = json.dumps(val).replace('\n', '\\n')
         if i == len(langjson)-1:
-            print("\t%s: \"%s\"" % (json.dumps(key), val))
+            print("\t%s: %s" % (dk, dv))
         else:
-            print("\t%s: \"%s\"," % (json.dumps(key), val))
+            print("\t%s: %s," % (dk, dv))
         i += 1
     print('}')
 
