@@ -5,5 +5,10 @@ messages:
 	rm jose.po
 
 merges:
-	python3 json-merge.py jose.json jose.en.json > jose.en.json
-	python3 json-merge.py jose.json jose.pt.json > jose.pt.json
+	python3 json-merge.py jose.json jose.en.json > jose.en2.json
+	rm jose.en.json
+	mv jose.en2.json jose.en.json
+
+	python3 json-merge.py jose.json jose.pt.json > jose.pt2.json
+	rm jose.pt.json
+	mv jose.pt2.json jose.pt.json
