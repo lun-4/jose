@@ -232,6 +232,10 @@ class JoseBot(jcommon.Extension):
             self.logger.error("Error registering module")
             return False
 
+        # redo the event handler shit
+        self.ev_empty()
+        self.ev_load()
+
         # finally
         return True
 
