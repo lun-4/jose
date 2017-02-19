@@ -242,7 +242,7 @@ class JoseBot(jcommon.Extension):
         if n in self.modules:
             await self.load_ext(n, self.modules[n]['class'], cxt)
         else:
-            await cxt.say("%s: module not found/loaded" % n)
+            await cxt.say("%s: module not found/loaded", (n,))
 
     async def c_unload(self, message, args, cxt):
         '''`j!unload module` - desrecarrega um módulo do josé'''
@@ -255,15 +255,15 @@ class JoseBot(jcommon.Extension):
         modname = args[1]
 
         if modname not in self.modules:
-            await cxt.say("%s: module not loaded" % modname)
+            await cxt.say("%s: module not loaded", (modname,))
         else:
             # unload it
             self.logger.info("!unload: %s" % modname)
             res = await self.unload_mod(modname)
             if res[0]:
-                await cxt.say(":skull: `%s` is dead :skull:" % modname)
+                await cxt.say(":skull: `%s` is dead :skull:", (modname,))
             else:
-                await cxt.say(":warning: Error happened: %s" % res[1])
+                await cxt.say(":warning: Error happened: %s", (res[1],))
 
     async def c_loadmod(self, message, args, cxt):
         '''`j!loadmod class@module` - carrega um módulo do josé'''
@@ -279,9 +279,9 @@ class JoseBot(jcommon.Extension):
         ok = await self.load_ext(modname, modclass, cxt)
         if ok:
             self.logger.info("!loadmod: %s" % modname)
-            await cxt.say(":ok_hand: Success loading `%s`!" % modname)
+            await cxt.say(":ok_hand: Success loading `%s`!", (modname,))
         else:
-            await cxt.say(":warning: Error loading `%s` :warning:" % modname)
+            await cxt.say(":warning: Error loading `%s` :warning:", (modname,))
 
     async def c_modlist(self, message, args, cxt):
         '''`j!modlist` - Módulos do josé'''
@@ -328,7 +328,7 @@ class JoseBot(jcommon.Extension):
         '''`j!ping` - pong'''
         t_init = time.time()
         t_cmdprocess = (time.time() - cxt.t_creation) * 1000
-        pong = await cxt.say("pong! took **%.2fms** to process the command" % (t_cmdprocess))
+        pong = await cxt.say("pong! took **%.2fms** to process the command", (t_cmdprocess,))
         t_end = time.time()
         delta = t_end - t_init
         await self.client.edit_message(pong, pong.content + ", **%.2fms** to send it" % (delta * 1000))
@@ -348,7 +348,7 @@ class JoseBot(jcommon.Extension):
             return
 
         n_rand = random.randint(n_min, n_max)
-        await cxt.say("random number from %d to %d: %d" % (n_min, n_max, n_rand))
+        await cxt.say("random number from %d to %d: %d", (n_min, n_max, n_rand))
         return
 
     async def c_enc(self, message, args, cxt):
@@ -360,7 +360,7 @@ class JoseBot(jcommon.Extension):
         to_encrypt = ' '.join(args[1:])
         encdata = await jcommon.str_xor(to_encrypt, jcommon.JCRYPT_KEY)
         a85data = base64.a85encode(bytes(encdata, 'UTF-8'))
-        await cxt.say('resultado(enc): %s' % a85data.decode('UTF-8'))
+        await cxt.say('resultado(enc): %s', (a85data.decode('UTF-8'),))
         return
 
     async def c_dec(self, message, args, cxt):
@@ -374,10 +374,10 @@ class JoseBot(jcommon.Extension):
         try:
             to_decrypt = base64.a85decode(to_decrypt).decode('UTF-8')
         except Exception as e:
-            await cxt.say("dec: erro tentando desencodar a mensagem(%r)" % e)
+            await cxt.say("dec: erro tentando desencodar a mensagem(%r)", (e,))
             return
         plaintext = await jcommon.str_xor(to_decrypt, jcommon.JCRYPT_KEY)
-        await cxt.say("resultado(dec): %s" % plaintext)
+        await cxt.say("resultado(dec): %s", (plaintext,))
         return
 
     async def c_money(self, message, args, cxt):
@@ -411,7 +411,7 @@ class JoseBot(jcommon.Extension):
         data = json.loads(content)
 
         if 'error' in data:
-            await cxt.say("!money: %s" % data['error'])
+            await cxt.say("!money: %s", (data['error'],))
             return
 
         if currency_to not in data['rates']:
@@ -473,7 +473,7 @@ class JoseBot(jcommon.Extension):
             response = await aiohttp.request('GET', url)
 
             if response.status != 200:
-                await cxt.say("!sndc: error: status code != 200(st = %d)" % response.status)
+                await cxt.say("!sndc: error: status code != 200(st = %d)", (response.status))
                 return
 
             try:
@@ -506,7 +506,7 @@ class JoseBot(jcommon.Extension):
 
         escolhas = (' '.join(args[1:])).split(';')
         choice = random.choice(escolhas)
-        await cxt.say(">%s" % choice)
+        await cxt.say(">%s", (choice,))
 
     async def c_pick(self, message, args, cxt):
         '''`j!pick` - alias for `!escolha`'''
@@ -561,11 +561,11 @@ class JoseBot(jcommon.Extension):
     async def c_version(self, message, args, cxt):
         '''`j!version` - mostra a versão do jose'''
         pyver = '%d.%d.%d' % (sys.version_info[:3])
-        await cxt.say("`José v%s py:%s discord.py:%s`" % (jcommon.JOSE_VERSION
+        await cxt.say("`José v%s py:%s discord.py:%s`", (jcommon.JOSE_VERSION
             , pyver, discord.__version__))
 
     async def c_jose_add(self, message, args, cxt):
-        await cxt.say("José pode ser adicionado para outro servidor usando este link:\n```%s```" % jcommon.OAUTH_URL)
+        await cxt.say("José pode ser adicionado para outro servidor usando este link:\n```%s```", (jcommon.OAUTH_URL,))
 
     async def c_clist(self, message, args, cxt):
         '''`j!clist module` - mostra todos os comandos de tal módulo'''
@@ -576,7 +576,7 @@ class JoseBot(jcommon.Extension):
         modname = args[1]
 
         if modname not in self.modules:
-            await cxt.say("`%s`: Not found" % modname)
+            await cxt.say("`%s`: Not found", (modname,))
             return
 
         res = ' '.join(self.modules[modname]['methods'])
@@ -607,7 +607,7 @@ class JoseBot(jcommon.Extension):
             eval_cmd = eval_cmd[1:-1]
 
         res = eval(eval_cmd)
-        await cxt.say("```%s``` -> `%s`" % (eval_cmd, res))
+        await cxt.say("```%s``` -> `%s`", (eval_cmd, res))
 
     async def c_rplaying(self, message, args, cxt):
         await self.is_admin(message.author.id)
@@ -632,7 +632,7 @@ class JoseBot(jcommon.Extension):
 
         jcommon.ADMIN_IDS.append(userid)
         if userid in jcommon.ADMIN_IDS:
-            await cxt.say("Added `%r` as temporary admin!" % userid)
+            await cxt.say("Added `%r` as temporary admin!", (userid,))
         else:
             await cxt.say(":poop: Error adding user as temporary admin")
 
@@ -643,9 +643,9 @@ class JoseBot(jcommon.Extension):
         try:
             name = str(args[1])
             await self.client.edit_profile(username=name)
-            await cxt.say("done!!!!1!!1 i am now %s" % name)
+            await cxt.say("done!!!!1!!1 i am now %s", (name,))
         except Exception as e:
-            await cxt.say("err hapnnd!!!!!!!! %r" % e)
+            await cxt.say("err hapnnd!!!!!!!! %r", (e,))
 
     async def c_announce(self, message, args, cxt):
         '''`j!announce` - announce stuff'''
@@ -653,7 +653,7 @@ class JoseBot(jcommon.Extension):
 
         announcement = ' '.join(args[1:])
         await cxt.say("I'm gonna say `%r` to all servers I'm in, are you \
-sure about that, pretty admin? (y/n)" % announcement)
+sure about that, pretty admin? (y/n)", (announcement,))
         yesno = await self.client.wait_for_message(author=message.author)
 
         if yesno.content == 'y':
@@ -665,7 +665,7 @@ sure about that, pretty admin? (y/n)" % announcement)
                         chcount += 1
                 svcount += 1
             await cxt.say("Sent announcement to \
-%d servers, %d channels" % (svcount, chcount))
+%d servers, %d channels", (svcount, chcount))
         else:
             await cxt.say("jk I'm not gonna do what you \
 don't want (unless I'm skynet)")
