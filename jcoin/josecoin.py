@@ -203,6 +203,55 @@ class JoseCoin(jcommon.Extension):
         else:
             await cxt.say('jc_err: `%s`' % res[1])
 
+    async def c_gtop10(self, message, args, cxt):
+        guild = message.server
+        jcdata = dict(data) # copy
+
+        range_max = 11 # default 10 users
+        if len(args) > 1:
+            range_max = int(args[1]) + 1
+
+        if range_max >= 16:
+            await cxt.say("LimitError: values higher than 16 aren't valid")
+            return
+        elif range_max <= 0:
+            await cxt.say("haha no")
+            return
+
+        maior = {
+            'id': 0,
+            'name': '',
+            'amount': 0.0,
+        }
+
+        order = []
+
+        for i in range(1,range_max):
+            if len(jcdata) < 1:
+                break
+
+            for member in guild.members:
+                if member.id in jcdata:
+                    acc = jcdata[accid]
+                    name, amount = acc['name'], acc['amount']
+                    if amount > maior['amount']:
+                        maior['id'] = accid
+                        maior['name'] = name
+                        maior['amount'] = amount
+
+            del jcdata[maior['id']]
+            order.append('%d. %s -> %.2f' % (i, maior['name'], maior['amount']))
+
+            # reset to next
+            maior = {
+                'id': 0,
+                'name': '',
+                'amount': 0.0,
+            }
+
+        await cxt.say('\n'.join(order))
+        return
+
     async def c_top10(self, message, args, cxt):
         jcdata = dict(data) # copy
 
