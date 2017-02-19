@@ -46,9 +46,8 @@ class JoseMath(jaux.Auxiliar):
         await self.c_wolframalpha(message, args, cxt)
 
     async def c_temperature(self, message, args, cxt):
-        '''`j!temperature location` - Temperatura de um local, usando OpenWeatherMap
-        mostra tanto em Celsius quanto em Fahrenheit
-        **ratelimit GLOBAL: 60 chamadas / minuto**'''
+        '''`j!temperature location` - OpenWeatherMap'''
+        # ratelimit 60/minute
         if len(args) < 2:
             await cxt.say(self.c_temperature.__doc__)
             return
@@ -62,13 +61,16 @@ class JoseMath(jaux.Auxiliar):
             return
         w = observation.get_weather()
 
+        tempkelvin = w.get_temperature()
         tempcelsius = w.get_temperature("celsius")
         tempfahren = w.get_temperature("fahrenheit")
 
         celsiusnow = tempcelsius['temp']
         fahnow = tempfahren['temp']
+        kelnow = tempkelvin['temp']
 
-        await cxt.say("`%s` is at `%s °C, %s °F`", (location, celsiusnow, fahnow))
+        await cxt.say("`%s` is at `%s °C, %s °F, %s °K`", \
+            (location, celsiusnow, fahnow, kelnow))
 
     async def c_temp(self, message, args, cxt):
         '''`j!temp location` - alias para `!temperature`'''
