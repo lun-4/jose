@@ -87,7 +87,9 @@ class JoseBot(jcommon.Extension):
 
     async def unload_all(self):
         # unload all modules
-        to_remove = self.modules.keys()
+        # copy instead of using .keys() directly
+        #  to avoid RuntimeErrors
+        to_remove = copy.copy(self.modules.keys())
 
         count = 0
         for modname in to_remove:
