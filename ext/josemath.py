@@ -36,7 +36,7 @@ class JoseMath(jaux.Auxiliar):
             except StopIteration:
                 await cxt.say(":warning: Erro tentando pegar o texto da resposta :warning:")
                 return
-            await cxt.say("%s:\n%s" % (term_to_wolfram, self.codeblock("", response_wolfram)))
+            await cxt.say("%s:\n%s", (term_to_wolfram, self.codeblock("", response_wolfram)))
         else:
             await cxt.say(":cyclone: Sem resposta :cyclone:")
             return
@@ -68,7 +68,7 @@ class JoseMath(jaux.Auxiliar):
         celsiusnow = tempcelsius['temp']
         fahnow = tempfahren['temp']
 
-        await cxt.say("%s °C, %s °F" % (celsiusnow, fahnow))
+        await cxt.say("%s °C, %s °F", (celsiusnow, fahnow))
 
     async def c_temp(self, message, args, cxt):
         '''`j!temp location` - alias para `!temperature`'''
@@ -99,7 +99,7 @@ class JoseMath(jaux.Auxiliar):
         try:
             n = int(args[1])
         except Exception as e:
-            await cxt.say("Error parsing arguments: %r" % e)
+            await cxt.say("Error parsing arguments: %r", (e,))
             return
 
         if n > 30:
