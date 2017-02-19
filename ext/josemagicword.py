@@ -142,7 +142,7 @@ class JoseMagicWord(jaux.Auxiliar):
             mw = serverdb[set_id]
             for word in magicwords:
                 if word in mw['words']:
-                    await cxt.say(":warning: Conflict: `%s` conflicts with Magic Word Set %d" % \
+                    await cxt.say(":warning: Conflict: `%s` conflicts with Magic Word Set %d", \
                         (word, set_id))
                     return
 
@@ -157,7 +157,7 @@ class JoseMagicWord(jaux.Auxiliar):
             'response': mwresponse
         }
 
-        await cxt.say("M.W. Set %s created!" % new_id)
+        await cxt.say("M.W. Set %s created!", (new_id,))
 
 
     async def c_listmw(self, message, args, cxt):
@@ -185,7 +185,7 @@ class JoseMagicWord(jaux.Auxiliar):
                 return
 
             mw = serverdb[set_id]
-            await cxt.say("`%s: %s > %s`" % (set_id, mw['words'], mw['response']))
+            await cxt.say("`%s: %s > %s`", (set_id, mw['words'], mw['response']))
 
 
     async def c_delmw(self, message, args, cxt):
@@ -201,7 +201,7 @@ class JoseMagicWord(jaux.Auxiliar):
 
         set_id = args[1]
         if set_id not in self.magicwords[message.server.id]:
-            await cxt.say("Magic Word Set `%r` not found" % set_id)
+            await cxt.say("Magic Word Set `%r` not found", (set_id,))
             return
 
         # so it doesn't trigger again
@@ -213,4 +213,4 @@ class JoseMagicWord(jaux.Auxiliar):
         # say to Python to FUCKING DELETE IT
         del self.magicwords[message.server.id][set_id]
         await self.savedb()
-        await cxt.say("Deleted set %s" % set_id)
+        await cxt.say("Deleted set %s", (set_id,))
