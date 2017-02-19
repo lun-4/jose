@@ -186,7 +186,7 @@
 	"I'm gonna say `%r` to all servers I'm in, are you sure about that, pretty admin? (y/n)": "",
 	"Sent announcement to %d servers, %d channels": "",
 	"jk I'm not gonna do what you don't want (unless I'm skynet)": "",
-	"quantidade de memes: %d": "",
+	"quantidade de memes: %d": "quantity of memes: %d",
 	"`[img.%s] most recent posts`": "",
 	"`[img.%s] random ID`": "",
 	"`[img.%s] tags: %r`": "",

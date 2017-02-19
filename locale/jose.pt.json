@@ -187,13 +187,13 @@
 	"Sent announcement to %d servers, %d channels": "",
 	"jk I'm not gonna do what you don't want (unless I'm skynet)": "",
 	"quantidade de memes: %d": "",
-	"`[img.%s] most recent posts`": "",
-	"`[img.%s] random ID`": "",
-	"`[img.%s] tags: %r`": "",
-	"`[img.%s] Error parsing JSON response`": "",
-	"`[img.%s] API doesn't support individual posts`": "",
+	"`[img.%s] most recent posts`": "`[img.%s] posts mais recentes`",
+	"`[img.%s] random ID`": "`[img.%s] ID aleatório`",
+	"`[img.%s] tags: %r`": "`[img.%s] tags: %r`",
+	"`[img.%s] Error parsing JSON response`": "`[img.%s] Erro parseando JSON de resposta`",
+	"`[img.%s] API doesn't support individual posts`": "`[img.%s] API não suporta posts individuais`",
 	"`%r`": "",
-	"`[img.%s] No results found.`": "",
+	"`[img.%s] No results found.`": "`[img.%s] Nenhum resultado encontrado`",
 	"ID: %s, URL: %s": "",
-	"*no free definitions*": ""
+	"*no free definitions*": "*sem definição grátis*"
 }
