@@ -43,11 +43,11 @@ class JoseLanguage(jaux.Auxiliar):
         language = args[1]
 
         if language not in self.LANGLIST:
-            await cxt.say("%s: Language not found" % language)
+            await cxt.say("%s: Language not found", (language,))
             return
 
         await jcommon.langdb_set(message.server.id, language)
-        await cxt.say(":speech_left: Set language to %s" % language)
+        await cxt.say(":speech_left: Set language to %s", (language,))
         await self.savedb()
 
 
@@ -59,5 +59,5 @@ class JoseLanguage(jaux.Auxiliar):
 
         llist = self.codeblock("", " ".join(self.LANGLIST))
         serverlang = await jcommon.langdb_get(message.server.id)
-        await cxt.say("This server's language: `%s`\nAvailable languages: %s" % \
+        await cxt.say("This server's language: `%s`\nAvailable languages: %s", \
             (serverlang, llist))
