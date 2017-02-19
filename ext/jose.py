@@ -76,7 +76,7 @@ class JoseBot(jcommon.Extension):
                     self.ev_empty()
                     self.ev_load()
 
-                self.logger.info("[unload_mod] Unloaded %d", modname)
+                self.logger.info("[unload_mod] Unloaded %s", modname)
                 return ok
             except Exception as e:
                 self.logger.error("[ERR][unload_mod]%s: %s", (modname, repr(e)))
