@@ -75,8 +75,14 @@ class JoseBot(jcommon.Extension):
         if getattr(module['inst'], 'ext_unload', False):
             try:
                 ok = await module['inst'].ext_unload()
+
                 # delete stuff from the module table
                 del self.modules[modname]
+
+                # remove its events, if any
+                if len(module['handlers']) > 0:
+                    self.ev_empty()
+                    self.ev_load()
 
                 self.logger.info("[unload_mod] Unloaded %d", modname)
                 return ok
