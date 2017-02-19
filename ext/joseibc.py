@@ -58,13 +58,13 @@ class JoseIBC(jaux.Auxiliar):
         try:
             json_data = json.loads(json_to_parse)
         except Exception as e:
-            await cxt.say("syscall->json.loads: `%r`" % e)
+            await cxt.say("syscall->json.loads: `%r`", (e,))
             return
 
         try:
             syscall_number = json_data['callnumber']
         except Exception as e:
-            await cxt.say("syscall->json_data.callnumber: `%r`" % e)
+            await cxt.say("syscall->json_data.callnumber: `%r`", (e,))
             return
 
         await syscall_functions[syscall_number](self, json_data['arguments'], cxt)

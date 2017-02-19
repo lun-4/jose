@@ -132,7 +132,7 @@ class JoseMemes(jcommon.Extension):
                 return
 
             if meme in self.memes:
-                await cxt.say("%s: meme já existe" % meme)
+                await cxt.say("%s: meme já existe", (meme,))
                 return
 
             for pat in self.patterns:
@@ -164,7 +164,7 @@ class JoseMemes(jcommon.Extension):
 
             # save it because of my sanity
             await self.save_memes()
-            await cxt.say("%s: meme adicionado!" % meme)
+            await cxt.say("%s: meme adicionado!", (meme,))
             return
         elif command == 'rm':
             meme = ' '.join(args[2:])
@@ -175,14 +175,14 @@ class JoseMemes(jcommon.Extension):
                 if (message.author.id == meme_data['owner']) or is_admin:
                     del self.memes[meme]
                     await self.save_memes()
-                    await cxt.say("%s: meme removido" % meme)
+                    await cxt.say("%s: meme removido", (meme,))
                     return
                 else:
                     raise je.PermissionError()
 
                 return
             else:
-                await cxt.say("%s: meme não encontrado" % meme)
+                await cxt.say("%s: meme não encontrado", (meme,))
                 return
         elif command == 'save':
             done = await self.save_memes()
@@ -225,7 +225,7 @@ class JoseMemes(jcommon.Extension):
                 await cxt.say(self.memes[meme]['data'])
                 await self.save_memes()
             else:
-                await cxt.say("%s: meme não encontrado" % meme)
+                await cxt.say("%s: meme não encontrado", (meme,))
             return
         elif command == 'cnv': # debug purposes
             for key in self.memes:
@@ -269,7 +269,7 @@ class JoseMemes(jcommon.Extension):
                 else:
                     await cxt.say(to_send)
             else:
-                await cxt.say("%r: Nenhum resultado encontrado" % term)
+                await cxt.say("%r: Nenhum resultado encontrado", (term,))
         elif command == 'rename':
             args_s = ' '.join(args[2:])
             args_sp = args_s.split(';')
@@ -277,10 +277,10 @@ class JoseMemes(jcommon.Extension):
                 oldname = args_sp[0]
                 newname = args_sp[1]
             except Exception as e:
-                await cxt.say("Error parsing arguments: %r" % e)
+                await cxt.say("Error parsing arguments: %r", (e,))
 
             if oldname not in self.memes:
-                await cxt.say("%s: meme não encontrado" % oldname)
+                await cxt.say("%s: meme não encontrado", (oldname,))
                 return
 
             # swapping
@@ -290,7 +290,7 @@ class JoseMemes(jcommon.Extension):
                 raise je.PermissionError()
 
             if newname in self.memes:
-                await cxt.say("`%s`: meme já existe" % newname)
+                await cxt.say("`%s`: meme já existe", (newname,))
                 return
 
             self.memes[newname] = {
@@ -299,7 +299,7 @@ class JoseMemes(jcommon.Extension):
             }
 
             del self.memes[oldname]
-            await cxt.say("`%s` foi renomeado para `%s`!" % (oldname, newname))
+            await cxt.say("`%s` foi renomeado para `%s`!", (oldname, newname))
             await self.save_memes()
             return
 
@@ -309,7 +309,7 @@ class JoseMemes(jcommon.Extension):
                 u = discord.utils.get(message.server.members, id=self.memes[meme]['owner'])
                 await cxt.say("%s foi criado por %s", (meme, u))
             else:
-                await cxt.say("%s: meme não encontrado" % meme)
+                await cxt.say("%s: meme não encontrado", (meme,))
             return
 
         elif command == 'count':
@@ -328,7 +328,7 @@ class JoseMemes(jcommon.Extension):
                     inconsistency = True
 
             if inconsistency:
-                await cxt.say("INCONSISTENCY: `%s`" % inconsistency_report)
+                await cxt.say("INCONSISTENCY: `%s`", (inconsistency_report,))
                 return
 
             i = 1
@@ -343,9 +343,9 @@ class JoseMemes(jcommon.Extension):
         elif command == 'istat':
             meme = ' '.join(args[2:])
             if meme in self.memes:
-                await cxt.say(self.codeblock('', 'usos: %d' % self.memes[meme]['uses']))
+                await cxt.say(self.codeblock('', 'usos: %d', (self.memes[meme]['uses'],)))
             else:
-                await cxt.say("%s: meme não encontrado" % meme)
+                await cxt.say("%s: meme não encontrado", (meme,))
             return
 
         elif command == 'page':
@@ -357,7 +357,7 @@ class JoseMemes(jcommon.Extension):
             try:
                 page = int(page)
             except Exception as e:
-                await cxt.say("jmemes: %r" % e)
+                await cxt.say("jmemes: %r", (e,))
                 return
 
             if page < 0:
@@ -383,7 +383,7 @@ class JoseMemes(jcommon.Extension):
             for key in self.memes:
                 meme = self.memes[key]
                 if 'uses' not in meme:
-                    await cxt.say("INCONSISTENCY(uses): %s" % key)
+                    await cxt.say("INCONSISTENCY(uses): %s", (key,))
                     self.memes[key].update({"uses": 0})
 
             await cxt.say("checking duplicates(by value)")
@@ -396,7 +396,7 @@ class JoseMemes(jcommon.Extension):
 
             for v in new_memes:
                 if len(new_memes[v]) > 1:
-                    await cxt.say("DUPLICATE(s): ```%s```\n" % (new_memes[v]))
+                    await cxt.say("DUPLICATE(s): ```%s```\n", (new_memes[v],))
 
             await cxt.say("done.")
             return
@@ -422,7 +422,7 @@ class JoseMemes(jcommon.Extension):
 
         elif command == 'rand':
             key = random.choice(list(self.memes.keys()))
-            await cxt.say('%s: %s' % (key, self.memes[key]['data']))
+            await cxt.say('%s: %s', (key, self.memes[key]['data'],))
 
         elif command == 'searchc':
             terms = ' '.join(args[2:])
@@ -433,14 +433,14 @@ class JoseMemes(jcommon.Extension):
 
             probables = [key for key in self.memes if terms in self.memes[key]['data'].lower()]
             if len(probables) <= 70:
-                await cxt.say("Resultados: %s" % ', '.join(probables))
+                await cxt.say("Resultados: %s", (', '.join(probables),))
             elif len(probables) > 70:
-                await cxt.say("PORRA EH MUITO RESULTADO NAO AGUENTO[%d resultados]" % len(probables))
+                await cxt.say("PORRA EH MUITO RESULTADO NAO AGUENTO[%d resultados]", (len(probables),))
             else:
-                await cxt.say("%r: Nenhum resultado encontrado" % terms)
+                await cxt.say("%r: Nenhum resultado encontrado", (terms,))
 
         else:
-            await cxt.say("comando inválido: %s" % command)
+            await cxt.say("comando inválido: %s", (command,))
 
         return
 
@@ -505,7 +505,7 @@ class JoseMemes(jcommon.Extension):
         try:
             response = await asyncio.wait_for(aiohttp.request('GET', wiki_api_url), 4)
         except asyncio.TimeoutError:
-            await cxt.say("`[wiki:%s] Timeout reached`" % wiki_methodname)
+            await cxt.say("`[wiki:%s] Timeout reached`", (wiki_methodname,))
             return
 
         response_text = await response.text()
