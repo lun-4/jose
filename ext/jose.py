@@ -87,9 +87,11 @@ class JoseBot(jcommon.Extension):
 
     async def unload_all(self):
         # unload all modules
-        # copy instead of using .keys() directly
-        #  to avoid RuntimeErrors
-        to_remove = copy.copy(self.modules.keys())
+
+        # copy.copy doesn't work on dict_keys objects
+        to_remove = []
+        for key in self.modules:
+            to_remove.append(key)
 
         count = 0
         for modname in to_remove:
