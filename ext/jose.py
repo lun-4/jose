@@ -35,17 +35,18 @@ class JoseBot(jcommon.Extension):
         self.event_tbl = {
             'on_message': [],
             'any_message': [],
+            'logout': [], # TODO logout event
         }
 
     def ev_load(self):
         # register events
+        count += 1
         for modname in self.modules:
             module = self.modules[modname]
             modinst = self.modules[modname]['inst']
             for method in module['handlers']:
                 if method.startswith("e_"):
                     evname = method[method.find("_")+1:]
-                    self.logger.info("[ev_load]")
 
                     # check if event exists
                     if evname in self.event_tbl:
@@ -57,9 +58,12 @@ class JoseBot(jcommon.Extension):
                             sys.exit(0)
 
                         self.event_tbl[evname].append(handler)
+                        count += 1
                     else:
                         self.logger.warning("Event %s@%s:%s doesn't exist in Event Table", \
                             method, modname, evname)
+
+        self.logger.info("[ev_load] Loaded %d handlers" % count)
 
     async def unload_mod(self, modname):
         module = self.modules[modname]
@@ -97,6 +101,7 @@ class JoseBot(jcommon.Extension):
         for modname in to_remove:
             ok = await self.unload_mod(modname)
             if not ok:
+                self.logger.error("[unload_all] %s didn't return a True", modname)
                 return ok
             count += 1
 
@@ -594,5 +599,5 @@ don't want (unless I'm skynet)")
             evcount = len(self.event_tbl[evname])
             res.append('event %r : %d handlers' % (evname, evcount))
 
-        await cxt.say("There are %d registered events: %s" % \
+        await cxt.say("There are %d registered events: ```%s```" % \
             (len(self.event_tbl), '\n'.join(res)))
