@@ -66,12 +66,12 @@ class JoseGambling(jcommon.Extension):
         atleast = (decimal.Decimal(amount) + fee_amount)
 
         if amount < self.last_bid:
-            await cxt.say("sua aposta tem que ser maior do que a última, que foi %.2fJC" % self.last_bid)
+            await cxt.say("sua aposta tem que ser maior do que a última, que foi %.2fJC", (self.last_bid,))
             return
 
         a = jcoin.get(id_from)[1]
         if a['amount'] <= atleast:
-            await cxt.say("sua conta não possui fundos suficientes para apostar(%.2fJC são necessários, você tem %.2fJC, faltam %.2fJC)" % \
+            await cxt.say("sua conta não possui fundos suficientes para apostar(%.2fJC são necessários, você tem %.2fJC, faltam %.2fJC)", \
                 (atleast, a['amount'], decimal.Decimal(atleast) - a['amount']))
             return
 
@@ -87,9 +87,9 @@ class JoseGambling(jcommon.Extension):
             val = self.gambling_env[id_from]
 
             self.last_bid = amount
-            await cxt.say("jc_aposta: aposta *total* de %.2f de <@%s>" % (val, id_from))
+            await cxt.say("jc_aposta: aposta *total* de %.2f de <@%s>", (val, id_from))
         else:
-            await cxt.say('jc->error: %s' % res[1])
+            await cxt.say('jc->error: %s', (res[1],))
 
     async def c_rolar(self, message, args, cxt):
         '''`j!rolar` - rola e mostra quem é o vencedor'''
@@ -135,7 +135,7 @@ class JoseGambling(jcommon.Extension):
                 await self.debug("jc_aposta->jcoin: %s" % res[1])
                 return
 
-        await cxt.say("%s\nModo aposta desativado!\nhttp://i.imgur.com/huUlJhR.jpg" % (report))
+        await cxt.say("%s\nModo aposta desativado!\nhttp://i.imgur.com/huUlJhR.jpg", (report,))
 
         # clear everything
         self.gambling_env = {}
@@ -156,7 +156,7 @@ class JoseGambling(jcommon.Extension):
 
     async def c_acheck(self, message, args, cxt):
         '''`j!acheck` - mostra se o modo aposta tá ligado ou não'''
-        await cxt.say("Modo aposta: %s" % ["desligado", "ligado"][self.gambling_mode])
+        await cxt.say("Modo aposta: %s", (["desligado", "ligado"][self.gambling_mode],))
 
     async def c_flip(self, message, args, cxt):
         '''`j!flip` - joga uma moeda(49%, 49% 2%)'''
