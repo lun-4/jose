@@ -6,7 +6,6 @@ asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 # profiling
 from pympler import tracker
 
-import sys
 import time
 import re
 import traceback

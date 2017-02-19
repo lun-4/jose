@@ -231,7 +231,8 @@ class JoseCoin(jcommon.Extension):
                 break
 
             for member in guild.members:
-                if member.id in jcdata:
+                accid = member.id
+                if accid in jcdata:
                     acc = jcdata[accid]
                     name, amount = acc['name'], acc['amount']
                     if amount > maior['amount']:
