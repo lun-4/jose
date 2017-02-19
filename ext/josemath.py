@@ -68,7 +68,7 @@ class JoseMath(jaux.Auxiliar):
         celsiusnow = tempcelsius['temp']
         fahnow = tempfahren['temp']
 
-        await cxt.say("%s °C, %s °F", (celsiusnow, fahnow))
+        await cxt.say("`%s` is at `%s °C, %s °F`", (location, celsiusnow, fahnow))
 
     async def c_temp(self, message, args, cxt):
         '''`j!temp location` - alias para `!temperature`'''
