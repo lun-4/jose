@@ -56,7 +56,7 @@ class JoseBot(jcommon.Extension):
                         method, modname, evname)
 
                     # check if event exists
-                    if evname in event_table:
+                    if evname in self.event_tbl:
                         handler = getattr(modinst, method, None)
                         if handler is None:
                             # ????
@@ -64,7 +64,7 @@ class JoseBot(jcommon.Extension):
                                 method, modname, evname)
                             sys.exit(0)
 
-                        event_table[evname].append(handler)
+                        self.event_tbl[evname].append(handler)
                     else:
                         jcommon.logger.warning("Event %s@%s:%s doesn't exist in Event Table", \
                             method, modname, evname)

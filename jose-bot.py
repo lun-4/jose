@@ -197,44 +197,11 @@ help_helptext = """
 Exemplos: `j!docstring docstring`, `j!docstring pstatus`, `j!docstring ap`, `j!docstring wa`, etc.
 """
 
-event_table = {
-    # any message that is not a command
-    "on_message": [],
-
-    # any message, including commands
-    "any_message": [],
-
-    # TODO: called on discord.client.logout
-    "logout": [],
-}
-
-# register events
-for modname in jose.modules:
-    module = jose.modules[modname]
-    modinst = jose.modules[modname]['inst']
-
-    for method in module['handlers']:
-        if method.startswith("e_"):
-            evname = method[method.find("_")+1:]
-            jcommon.logger.info("Register Event %s@%s:%s", \
-                method, modname, evname)
-
-            # check if event exists
-            if evname in event_table:
-                handler = getattr(modinst, method, None)
-                if handler is None:
-                    # ????
-                    jcommon.logger.error("Event handler %s@%s:%s doesn't... exist????", \
-                        method, modname, evname)
-                    sys.exit(0)
-
-                event_table[evname].append(handler)
-            else:
-                jcommon.logger.warning("Event %s@%s:%s doesn't exist in Event Table", \
-                    method, modname, evname)
+# load events
+jose.ev_empty()
 
 async def do_event(event_name, message):
-    for handler in event_table[event_name]:
+    for handler in jose.event_tbl[event_name]:
         cxt = jcommon.Context(client, message, time.time(), jose)
         await handler(message, cxt)
 
