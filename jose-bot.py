@@ -278,10 +278,7 @@ async def do_josecoin(message, t_start):
                 amount = random.choice(jcommon.JC_REWARDS)
                 acc_to = jcoin.get(author_id)[1]
 
-                if amount == 0:
-                    # if it is on the wrong server, return
-                    await client.add_reaction(message, '💰')
-                else:
+                if amount != 0:
                     res = jcoin.transfer(jcoin.jose_id, author_id,\
                         amount, jcoin.LEDGER_PATH)
                     await josecoin_save(message, False)
@@ -291,6 +288,8 @@ async def do_josecoin(message, t_start):
                             await cxt.say('%s %.2fJC > %s' % (emoji_res, \
                                 amount, acc_to['name']))
 
+                        # delay because ratelimits
+                        await asyncio.sleep(0.4)
                         await client.add_reaction(message, '💰')
                     else:
                         await jcommon.jose_debug(message, 'josecoin_error: %s' % res[1])
