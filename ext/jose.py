@@ -52,8 +52,7 @@ class JoseBot(jcommon.Extension):
             for method in module['handlers']:
                 if method.startswith("e_"):
                     evname = method[method.find("_")+1:]
-                    self.logger.info("Register Event %s@%s:%s", \
-                        method, modname, evname)
+                    self.logger.info("[ev_load]")
 
                     # check if event exists
                     if evname in self.event_tbl:
@@ -328,15 +327,11 @@ class JoseBot(jcommon.Extension):
         # show everyone in a nice codeblock
         await cxt.say(self.codeblock("", " ".join(mod_list)))
 
-    def says(self, msg):
-        # calls self.say but in an non-async context
-        asyncio.ensure_future(self.say(msg), loop=self.loop)
-
     async def c_hjose(self, message, args, cxt):
         await cxt.say(jcommon.JOSE_GENERAL_HTEXT, message.author)
 
     async def sec_auth(self, f, cxt):
-        auth = await self.is_admin(self.current.author.id)
+        auth = await self.is_admin(cxt.message.author.id)
         if auth:
             self.command_lock = True
             await f(cxt)
@@ -410,51 +405,6 @@ class JoseBot(jcommon.Extension):
         plaintext = await jcommon.str_xor(to_decrypt, jcommon.JCRYPT_KEY)
         await cxt.say("resultado(dec): %s", (plaintext,))
         return
-
-    async def c_money(self, message, args, cxt):
-        '''`j!money quantity base to` - converte dinheiro usando cotações etc
-        `!money list` - lista todas as moedas disponíveis'''
-
-        if len(args) > 1:
-            if args[1] == 'list':
-                r = await aiohttp.request('GET', "http://api.fixer.io/latest")
-                content = await r.text()
-                data = json.loads(content)
-                await cxt.say(self.codeblock("", " ".join(data["rates"])))
-                return
-
-        if len(args) < 3:
-            await cxt.say(self.c_money.__doc__)
-            return
-
-        try:
-            amount = float(args[1])
-        except Exception as e:
-            await cxt.say("Error parsing `quantity`")
-            return
-
-        currency_from = args[2]
-        currency_to = args[3]
-
-        url = "http://api.fixer.io/latest?base={}".format(currency_from.upper())
-        r = await aiohttp.request('GET', url)
-        content = await r.text()
-        data = json.loads(content)
-
-        if 'error' in data:
-            await cxt.say("!money: %s", (data['error'],))
-            return
-
-        if currency_to not in data['rates']:
-            await cxt.say("Invalid currency to convert to")
-            return
-
-        rate = data['rates'][currency_to]
-        res = amount * rate
-
-        await cxt.say('{} {} = {} {}'.format(
-            amount, currency_from, res, currency_to
-        ))
 
     async def c_yt(self, message, args, cxt):
         '''`j!yt [termo 1] [termo 2]...` - procura no youtube'''

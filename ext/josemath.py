@@ -5,6 +5,8 @@ sys.path.append("..")
 import jauxiliar as jaux
 import joseconfig as jconfig
 
+import aiohttp
+import json
 import wolframalpha
 import pyowm
 
@@ -113,3 +115,48 @@ class JoseMath(jaux.Auxiliar):
     async def c_plot(self, message, args, cxt):
         '''`j!plot func` - plot f(x) functions'''
         pass
+
+    async def c_money(self, message, args, cxt):
+        '''`j!money quantity base to` - converte dinheiro usando cotações etc
+        `!money list` - lista todas as moedas disponíveis'''
+
+        if len(args) > 1:
+            if args[1] == 'list':
+                r = await aiohttp.request('GET', "http://api.fixer.io/latest")
+                content = await r.text()
+                data = json.loads(content)
+                await cxt.say(self.codeblock("", " ".join(data["rates"])))
+                return
+
+        if len(args) < 3:
+            await cxt.say(self.c_money.__doc__)
+            return
+
+        try:
+            amount = float(args[1])
+        except Exception as e:
+            await cxt.say("Error parsing `quantity`")
+            return
+
+        currency_from = args[2]
+        currency_to = args[3]
+
+        url = "http://api.fixer.io/latest?base={}".format(currency_from.upper())
+        r = await aiohttp.request('GET', url)
+        content = await r.text()
+        data = json.loads(content)
+
+        if 'error' in data:
+            await cxt.say("!money: %s", (data['error'],))
+            return
+
+        if currency_to not in data['rates']:
+            await cxt.say("Invalid currency to convert to")
+            return
+
+        rate = data['rates'][currency_to]
+        res = amount * rate
+
+        await cxt.say('{} {} = {} {}'.format(
+            amount, currency_from, res, currency_to
+        ))
