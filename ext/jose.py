@@ -38,7 +38,7 @@ class JoseBot(jcommon.Extension):
             'logout': [], # TODO logout event
         }
 
-    def ev_load(self):
+    def ev_load(self, dflag=False):
         # register events
         count = 0
         for modname in self.modules:
@@ -47,6 +47,10 @@ class JoseBot(jcommon.Extension):
             for method in module['handlers']:
                 if method.startswith("e_"):
                     evname = method[method.find("_")+1:]
+
+                    if dflag:
+                        self.logger.info("Event handler %s@%s:%s", \
+                            method, modname, evname)
 
                     # check if event exists
                     if evname in self.event_tbl:

@@ -198,6 +198,7 @@ Exemplos: `j!docstring docstring`, `j!docstring pstatus`, `j!docstring ap`, `j!d
 
 # load events
 jose.ev_empty()
+jose.ev_load(True)
 
 async def do_event(event_name, message):
     for handler in jose.event_tbl[event_name]:
