@@ -77,9 +77,11 @@ class JoseBot(jcommon.Extension):
                 ok = await module['inst'].ext_unload()
                 # delete stuff from the module table
                 del self.modules[modname]
+
+                self.logger.info("[unload_mod] Unloaded %d", modname)
                 return ok
             except Exception as e:
-                self.logger.error("%s[ERROR]: %s" % (modname, repr(e)))
+                self.logger.error("[ERR][unload_mod]%s: %s", (modname, repr(e)))
                 return False, repr(e)
         else:
             self.logger.info("%s doesn't have ext_unload", modname)
