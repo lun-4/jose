@@ -52,7 +52,7 @@ class JoseBot(jcommon.Extension):
             for method in module['handlers']:
                 if method.startswith("e_"):
                     evname = method[method.find("_")+1:]
-                    jcommon.logger.info("Register Event %s@%s:%s", \
+                    self.logger.info("Register Event %s@%s:%s", \
                         method, modname, evname)
 
                     # check if event exists
@@ -60,13 +60,13 @@ class JoseBot(jcommon.Extension):
                         handler = getattr(modinst, method, None)
                         if handler is None:
                             # ????
-                            jcommon.logger.error("Event handler %s@%s:%s doesn't... exist????", \
+                            self.logger.error("Event handler %s@%s:%s doesn't... exist????", \
                                 method, modname, evname)
                             sys.exit(0)
 
                         self.event_tbl[evname].append(handler)
                     else:
-                        jcommon.logger.warning("Event %s@%s:%s doesn't exist in Event Table", \
+                        self.logger.warning("Event %s@%s:%s doesn't exist in Event Table", \
                             method, modname, evname)
 
     async def unload_mod(self, modname):
@@ -643,7 +643,7 @@ class JoseBot(jcommon.Extension):
         playing_phrase = random.choice(jcommon.JOSE_PLAYING_PHRASES)
         playing_name = '%s | v%s | %d guilds | %shjose' % (playing_phrase, jcommon.JOSE_VERSION, \
             len(self.client.servers), jcommon.JOSE_PREFIX)
-        jcommon.logger.info("Playing %s", playing_name)
+        self.logger.info("Playing %s", playing_name)
         g = discord.Game(name = playing_name, url = playing_name)
         await self.client.change_presence(game = g)
 
