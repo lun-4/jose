@@ -63,16 +63,16 @@ class JoseImages(jcommon.Extension):
 
         if search_term == '-latest':
             # get latest
-            await cxt.say('`[img.%s] most recent posts`' % boardid)
+            await cxt.say('`[img.%s] most recent posts`', (boardid,))
             url = '%s?%s=%s' % (index_url, limit_key, IMAGE_LIMIT)
         elif search_term == '-random':
             # random id
-            await cxt.say('`[img.%s] random ID`' % boardid)
+            await cxt.say('`[img.%s] random ID`', (boardid,))
             random_flag = True
             url = '%s?%s=%s' % (index_url, limit_key, 1)
         else:
             # normally, search tags
-            await cxt.say('`[img.%s] tags: %r`' % (boardid, search_term))
+            await cxt.say('`[img.%s] tags: %r`', (boardid, search_term))
             url = '%s?%s=%s&%s=%s' % (search_url, limit_key, IMAGE_LIMIT,\
                 search_key, search_term)
             if search_key:
@@ -82,7 +82,7 @@ class JoseImages(jcommon.Extension):
         response = await self.get_json(url)
 
         if not response:
-            await cxt.say("`[img.%s] Error parsing JSON response`" % boardid)
+            await cxt.say("`[img.%s] Error parsing JSON response`", (boardid,))
             return
 
         if list_key:
@@ -93,7 +93,7 @@ class JoseImages(jcommon.Extension):
             post = random.choice(response[rspec])
         elif random_flag:
             if not show_url:
-                await cxt.say("`[img.%s] API doesn't support individual posts`" % boardid)
+                await cxt.say("`[img.%s] API doesn't support individual posts`", (boardid,))
                 return
 
             most_recent_id = response[0]['id']
@@ -101,14 +101,14 @@ class JoseImages(jcommon.Extension):
             try:
                 random_id = random.randint(1, int(most_recent_id))
             except Exception as e:
-                await cxt.say("`%r`" % e)
+                await cxt.say("`%r`", (e,))
                 return
 
             random_post_url = '%s?id=%s' % (show_url, random_id)
             post = await self.get_json(random_post_url)
         else:
             if len(response) < 1:
-                await cxt.say("`[img.%s] No results found.`" % boardid)
+                await cxt.say("`[img.%s] No results found.`", (boardid,))
                 return
             post = random.choice(response)
 
@@ -117,13 +117,13 @@ class JoseImages(jcommon.Extension):
             post_url = post_url.replace('//', '/')
             post_url = 'http:/%s' % post_url
 
-        await cxt.say('ID: %s, URL: %s' % (str(post['id']), str(post_url)))
+        await cxt.say('ID: %s, URL: %s', (str(post['id']), str(post_url)))
         return
 
     async def img_routine(self, cxt):
         res = await jcoin.jcoin_control(self.current.author.id, jcommon.IMG_PRICE)
         if not res[0]:
-            await cxt.say("PermError: %s" % res[1])
+            await cxt.say("PermError: %s", (res[1],))
             return False
         return True
 
