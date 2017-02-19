@@ -423,7 +423,7 @@ class JoseBot(jcommon.Extension):
         await self.c_escolha(message, args, cxt)
 
     async def c_nick(self, message, args, cxt):
-        '''`j!nick [nick]` - [SOMENTE ADMIN]'''
+        '''`j!nick [nick]` - only admins'''
         await self.is_admin(message.author.id)
 
         if len(args) < 2:

@@ -142,8 +142,8 @@ class JoseStats(jaux.Auxiliar):
             self.statistics['gl_messages'] += 1
 
     async def c_query(self, message, args, cxt):
-        '''`j!query data` - Fazer pedidos ao banco de dados de estatísticas do josé
-A lista de possíveis dados está em https://github.com/lkmnds/jose/blob/master/doc/queries-pt.md'''
+        '''`j!query data` - Query some statistics
+https://github.com/lkmnds/jose/blob/master/doc/queries-pt.md'''
 
         if len(args) < 2:
             await cxt.say(self.c_query.__doc__)
@@ -157,17 +157,20 @@ A lista de possíveis dados está em https://github.com/lkmnds/jose/blob/master/
             # Because `josestats` came AFTER `josespeak`, the Texter calculation
             # was off by 7931 messages from the `josestats` calculation
             # this fixes it, i suppose
-            response += "Mensagens recebidas: %d\n" % (self.statistics['gl_messages'] + 7931)
-            response += "Comandos recebidos: %d\n" % sum(self.statistics['gl_commands'].values())
-            response += "Pedidos recebidos(queries): %d\n" % self.statistics['gl_queries']
+            response += "Messages received: %d\n" % (self.statistics['gl_messages'] + 7931)
+            response += "Commands done: %d\n" % sum(self.statistics['gl_commands'].values())
+            response += "Queries made: %d\n" % self.statistics['gl_queries']
 
             # calculate most used command
-            sorted_gcmd = sorted(self.statistics['gl_commands'].items(), key=operator.itemgetter(1))
+            sorted_gcmd = sorted(self.statistics['gl_commands'].items(), \
+                key=operator.itemgetter(1))
 
             if len(sorted_gcmd) > 1:
                 most_used_commmand = sorted_gcmd[-1][0]
                 muc_uses = sorted_gcmd[-1][1]
-                response += "Comando mais usado: %s, usado %d vezes\n" % (most_used_commmand, muc_uses)
+                response += "Most used command: %s, used %d times\n" % \
+                    (most_used_commmand, muc_uses)
+
         elif querytype == 'dbsize':
             sizes = await self.db_fsizes()
             for db in sizes:
@@ -185,25 +188,31 @@ A lista de possíveis dados está em https://github.com/lkmnds/jose/blob/master/
             for authorid in sdb['messages']:
                 total_msg += sdb['messages'][authorid]
 
-            response += "Mensagens recebidas deste servidor: %d\n" % total_msg
-            response += "Comandos recebidos deste servidor: %d\n" % sum(sdb['commands'].values())
+            response += "Messages from this server: %d\n" % total_msg
+            response += "Commands from this server: %d\n" % sum(sdb['commands'].values())
 
             # calculate most used command
-            sorted_gcmd = sorted(sdb['commands'].items(), key=operator.itemgetter(1))
+            sorted_gcmd = sorted(sdb['commands'].items(), \
+                key=operator.itemgetter(1))
 
             if len(sorted_gcmd) > 1:
                 most_used_commmand = sorted_gcmd[-1][0]
                 muc_uses = sorted_gcmd[-1][1]
-                response += "Comando mais usado deste servidor: %s, usado %d vezes\n" % (most_used_commmand, muc_uses)
+                response += "Most used command from this server: %s, used %d times\n" % \
+                    (most_used_commmand, muc_uses)
+
         elif querytype == 'topcmd':
             g_cmd = self.statistics['gl_commands']
-            sorted_gcmd = sorted(g_cmd.items(), key=operator.itemgetter(1), reverse=True)
-            response = '\n'.join(['%s - %d vezes' % (x, y) for (x, y) in sorted_gcmd[:10]])
+            sorted_gcmd = sorted(g_cmd.items(), \
+                key=operator.itemgetter(1), reverse=True)
+
+            response = '\n'.join(['%s - %d vezes' % \
+                (x, y) for (x, y) in sorted_gcmd[:10]])
         else:
-            await cxt.say("Tipo de pedido não encontrado")
+            await cxt.say("Query type not found")
             return
 
-        if len(response) >= 2000: # 1 9 9 9
-            await cxt.say(":elephant: Resultado muito grande :elephant:")
+        if len(response) >= 2000:
+            await cxt.say(":elephant: big results :elephant:")
         else:
             await cxt.say(self.codeblock("", response))
