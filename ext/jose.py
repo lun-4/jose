@@ -584,3 +584,12 @@ don't want (unless I'm skynet)")
         await self.is_admin(message.author.id)
         obj = gc.collect()
         await cxt.say("Collected %d objects!", (obj,))
+
+    async def c_listev(self, message, args, cxt):
+        res = []
+        for evname in self.event_tbl:
+            evcount = len(self.event_tbl[evname])
+            res.append('event %r : %d handlers' % (evname, evcount))
+
+        await cxt.say("There are %d registered events: %s" % \
+            (len(self.event_tbl), '\n'.join(res)))
