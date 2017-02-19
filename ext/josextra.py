@@ -6,7 +6,6 @@ import subprocess
 import re
 import psutil
 import os
-import gc
 
 import sys
 sys.path.append("..")
@@ -201,10 +200,67 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
     async def c_cantada(self, message, args, cxt):
         await self.mkresponse(message, 'Ei {}, {}', jcommon.cantadas, cxt)
 
-    async def c_gcollect(self, message, args, cxt):
-        await self.is_admin(message.author.id)
-        obj = gc.collect()
-        await cxt.say("Collected %d objects!", (obj,))
+    async def c_yt(self, message, args, cxt):
+        '''`j!yt [termo 1] [termo 2]...` - procura no youtube'''
+        if len(args) < 2:
+            await cxt.say(self.c_yt.__doc__)
+            return
 
-    async def c_jose(self, message, args, cxt):
-        await jcommon.show_help(message)
+        search_term = ' '.join(args[1:])
+
+        loop = asyncio.get_event_loop()
+
+        self.logger.info("Youtube request @ %s : %s", message.author, search_term)
+
+        query_string = urllib.parse.urlencode({"search_query" : search_term})
+
+        url = "http://www.youtube.com/results?" + query_string
+        future_search = loop.run_in_executor(None, urllib.request.urlopen, url)
+        html_content = await future_search
+
+        future_re = loop.run_in_executor(None, re.findall, r'href=\"\/watch\?v=(.{11})', html_content.read().decode())
+        search_results = await future_re
+
+        if len(search_results) < 2:
+            await cxt.say("!yt: Nenhum resultado encontrado.")
+            return
+
+        await cxt.say("http://www.youtube.com/watch?v=" + search_results[0])
+
+    async def c_sndc(self, message, args, cxt):
+        '''`j!sndc [stuff]` - Soundcloud search'''
+        if len(args) < 2:
+            await cxt.say(self.c_sndc.__doc__)
+            return
+
+        query = ' '.join(args[1:])
+
+        self.logger.info("Soundcloud request: %s", query)
+
+        if len(query) < 3:
+            await cxt.say("preciso de mais coisas para pesquisar(length < 3)")
+            return
+
+        search_url = 'https://api.soundcloud.com/search?q=%s&facet=model&limit=10&offset=0&linked_partitioning=1&client_id='+jconfig.soundcloud_id
+        url = search_url % urllib.parse.quote(query)
+
+        while url:
+            response = await aiohttp.request('GET', url)
+
+            if response.status != 200:
+                await cxt.say("!sndc: error: status code != 200(st = %d)", (response.status))
+                return
+
+            try:
+                doc = await response.json()
+            except Exception as e:
+                await jose_debug(message, "!sndc: py_err %s" % str(e))
+                return
+
+            for entity in doc['collection']:
+                if entity['kind'] == 'track':
+                    await cxt.say(entity['permalink_url'])
+                    return
+
+            await cxt.say("verifique sua pesquisa, porque nenhuma track foi encontrada.")
+            return
