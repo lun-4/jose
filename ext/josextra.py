@@ -92,13 +92,13 @@ class joseXtra(jaux.Auxiliar):
                 r = await aiohttp.request('GET', url)
                 content = await r.text()
                 info = json.loads(content)
-            await cxt.say('xkcd %s : %s' % (n, info['img']))
+            await cxt.say('xkcd %s : %s', (n, info['img']))
 
         except Exception as e:
-            await cxt.say("err: %r" % e)
+            await cxt.say("err: %r", (e,))
 
     async def c_tm(self, message, args, cxt):
-        await cxt.say('%s™' % ' '.join(args[1:]))
+        await cxt.say('%s™', (' '.join(args[1:]),))
 
     async def c_loteria(self, message, args, cxt):
         await cxt.say("nao")
@@ -184,7 +184,7 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             if topic in self.docs:
                 await cxt.say(self.docs[topic])
             else:
-                await cxt.say("%s: tópico não encontrado" % topic)
+                await cxt.say("%s: tópico não encontrado", (topic,))
 
     async def mkresponse(self, message, fmt, phrases, cxt):
         d = message.content.split(' ')
@@ -204,7 +204,7 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
     async def c_gcollect(self, message, args, cxt):
         await self.is_admin(message.author.id)
         obj = gc.collect()
-        await cxt.say("Collected %d objects!" % obj)
+        await cxt.say("Collected %d objects!", (obj,))
 
     async def c_jose(self, message, args, cxt):
         await jcommon.show_help(message)

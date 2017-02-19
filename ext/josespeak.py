@@ -328,12 +328,12 @@ class JoseSpeak(jcommon.Extension):
         for serverid in servers:
             ok = await self.new_generator(serverid, MESSAGE_LIMIT)
             if not ok:
-                await cxt.say(":poop: Error creating Texter for %s" % serverid)
+                await cxt.say(":poop: Error creating Texter for %s", (serverid,))
                 return
 
         t_taken = (time.time() - t_start) * 1000
 
-        await cxt.say("`Created %d Texters. Took %.2fms`" % \
+        await cxt.say("`Created %d Texters. Took %.2fms`", \
             (len(servers), t_taken))
 
     async def c_texclean(self, message, args, cxt):
@@ -347,7 +347,7 @@ class JoseSpeak(jcommon.Extension):
 
         newamount = len(self.text_generators)
 
-        await cxt.say("`Took %.5fms cleaning %d Texters out of %d`" % \
+        await cxt.say("`Took %.5fms cleaning %d Texters out of %d`", \
             (t_taken, oldamount - newamount, oldamount))
 
     async def c_texstat(self, message, args, cxt):
@@ -477,7 +477,7 @@ class JoseSpeak(jcommon.Extension):
         ecxt = jcommon.EmptyContext(self.client, message)
         await self.c_speaktrigger(message, args, ecxt)
         res = await ecxt.getall()
-        await cxt.say("<@127296623779774464> wormhole send %s" % res)
+        await cxt.say("<@127296623779774464> wormhole send %s", (res,))
 
     async def c_jw(self, message, args, cxt):
         '''`j!jw` - alias para `!jwormhole`'''
