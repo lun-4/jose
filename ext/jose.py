@@ -1,19 +1,11 @@
 import discord
-import asyncio
-
-import sys
 import time
 from random import SystemRandom
 random = SystemRandom()
 
 import base64
 import subprocess
-
-import aiohttp
-import urllib.parse
-import urllib.request
 import re
-import json
 import importlib
 import copy
 import gc

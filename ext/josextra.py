@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 
+import asyncio
 import aiohttp
 import json
+import urllib.parse
+import urllib.request
 import subprocess
 import re
 import psutil
@@ -11,6 +14,7 @@ import sys
 sys.path.append("..")
 import jauxiliar as jaux
 import josecommon as jcommon
+import joseconfig as jconfig
 
 from random import SystemRandom
 random = SystemRandom()
@@ -248,13 +252,13 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             response = await aiohttp.request('GET', url)
 
             if response.status != 200:
-                await cxt.say("!sndc: error: status code != 200(st = %d)", (response.status))
+                await cxt.say("sndc: error: status code != 200(st = %d)", (response.status))
                 return
 
             try:
                 doc = await response.json()
             except Exception as e:
-                await jose_debug(message, "!sndc: py_err %s" % str(e))
+                await cxt.say("sndc: py_err %s" % str(e))
                 return
 
             for entity in doc['collection']:
