@@ -47,7 +47,7 @@
 	"Nada de mensagem vazia": "No empty messages :^)",
 	">%s": "",
 	"`Jos\u00e9 v%s py:%s discord.py:%s`": "",
-	"Jos\u00e9 pode ser adicionado para outro servidor usando este link:\n```%s```": "José can be added to other servers using this URL:\n ```%s```",
+	"Jos\u00e9 pode ser adicionado para outro servidor usando este link:\n```%s```": "Jos\u00e9 can be added to other servers using this URL:\n ```%s```",
 	"`%s`: Not found": "",
 	"```%s``` -> `%s`": "",
 	"Erro parseando argumentos(%r).": "Error parsing arguments: %r",
