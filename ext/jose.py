@@ -69,35 +69,6 @@ class JoseBot(jcommon.Extension):
                         jcommon.logger.warning("Event %s@%s:%s doesn't exist in Event Table", \
                             method, modname, evname)
 
-    async def unload_all(self):
-        # unload all modules
-        to_remove = []
-
-        for modname in self.modules:
-            module = self.modules[modname]
-            # if ext_unload exists
-            if getattr(module['inst'], 'ext_unload', False):
-                try:
-                    ok = await module['inst'].ext_unload()
-                    if not ok[0]:
-                        self.logger.error("Error happened when ext_unload(%s): %s", modname, ok[1])
-                    else:
-                        self.logger.info("Unloaded %s", modname)
-
-                    # it will be removed later
-                    to_remove.append(modname)
-
-                except Exception as e:
-                    self.logger.warn("Almost unloaded %s: %s", modname, repr(e))
-            else:
-                self.logger.info("%s doesn't have ext_unload", modname)
-
-        # avoid RuntimeError
-        for mod in to_remove:
-            del self.modules[mod]
-
-        self.logger.info("Unloaded all modules")
-
     async def unload_mod(self, modname):
         module = self.modules[modname]
         # if ext_unload exists
@@ -113,6 +84,22 @@ class JoseBot(jcommon.Extension):
         else:
             self.logger.info("%s doesn't have ext_unload", modname)
             return False, "ext_unload isn't available in %s" % (modname)
+
+    async def unload_all(self):
+        # unload all modules
+        to_remove = self.modules.keys()
+
+        count = 0
+        for modname in to_remove:
+            ok = await self.unload_mod(modname)
+            if not ok:
+                return ok
+            count += 1
+
+        self.logger.info("[unload_all] Unloaded %d out of %d modules", \
+            count, len(to_remove))
+
+        return True, ''
 
     def load_gext(self, inst, n):
         self.logger.info("Loading gext %s", n)
