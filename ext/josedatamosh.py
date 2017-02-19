@@ -98,7 +98,7 @@ Resultados de fotos jogadas ao !datamosh:
             try:
                 iterations = int(args[2])
             except Exception as e:
-                await cxt.say("Erro parseando argumentos(%r)." % e)
+                await cxt.say("Erro parseando argumentos(%r).", (e,))
                 return
 
         if iterations > 129:
@@ -111,7 +111,7 @@ Resultados de fotos jogadas ao !datamosh:
         try:
             img = Image.open(data)
         except Exception as e:
-            await cxt.say("Erro abrindo imagem com o Pillow(%r)" % e)
+            await cxt.say("Erro abrindo imagem com o Pillow(%r)", (e,))
             return
 
         if img.format in ['JPEG', 'JPEG 2000']:
@@ -135,4 +135,4 @@ Resultados de fotos jogadas ao !datamosh:
         elif img.format in ['GIF']:
             await cxt.say("*o sr esta de brincando comigo NAO VAI TE GIF NO DATAMOSH* é muito caro em relação a processamento NAO")
         else:
-            await cxt.say("Formato %s: desconhecido" % img.format)
+            await cxt.say("Formato %s: desconhecido", (img.format,))
