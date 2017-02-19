@@ -17,7 +17,11 @@ def main(args):
         if entry not in langjson:
             langjson[entry] = basejson[entry]
 
-    print(json.dump(langjson))
+    print('{')
+    for key in langjson:
+        val = langjson[key]
+        print("\t%s: \"%s\"," % (json.dumps(key), val))
+    print('}')
 
 
 if __name__ == '__main__':
