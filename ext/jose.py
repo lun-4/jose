@@ -36,6 +36,38 @@ class JoseBot(jcommon.Extension):
         }
         self.start_time = time.time()
         self.command_lock = False
+        self.ev_empty()
+
+    def ev_empty(self):
+        self.event_tbl = {
+            'on_message': [],
+            'any_message': [],
+        }
+
+    def ev_load(self):
+        # register events
+        for modname in self.modules:
+            module = self.modules[modname]
+            modinst = self.modules[modname]['inst']
+            for method in module['handlers']:
+                if method.startswith("e_"):
+                    evname = method[method.find("_")+1:]
+                    jcommon.logger.info("Register Event %s@%s:%s", \
+                        method, modname, evname)
+
+                    # check if event exists
+                    if evname in event_table:
+                        handler = getattr(modinst, method, None)
+                        if handler is None:
+                            # ????
+                            jcommon.logger.error("Event handler %s@%s:%s doesn't... exist????", \
+                                method, modname, evname)
+                            sys.exit(0)
+
+                        event_table[evname].append(handler)
+                    else:
+                        jcommon.logger.warning("Event %s@%s:%s doesn't exist in Event Table", \
+                            method, modname, evname)
 
     async def unload_all(self):
         # unload all modules
