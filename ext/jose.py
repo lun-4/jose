@@ -40,7 +40,7 @@ class JoseBot(jcommon.Extension):
 
     def ev_load(self):
         # register events
-        count += 1
+        count = 0
         for modname in self.modules:
             module = self.modules[modname]
             modinst = self.modules[modname]['inst']
