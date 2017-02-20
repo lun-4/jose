@@ -140,7 +140,7 @@ class JoseCoin(jcommon.Extension):
             await self.client.send_message(message.channel, "err: `%r`" % res)
 
     async def c_saldo(self, message, args, cxt):
-        '''`!saldo [@mention]` - mostra o saldo seu ou de outra pessoa'''
+        '''`j!saldo [@mention]` - your wallet(or other person's wallet)'''
         args = message.content.split(' ')
 
         id_check = None
@@ -157,7 +157,8 @@ class JoseCoin(jcommon.Extension):
             await cxt.say('account not found(`id:%s`)' % (id_check))
 
     async def c_conta(self, message, args, cxt):
-        print("new jcoin account %s" % message.author.id)
+        '''`j!conta` - create a new JoséCoin account'''
+        jcommon.logger.info("new jc account, id = %s" % message.author.id)
 
         res = new_acc(message.author.id, str(message.author))
         if res[0]:
@@ -166,7 +167,7 @@ class JoseCoin(jcommon.Extension):
             await cxt.say('jc->err: %s' % res[1])
 
     async def c_write(self, message, args, cxt):
-        '''`!write @mention new_amount` - Overwrite an account's josecoins'''
+        '''`j!write @mention new_amount` - Overwrite an account's josecoins'''
         global data
         await self.is_admin(message.author.id)
 
@@ -185,10 +186,10 @@ class JoseCoin(jcommon.Extension):
         await cxt.say("<@%s> has %.2fJC now" % (id_from, data[id_from]['amount']))
 
         jcommon.logger.info("%r Wrote %.2fJC to Account %s" % \
-            (message.author, id_from, new_amount))
+            (message.author, new_amount, id_from))
 
     async def c_enviar(self, message, args, cxt):
-        '''`!enviar @mention quantidade` - envia JCoins para uma conta'''
+        '''`j!enviar @mention quantidade` - envia JCoins para uma conta'''
 
         if len(args) != 3:
             await cxt.say(self.c_enviar.__doc__)
