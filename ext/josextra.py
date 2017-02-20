@@ -51,6 +51,7 @@ class joseXtra(jaux.Auxiliar):
         return True, ''
 
     async def ext_unload(self):
+        self.cbk_remove('jxtra.msgcount')
         return True, ''
 
     async def message_count(self):
