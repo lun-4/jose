@@ -663,6 +663,9 @@ class EmptyContext:
         self.message = message
         self.messages = []
 
+    async def send_typing(self):
+        return None
+
     async def say(self, string, channel=None):
         self.messages.append(string)
 
