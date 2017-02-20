@@ -10,7 +10,6 @@ import re
 import importlib
 import copy
 import gc
-import logging
 
 sys.path.append("..")
 import josecommon as jcommon

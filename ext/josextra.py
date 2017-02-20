@@ -55,7 +55,6 @@ class joseXtra(jaux.Auxiliar):
         return True, ''
 
     async def message_count(self):
-        msg_per_minute = self.msgcount
         if self.msgcount > 0:
             self.logger.info("Processed %d messages/minute" % self.msgcount)
         self.msgcount = 0
@@ -133,7 +132,7 @@ class joseXtra(jaux.Auxiliar):
     async def c_status(self, message, args, cxt):
         # ping discordapp one time
 
-        msg = await self.client.send_message(message.channel, "Pong!")
+        msg = await self.client.send_message(message.channel, "Status:")
 
         discordapp_ping = subprocess.Popen(
             ["ping", "-c", "3", "discordapp.com"],

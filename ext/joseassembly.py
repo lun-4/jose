@@ -415,7 +415,7 @@ async def execute(instructions, env):
             if reg not in env['registers']:
                 return False, env, "registrador de controle não encontrado"
 
-            control_register = reg
+            #control_register = reg
 
             # get length of block
             lp = 0 # loop pointer
