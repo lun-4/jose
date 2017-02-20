@@ -450,6 +450,7 @@ class Extension:
         if len(msg) > 2000:
             await self.client.send_message(channel, ":elephant: Mensagem muito grande :elephant:")
         else:
+            logger.warning("Extension.say: DEPRECATED API: %s", msg)
             await self.client.send_message(channel, ":warning: This message is using a deprecated API!! :warning:")
 
     async def debug(self, msg, flag=True):
@@ -631,7 +632,7 @@ serverid %s servername %s" % (server.id, server.name))
             await self.client.send_message(channel, ":elephant: Mensagem muito grande :elephant:")
         else:
             if langdb is None:
-                await logger.info("Loading language database @ cxt.say")
+                logger.info("Loading language database @ cxt.say")
                 await load_langdb()
 
             if self.message.server is not None:

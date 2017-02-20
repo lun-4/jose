@@ -151,9 +151,14 @@ class JoseBot(jcommon.Extension):
 
     async def mod_instance(self, name, classobj):
         instance = classobj(self.client)
+
+        # set its logger
+        instance.logger = logger.getLogger(name)
+
+        # check if it has ext_load method
         mod_ext_load = getattr(instance, 'ext_load', False)
         if not mod_ext_load:
-            # module not compatible with API
+            # module not compatible with Extension API
             self.logger.error("Module not compatible with EAPI")
             return False
         else:

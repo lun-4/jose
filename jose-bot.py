@@ -549,3 +549,4 @@ finally:
 tr.print_diff()
 
 jcommon.logger.info("Exit")
+logging.shutdown()
