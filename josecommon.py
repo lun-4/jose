@@ -32,7 +32,7 @@ logger.addHandler(handler)
 
 
 JOSE_PREFIX = "j!"
-JOSE_VERSION = '1.3.6'
+JOSE_VERSION = '1.4.0'
 
 MARKOV_LENGTH_PATH = 'db/wordlength.json'
 MARKOV_MESSAGES_PATH = 'db/messages.json'
@@ -280,8 +280,8 @@ show_casa = make_func("https://thumbs.dreamstime.com/z/locais-de-trabalho-em-um-
 meme_ratelimit = make_func("http://i.imgur.com/P6bDtR9.gif")
 meme_dank_memes = make_func("http://i.imgur.com/Fzk4jfl.png")
 
-async def str_xor(s,t):
-    return "".join(chr(ord(a)^ord(b)) for a,b in zip(s,t))
+async def str_xor(s, t):
+    return "".join(chr(ord(a) ^ ord(b)) for a, b in zip(s, t))
 
 JCRYPT_KEY = 'vcefodaparabensfrozen2meuovomeuovinhoayylmaogordoquaseexploderindo'
 
@@ -347,7 +347,7 @@ class Callback:
         self.cid = cid
 
     async def do(self):
-        logger.debug("%s: running", self.cid)
+        logger.info("%s: Running Callback", self.cid)
         while self.run:
             logger.debug("%s: called", self.cid)
             await self.func()
@@ -641,7 +641,7 @@ serverid %s servername %s" % (server.id, server.name))
                         ":warning: No Language has been defined for this server, use `!language` to set up :warning:")
             else:
                 # in a DM
-                ret = await self.client.send_message(channel, string)
+                ret = await self.client.send_message(channel, (string % tup))
                 return ret
 
             # since 'default' doesn't exist in the language table

@@ -585,3 +585,6 @@ class JoseMemes(jcommon.Extension):
             .replace(':regional_indicator_ :', ' ')
 
         await cxt.say(res)
+
+    async def c_pupper(self, message, args, cxt):
+        await cxt.say("http://i.imgur.com/9Le8rW7.jpg :sob:")

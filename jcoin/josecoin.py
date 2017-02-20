@@ -166,15 +166,26 @@ class JoseCoin(jcommon.Extension):
             await cxt.say('jc->err: %s' % res[1])
 
     async def c_write(self, message, args, cxt):
-        '''`!write @mention new_amount` - sobrescreve o saldo de uma conta'''
+        '''`!write @mention new_amount` - Overwrite an account's josecoins'''
         global data
         await self.is_admin(message.author.id)
 
-        id_from = await jcommon.parse_id(args[1], message)
-        new_amount = decimal.Decimal(args[2])
+        if len(args) != 3:
+            await cxt.say(self.c_write.__doc__)
+            return
+
+        try:
+            id_from = await jcommon.parse_id(args[1], message)
+            new_amount = decimal.Decimal(args[2])
+        except Exception as e:
+            await cxt.say("huh, exception thingy... `%r`", (e,))
+            return
 
         data[id_from]['amount'] = new_amount
         await cxt.say("<@%s> has %.2fJC now" % (id_from, data[id_from]['amount']))
+
+        jcommon.logger.info("%r Wrote %.2fJC to Account %s" % \
+            (message.author, id_from, new_amount))
 
     async def c_enviar(self, message, args, cxt):
         '''`!enviar @mention quantidade` - envia JCoins para uma conta'''
