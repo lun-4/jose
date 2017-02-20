@@ -153,7 +153,7 @@ class JoseBot(jcommon.Extension):
         instance = classobj(self.client)
 
         # set its logger
-        instance.logger = logger.getLogger(name)
+        instance.logger = logging.getLogger(name)
 
         # check if it has ext_load method
         mod_ext_load = getattr(instance, 'ext_load', False)
