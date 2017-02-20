@@ -398,7 +398,7 @@ class JoseSpeak(jcommon.Extension):
         if random.random() < 0.03 or self.flag:
             self.flag = False
             self.current = message
-            await self.client.send_typing(message.channel)
+            await cxt.send_typing()
 
             # default 5 words
             length = 5

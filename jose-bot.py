@@ -522,7 +522,7 @@ async def on_error(event, *args, **kwargs):
 
     if str(event) == 'on_message':
         message = args[0]
-        jcommon.logger.error("Message error happened at ServerID %s name %s" % \
+        jcommon.logger.error("Message error happened at ServerID %s name %r" % \
             (message.server.id, message.server.name))
 
 async def main_task():

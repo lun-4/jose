@@ -606,6 +606,14 @@ class Context:
         self.t_creation = t_creation
         self.jose = jose
 
+    async def send_typing(self):
+        try:
+            await self.client.send_typing(self.message.channel)
+        except discord.Forbidden:
+            server = self.message.server
+            logger.info("Context.send_typing: got err Forbidden from\
+serverid %s servername %s" % (server.id, server.name))
+
     async def say(self, string, _channel=None, tup=None):
         global langdb
 
