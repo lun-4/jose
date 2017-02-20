@@ -203,7 +203,7 @@ class JoseCoin(jcommon.Extension):
         else:
             await cxt.say('jc_err: `%s`' % res[1])
 
-    async def c_gtop10(self, message, args, cxt):
+    async def c_ltop10(self, message, args, cxt):
         guild = message.server
         jcdata = dict(data) # copy
 
@@ -239,16 +239,19 @@ class JoseCoin(jcommon.Extension):
                         maior['id'] = accid
                         maior['name'] = name
                         maior['amount'] = amount
+                else:
+                    pass
 
-            del jcdata[maior['id']]
-            order.append('%d. %s -> %.2f' % (i, maior['name'], maior['amount']))
+            if maior['id'] in jcdata:
+                del jcdata[maior['id']]
+                order.append('%d. %s -> %.2f' % (i, maior['name'], maior['amount']))
 
-            # reset to next
-            maior = {
-                'id': 0,
-                'name': '',
-                'amount': 0.0,
-            }
+                # reset to next
+                maior = {
+                    'id': 0,
+                    'name': '',
+                    'amount': 0.0,
+                }
 
         await cxt.say('\n'.join(order))
         return
