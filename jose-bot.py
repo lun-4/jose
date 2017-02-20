@@ -238,6 +238,7 @@ async def do_command_table(message):
     return False
 
 async def do_jasm(message, cxt):
+    await jose.is_admin(message.author.id)
     await cxt.say('Bem vindo ao REPL do JoseAssembly!\nPara sair, digite "exit"')
 
     if not (message.author.id in jasm_env):
