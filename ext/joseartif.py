@@ -23,7 +23,7 @@ class JoseArtif(jaux.Auxiliar):
     async def make_output(self, input):
         return False, "Nothing available"
 
-    async def e_on_message(self, message, cxt):
+    async def ne_on_message(self, message, cxt):
         if True:
             # for now, disable this
             return
