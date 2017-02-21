@@ -44,6 +44,10 @@ class JoseMath(jaux.Auxiliar):
             if getattr(pod, 'text', False):
                 text = pod.text
             elif pod.get('subpod', False):
+                print("get image")
+                subpod = pod['subpod']
+                print(repr(subpod))
+                print(repr(subpod['img']))
                 text = pod['subpod']['img']['@src']
             else:
                 text = None
