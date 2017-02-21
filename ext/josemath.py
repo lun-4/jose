@@ -40,7 +40,7 @@ class JoseMath(jaux.Auxiliar):
 
         if getattr(res, 'results', False):
             try:
-                pg = (pod for pod in res.pods if pod.primary)
+                pg = (pod for pod in res.pods)
                 pod = next(pg)
                 text = None
 
