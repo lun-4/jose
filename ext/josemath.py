@@ -41,9 +41,9 @@ class JoseMath(jaux.Auxiliar):
         if getattr(res, 'results', False):
             try:
                 pods = (pod for pod in res.pods)
-                pod = next(pg)
+                pod = next(pods)
                 while pod.title != 'Input interpretation':
-                    pod = next(pg)
+                    pod = next(pods)
                 text = None
 
                 self.logger.info(repr(pod))
