@@ -59,7 +59,7 @@ class JoseMath(jaux.Auxiliar):
                     pass
 
                 if text is not None:
-                    await cxt.say("%s:\n%s", (term_to_wolfram, text)
+                    await cxt.say("%s:\n%s", (term_to_wolfram, text))
                 else:
                     await cxt.say(":poop:")
                 return
