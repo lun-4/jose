@@ -36,7 +36,10 @@ class JoseMath(jaux.Auxiliar):
             return
 
         self.logger.info("Wolfram|Alpha: %s", term_to_wolfram)
-        res = self.wac.query(term_to_wolfram)
+
+        future = self.loop.run_in_executor(None, \
+            self.wac.query, term_to_wolfram)
+        res = await future
 
         if getattr(res, 'results', False):
             try:
@@ -80,7 +83,9 @@ class JoseMath(jaux.Auxiliar):
         location = ' '.join(args[1:])
 
         try:
-            observation = self.owm.weather_at_place(location)
+            future = self.loop.run_in_executor(None, \
+                self.owm.weather_at_place, location)
+            observation = await future
         except:
             await cxt.say("Erro tentando conseguir a temperatura para esse local")
             return
