@@ -107,7 +107,7 @@ async def show_price(message):
 
     for k in jcommon.PRICE_TABLE:
         d = jcommon.PRICE_TABLE[k]
-        res += "categoria %r: %s > %.2f\n" % (k, d[0], d[1])
+        res += "%r: %s > %.2f\n" % (k, d[0], d[1])
 
     await jose.say(res)
     return
@@ -126,11 +126,11 @@ josecoin_save = jc.josecoin_save
 josecoin_load = jc.josecoin_load
 
 commands_start = {
-    'j!learn': learn_data,
-    'j!ahelp': jcommon.show_gambling_full,
-    'j!adummy': jcommon.show_gambling,
-    'j!awoo': jcommon.make_func("https://cdn.discordapp.com/attachments/202055538773721099/257717450135568394/awooo.gif"),
-    'j!price': show_price,
+    'learn': learn_data,
+    'ahelp': jcommon.show_gambling_full,
+    'adummy': jcommon.show_gambling,
+    'awoo': jcommon.make_func("https://cdn.discordapp.com/attachments/202055538773721099/257717450135568394/awooo.gif"),
+    'price': show_price,
 }
 
 commands_match = {
