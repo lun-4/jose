@@ -41,22 +41,22 @@ class JoseMath(jaux.Auxiliar):
             try:
                 pod = next(res.results)
                 text = None
-                try:
+
+                if getattr(pod, text, False):
                     text = pod.text
-                except:
+                elif pod.get('subpod', False):
+                    text = pod['subpod']['img']['@src']
+                else:
                     text = None
+                    pass
 
-                try:
-                    text = pod.img.src
-                except:
-                    text = None
-
-                if text is None:
+                if text is not None:
+                    await cxt.say("%s:\n%s", (term_to_wolfram, self.codeblock("", text)))
+                else:
                     await cxt.say(":poop:")
-                    return
 
                 await cxt.say("p`%r` dp`%r` s`%r` ds`%r`", (pod, dir(pod), s, dir(s)))
-                await cxt.say("%s:\n%s", (term_to_wolfram, self.codeblock("", text)))
+
                 return
             except StopIteration:
                 await cxt.say(":warning: Erro tentando pegar o texto da resposta :warning:")
