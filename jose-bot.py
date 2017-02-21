@@ -18,7 +18,7 @@ import discord
 import josecommon as jcommon
 import ext.jose as jose_bot
 import ext.joseassembly as jasm
-import jcoin.josecoin as jcoin
+import jcoin.josecoin as josecoin
 import joseconfig as jconfig
 import joseerror as je
 from inspect import signature
@@ -40,13 +40,14 @@ GAMBLING_LAST_BID = 0.0
 # JASM enviroment
 jasm_env = {}
 
-help_josecoin = jcommon.make_func(jcoin.JOSECOIN_HELP_TEXT)
+help_josecoin = jcommon.make_func(josecoin.JOSECOIN_HELP_TEXT)
 
 async def jcoin_control(id_user, amnt):
     '''
     returns True if user can access
     '''
-    return jcoin.transfer(id_user, jcoin.jose_id, amnt, jcoin.LEDGER_PATH)
+    return josecoin.transfer(id_user, josecoin.jose_id, \
+        amnt, josecoin.LEDGER_PATH)
 
 def sanitize_data(data):
     data = re.sub(r'<@!?([0-9]+)>', '', data)
@@ -118,9 +119,6 @@ exact_commands = {
     'melhor bot': jcommon.show_shit,
     'pior bot': show_pior_bot,
 }
-
-josecoin_save = jc.josecoin_save
-josecoin_load = jc.josecoin_load
 
 commands_start = {
     'learn': learn_data,
@@ -265,7 +263,7 @@ async def do_josecoin(message, t_start):
         if not message.channel.is_private:
 
             # only if author has account
-            if str(message.author.id) in jcoin.data:
+            if str(message.author.id) in josecoin.data:
                 if jcommon.MAINTENANCE_MODE:
                     return True
 
@@ -273,12 +271,11 @@ async def do_josecoin(message, t_start):
 
                 author_id = str(message.author.id)
                 amount = random.choice(jcommon.JC_REWARDS)
-                acc_to = jcoin.get(author_id)[1]
+                acc_to = josecoin.get(author_id)[1]
 
                 if amount != 0:
-                    res = jcoin.transfer(jcoin.jose_id, author_id,\
-                        amount, jcoin.LEDGER_PATH)
-                    await josecoin_save(message, False)
+                    res = josecoin.transfer(josecoin.jose_id, author_id,\
+                        amount, josecoin.LEDGER_PATH)
                     if res[0]:
                         emoji_res = await jcommon.random_emoji(3)
                         if message.server.id == "271378126234320897":
@@ -408,8 +405,8 @@ async def on_message(message):
     if not is_good:
         return
 
-    if message.author.id in jcoin.data:
-        jcoin.data[message.author.id]['name'] = str(message.author)
+    if message.author.id in josecoin.data:
+        josecoin.data[message.author.id]['name'] = str(message.author)
 
     st = time.time()
 
