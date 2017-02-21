@@ -38,29 +38,22 @@ class JoseMath(jaux.Auxiliar):
         res = self.wac.query(term_to_wolfram)
 
         if getattr(res, 'results', False):
-            try:
-                pod = next(res.results)
+            pod = next(res.results)
+            text = None
+
+            if getattr(pod, 'text', False):
+                text = pod.text
+            elif pod.get('subpod', False):
+                text = pod['subpod']['img']['@src']
+            else:
                 text = None
+                pass
 
-                if getattr(pod, 'text', False):
-                    text = pod.text
-                elif pod.get('subpod', False):
-                    text = pod['subpod']['img']['@src']
-                else:
-                    text = None
-                    pass
-
-                if text is not None:
-                    await cxt.say("%s:\n%s", (term_to_wolfram, self.codeblock("", text)))
-                else:
-                    await cxt.say(":poop:")
-
-                await cxt.say("p`%r` dp`%r` s`%r` ds`%r`", (pod, dir(pod), s, dir(s)))
-
-                return
-            except StopIteration:
-                await cxt.say(":warning: Erro tentando pegar o texto da resposta :warning:")
-                return
+            if text is not None:
+                await cxt.say("%s:\n%s", (term_to_wolfram, self.codeblock("", text)))
+            else:
+                await cxt.say(":poop:")
+            return
         else:
             await cxt.say(":cyclone: Sem resposta :cyclone:")
             return
