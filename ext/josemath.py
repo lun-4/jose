@@ -41,18 +41,18 @@ class JoseMath(jaux.Auxiliar):
             pod = next(res.results)
             text = None
 
-            print(repr(pod))
+            self.logger.info(repr(pod))
             if getattr(pod, 'text', False):
-                print("get text")
+                self.logger.info("get text")
                 text = pod.text
             elif pod.get('subpod', False):
-                print("get image")
+                self.logger.info("get image")
                 subpod = pod['subpod']
-                print(repr(subpod))
-                print(repr(subpod['img']))
+                self.logger.info(repr(subpod))
+                self.logger.info(repr(subpod['img']))
                 text = pod['subpod']['img']['@src']
             else:
-                print("fucking nothing")
+                self.logger.info("fucking nothing")
                 text = None
                 pass
 
