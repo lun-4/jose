@@ -46,22 +46,19 @@ class JoseMath(jaux.Auxiliar):
                     pod = next(pods)
                 text = None
 
-                self.logger.info(repr(pod))
                 if getattr(pod, 'text', False):
-                    self.logger.info("get text")
                     text = pod.text
                 elif pod.get('subpod', False):
                     subpod = pod['subpod']
                     text = subpod['img']['@src']
                 else:
-                    self.logger.info("fucking nothing")
                     text = None
                     pass
 
                 if text is not None:
                     await cxt.say("%s:\n%s", (term_to_wolfram, text))
                 else:
-                    await cxt.say(":poop:")
+                    await cxt.say(":poop: `%r`", (pod,))
                 return
             except Exception as e:
                 await cxt.say(self.codeblock("", traceback.format_exc()))
