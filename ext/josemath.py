@@ -40,8 +40,10 @@ class JoseMath(jaux.Auxiliar):
 
         if getattr(res, 'results', False):
             try:
-                pg = (pod for pod in res.pods)
+                pods = (pod for pod in res.pods)
                 pod = next(pg)
+                while pod.title != 'Input interpretation':
+                    pod = next(pg)
                 text = None
 
                 self.logger.info(repr(pod))
@@ -53,7 +55,7 @@ class JoseMath(jaux.Auxiliar):
                     subpod = pod['subpod']
                     self.logger.info(repr(subpod))
                     self.logger.info(repr(subpod['img']))
-                    text = pod['subpod']['img']['@src']
+                    text = subpod['img'].src
                 else:
                     self.logger.info("fucking nothing")
                     text = None
