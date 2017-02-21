@@ -42,7 +42,7 @@ class JoseMath(jaux.Auxiliar):
             try:
                 pods = (pod for pod in res.pods)
                 pod = next(pods)
-                while pod.title != 'Input interpretation':
+                while pod.title == 'Input interpretation':
                     pod = next(pods)
                 text = None
 
