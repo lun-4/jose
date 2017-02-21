@@ -40,13 +40,27 @@ class JoseMath(jaux.Auxiliar):
         if getattr(res, 'results', False):
             try:
                 pod = next(res.results)
-                s = pod.subpod
+                text = None
+                try:
+                    text = pod.text
+                except:
+                    text = None
+
+                try:
+                    text = pod.img.src
+                except:
+                    text = None
+
+                if text is None:
+                    await cxt.say(":poop:")
+                    return
+
                 await cxt.say("p`%r` dp`%r` s`%r` ds`%r`", (pod, dir(pod), s, dir(s)))
+                await cxt.say("%s:\n%s", (term_to_wolfram, self.codeblock("", text)))
                 return
             except StopIteration:
                 await cxt.say(":warning: Erro tentando pegar o texto da resposta :warning:")
                 return
-            #await cxt.say("%s:\n%s", (term_to_wolfram, self.codeblock("", )))
         else:
             await cxt.say(":cyclone: Sem resposta :cyclone:")
             return
