@@ -30,15 +30,23 @@ class JoseMath(jaux.Auxiliar):
             return
 
         term_to_wolfram = ' '.join(args[1:])
+        if len(term_to_wolfram).strip() < 1:
+            await cxt.say("haha no")
+            return
 
+        self.logger.info("Wolfram|Alpha: %s", term_to_wolfram)
         res = self.wac.query(term_to_wolfram)
+
         if getattr(res, 'results', False):
             try:
-                response_wolfram = next(res.results).text
+                pod = next(res.results)
+                s = pod.subpod
+                await cxt.say("p`%r` dp`%r` s`%r` ds`%r`", (pod, dir(pod), s, dir(s)))
+                return
             except StopIteration:
                 await cxt.say(":warning: Erro tentando pegar o texto da resposta :warning:")
                 return
-            await cxt.say("%s:\n%s", (term_to_wolfram, self.codeblock("", response_wolfram)))
+            #await cxt.say("%s:\n%s", (term_to_wolfram, self.codeblock("", )))
         else:
             await cxt.say(":cyclone: Sem resposta :cyclone:")
             return
