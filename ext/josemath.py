@@ -51,11 +51,8 @@ class JoseMath(jaux.Auxiliar):
                     self.logger.info("get text")
                     text = pod.text
                 elif pod.get('subpod', False):
-                    self.logger.info("get image")
                     subpod = pod['subpod']
-                    self.logger.info(repr(subpod))
-                    self.logger.info(repr(subpod['img']))
-                    text = subpod['img'].src
+                    text = subpod['img']['@src']
                 else:
                     self.logger.info("fucking nothing")
                     text = None
