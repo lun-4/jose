@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
-import discord
-import asyncio
 import sys
 sys.path.append("..")
 import jauxiliar as jaux
-import joseerror as je
+import josecommon as jcommon
+import decimal
 
 class JoseCoin(jaux.Auxiliar):
     def __init__(self, cl):
@@ -15,21 +14,29 @@ class JoseCoin(jaux.Auxiliar):
         self.data = self.jcoin.data
 
     async def ext_load(self):
-        return self.josecoin_load(message)
+        return self.josecoin_load(None)
 
     async def ext_unload(self):
-        return self.josecoin_save(message)
+        return self.josecoin_save(None)
 
     async def josecoin_save(self, message, dbg_flag=True):
         res = self.jcoin.save('jcoin/josecoin.db')
         if not res[0]:
-            await self.client.send_message(message.channel, "jcerr: `%r`" % res)
+            if message is not None:
+                await self.client.send_message(message.channel, \
+                    "jcerr: `%r`" % res)
+            else:
+                self.logger.error("jcerr: %r" % res)
         return res
 
     async def josecoin_load(self, message, dbg_flag=True):
         res = self.jcoin.load('jcoin/josecoin.db')
         if not res[0]:
-            await self.client.send_message(message.channel, "jcerr: `%r`" % res)
+            if message is not None:
+                await self.client.send_message(message.channel, \
+                    "jcerr: `%r`" % res)
+            else:
+                self.logger.error("jcerr: %r" % res)
         return res
 
     async def e_any_message(self, message, cxt):
@@ -48,11 +55,10 @@ class JoseCoin(jaux.Auxiliar):
         else:
             id_check = await jcommon.parse_id(args[1], message)
 
-        res = get(id_check)
+        res = self.jcoin.get(id_check)
         if res[0]:
             accdata = res[1]
-            await cxt.say(('%s -> %.2f' % \
-                (accself.data['name'], accself.data['amount'])))
+            await cxt.say(('%s -> %.2f' % (accdata['name'], accdata['amount'])))
         else:
             await cxt.say('account not found(`id:%s`)' % (id_check))
 
@@ -60,7 +66,7 @@ class JoseCoin(jaux.Auxiliar):
         '''`j!conta` - create a new JoséCoin account'''
         self.logger.info("new jc account, id = %s" % message.author.id)
 
-        res = new_acc(message.author.id, str(message.author))
+        res = self.jcoin.new_acc(message.author.id, str(message.author))
         if res[0]:
             await cxt.say(res[1])
         else:
@@ -109,7 +115,8 @@ class JoseCoin(jaux.Auxiliar):
         id_from = message.author.id
         id_to = await jcommon.parse_id(id_to, message)
 
-        res = transfer(id_from, id_to, amount, LEDGER_PATH)
+        res = self.jcoin.transfer(id_from, id_to, \
+            amount, self.jcoin.LEDGER_PATH)
         await self.josecoin_save(message, False)
         if res[0]:
             await cxt.say(res[1])
@@ -146,7 +153,7 @@ class JoseCoin(jaux.Auxiliar):
             for member in guild.members:
                 accid = member.id
                 if accid in jcdata:
-                    acc = jcself.data[accid]
+                    acc = self.data[accid]
                     name, amount = acc['name'], acc['amount']
                     if amount > maior['amount']:
                         maior['id'] = accid
@@ -156,7 +163,7 @@ class JoseCoin(jaux.Auxiliar):
                     pass
 
             if maior['id'] in jcdata:
-                del jcself.data[maior['id']]
+                del self.data[maior['id']]
                 order.append('%d. %s -> %.2f' % \
                     (i, maior['name'], maior['amount']))
 
@@ -197,14 +204,14 @@ class JoseCoin(jaux.Auxiliar):
                 break
 
             for accid in jcdata:
-                acc = jcself.data[accid]
+                acc = self.data[accid]
                 name, amount = acc['name'], acc['amount']
                 if amount > maior['amount']:
                     maior['id'] = accid
                     maior['name'] = name
                     maior['amount'] = amount
 
-            del jcself.data[maior['id']]
+            del self.data[maior['id']]
             order.append('%d. %s -> %.2f' % \
                 (i, maior['name'], maior['amount']))
 
