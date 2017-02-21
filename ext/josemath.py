@@ -9,6 +9,7 @@ import aiohttp
 import json
 import wolframalpha
 import pyowm
+import traceback
 
 class JoseMath(jaux.Auxiliar):
     def __init__(self, cl):
@@ -38,29 +39,32 @@ class JoseMath(jaux.Auxiliar):
         res = self.wac.query(term_to_wolfram)
 
         if getattr(res, 'results', False):
-            pod = next(res.results)
-            text = None
-
-            self.logger.info(repr(pod))
-            if getattr(pod, 'text', False):
-                self.logger.info("get text")
-                text = pod.text
-            elif pod.get('subpod', False):
-                self.logger.info("get image")
-                subpod = pod['subpod']
-                self.logger.info(repr(subpod))
-                self.logger.info(repr(subpod['img']))
-                text = pod['subpod']['img']['@src']
-            else:
-                self.logger.info("fucking nothing")
+            try:
+                pod = next(res.results)
                 text = None
-                pass
 
-            if text is not None:
-                await cxt.say("%s:\n%s", (term_to_wolfram, self.codeblock("", text)))
-            else:
-                await cxt.say(":poop:")
-            return
+                self.logger.info(repr(pod))
+                if getattr(pod, 'text', False):
+                    self.logger.info("get text")
+                    text = pod.text
+                elif pod.get('subpod', False):
+                    self.logger.info("get image")
+                    subpod = pod['subpod']
+                    self.logger.info(repr(subpod))
+                    self.logger.info(repr(subpod['img']))
+                    text = pod['subpod']['img']['@src']
+                else:
+                    self.logger.info("fucking nothing")
+                    text = None
+                    pass
+
+                if text is not None:
+                    await cxt.say("%s:\n%s", (term_to_wolfram, self.codeblock("", text)))
+                else:
+                    await cxt.say(":poop:")
+                return
+            except Exception as e:
+                await cxt.say(self.codeblock("", traceback.format_exc()))
         else:
             await cxt.say(":cyclone: Sem resposta :cyclone:")
             return
