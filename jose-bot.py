@@ -533,20 +533,23 @@ async def main_task():
     jcommon.logger.info("José Starting")
     await client.start(jconfig.discord_token)
 
-tr = tracker.SummaryTracker()
+def main():
+    tr = tracker.SummaryTracker()
 
-loop = asyncio.get_event_loop()
-try:
-    print("main_task")
-    loop.run_until_complete(main_task())
-except:
-    # unload everything and logout
-    loop.run_until_complete(jose.unload_all())
-    loop.run_until_complete(client.logout())
-finally:
-    loop.close()
+    loop = asyncio.get_event_loop()
+    try:
+        loop.run_until_complete(main_task())
+    except:
+        # unload everything and logout
+        loop.run_until_complete(jose.unload_all())
+        loop.run_until_complete(client.logout())
+    finally:
+        loop.close()
 
-tr.print_diff()
+    tr.print_diff()
 
-jcommon.logger.info("Exit")
-logging.shutdown()
+    jcommon.logger.info("Exit")
+    logging.shutdown()
+
+if __name__ == '__main__':
+    main()
