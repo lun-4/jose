@@ -11,17 +11,32 @@ class JoseCoin(jaux.Auxiliar):
     def __init__(self, cl):
         jaux.Auxiliar.__init__(self, cl)
         self.top10_flag = False
+        self.counter = 0
         self.data = self.jcoin.data
+
+    async def ext_load(self):
+        return self.josecoin_load(message)
+
+    async def ext_unload(self):
+        return self.josecoin_save(message)
 
     async def josecoin_save(self, message, dbg_flag=True):
         res = self.jcoin.save('jcoin/josecoin.db')
         if not res[0]:
             await self.client.send_message(message.channel, "jcerr: `%r`" % res)
+        return res
 
     async def josecoin_load(self, message, dbg_flag=True):
         res = self.jcoin.load('jcoin/josecoin.db')
         if not res[0]:
             await self.client.send_message(message.channel, "jcerr: `%r`" % res)
+        return res
+
+    async def e_any_message(self, message, cxt):
+        self.counter += 1
+        if self.counter > 11:
+            await self.josecoin_save(message, False)
+            self.counter = 0
 
     async def c_saldo(self, message, args, cxt):
         '''`j!saldo [@mention]` - your wallet(or other person's wallet)'''

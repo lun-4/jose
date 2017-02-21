@@ -119,9 +119,6 @@ exact_commands = {
     'pior bot': show_pior_bot,
 }
 
-jcoin.load(jconfig.jcoin_path)
-jc = jcoin.JoseCoin(client)
-
 josecoin_save = jc.josecoin_save
 josecoin_load = jc.josecoin_load
 
@@ -159,9 +156,7 @@ def from_dict(f):
     return a
 
 for cmd in commands_start:
-    setattr(jose, 'c_%s' % cmd[1:], from_dict(commands_start[cmd]))
-
-jose.load_gext(jc, 'josecoin')
+    setattr(jose, 'c_%s' % cmd, from_dict(commands_start[cmd]))
 
 def load_module(n, n_cl):
     t_start = time.time()
@@ -177,6 +172,7 @@ load_module('joselang', 'JoseLanguage')
 load_module('josespeak', 'JoseSpeak')
 load_module('josestats', 'JoseStats')
 load_module('josemagicword', 'JoseMagicWord')
+load_module('jcoin', 'JoseCoin')
 
 # fun stuff
 load_module('josememes', 'JoseMemes')
@@ -187,7 +183,7 @@ load_module('josegambling', 'JoseGambling')
 
 # etc
 load_module('joseibc', 'JoseIBC')
-load_module('joseartif', 'JoseArtif')
+# load_module('joseartif', 'JoseArtif')
 load_module('josemath', 'JoseMath')
 
 help_helptext = """
@@ -414,11 +410,6 @@ async def on_message(message):
 
     if message.author.id in jcoin.data:
         jcoin.data[message.author.id]['name'] = str(message.author)
-
-    counter += 1
-    if counter > 11:
-        await josecoin_save(message, False)
-        counter = 0
 
     st = time.time()
 
