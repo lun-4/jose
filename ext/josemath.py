@@ -42,7 +42,7 @@ class JoseMath(jaux.Auxiliar):
                 pod = next(res.results)
                 text = None
 
-                if getattr(pod, text, False):
+                if getattr(pod, 'text', False):
                     text = pod.text
                 elif pod.get('subpod', False):
                     text = pod['subpod']['img']['@src']
