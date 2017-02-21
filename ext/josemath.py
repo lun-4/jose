@@ -30,7 +30,7 @@ class JoseMath(jaux.Auxiliar):
             return
 
         term_to_wolfram = ' '.join(args[1:])
-        if len(term_to_wolfram).strip() < 1:
+        if len(term_to_wolfram.strip()) < 1:
             await cxt.say("haha no")
             return
 
