@@ -418,14 +418,14 @@ class JoseMemes(jcommon.Extension):
 
             probables = [key for key in self.memes if terms in self.memes[key]['data'].lower()]
             if len(probables) <= 70:
-                await cxt.say("Resultados: %s", (', '.join(probables),))
+                await cxt.say("Results: %s", (', '.join(probables),))
             elif len(probables) > 70:
-                await cxt.say("PORRA EH MUITO RESULTADO NAO AGUENTO[%d resultados]", (len(probables),))
+                await cxt.say("[%d results]", (len(probables),))
             else:
-                await cxt.say("%r: Nenhum resultado encontrado", (terms,))
+                await cxt.say("%r: No Results", (terms,))
 
         else:
-            await cxt.say("comando inválido: %s", (command,))
+            await cxt.say("Invalid command: %s", (command,))
 
         return
 
