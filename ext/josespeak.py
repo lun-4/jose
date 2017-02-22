@@ -297,7 +297,7 @@ class JoseSpeak(jcommon.Extension):
             self.text_generators.clear()
 
             # Remove the callbacks
-            self.cbk_remove('jspeak.reload_texter')
+            self.cbk_remove('jspeak.texter_collection')
             self.cbk_remove('jspeak.savedb')
 
             return True, ''
