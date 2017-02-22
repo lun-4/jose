@@ -210,7 +210,7 @@ class JoseMath(jaux.Auxiliar):
             dice_amount = 1
 
         try:
-            dice_sides = dice[1]
+            dice_sides = int(dice[1])
         except ValueError:
             await cxt.say("try to do your things better(dice_sides).")
             return
