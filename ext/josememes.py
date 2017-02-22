@@ -229,8 +229,6 @@ class JoseMemes(jcommon.Extension):
                 raise IOError("banco de dados não carregado corretamente")
 
             return
-        #elif command == 'list':
-        #    await cxt.say("memes: %s" % ', '.join(self.memes.keys()))
         elif command == 'get':
             meme = ' '.join(args[2:])
             if meme in self.memes:
@@ -240,31 +238,6 @@ class JoseMemes(jcommon.Extension):
             else:
                 await cxt.say("%s: meme não encontrado", (meme,))
             return
-        elif command == 'cnv': # debug purposes
-            for key in self.memes:
-                meme = self.memes[key]
-                url = meme['data']
-                for pat in self.patterns:
-                    if re.search(pat, url[:40]):
-                        await cxt.say("Detectado um link do facebook, tratando...")
-
-                        with aiohttp.ClientSession() as session:
-                            data = io.BytesIO()
-
-                            async with session.get(url) as resp:
-                                data_read = await resp.read()
-                                data.write(data_read)
-
-                            clone = io.BytesIO(data.getvalue())
-                            msg = await self.client.send_file(message.channel, clone, filename='%s.jpg' % key, content='*tratado*')
-                            data.close()
-                            clone.close()
-
-                            url = msg.attachments[0]['url']
-                            await asyncio.sleep(0.3)
-                        meme['data'] = url
-            await self.save_memes()
-            await cxt.say("done.")
         elif command == 'search':
             term = ' '.join(args[2:])
             term = term.lower()
