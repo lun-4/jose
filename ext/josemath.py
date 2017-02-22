@@ -200,22 +200,21 @@ class JoseMath(jaux.Auxiliar):
 
         dicestr = args[1]
         dice = dicestr.split('d')
+        dice_amount = 1
+        dice_sides = 6
 
         try:
-            dice_amount = int(dice[0])
+            if dice[0] != '':
+                dice_amount = int(dice[0])
         except ValueError:
             await cxt.say("try to do your things better(dice_amount).")
             return
-        except:
-            dice_amount = 1
 
         try:
             dice_sides = int(dice[1])
         except ValueError:
             await cxt.say("try to do your things better(dice_sides).")
             return
-        except:
-            dice_sides = 6
 
         dices = []
         for i in range(dice_amount):
