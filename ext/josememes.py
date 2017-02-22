@@ -292,7 +292,8 @@ class JoseMemes(jcommon.Extension):
         elif command == 'owner':
             meme = ' '.join(args[2:])
             if meme in self.memes:
-                u = discord.utils.get(message.server.members, id=self.memes[meme]['owner'])
+                u = discord.utils.get(self.client.get_all_members(), \
+                    id = self.memes[meme]['owner'])
                 await cxt.say("%s foi criado por %s", (meme, u))
             else:
                 await cxt.say("%s: meme não encontrado", (meme,))
@@ -365,14 +366,12 @@ class JoseMemes(jcommon.Extension):
             await cxt.say(report)
 
         elif command == 'check':
-            await cxt.say("checking INCONSISTENCY data")
             for key in self.memes:
                 meme = self.memes[key]
                 if 'uses' not in meme:
                     await cxt.say("INCONSISTENCY(uses): %s", (key,))
                     self.memes[key].update({"uses": 0})
 
-            await cxt.say("checking duplicates(by value)")
             new_memes = {}
             for k in self.memes:
                 v = self.memes[k]
