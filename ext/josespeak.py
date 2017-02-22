@@ -43,13 +43,14 @@ class NewTexter:
     def __init_(self, textpath=None, markov_length=2, text=None):
         self.refcount = 1
         t_start = time.time()
-        textdata = ''
+        self.markov_length = markov_length
+        self.textdata = ''
 
         if textpath is None:
-            textdata = text
+            self.textdata = text
         else:
             with open(textpath, 'r') as f:
-                textdata = f.read()
+                self.textdata = f.read()
 
         self.text_model = None
         loop.run_until_complete(self.mktexter())
@@ -63,7 +64,7 @@ class NewTexter:
     async def mktexter(self):
         loop = asyncio.get_event_loop()
         future_textmodel = loop.run_in_executor(markovify.NewlineText, \
-            textdata, markov_length)
+            self.textdata, self.markov_length)
 
         self.text_model = await future_textmodel
 
