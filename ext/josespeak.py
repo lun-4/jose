@@ -493,11 +493,15 @@ class JoseSpeak(jcommon.Extension):
             return
 
         await cxt.send_typing()
+        res = ''
 
-        # generate the message
-        ecxt = jcommon.EmptyContext(self.client, message)
-        await self.c_speaktrigger(message, args, ecxt)
-        res = await ecxt.getall()
+        if len(args) < 2:
+            # generate the message
+            ecxt = jcommon.EmptyContext(self.client, message)
+            await self.c_speaktrigger(message, args, ecxt)
+            res = await ecxt.getall()
+        else:
+            res = ' '.join(args[1:])
 
         mf = MIDIFile(1)
         track = 0
