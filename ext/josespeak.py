@@ -39,8 +39,13 @@ def wordlist(filename, file_object=None):
     file_object.close()
     return wordlist
 
+async def make_texter(textpath=None, markov_length=2, text=None):
+    t = NewTexter(textpath, markov_length, text)
+    await t.mktexter()
+    return t
+
 class NewTexter:
-    def __init__(self, textpath=None, markov_length=2, text=None):
+    def __init__(self, textpath, markov_length, text):
         self.refcount = 1
         t_start = time.time()
         self.markov_length = markov_length
@@ -53,9 +58,6 @@ class NewTexter:
                 self.textdata = f.read()
 
         self.text_model = None
-
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(self.mktexter())
 
         t_taken = (time.time() - t_start) * 1000
         if logger:
@@ -209,8 +211,6 @@ class JoseSpeak(jcommon.Extension):
     def __init__(self, cl):
         global logger
         jcommon.Extension.__init__(self, cl)
-        self.cult_generator = NewTexter('db/jose-data.txt', 1)
-        self.global_generator = NewTexter('db/zelao.txt', 1)
         logger = self.logger
 
         self.flag = False
@@ -240,6 +240,39 @@ class JoseSpeak(jcommon.Extension):
 
         # every minute
         self.cbk_new('jspeak.texter_collection', self.texter_collection, 60)
+
+    async def ext_load(self):
+        try:
+            self.text_generators = {}
+            self.text_lengths = {}
+
+            # make generators
+            self.cult_generator = await make_texter('db/jose-data.txt', 1)
+            self.global_generator = await make_texter('db/zelao.txt', 1)
+
+            # load things in files
+            self.wlengths = json.load(open(self.db_length_path, 'r'))
+            self.messages = json.load(open(self.db_msg_path, 'r'))
+
+            return True, ''
+        except Exception as e:
+            return False, repr(e)
+
+    async def ext_unload(self):
+        try:
+            # save DB
+            await self.save_databases()
+
+            # clear the dict full of shit (it rhymes)
+            self.text_generators.clear()
+
+            # Remove the callbacks
+            self.cbk_remove('jspeak.texter_collection')
+            self.cbk_remove('jspeak.savedb')
+
+            return True, ''
+        except Exception as e:
+            return False, repr(e)
 
     async def server_messages(self, serverid, limit=None):
         cur = await self.dbapi.do('SELECT message FROM markovdb WHERE serverid=?', (serverid,))
@@ -324,35 +357,6 @@ class JoseSpeak(jcommon.Extension):
     async def c_spt(self, message, args, cxt):
         '''`j!spt` - alias para `!speaktrigger`'''
         await self.c_speaktrigger(message, args, cxt)
-
-    async def ext_load(self):
-        try:
-            self.text_generators = {}
-            self.text_lengths = {}
-
-            # load things in files
-            self.wlengths = json.load(open(self.db_length_path, 'r'))
-            self.messages = json.load(open(self.db_msg_path, 'r'))
-
-            return True, ''
-        except Exception as e:
-            return False, repr(e)
-
-    async def ext_unload(self):
-        try:
-            # save DB
-            await self.save_databases()
-
-            # clear the dict full of shit (it rhymes)
-            self.text_generators.clear()
-
-            # Remove the callbacks
-            self.cbk_remove('jspeak.texter_collection')
-            self.cbk_remove('jspeak.savedb')
-
-            return True, ''
-        except Exception as e:
-            return False, repr(e)
 
     async def c_getmsg(self, message, args, cxt):
         '''`j!getmsg serverid amount`'''
