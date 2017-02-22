@@ -40,7 +40,7 @@ def wordlist(filename, file_object=None):
     return wordlist
 
 class NewTexter:
-    def __init_(self, textpath=None, markov_length=2, text=None):
+    def __init__(self, textpath=None, markov_length=2, text=None):
         self.refcount = 1
         t_start = time.time()
         self.markov_length = markov_length
