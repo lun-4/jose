@@ -495,13 +495,14 @@ class JoseSpeak(jcommon.Extension):
         await cxt.send_typing()
         res = ''
 
+        ecxt = jcommon.EmptyContext(self.client, message)
+        await self.c_speaktrigger(message, args, ecxt)
+        generated_str = await ecxt.getall()
+
         if len(args) < 2:
-            # generate the message
-            ecxt = jcommon.EmptyContext(self.client, message)
-            await self.c_speaktrigger(message, args, ecxt)
-            res = await ecxt.getall()
-        else:
             res = ' '.join(args[1:])
+        else:
+            res = gstr
 
         mf = MIDIFile(1)
         track = 0
@@ -538,7 +539,7 @@ class JoseSpeak(jcommon.Extension):
                 pitch = LETTER_TO_PITCH[letter]
                 mf.addNote(track, channel, pitch, time, duration, volume)
 
-        fname = '%s.mid' % res
+        fname = '%s.mid' % generated_str
         with open(fname, 'wb') as outf:
             mf.writeFile(outf)
 
