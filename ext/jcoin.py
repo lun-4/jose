@@ -9,9 +9,7 @@ import decimal
 class JoseCoin(jaux.Auxiliar):
     def __init__(self, cl):
         jaux.Auxiliar.__init__(self, cl)
-        self.top10_flag = False
         self.counter = 0
-        self.data = self.jcoin.data
 
     async def ext_load(self):
         return (await self.josecoin_load(None))
@@ -88,9 +86,9 @@ class JoseCoin(jaux.Auxiliar):
             await cxt.say("huh, exception thingy... `%r`", (e,))
             return
 
-        self.data[id_from]['amount'] = new_amount
+        self.jcoin.data[id_from]['amount'] = new_amount
         await cxt.say("<@%s> has %.2fJC now" % (id_from, \
-            self.data[id_from]['amount']))
+            self.jcoin.data[id_from]['amount']))
 
         self.logger.info("%r Wrote %.2fJC to Account %s" % \
             (message.author, new_amount, id_from))
@@ -153,7 +151,7 @@ class JoseCoin(jaux.Auxiliar):
             for member in guild.members:
                 accid = member.id
                 if accid in jcdata:
-                    acc = self.data[accid]
+                    acc = self.jcoin.data[accid]
                     name, amount = acc['name'], acc['amount']
                     if amount > maior['amount']:
                         maior['id'] = accid
@@ -163,7 +161,7 @@ class JoseCoin(jaux.Auxiliar):
                     pass
 
             if maior['id'] in jcdata:
-                del self.data[maior['id']]
+                del self.jcoin.data[maior['id']]
                 order.append('%d. %s -> %.2f' % \
                     (i, maior['name'], maior['amount']))
 
@@ -204,14 +202,14 @@ class JoseCoin(jaux.Auxiliar):
                 break
 
             for accid in jcdata:
-                acc = self.data[accid]
+                acc = self.jcoin.data[accid]
                 name, amount = acc['name'], acc['amount']
                 if amount > maior['amount']:
                     maior['id'] = accid
                     maior['name'] = name
                     maior['amount'] = amount
 
-            del self.data[maior['id']]
+            del self.jcoin.data[maior['id']]
             order.append('%d. %s -> %.2f' % \
                 (i, maior['name'], maior['amount']))
 
