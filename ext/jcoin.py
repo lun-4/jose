@@ -151,7 +151,7 @@ class JoseCoin(jaux.Auxiliar):
             for member in guild.members:
                 accid = member.id
                 if accid in jcdata:
-                    acc = self.jcoin.data[accid]
+                    acc = jcdata[accid]
                     name, amount = acc['name'], acc['amount']
                     if amount > maior['amount']:
                         maior['id'] = accid
@@ -161,7 +161,7 @@ class JoseCoin(jaux.Auxiliar):
                     pass
 
             if maior['id'] in jcdata:
-                del self.jcoin.data[maior['id']]
+                del jcdata[maior['id']]
                 order.append('%d. %s -> %.2f' % \
                     (i, maior['name'], maior['amount']))
 
@@ -202,14 +202,14 @@ class JoseCoin(jaux.Auxiliar):
                 break
 
             for accid in jcdata:
-                acc = self.jcoin.data[accid]
+                acc = jcdata[accid]
                 name, amount = acc['name'], acc['amount']
                 if amount > maior['amount']:
                     maior['id'] = accid
                     maior['name'] = name
                     maior['amount'] = amount
 
-            del self.jcoin.data[maior['id']]
+            del jcdata[maior['id']]
             order.append('%d. %s -> %.2f' % \
                 (i, maior['name'], maior['amount']))
 
