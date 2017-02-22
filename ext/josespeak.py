@@ -202,8 +202,8 @@ class JoseSpeak(jcommon.Extension):
     def __init__(self, cl):
         global logger
         jcommon.Extension.__init__(self, cl)
-        self.cult_generator = Texter('db/jose-data.txt', 1)
-        self.global_generator = Texter('db/zelao.txt', 1)
+        self.cult_generator = NewTexter('db/jose-data.txt', 1)
+        self.global_generator = NewTexter('db/zelao.txt', 1)
         logger = self.logger
 
         self.flag = False
@@ -259,7 +259,7 @@ class JoseSpeak(jcommon.Extension):
             await self.text_generators[serverid].clear()
 
         # create it
-        self.text_generators[serverid] = Texter(None, 1, '\n'.join(messages))
+        self.text_generators[serverid] = NewTexter(None, 1, '\n'.join(messages))
 
         self.last_texter_mcount = self.msgcount[serverid]
         self.last_texter_time = (time.time() - t_start)
