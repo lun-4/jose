@@ -18,6 +18,25 @@ import aiohttp
 import urllib
 import json
 
+RI_TABLE = {
+    '0': ':zero:',
+    '1': ':one:',
+    '2': ':two:',
+    '3': ':three:',
+    '4': ':four:',
+    '5': ':five:',
+    '6': ':six:',
+    '7': ':seven:',
+    '8': ':eight:',
+    '9': ':nine:',
+
+    '.': ':record_button:',
+    '!': ':exclamation:',
+    '?': ':question:',
+    '+': ':heavy_plus_sign:',
+    '-': ':heavy_minus_sign:',
+}
+
 MEMES_TECH_HELP = '''
 Então você teve problemas usando `j!m stat` ou `j!m get` ou alguma merda assim?
 Siga esses passos:
@@ -579,8 +598,12 @@ class JoseMemes(jcommon.Extension):
 
     async def c_ri(self, message, args, cxt):
         inputstr = ' '.join(args[1:]).lower()
-        res = (' '.join([':regional_indicator_{}:'.format(c) for c in inputstr]))\
-            .replace(':regional_indicator_ :', ' ')
+
+        res = (' '.join([':regional_indicator_{}:'.format(c) for c in \
+            inputstr if c.isalpha()]))
+
+        for char in RI_TABLE:
+            res.replace(char, RI_TABLE[char])
 
         await cxt.say(res)
 
