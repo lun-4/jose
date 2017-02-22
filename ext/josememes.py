@@ -598,13 +598,15 @@ class JoseMemes(jcommon.Extension):
 
     async def c_ri(self, message, args, cxt):
         inputstr = ' '.join(args[1:]).lower()
+        inputstr = list(inputstr)
 
-        res = (' '.join([':regional_indicator_{}:'.format(c) for c in \
-            inputstr if c.isalpha()]))
+        for (index, char) in enumerate(inputstr):
+            if char.isalpha():
+                inputstr[index] = ':regional_indicator_%s:' % char
+            elif char in RI_TABLE:
+                inputstr[index] = RI_TABLE[char]
 
-        for char in RI_TABLE:
-            res.replace(char, RI_TABLE[char])
-
+        res = ''.join(inputstr)
         await cxt.say(res)
 
     async def c_pupper(self, message, args, cxt):
