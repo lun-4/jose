@@ -220,7 +220,7 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
 
         url = "http://www.youtube.com/results?" + query_string
         r = await aiohttp.request('GET', url)
-        html_content = await response.text()
+        html_content = await r.text()
 
         # run in a thread
         future_re = loop.run_in_executor(None, re.findall, r'href=\"\/watch\?v=(.{11})', html_content.read().decode())
