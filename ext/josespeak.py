@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import asyncio
 import sys
 sys.path.append("..")
 import josecommon as jcommon
@@ -553,14 +554,19 @@ class JoseSpeak(jcommon.Extension):
 
                 st_time += duration
                 pitch = LETTER_TO_PITCH[letter]
-                mf.addNote(track, channel, pitch, st_time, duration, volume)
+
+                # run that in a thread
+                future = self.loop.run_in_executor(None, mf.addNote, track\
+                    channel, pitch, st_time, duration, volume)
+                await future
 
         t_taken_ms = (time.time() - t_start) * 1000
         self.logger.info("Took %.2fms to make MIDI file", t_taken_ms)
 
         fname = '%s.mid' % generated_str
         with open(fname, 'wb') as outf:
-            mf.writeFile(outf)
+            future = self.loop.run_in_executor(None, mf.writeFile, outf)
+            await future
 
         # send file
         await self.client.send_file(message.channel, fname, \
