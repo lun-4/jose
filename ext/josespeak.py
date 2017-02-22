@@ -506,8 +506,24 @@ class JoseSpeak(jcommon.Extension):
         volume = 100
         duration = 1
         time = 0
-        for letter in res:
+
+        # do the magic
+        for index, letter in enumerate(res):
             if letter in LETTER_TO_PITCH:
+                # get letter after the letter
+                try:
+                    modifier = res[letter + 1]
+                    if modifier == " ":
+                        duration = 2
+                    elif modifier == ",":
+                        duration = 3
+                    elif modifier == ".":
+                        duration = 4
+                    else:
+                        duration = 1
+                except IndexError:
+                    duration = 1
+
                 time += 1
                 pitch = LETTER_TO_PITCH[letter]
                 mf.addNote(track, channel, pitch, time, duration, volume)
