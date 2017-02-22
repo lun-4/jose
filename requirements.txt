@@ -4,3 +4,4 @@ Pillow
 wolframalpha
 pyowm
 psutil
+MIDIUtil
