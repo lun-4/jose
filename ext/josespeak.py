@@ -487,20 +487,32 @@ class JoseSpeak(jcommon.Extension):
         await self.c_jwormhole(message, args, cxt)
 
     async def c_midi(self, message, args, cxt):
-        '''`j!midi` - Make MIDI files made out of josé's generated sentences'''
+        '''`j!midi [stuff]` - Make MIDI files made out of josé's generated sentences
+        `j!midi bpm<bpm> [stuff]` - set tempo'''
         if message.server is None:
             await cxt.say("Esse comando não está disponível em DMs")
             return
 
         await cxt.send_typing()
         res = ''
+        tempo_to_use = 120
 
         ecxt = jcommon.EmptyContext(self.client, message)
         await self.c_speaktrigger(message, args, ecxt)
         generated_str = await ecxt.getall()
 
+        if args[1].startswith('bpm'):
+            try:
+                tempo_to_use = int(args[len('bpm'):])
+            except ValueError:
+                await cxt.say("Sorry, but `%r` isn't a valid integer for BPM.")
+                return
+
         if len(args) > 1:
-            res = ' '.join(args[1:])
+            if tempo_to_use == 120:
+                res = ' '.join(args[1:])
+            else:
+                res = ' '.join(args[2:])
         else:
             res = generated_str
 
@@ -508,7 +520,7 @@ class JoseSpeak(jcommon.Extension):
         track = 0
         time = 0
         mf.addTrackName(track, time, "Jose")
-        mf.addTempo(track, time, 120)
+        mf.addTempo(track, time, tempo_to_use)
 
         # add some notes
         channel = 0
