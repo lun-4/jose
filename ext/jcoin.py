@@ -14,10 +14,10 @@ class JoseCoin(jaux.Auxiliar):
         self.data = self.jcoin.data
 
     async def ext_load(self):
-        return self.josecoin_load(None)
+        return (await self.josecoin_load(None))
 
     async def ext_unload(self):
-        return self.josecoin_save(None)
+        return (await self.josecoin_save(None))
 
     async def josecoin_save(self, message, dbg_flag=True):
         res = self.jcoin.save('jcoin/josecoin.db')
