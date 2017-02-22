@@ -123,7 +123,7 @@ class JoseCoin(jaux.Auxiliar):
 
     async def c_ltop10(self, message, args, cxt):
         guild = message.server
-        jcdata = dict(data) # copy
+        jcdata = dict(self.jcoin.data) # copy
 
         range_max = 11 # default 10 users
         if len(args) > 1:
@@ -176,7 +176,7 @@ class JoseCoin(jaux.Auxiliar):
         return
 
     async def c_top10(self, message, args, cxt):
-        jcdata = dict(data) # copy
+        jcdata = dict(self.jcoin.data) # copy
 
         range_max = 11 # default 10 users
         if len(args) > 1:
