@@ -299,7 +299,7 @@ class JoseSpeak(jcommon.Extension):
             await self.text_generators[serverid].clear()
 
         # create it
-        self.text_generators[serverid] = NewTexter(None, 1, '\n'.join(messages))
+        self.text_generators[serverid] = await make_texter(None, 1, '\n'.join(messages))
 
         self.last_texter_mcount = self.msgcount[serverid]
         self.last_texter_time = (time.time() - t_start)
