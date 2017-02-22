@@ -588,3 +588,15 @@ class JoseMemes(jcommon.Extension):
 
     async def c_pupper(self, message, args, cxt):
         await cxt.say("http://i.imgur.com/9Le8rW7.jpg :sob:")
+
+    async def c_8ball(self, message, args, cxt):
+        '''`j!8ball` - 8ball'''
+        try:
+            response = await asyncio.wait_for(aiohttp.request('GET', \
+                'https://api.rtainc.co/twitch/8ball'), 4)
+        except asyncio.TimeoutError:
+            await cxt.say("`[8ball] Timeout reached`")
+            return
+
+        answer = await response.text()
+        await cxt.say("%s, %s", (str(message.author.name), answer))
