@@ -723,7 +723,8 @@ serverid %s servername %s chname #%s" % (server.id, server.name, channel.name))
                 ret = await self.client.send_message(channel, translated)
                 return ret
             except discord.Forbidden:
-                logger.info("discord.Forbidden: %r %r %r" % (channel, channel.server.id, channel.server.name))
+                logger.info("discord.Forbidden: %r %r %r" % \
+                    (channel, channel.server.id, channel.server.name))
 
 class EmptyContext:
     def __init__(self, client, message):

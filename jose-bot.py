@@ -286,7 +286,8 @@ async def do_josecoin(message, t_start):
                         await asyncio.sleep(0.4)
                         await client.add_reaction(message, '💰')
                     else:
-                        await jcommon.jose_debug(message, 'josecoin_error: %s' % res[1])
+                        jcommon.logger.error("do_josecoin->jc->err: %s", res[1])
+                        await cxt.say("jc->err: %s", (res[1],))
         else:
             return True
 
@@ -343,9 +344,14 @@ async def do_command(method, message, args, cxt, t_start, st):
             await jose_method(message, args)
 
     except je.PermissionError:
+        jcommon.logger.warning("thrown PermissionError at author %s", \
+            str(message.author))
+
         await cxt.say("Permission ¯\_(ツ)_/¯ 💠 ¯\_(ツ)_/¯ Error")
     except RuntimeError as e:
-        await cxt.say('jose: py_rt_err: %s' % repr(e))
+        jcommon.logger.error("RuntimeError happened with %s", \
+            str(message.author), exc_info=True)
+        await cxt.say(':interrobang: RuntimeError: %s' % repr(e))
     except je.LimitError:
         pass
 
@@ -354,7 +360,7 @@ async def do_command(method, message, args, cxt, t_start, st):
     end = time.time()
     delta = end - st
     if delta > 13:
-        await cxt.say("Alguma coisa está demorando demais para responder(delta=%.4fs)..." % delta)
+        jcommon.logger.warning("Something is takind longer than expected, delta=%.4fs", delta)
 
     # signal python to clean this shit
     del delta, st, end, jose_method
@@ -386,7 +392,8 @@ async def do_cooldown(message, cxt):
             try:
                 del env['cooldowns'][authorid]
             except Exception as e:
-                pass
+                jcommon.logger.error("do_cooldown: error removing cooldown for %d: %r", \
+                    authorid, e)
 
             return True
 

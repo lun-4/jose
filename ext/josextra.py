@@ -125,7 +125,8 @@ class joseXtra(jaux.Auxiliar):
         res.append("Members: %s" % len(list(self.client.get_all_members())))
 
         # num of actual numbers that aren't bots
-        res.append("Users: %s" % len([m for m in self.client.get_all_members() if not m.bot]))
+        res.append("Users: %s" % len([m for m in \
+            self.client.get_all_members() if not m.bot]))
 
         await cxt.say(self.codeblock("", '\n'.join(res)))
 
@@ -214,7 +215,8 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
 
         loop = asyncio.get_event_loop()
 
-        self.logger.info("Youtube request @ %s : %s", message.author, search_term)
+        self.logger.info("Youtube request @ %s : %s", \
+            message.author, search_term)
 
         query_string = urllib.parse.urlencode({"search_query" : search_term})
 
@@ -223,7 +225,8 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
         html_content = await r.text()
 
         # run in a thread
-        future_re = loop.run_in_executor(None, re.findall, r'href=\"\/watch\?v=(.{11})', html_content.read().decode())
+        future_re = loop.run_in_executor(None, re.findall, \
+            r'href=\"\/watch\?v=(.{11})', html_content.read().decode())
         search_results = await future_re
 
         if len(search_results) < 2:
@@ -253,7 +256,8 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             response = await aiohttp.request('GET', url)
 
             if response.status != 200:
-                await cxt.say("sndc: error: status code != 200(st = %d)", (response.status))
+                await cxt.say("sndc: error: status code != 200(st = %d)", \
+                    (response.status))
                 return
 
             try:
