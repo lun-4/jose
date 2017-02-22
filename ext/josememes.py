@@ -597,4 +597,4 @@ class JoseMemes(jcommon.Extension):
             return
 
         answer = await response.text()
-        await cxt.say("%s, %s", (str(message.author.name), answer))
+        await cxt.say("**%s**, %s", (str(message.author.name), answer))
