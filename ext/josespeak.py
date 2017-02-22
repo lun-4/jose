@@ -4,6 +4,7 @@ import sys
 sys.path.append("..")
 import josecommon as jcommon
 
+import os
 import re
 import random
 import subprocess
@@ -533,11 +534,11 @@ class JoseSpeak(jcommon.Extension):
                 pitch = LETTER_TO_PITCH[letter]
                 mf.addNote(track, channel, pitch, time, duration, volume)
 
-        midifile = io.BytesIO()
-        mf.writeFile(midifile)
+        fname = '%s.mid' % res
+        with open(fname, 'wb') as outf:
+            mf.writeFile(outf)
 
         # send file
-        await self.client.send_file(message.channel, midifile, \
-            filename='%s.mid' % res, content=res)
+        await self.client.send_file(message.channel, fname, content=res)
 
-        midifile.close()
+        os.remove(fname)
