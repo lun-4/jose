@@ -82,12 +82,7 @@ class NewTexter:
             # max value refcount can be is 3
             self.refcount += 1
 
-        # run in a thread
-        loop = asyncio.get_event_loop()
-        future = loop.run_in_executor(self.text_model.make_short_sentence, \
-            5 * word_limit)
-        res = await future
-        return res
+        return self.text_model.make_short_sentence(5 * word_limit)
 
     async def clear(self):
         del self.text_model
