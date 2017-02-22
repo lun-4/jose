@@ -680,7 +680,7 @@ class Context:
         except discord.Forbidden:
             server = self.message.server
             logger.info("Context.send_typing: got err Forbidden from\
-serverid %s servername %s" % (server.id, server.name))
+serverid %s servername %s chname #%s" % (server.id, server.name, channel.name))
 
     async def say(self, string, _channel=None, tup=None):
         global langdb
