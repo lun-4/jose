@@ -51,17 +51,21 @@ class NewTexter:
             with open(textpath, 'r') as f:
                 textdata = f.read()
 
-        loop = asyncio.get_event_loop()
-        future_textmodel = loop.run_in_executor(markovify.NewlineText, \
-            textdata, markov_length)
-
-        self.text_model = await future_textmodel
+        self.text_model = None
+        loop.run_until_complete(self.mktexter())
 
         t_taken = (time.time() - t_start) * 1000
         if logger:
             logger.info("NewTexter: markovify took %.2fms" % t_taken)
         else:
             print("NewTexter: markovify took %.2fms" % t_taken)
+
+    async def mktexter(self):
+        loop = asyncio.get_event_loop()
+        future_textmodel = loop.run_in_executor(markovify.NewlineText, \
+            textdata, markov_length)
+
+        self.text_model = await future_textmodel
 
     def __repr__(self):
         return 'Texter(refcount=%s)' % self.refcount

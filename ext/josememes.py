@@ -122,7 +122,8 @@ class JoseMemes(jcommon.Extension):
                         data.write(data_read)
 
                     clone = io.BytesIO(data.getvalue())
-                    msg = await self.client.send_file(message.channel, clone, filename='%s.jpg' % meme, content='*tratado*')
+                    msg = await self.client.send_file(cxt.message.channel, \
+                        clone, filename='%s.jpg' % meme, content='*treated*')
                     data.close()
                     clone.close()
 
