@@ -425,7 +425,7 @@ async def execute(instructions, env):
         pc += 1
     return True, env, stdout
 
-class JoseExtension(jaux.Auxiliar):
+class JoseAssembly(jaux.Auxiliar):
     def __init__(self, cl):
         jaux.Auxiliar.__init__(self, cl)
         self.jasm_env = {}
