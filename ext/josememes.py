@@ -108,6 +108,28 @@ class JoseMemes(jcommon.Extension):
     async def c_htmpr(self, message, args, cxt):
         await cxt.say(MEMES_TECH_HELP)
 
+    async def do_patterns(self, cxt, url):
+        for pat in self.patterns:
+            if re.search(pat, url):
+                # if facebook, upload to Discord
+                await cxt.say("Facebook URL detected, uploading to Discord")
+
+                with aiohttp.ClientSession() as session:
+                    data = io.BytesIO()
+
+                    async with session.get(url) as resp:
+                        data_read = await resp.read()
+                        data.write(data_read)
+
+                    clone = io.BytesIO(data.getvalue())
+                    msg = await self.client.send_file(message.channel, clone, filename='%s.jpg' % meme, content='*tratado*')
+                    data.close()
+                    clone.close()
+
+                    url = msg.attachments[0]['url']
+                    break
+        return url
+
     async def c_meme(self, message, args, cxt):
         '''
         j!meme: Adicione e mostre memes com o josé!
@@ -152,25 +174,7 @@ class JoseMemes(jcommon.Extension):
                 await cxt.say("%s: meme já existe", (meme,))
                 return
 
-            for pat in self.patterns:
-                if re.search(pat, url):
-                    # if facebook, upload to Discord
-                    await cxt.say("Detectado um link do facebook, tratando...")
-
-                    with aiohttp.ClientSession() as session:
-                        data = io.BytesIO()
-
-                        async with session.get(url) as resp:
-                            data_read = await resp.read()
-                            data.write(data_read)
-
-                        clone = io.BytesIO(data.getvalue())
-                        msg = await self.client.send_file(message.channel, clone, filename='%s.jpg' % meme, content='*tratado*')
-                        data.close()
-                        clone.close()
-
-                        url = msg.attachments[0]['url']
-                        break
+            url = await self.do_patterns(cxt, url)
 
             # create meme in database
             self.memes[meme] = {
