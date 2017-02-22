@@ -10,6 +10,14 @@ JOSECOIN_VERSION = '0.6'
 import decimal
 decimal.getcontext().prec = 3
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+handler = logging.FileHandler('José.log')
+handler.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+
 JOSECOIN_HELP_TEXT = '''JoseCoin(%s) é a melhor moeda que o josé pode te oferecer!
 
 Toda mensagem enviada tem 1%% de chance de conseguir 1, 1.2, 2, 2.5, 5, 5.1 ou 7.4JC$ para o autor da mensagem
@@ -79,7 +87,9 @@ def transfer(id_from, id_to, amnt, file_name):
     except Exception as e:
         return False, str(e)
 
-    print('from', acc_from, 'to', acc_to, 'amount', amnt)
+    logger.info("%s > %.6fJC > %s", \
+        acc_from['name'], amnt, acc_to['name'])
+
     if not (acc_from['amount'] >= amnt):
         return False, "account doesn't have enough funds to make this transaction"
 

@@ -78,7 +78,7 @@ class JoseImages(jcommon.Extension):
             if search_key:
                 list_key = search_url_key
 
-        self.logger.info("image: json_api->%s: %r", boardid, url)
+        self.logger.info("images: json_api->%s: %r", boardid, search_term)
         response = await self.get_json(url)
 
         if not response:
