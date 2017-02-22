@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import asyncio
 import sys
 sys.path.append("..")
 import josecommon as jcommon
@@ -12,6 +13,7 @@ import json
 import io
 import time
 from midiutil.MidiFile import MIDIFile
+import markovify
 
 logger = None
 MESSAGE_LIMIT = 10000 # 10k messages
@@ -36,6 +38,48 @@ def wordlist(filename, file_object=None):
     wordlist = [fix_caps(w) for w in re.findall(r"[\w']+|[.,!?;]", file_object.read())]
     file_object.close()
     return wordlist
+
+class NewTexter:
+    def __init_(self, textpath=None, markov_length=2, text=None):
+        self.refcount = 1
+        t_start = time.time()
+        textdata = ''
+
+        if textpath is None:
+            textdata = text
+        else:
+            with open(textpath, 'r') as f:
+                textdata = f.read()
+
+        loop = asyncio.get_event_loop()
+        future_textmodel = loop.run_in_executor(markovify.NewlineText, \
+            textdata, markov_length)
+
+        self.text_model = await future_textmodel
+
+        t_taken = (time.time() - t_start) * 1000
+        if logger:
+            logger.info("NewTexter: markovify took %.2fms" % t_taken)
+        else:
+            print("NewTexter: markovify took %.2fms" % t_taken)
+
+    def __repr__(self):
+        return 'Texter(refcount=%s)' % self.refcount
+
+    async def gen_sentence(self, markov_length, word_limit):
+        if self.refcount <= 2:
+            # max value refcount can be is 3
+            self.refcount += 1
+
+        # run in a thread
+        loop = asyncio.get_event_loop()
+        future = loop.run_in_executor(self.text_model.make_short_sentence, \
+            5 * word_limit)
+        res = await future
+        return res
+
+    async def clear(self):
+        del self.text_model
 
 class Texter:
     def __init__(self, textpath, markov_length, text=None):
