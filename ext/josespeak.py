@@ -53,6 +53,8 @@ class NewTexter:
                 self.textdata = f.read()
 
         self.text_model = None
+
+        loop = asyncio.get_event_loop()
         loop.run_until_complete(self.mktexter())
 
         t_taken = (time.time() - t_start) * 1000
