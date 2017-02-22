@@ -91,17 +91,6 @@ async def learn_data(message):
     await jose.say(feedback)
     return
 
-async def main_status(message):
-    auth = await jcommon.check_roles(jcommon.MASTER_ROLE, message.author.roles)
-    if auth:
-        jcommon.MAINTENANCE_MODE = not jcommon.MAINTENANCE_MODE
-        await jcommon.jose_debug(message, "Modo de construção: %s" % (jcommon.MAINTENANCE_MODE))
-    else:
-        raise je.PermissionError()
-
-async def show_maintenance(message):
-    await jose.say("**JOSÉ EM CONSTRUÇÃO, AGUARDE**\nhttps://umasofe.files.wordpress.com/2012/11/placa.jpg")
-
 async def show_price(message):
     res = ''
 
@@ -142,7 +131,8 @@ commands_match = {
     'janela':           jcommon.show_casa,
     'frozen3':          jcommon.make_func("https://thumbs.dreamstime.com/t/construo-refletiu-nas-janelas-do-prdio-de-escritrios-moderno-contra-47148949.jpg"),
     'q fita':           jcommon.make_func("http://i.imgur.com/DQ3YnI0.jpg"),
-    'compiuter':        jcommon.make_func("https://i.ytimg.com/vi/cU3330gwoh8/hqdefault.jpg\nhttp://puu.sh/qcVi0/04d58f422d.JPG"),
+    'compiuter':        jcommon.make_func("https://i.ytimg.com/vi/cU3330gwoh8/hqdefault.jpg"),
+    'Parabéns':         jcommon.make_func("http://i.imgur.com/L0VlX0m.jpg")
 }
 
 counter = 0
@@ -181,7 +171,6 @@ load_module('josegambling', 'JoseGambling')
 # etc
 load_module('joseassembly', 'JoseAssembly')
 load_module('joseibc', 'JoseIBC')
-# load_module('joseartif', 'JoseArtif')
 load_module('josemath', 'JoseMath')
 
 help_helptext = """
@@ -202,11 +191,6 @@ async def do_event(event_name, message):
 async def check_message(message):
     # we do not want the bot to reply to itself
     if message.author == client.user:
-        return False
-
-    # override maintenance mode
-    if message.content == '!construção':
-        await main_status(message)
         return False
 
     if jose.command_lock:
@@ -237,9 +221,6 @@ async def do_josecoin(message, t_start):
 
             # only if author has account
             if str(message.author.id) in josecoin.data:
-                if jcommon.MAINTENANCE_MODE:
-                    return True
-
                 cxt = jcommon.Context(client, message, t_start, jose)
 
                 author_id = str(message.author.id)
