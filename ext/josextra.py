@@ -219,9 +219,10 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
         query_string = urllib.parse.urlencode({"search_query" : search_term})
 
         url = "http://www.youtube.com/results?" + query_string
-        future_search = loop.run_in_executor(None, urllib.request.urlopen, url)
-        html_content = await future_search
+        r = await aiohttp.request('GET', url)
+        html_content = await response.text()
 
+        # run in a thread
         future_re = loop.run_in_executor(None, re.findall, r'href=\"\/watch\?v=(.{11})', html_content.read().decode())
         search_results = await future_re
 
