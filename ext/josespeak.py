@@ -286,7 +286,7 @@ class JoseSpeak(jcommon.Extension):
 
             return True, ''
         except Exception as e:
-            return False, str(e)
+            return False, repr(e)
 
     async def ext_unload(self):
         try:
@@ -302,7 +302,7 @@ class JoseSpeak(jcommon.Extension):
 
             return True, ''
         except Exception as e:
-            return False, str(e)
+            return False, repr(e)
 
     async def c_getmsg(self, message, args, cxt):
         '''`j!getmsg serverid amount`'''
