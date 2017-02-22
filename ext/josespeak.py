@@ -491,6 +491,8 @@ class JoseSpeak(jcommon.Extension):
             await cxt.say("Esse comando não está disponível em DMs")
             return
 
+        await cxt.send_typing()
+
         # generate the message
         ecxt = jcommon.EmptyContext(self.client, message)
         await self.c_speaktrigger(message, args, ecxt)
