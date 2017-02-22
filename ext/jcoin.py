@@ -122,6 +122,10 @@ class JoseCoin(jaux.Auxiliar):
             await cxt.say('jc_err: `%s`' % res[1])
 
     async def c_ltop10(self, message, args, cxt):
+        if message.server is None:
+            await cxt.say("You're not in a server, dummy!")
+            return
+
         guild = message.server
         jcdata = dict(self.jcoin.data) # copy
 
