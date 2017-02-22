@@ -493,6 +493,7 @@ class JoseSpeak(jcommon.Extension):
             await cxt.say("Esse comando não está disponível em DMs")
             return
 
+        t_start = time.time()
         await cxt.send_typing()
         res = ''
         tempo_to_use = 120
@@ -553,11 +554,15 @@ class JoseSpeak(jcommon.Extension):
                 pitch = LETTER_TO_PITCH[letter]
                 mf.addNote(track, channel, pitch, time, duration, volume)
 
+        t_taken_ms = (time.time() - t_start) * 1000
+        self.logger.info("Took %.2fms to make MIDI file", t_taken_ms)
+
         fname = '%s.mid' % generated_str
         with open(fname, 'wb') as outf:
             mf.writeFile(outf)
 
         # send file
-        await self.client.send_file(message.channel, fname, content=res)
+        await self.client.send_file(message.channel, fname, \
+            content=('took %.2fms to do that' % t_taken_ms))
 
         os.remove(fname)
