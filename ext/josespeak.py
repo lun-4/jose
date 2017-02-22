@@ -77,15 +77,15 @@ class NewTexter:
     def __repr__(self):
         return 'Texter(refcount=%s)' % self.refcount
 
-    async def gen_sentence(self, markov_length, word_limit):
+    async def gen_sentence(self, word_limit):
         if self.refcount <= 2:
             # max value refcount can be is 3
             self.refcount += 1
 
-        characters = 5 * word_limit
-        # limit it to 15
-        if characters < 15:
-            characters = 15
+        characters = round(5.5 * word_limit)
+        # limit it to 29
+        if characters < 29:
+            characters = 32
 
         res = None
         count = 0
@@ -480,7 +480,7 @@ class JoseSpeak(jcommon.Extension):
             await self.speak(self.text_generators[sid], length, cxt)
 
     async def speak(self, texter, length_words, cxt):
-        res = await texter.gen_sentence(1, length_words)
+        res = await texter.gen_sentence(length_words)
         await cxt.say(res)
 
     async def c_falar(self, message, args, cxt):
