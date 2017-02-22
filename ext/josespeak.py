@@ -499,7 +499,7 @@ class JoseSpeak(jcommon.Extension):
         await self.c_speaktrigger(message, args, ecxt)
         generated_str = await ecxt.getall()
 
-        if len(args) < 2:
+        if len(args) > 1:
             res = ' '.join(args[1:])
         else:
             res = generated_str
