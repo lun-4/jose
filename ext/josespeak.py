@@ -502,10 +502,12 @@ class JoseSpeak(jcommon.Extension):
         generated_str = await ecxt.getall()
 
         if args[1].startswith('bpm'):
+            bpmval = args[1][len('bpm'):]
             try:
-                tempo_to_use = int(args[1][len('bpm'):])
+                tempo_to_use = int(bpmval)
             except ValueError:
-                await cxt.say("Sorry, but `%r` isn't a valid integer for BPM.")
+                await cxt.say("Sorry, but `%r` isn't a valid integer for BPM.", \
+                    (bpmval,))
                 return
 
         if len(args) > 1:
