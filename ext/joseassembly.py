@@ -437,7 +437,7 @@ class JoseAssembly(jaux.Auxiliar):
         return True, ''
 
     async def c_jasm(self, message, args, cxt):
-        await jcommon.is_admin(message.author.id)
+        await self.is_admin(message.author.id)
         await cxt.say("JASM enabled, type `exit` to exit the REPL.")
 
         if not (message.author.id in self.jasm_env):
