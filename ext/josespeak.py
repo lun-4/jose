@@ -10,6 +10,7 @@ import subprocess
 import json
 import io
 import time
+from midiutil.MidiFile import MIDIFile
 
 logger = None
 MESSAGE_LIMIT = 10000 # 10k messages
@@ -482,3 +483,40 @@ class JoseSpeak(jcommon.Extension):
     async def c_jw(self, message, args, cxt):
         '''`j!jw` - alias para `!jwormhole`'''
         await self.c_jwormhole(message, args, cxt)
+
+    async def c_midi(self, message, args, cxt):
+        '''`j!midi` - Make MIDI files made out of josé's generated sentences'''
+        if message.server is None:
+            await cxt.say("Esse comando não está disponível em DMs")
+            return
+
+        # generate the message
+        ecxt = jcommon.EmptyContext(self.client, message)
+        await self.c_speaktrigger(message, args, ecxt)
+        res = await ecxt.getall()
+
+        mf = MIDIFile(1)
+        track = 0
+        time = 0
+        mf.addTrackName(track, time, "Jose")
+        mf.addTempo(track, time, 120)
+
+        # add some notes
+        channel = 0
+        volume = 100
+        duration = 1
+        time = 0
+        for letter in res:
+            if letter in LETTER_TO_PITCH:
+                time += 1
+                pitch = LETTER_TO_PITCH[letter]
+                mf.addNote(track, channel, pitch, time, duration, volume)
+
+        midifile = io.BytesIO()
+        mf.writeFile(midifile)
+
+        # send file
+        await self.client.send_file(message.channel, midifile, \
+            filename='%s.mid' % res, content='the madness is here')
+
+        midifile.close()
