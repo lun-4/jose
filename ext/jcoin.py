@@ -90,8 +90,8 @@ class JoseCoin(jaux.Auxiliar):
         await cxt.say("<@%s> has %.2fJC now" % (id_from, \
             self.jcoin.data[id_from]['amount']))
 
-        self.logger.info("%r Wrote %.2fJC to Account %s" % \
-            (message.author, new_amount, id_from))
+        self.logger.info("%s Wrote %.2fJC to Account %s" % \
+            (str(message.author), new_amount, id_from))
 
     async def c_enviar(self, message, args, cxt):
         '''`j!enviar @mention quantidade` - envia JCoins para uma conta'''
