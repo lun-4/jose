@@ -57,8 +57,9 @@ class JoseMemes(jcommon.Extension):
         # supress every kind of debug to self.say
         old_cur = self.current
         self.current = None
-        await self.save_memes()
+        ok = await self.save_memes()
         self.currrent = old_cur
+        return ok, ""
 
     async def load_memes(self):
         try:
@@ -78,10 +79,7 @@ class JoseMemes(jcommon.Extension):
             pickle.dump(self.memes, open("ext/josememes.db", 'wb'))
             return True
         except Exception as e:
-            if self.current is not None:
-                await self.debug("save_memes: pyerr: %s" % e)
-            else:
-                self.logger.error("Error in save_memes", exc_info=True)
+            self.logger.error("Error in save_memes", exc_info=True)
             return False
 
     async def c_aprovado(self, message, args, cxt):
