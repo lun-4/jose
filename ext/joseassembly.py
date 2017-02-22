@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
 
+import discord
+import asyncio
+import sys
+sys.path.append("..")
+import jauxiliar as jaux
+import joseerror as je
+
 import cmath as math
 
 JASM_VERSION = '0.2.1'
@@ -55,7 +62,6 @@ def empty_env():
 async def parse(text):
     insts = []
     for line in text.split('\n'):
-        print(line)
         s = line.split(' ')
         command = s[0]
         args = ' '.join(s[1:])
@@ -73,12 +79,12 @@ async def is_numeric(lit):
     litneg = lit[1:] if lit[0] == '-' else lit
     if litneg[0] == '0':
         if litneg[1] in 'xX':
-            return int(lit,16)
+            return int(lit, 16)
         elif litneg[1] in 'bB':
-            return int(lit,2)
+            return int(lit, 2)
         else:
             try:
-                return int(lit,8)
+                return int(lit, 8)
             except ValueError:
                 pass
 
@@ -153,21 +159,6 @@ mov r10,"loop terminated"
 echo r10
 
 '''
-
-def syscall_nop(env):
-    pass
-
-def syscall_write(env):
-    pass
-
-def syscall_read(env):
-    pass
-
-syscall_table = {
-    0: syscall_nop,
-    1: syscall_write,
-    2: syscall_read,
-}
 
 def math_calc(opstr, inst, env):
     try:
@@ -435,3 +426,40 @@ async def execute(instructions, env):
 
         pc += 1
     return True, env, stdout
+
+class JoseExtension(jaux.Auxiliar):
+    def __init__(self, cl):
+        jaux.Auxiliar.__init__(self, cl)
+        self.jasm_env = {}
+
+    async def ext_load(self):
+        return True, ''
+
+    async def ext_unload(self):
+        return True, ''
+
+    async def c_jasm(self, message, args, cxt):
+        await jcommon.is_admin(message.author.id)
+        await cxt.say("JASM enabled, type `exit` to exit the REPL.")
+
+        if not (message.author.id in self.jasm_env):
+            self.jasm_env[message.author.id] = jasm.empty_env()
+        pointer = self.jasm_env[message.author.id]
+
+        while True:
+            data = await client.wait_for_message(author=message.author)
+            if data.content == 'exit':
+                await cxt.say(':arrow_left: Exited REPL')
+                break
+            else:
+                insts = await parse(data.content)
+                res = await execute(insts, pointer)
+                if res[0] == True:
+                    if len(res[2]) < 1:
+                        await cxt.say("**`[debug] no result`**")
+                    else:
+                        await cxt.say(res[2])
+                else:
+                    await cxt.say("jasm error: %s" % res[2])
+                pointer = res[1]
+        return

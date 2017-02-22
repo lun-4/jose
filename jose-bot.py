@@ -17,7 +17,6 @@ import discord
 
 import josecommon as jcommon
 import ext.jose as jose_bot
-import ext.joseassembly as jasm
 import jcoin.josecoin as josecoin
 import joseconfig as jconfig
 import joseerror as je
@@ -180,6 +179,7 @@ load_module('josextra', 'joseXtra')
 load_module('josegambling', 'JoseGambling')
 
 # etc
+load_module('joseassembly', 'JoseAssembly')
 load_module('joseibc', 'JoseIBC')
 # load_module('joseartif', 'JoseArtif')
 load_module('josemath', 'JoseMath')
@@ -230,33 +230,6 @@ async def do_command_table(message):
             return True
 
     return False
-
-async def do_jasm(message, cxt):
-    await jose.is_admin(message.author.id)
-    await cxt.say('Bem vindo ao REPL do JoseAssembly!\nPara sair, digite "exit"')
-
-    if not (message.author.id in jasm_env):
-        jasm_env[message.author.id] = jasm.empty_env()
-
-    pointer = jasm_env[message.author.id]
-
-    while True:
-        data = await client.wait_for_message(author=message.author)
-        if data.content == 'exit':
-            await cxt.say('saindo do REPL')
-            break
-        else:
-            insts = await jasm.parse(data.content)
-            res = await jasm.execute(insts, pointer)
-            if res[0] == True:
-                if len(res[2]) < 1:
-                    await cxt.say("**debug: nenhum resultado**")
-                else:
-                    await cxt.say(res[2])
-            else:
-                await cxt.say("jasm error: %s" % res[2])
-            pointer = res[1]
-    return
 
 async def do_josecoin(message, t_start):
     if random.random() < jcommon.jc_probabiblity:
@@ -453,9 +426,6 @@ async def on_message(message):
     should_stop = await do_command_table(message)
     if should_stop:
         return
-
-    if message.content.startswith('%sjasm' % jcommon.JOSE_PREFIX):
-        await do_jasm(message, cxt)
 
     # a normal message, put it in the global text
     if not message.author.bot:
