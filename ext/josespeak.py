@@ -510,6 +510,8 @@ class JoseSpeak(jcommon.Extension):
         duration = 1
         time = 0
 
+        self.logger.info("Making MIDI out of %r", res)
+
         # do the magic
         for index, letter in enumerate(res):
             if letter in LETTER_TO_PITCH:
@@ -534,8 +536,10 @@ class JoseSpeak(jcommon.Extension):
         midifile = io.BytesIO()
         mf.writeFile(midifile)
 
+        length = len(io.BytesIO(midifile).getvalue())
+
         # send file
         await self.client.send_file(message.channel, midifile, \
-            filename='%s.mid' % res, content='the madness is here')
+            filename='%s.mid' % res, content='length: %d' % length)
 
         midifile.close()
