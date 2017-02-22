@@ -679,6 +679,7 @@ class Context:
             await self.client.send_typing(self.message.channel)
         except discord.Forbidden:
             server = self.message.server
+            channel = self.message.channel
             logger.info("Context.send_typing: got err Forbidden from\
 serverid %s servername %s chname #%s" % (server.id, server.name, channel.name))
 

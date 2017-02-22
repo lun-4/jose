@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 
-import discord
-import asyncio
 import sys
 sys.path.append("..")
 import jauxiliar as jaux
-import joseerror as je
+import josecommon as jcommon
 
 import cmath as math
 
@@ -443,18 +441,18 @@ class JoseExtension(jaux.Auxiliar):
         await cxt.say("JASM enabled, type `exit` to exit the REPL.")
 
         if not (message.author.id in self.jasm_env):
-            self.jasm_env[message.author.id] = jasm.empty_env()
+            self.jasm_env[message.author.id] = empty_env()
         pointer = self.jasm_env[message.author.id]
 
         while True:
-            data = await client.wait_for_message(author=message.author)
+            data = await self.client.wait_for_message(author=message.author)
             if data.content == 'exit':
                 await cxt.say(':arrow_left: Exited REPL')
                 break
             else:
                 insts = await parse(data.content)
                 res = await execute(insts, pointer)
-                if res[0] == True:
+                if res[0]:
                     if len(res[2]) < 1:
                         await cxt.say("**`[debug] no result`**")
                     else:
