@@ -213,14 +213,6 @@ class JoseMemes(jcommon.Extension):
                 raise IOError("banco de dados não salvo corretamente")
 
             return
-        elif command == 'load':
-            done = await self.load_memes()
-            if done:
-                await cxt.say("jmemes: banco de dados carregado")
-            else:
-                raise IOError("banco de dados não carregado corretamente")
-
-            return
 
         elif command == 'saveload':
             self.logger.info("saveloading meme database")
