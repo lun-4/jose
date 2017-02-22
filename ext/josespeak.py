@@ -14,6 +14,7 @@ from midiutil.MidiFile import MIDIFile
 
 logger = None
 MESSAGE_LIMIT = 10000 # 10k messages
+LETTER_TO_PITCH = jcommon.LETTER_TO_PITCH
 
 def fix_caps(word):
     if word.isupper() and (word != "I" or word != "Eu"):

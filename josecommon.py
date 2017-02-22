@@ -162,6 +162,8 @@ j!ap <quantidade> - aposta propiamente dita
 j!rolar - quando você já está pronto pra ver quem é o ganhador
 '''
 
+LETTER_TO_PITCH = {}
+
 debug_logs = []
 
 async def debug_log(string):
