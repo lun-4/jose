@@ -223,4 +223,4 @@ class JoseMath(jaux.Auxiliar):
             dices.append(dice_result)
 
         await cxt.say("%s: `%s` => %d", (dicestr, \
-            ', '.join(dices), sum(dices)))
+            ', '.join(str(r) for r in dices), sum(dices)))
