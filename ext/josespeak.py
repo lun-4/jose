@@ -494,6 +494,7 @@ class JoseSpeak(jcommon.Extension):
             return
 
         t_start = time.time()
+
         await cxt.send_typing()
         res = ''
         tempo_to_use = 120
@@ -521,15 +522,15 @@ class JoseSpeak(jcommon.Extension):
 
         mf = MIDIFile(1)
         track = 0
-        time = 0
-        mf.addTrackName(track, time, "Jose")
-        mf.addTempo(track, time, tempo_to_use)
+        st_time = 0
+        mf.addTrackName(track, st_time, "Jose")
+        mf.addTempo(track, st_time, tempo_to_use)
 
         # add some notes
         channel = 0
         volume = 100
         duration = 1
-        time = 0
+        st_time = 0
 
         self.logger.info("Making MIDI out of %r", res)
 
@@ -550,9 +551,9 @@ class JoseSpeak(jcommon.Extension):
                 except IndexError:
                     duration = 1
 
-                time += duration
+                st_time += duration
                 pitch = LETTER_TO_PITCH[letter]
-                mf.addNote(track, channel, pitch, time, duration, volume)
+                mf.addNote(track, channel, pitch, st_time, duration, volume)
 
         t_taken_ms = (time.time() - t_start) * 1000
         self.logger.info("Took %.2fms to make MIDI file", t_taken_ms)
