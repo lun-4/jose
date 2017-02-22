@@ -82,7 +82,16 @@ class NewTexter:
             # max value refcount can be is 3
             self.refcount += 1
 
-        return self.text_model.make_short_sentence(5 * word_limit)
+        res = None
+        count = 0
+        while res is None:
+            if count > 3: break
+            characters = 5 * word_limit
+            logger.info("Generating sentence with %d characters", characters)
+            res = self.text_model.make_short_sentence(characters)
+            count += 1
+
+        return str(res)
 
     async def clear(self):
         del self.text_model
