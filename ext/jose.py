@@ -14,7 +14,6 @@ import gc
 sys.path.append("..")
 import josecommon as jcommon
 import joseerror as je
-import jcoin.josecoin as jcoin
 
 jose_debug = jcommon.jose_debug
 
