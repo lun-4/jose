@@ -355,7 +355,7 @@ class JoseBot(jcommon.Extension):
             raise je.PermissionError()
 
     async def turnoff(self, cxt):
-        await jcoin.JoseCoin(self.client).josecoin_save(self.current, True)
+        await self.modules['josecoin']['inst'].josecoin_save(cxt.message)
         await self.unload_all()
         await cxt.say(":wave: kthxbye :wave:")
         await self.client.logout()

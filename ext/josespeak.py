@@ -536,7 +536,7 @@ class JoseSpeak(jcommon.Extension):
         midifile = io.BytesIO()
         mf.writeFile(midifile)
 
-        length = len(io.BytesIO(midifile).getvalue())
+        length = midifile.len
 
         # send file
         await self.client.send_file(message.channel, midifile, \
