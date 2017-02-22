@@ -556,7 +556,7 @@ class JoseSpeak(jcommon.Extension):
                 pitch = LETTER_TO_PITCH[letter]
 
                 # run that in a thread
-                future = self.loop.run_in_executor(None, mf.addNote, track\
+                future = self.loop.run_in_executor(None, mf.addNote, track, \
                     channel, pitch, st_time, duration, volume)
                 await future
 
