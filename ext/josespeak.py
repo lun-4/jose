@@ -502,7 +502,7 @@ class JoseSpeak(jcommon.Extension):
         if len(args) < 2:
             res = ' '.join(args[1:])
         else:
-            res = gstr
+            res = generated_str
 
         mf = MIDIFile(1)
         track = 0
