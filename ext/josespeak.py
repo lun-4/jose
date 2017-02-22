@@ -503,7 +503,7 @@ class JoseSpeak(jcommon.Extension):
 
         if args[1].startswith('bpm'):
             try:
-                tempo_to_use = int(args[len('bpm'):])
+                tempo_to_use = int(args[1][len('bpm'):])
             except ValueError:
                 await cxt.say("Sorry, but `%r` isn't a valid integer for BPM.")
                 return
