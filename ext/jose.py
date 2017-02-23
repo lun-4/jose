@@ -628,8 +628,9 @@ don't want (unless I'm skynet)")
             return
 
         cmd = "cat José.log | tail -%d" % (linestoget)
-        res = str(subprocess.check_output(cmd, shell=True, \
-            stderr=subprocess.STDOUT))
+        res = subprocess.check_output(cmd, shell=True, \
+            stderr=subprocess.STDOUT)
+        res = res.decode("utf-8")
 
         await cxt.say("Last `%d` lines from José.log said: \n```%s```" % \
             (linestoget, res))
