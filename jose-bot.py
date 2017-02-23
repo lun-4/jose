@@ -342,14 +342,19 @@ async def do_cooldown(message, cxt):
                 await asyncio.sleep(secleft)
                 await client.delete_message(m)
 
-            # don't go more than here, just remove the cooldown and return
-            try:
-                del env['cooldowns'][authorid]
-            except Exception as e:
-                jcommon.logger.error("do_cooldown: error removing cooldown for %d: %r", \
-                    authorid, e)
-
-            return True
+                # that code repetiton was needed, sorry
+                try:
+                    del env['cooldowns'][authorid]
+                    return True
+                except Exception as e:
+                    jcommon.logger.error("do_cooldown: error removing cooldown for %d: %r", \
+                        authorid, e)
+            else:
+                try:
+                    del env['cooldowns'][authorid]
+                except Exception as e:
+                    jcommon.logger.error("do_cooldown: error removing cooldown for %d: %r", \
+                        authorid, e)
 
     # always update user's cooldown
     env['cooldowns'][authorid] = now + jcommon.COOLDOWN_SECONDS

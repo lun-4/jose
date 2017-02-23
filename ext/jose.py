@@ -3,7 +3,6 @@ import time
 from random import SystemRandom
 random = SystemRandom()
 
-import os
 import sys
 import base64
 import subprocess
