@@ -258,12 +258,12 @@ class JoseMemes(jcommon.Extension):
             # better than google
             probables = [key for key in self.memes if term in key.lower()]
             if len(probables) > 0:
-                to_send = "Resultados: %s" % ', '.join(probables)
+                to_send = ', '.join(probables)
                 # check length of message
                 if len(to_send) > 1995: # 1 9 9 5
                     await cxt.say(":elephant: Resultados muito grandes :elephant:")
                 else:
-                    await cxt.say(to_send)
+                    await cxt.say(self.codeblock("", to_send))
             else:
                 await cxt.say("%r: Nenhum resultado encontrado", (term,))
         elif command == 'rename':
