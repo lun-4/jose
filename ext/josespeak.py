@@ -91,8 +91,8 @@ class NewTexter:
         count = 0
         while res is None:
             if count > 3: break
-            logger.info("Generating sentence with %d characters", characters)
-            res = self.text_model.make_short_sentence(characters)
+            logger.info("gen_sentence with %d characters", characters)
+            res = self.text_model.make_sentence()
             count += 1
 
         return str(res)
