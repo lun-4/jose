@@ -607,9 +607,26 @@ don't want (unless I'm skynet)")
 
     async def c_listev(self, message, args, cxt):
         res = []
-        for evname in self.event_tbl:
+        for evname in sorted(self.event_tbl):
             evcount = len(self.event_tbl[evname])
             res.append('event %r : %d handlers' % (evname, evcount))
 
-        await cxt.say("There are %d registered events: ```%s```" % \
+        await cxt.say(":cop: There are %d registered events: ```%s```" % \
             (len(self.event_tbl), '\n'.join(res)))
+
+    async def c_logs(self, message, args, cxt):
+        '''`j!logs num` - get `num` last lines from `José.log`'''
+        await self.is_admin(message.author.id)
+
+        try:
+            linestoget = int(args[1])
+        except IndexError:
+            await cxt.say("use the command fucking properly")
+            return
+        except Exception as e:
+            await cxt.say(":warning: %r" % e)
+            return
+
+        res = os.system("cat José.log | tail -%d" % (linestoget))
+        await cxt.say("Last `%d` lines from José.log said: \n%s" % \
+            (linestoget, self.codeblock("", res)))
