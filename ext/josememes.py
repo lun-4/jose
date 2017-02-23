@@ -108,7 +108,7 @@ class JoseMemes(jcommon.Extension):
     async def c_htmpr(self, message, args, cxt):
         await cxt.say(MEMES_TECH_HELP)
 
-    async def do_patterns(self, cxt, url):
+    async def do_patterns(self, cxt, meme, url):
         for pat in self.patterns:
             if re.search(pat, url):
                 # if facebook, upload to Discord
@@ -175,7 +175,7 @@ class JoseMemes(jcommon.Extension):
                 await cxt.say("%s: meme já existe", (meme,))
                 return
 
-            url = await self.do_patterns(cxt, url)
+            url = await self.do_patterns(cxt, meme, url)
 
             # create meme in database
             self.memes[meme] = {
