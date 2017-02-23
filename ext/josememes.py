@@ -195,10 +195,10 @@ class JoseMemes(jcommon.Extension):
         elif command == 'rm':
             meme = ' '.join(args[2:])
             if meme in self.memes:
-                meme_data = self.memes[meme]
+                meme_owner = self.memes[meme]['owner']
                 is_admin = await self.b_isowner(cxt)
 
-                if (message.author.id == meme_data['owner']) or is_admin:
+                if (message.author.id == meme_owner) or is_admin:
                     del self.memes[meme]
                     await self.save_memes()
                     await cxt.say("%s: meme removido", (meme,))
@@ -241,7 +241,12 @@ class JoseMemes(jcommon.Extension):
                 await cxt.say(self.memes[meme]['data'])
                 await self.save_memes()
             else:
-                await cxt.say("%s: meme não encontrado", (meme,))
+                # find other memes that are like the not found one
+                probables = [key for key in self.memes if term in key.lower()]
+                if len(probables) > 0:
+                    await cxt.say("Didn't you mean `%s`?" % ','.join(probables))
+                else:
+                    await cxt.say("%s: meme não encontrado", (meme,))
             return
         elif command == 'search':
             term = ' '.join(args[2:])
