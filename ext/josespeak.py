@@ -548,6 +548,18 @@ class JoseSpeak(jcommon.Extension):
         res = await ecxt.getall()
         await cxt.say("<@127296623779774464> wormhole send %s", (res,))
 
+    async def c_tatsu(self, message, args, cxt):
+        '''`j!tatsu` - `j!speaktrigger` rerouted to prefix with `^``'''
+        if message.server is None:
+            await cxt.say("DMs not available")
+            return
+
+        await cxt.send_typing()
+        ecxt = jcommon.EmptyContext(self.client, message)
+        await self.c_speaktrigger(message, args, ecxt)
+        res = await ecxt.getall()
+        await cxt.say("^%s", (res,))
+
     async def c_jw(self, message, args, cxt):
         '''`j!jw` - alias para `!jwormhole`'''
         await self.c_jwormhole(message, args, cxt)
