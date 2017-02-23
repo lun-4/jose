@@ -242,7 +242,7 @@ class JoseMemes(jcommon.Extension):
                 await self.save_memes()
             else:
                 # find other memes that are like the not found one
-                probables = [key for key in self.memes if term in key.lower()]
+                probables = [key for key in self.memes if meme in key.lower()]
                 if len(probables) > 0:
                     await cxt.say("Didn't you mean `%s`?" % ','.join(probables))
                 else:
