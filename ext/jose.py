@@ -627,6 +627,8 @@ don't want (unless I'm skynet)")
             await cxt.say(":warning: %r" % e)
             return
 
-        res = os.system("cat José.log | tail -%d" % (linestoget))
+        cmd = "cat José.log | tail -%d" % (linestoget)
+        res = subprocess.check_output(cmd, shell=True, \
+            stderr=subprocess.STDOUT)
         await cxt.say("Last `%d` lines from José.log said: \n%s" % \
             (linestoget, self.codeblock("", res)))
