@@ -164,8 +164,12 @@ class JoseMemes(jcommon.Extension):
         if command == 'add':
             args_s = ' '.join(args[2:])
             args_sp = args_s.split(';')
-            meme = args_sp[0]
-            url = args_sp[1]
+            try:
+                meme = args_sp[0]
+                url = args_sp[1]
+            except IndexError:
+                await cxt.say("Error parsing arguments")
+                return
 
             if len(meme) > 96:
                 await cxt.say("*não tem meme grátis*")
