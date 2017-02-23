@@ -330,7 +330,7 @@ class JoseMemes(jcommon.Extension):
 
             i = 1
             for key in sorted(copy, key=lambda key: -copy[key]['uses'])[:10]:
-                stat += '%d. %s com %d usos\n' % (i, \
+                stat += '%d. %s used %d times\n' % (i, \
                     key, copy[key]['uses'])
                 i += 1
 
@@ -340,7 +340,7 @@ class JoseMemes(jcommon.Extension):
         elif command == 'istat':
             meme = ' '.join(args[2:])
             if meme in self.memes:
-                await cxt.say(self.codeblock('', 'usos: %d', (self.memes[meme]['uses'],)))
+                await cxt.say(self.codeblock('', 'uses: %d'), (self.memes[meme]['uses'],))
             else:
                 await cxt.say("%s: meme não encontrado", (meme,))
             return
