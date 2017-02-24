@@ -581,14 +581,17 @@ class JoseSpeak(jcommon.Extension):
         await self.c_speaktrigger(message, args, ecxt)
         generated_str = await ecxt.getall()
 
-        if args[1].startswith('bpm'):
-            bpmval = args[1][len('bpm'):]
-            try:
-                tempo_to_use = int(bpmval)
-            except ValueError:
-                await cxt.say("Sorry, but `%r` isn't a valid integer for BPM.", \
-                    (bpmval,))
-                return
+        try:
+            if args[1].startswith('bpm'):
+                bpmval = args[1][len('bpm'):]
+                try:
+                    tempo_to_use = int(bpmval)
+                except ValueError:
+                    await cxt.say("Sorry, but `%r` isn't a valid integer for BPM.", \
+                        (bpmval,))
+                    return
+        except IndexError:
+            pass
 
         if len(args) > 1:
             if tempo_to_use == 120:
