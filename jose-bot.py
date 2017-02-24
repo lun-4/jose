@@ -492,8 +492,8 @@ async def on_error(event, *args, **kwargs):
 async def main_task():
     global client
     startupdelta = time.time() - jose.start_time
-    jcommon.logger.info("took %.2f seconds on startup", startupdelta)
-    jcommon.logger.info("José Starting")
+    jcommon.logger.info("--- STARTUP TOOK %.2f SECONDS ---", startupdelta)
+    jcommon.logger.info("Starting Client")
     await client.start(jconfig.discord_token)
 
 def main():
@@ -505,8 +505,17 @@ def main():
     loop = asyncio.get_event_loop()
     try:
         loop.run_until_complete(main_task())
-    except:
-        # unload everything and logout
+    except KeyboardInterrupt:
+        jcommon.logger.info("received KeyboardInterrupt, exiting")
+
+        # unload normally
+        loop.run_until_complete(jose.unload_all())
+        loop.run_until_complete(client.logout())
+    except Exception as e:
+        jcommon.logger.error("Received Exception from main function, exiting")
+        jcommon.logger.error("This is the error: %s", traceback.format_exc())
+
+        # unload as always
         loop.run_until_complete(jose.unload_all())
         loop.run_until_complete(client.logout())
     finally:
@@ -514,7 +523,7 @@ def main():
 
     tr.print_diff()
 
-    jcommon.logger.info("Exit")
+    jcommon.logger.info("Exiting main function")
     logging.shutdown()
 
 if __name__ == '__main__':
