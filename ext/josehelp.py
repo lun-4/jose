@@ -18,7 +18,7 @@ class JoseExtension(jaux.Auxiliar):
         jaux.Auxiliar.__init__(self, cl)
         self.help = {}
 
-    def load_helpfiles():
+    def load_helpfiles(self):
         for file in MARKDOWN_HELP_FILES:
             with open(file, 'r') as f:
                 # do I really need to parse MARKDOWN, without libs?

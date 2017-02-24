@@ -176,8 +176,8 @@ def load_all_modules():
 async def do_event(event_name, **args):
     for handler in jose.event_tbl[event_name]:
         if isinstance(args[1], discord.Message):
-            cxt = jcommon.Context(client, message, time.time(), jose)
-            await handler(message, cxt)
+            cxt = jcommon.Context(client, args[1], time.time(), jose)
+            await handler(cxt.message, cxt)
         else:
             await handler(**args)
 
