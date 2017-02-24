@@ -3,8 +3,6 @@
 import sys
 sys.path.append("..")
 import jauxiliar as jaux
-import josecommon as jcommon
-
 import cmath as math
 
 JASM_VERSION = '0.2.1'

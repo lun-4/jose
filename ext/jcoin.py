@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import asyncio
 import sys
 sys.path.append("..")
 import jauxiliar as jaux
