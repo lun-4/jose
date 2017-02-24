@@ -11,7 +11,7 @@ MARKDOWN_HELP_FILES = [
     'doc/jcoin.md'
 ]
 
-class JoseExtension(jaux.Auxiliar):
+class JoseHelp(jaux.Auxiliar):
     def __init__(self, cl):
         jaux.Auxiliar.__init__(self, cl)
         self.help = {}
