@@ -25,8 +25,8 @@ class JoseHelp(jaux.Auxiliar):
                         data = [sp.strip() for sp in line.split('|')]
                         if len(data) == 4:
                             raw_cmd = data[0]
-                            c = cmd.find('`')
-                            a_cmd = cmd[c+1:cmd.find('`', c+1)]
+                            c = raw_cmd.find('`')
+                            a_cmd = raw_cmd[c+1:raw_cmd.find('`', c+1)]
                             a_cmd = a_cmd.split()
                             cmd = '`%s`' % (a_cmd[0])
                             desc = data[1]
