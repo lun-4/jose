@@ -55,21 +55,15 @@ class NewTexter:
     def __repr__(self):
         return 'Texter(refcount=%s)' % self.refcount
 
-    async def gen_sentence(self, word_limit):
+    async def gen_sentence(self, word_limit=None):
         if self.refcount <= 2:
             # max value refcount can be is 3
             self.refcount += 1
-
-        characters = round(5.5 * word_limit)
-        # limit it to 29
-        if characters < 29:
-            characters = 32
 
         res = None
         count = 0
         while res is None:
             if count > 3: break
-            logger.info("gen_sentence with %d characters", characters)
             res = self.text_model.make_sentence()
             count += 1
 
