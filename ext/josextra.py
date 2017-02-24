@@ -194,21 +194,6 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             else:
                 await cxt.say("%s: tópico não encontrado", (topic,))
 
-    async def mkresponse(self, message, fmt, phrases, cxt):
-        d = message.content.split(' ')
-        user_use = d[1]
-        response = random.choice(phrases)
-        await cxt.say(fmt.format(user_use, response))
-
-    async def c_xingar(self, message, args, cxt):
-        await self.mkresponse(message, '{}, {}', jcommon.xingamentos, cxt)
-
-    async def c_elogio(self, message, args, cxt):
-        await self.mkresponse(message, '{}, {}', jcommon.elogios, cxt)
-
-    async def c_cantada(self, message, args, cxt):
-        await self.mkresponse(message, 'Ei {}, {}', jcommon.cantadas, cxt)
-
     async def c_yt(self, message, args, cxt):
         '''`j!yt tunak tunak tun` - youtube searches'''
         if len(args) < 2:

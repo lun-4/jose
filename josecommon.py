@@ -245,45 +245,6 @@ async def jose_debug(message, dbg_msg, flag=True):
     if flag:
         await client.send_message(message.channel, "jdebug: {}".format(dbg_msg))
 
-cantadas = [
-    'ô lá em casa',
-    'vc é o feijão do meu acarajé',
-    'gate, teu cu tem air bag?? pq meu pau tá sem freio',
-    'se merda fosse beleza você estaria toda cagada',
-    'me chama de bombeiro e deixa eu apagar seu fogo com a minha mangueira',
-    'tô no hospital esperando uma doaçao de coração, pq vc roubou o meu',
-    'me chama de piraque e vamos pra minha casa',
-    'me chama de gorila e deixa eu te sarrar no ritmo do seu coração',
-    'meu nome é arlindo, mas pode me chamar de lindo pq perdi o ar quando te vi',
-    'me chama de lula e deixa eu roubar seu coração',
-    'espero que o seu dia seja tão bom quanto sua bunda',
-    'chama meu pau de Jean Willys e deixa ele cuspir na sua cara',
-    'deixe eu ser a bala do seu Hamilton e acertar seu coração',
-    'me chama de terrorista e deixa eu explodir dentro de você',
-    'me chama de lava jato e me deixa te taxar de tão linde',
-]
-
-elogios = [
-    "você é linde! <3",
-    "sabia que você pode ser alguém na vida?",
-    "eu acredito em você",
-    'vc é FODA',
-    'Parabéns',
-]
-
-xingamentos = [
-    "Tu fica na merda",
-    "Vai se fuder!",
-    "pq colocou man",
-    "MANO PQ",
-    "vsf",
-    "seu FILHO DA PUTA",
-    "se fosse eu não deixava",
-    "vai tomar no cu",
-    'CABALO IMUNDO',
-    'HIJO DE PUTA',
-]
-
 aviaos = [
     'https://www.aboutcar.com/car-advice/wp-content/uploads/2011/02/Spoiler.jpg',
     'http://i.imgur.com/eL2hUyd.jpg',

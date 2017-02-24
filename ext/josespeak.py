@@ -201,7 +201,7 @@ class JoseSpeak(jcommon.Extension):
             del sid_to_clear, t_start, time_taken_ms
 
     async def save_databases(self):
-        self.logger.info("Save josespeak database")
+        self.logger.info("savedb:speak")
         json.dump(self.wlengths, open(self.db_length_path, 'w'))
         json.dump(self.messages, open(self.db_msg_path, 'w'))
 
