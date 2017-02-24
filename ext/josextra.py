@@ -178,8 +178,7 @@ See the source at https://github.com/lkmnds/jose
 Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
 
     async def c_docs(self, message, args, cxt):
-        '''`j!docs <topic>` - Documentação do josé
-        `j!docs list` lista todos os tópicos disponíveis'''
+        '''`j!docs <topic>` - José's Documentation, use `j!docs list`'''
         if len(args) < 2:
             await cxt.say(self.c_docs.__doc__)
             return
@@ -211,7 +210,7 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
         await self.mkresponse(message, 'Ei {}, {}', jcommon.cantadas, cxt)
 
     async def c_yt(self, message, args, cxt):
-        '''`j!yt [termo 1] [termo 2]...` - procura no youtube'''
+        '''`j!yt tunak tunak tun` - youtube searches'''
         if len(args) < 2:
             await cxt.say(self.c_yt.__doc__)
             return
@@ -276,5 +275,5 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
                     await cxt.say(entity['permalink_url'])
                     return
 
-            await cxt.say("verifique sua pesquisa, porque nenhuma track foi encontrada.")
+            await cxt.say("No results found")
             return

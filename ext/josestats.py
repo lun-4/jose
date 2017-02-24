@@ -47,7 +47,7 @@ class JoseStats(jaux.Auxiliar):
         self.cbk_new('jstats.savedb', self.savedb, 180)
 
     async def savedb(self):
-        self.logger.info("Saving statistics database")
+        self.logger.info("savedb:stats")
         json.dump(self.statistics, open(self.db_stats_path, 'w'))
 
     async def ext_load(self):
@@ -178,7 +178,7 @@ https://github.com/lkmnds/jose/blob/master/doc/queries-pt.md'''
             response = "\n".join(": ".join(_) + "KB" for _ in sizes.items())
         elif querytype == 'this':
             if message.server.id is None:
-                await cxt.say("`!query this` not available for DMs")
+                await cxt.say("`j!query this` not available for DMs")
                 return
 
             sid = message.server.id
@@ -206,8 +206,21 @@ https://github.com/lkmnds/jose/blob/master/doc/queries-pt.md'''
             sorted_gcmd = sorted(g_cmd.items(), \
                 key=operator.itemgetter(1), reverse=True)
 
-            response = '\n'.join(['%s - %d vezes' % \
+            response = '\n'.join(['%s - %d times' % \
                 (x, y) for (x, y) in sorted_gcmd[:10]])
+        elif querytype == 'ltopcmd':
+            if message.server.id is None:
+                await cxt.say("`j!query ltopcmd` not available for DMs")
+                return
+
+            sid = message.server.id
+            sdb = self.statistics[sid]
+            sorted_gcmd = sorted(sdb['commands'].items(), \
+                key=operator.itemgetter(1))
+
+            response = '\n'.join(['%s - %d times' % \
+                (x, y) for (x, y) in sorted_gcmd[:10]])
+
         else:
             await cxt.say("Query type not found")
             return
