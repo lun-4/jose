@@ -22,17 +22,18 @@ class JoseHelp(jaux.Auxiliar):
                 # do I really need to parse MARKDOWN, without libs?
                 for line in f.readlines():
                     if line.find('|'):
-                        data = line.split('|')
-                        cmd = data[0].strip()
-                        desc = data[1].strip()
-                        examples = data[2].strip()
-                        aliases = data[3].strip()
+                        data = [sp.strip() for sp in line.split('|')]
+                        if len(data) == 4:
+                            cmd = data[0]
+                            desc = data[1]
+                            examples = data[2]
+                            aliases = data[3]
 
-                        self.help[cmd] = {
-                            'description': desc,
-                            'examples': examples,
-                            'aliases': aliases
-                        }
+                            self.help[cmd] = {
+                                'description': desc,
+                                'examples': examples,
+                                'aliases': aliases
+                            }
 
     async def ext_load(self):
         self.load_helpfiles()

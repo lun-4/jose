@@ -171,7 +171,7 @@ class JoseBot(jcommon.Extension):
                 else:
                     return instance
             except Exception as e:
-                self.logger.warn("Almost loaded %s: %s", name, repr(e))
+                self.logger.warn("Almost loaded %s", name, exc_info=True)
                 return False
 
     async def register_mod(self, name, class_name, module, instance):
