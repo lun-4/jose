@@ -6,7 +6,10 @@ import sys
 sys.path.append("..")
 import jauxiliar as jaux
 
-MARKDOWN_HELP_FILES = ['cmd/listcmd.md']
+MARKDOWN_HELP_FILES = [
+    'doc/cmd/listcmd.md',
+    'doc/josespeak.md',
+]
 
 class JoseExtension(jaux.Auxiliar):
     def __init__(self, cl):
