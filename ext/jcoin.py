@@ -5,7 +5,8 @@ sys.path.append("..")
 import jauxiliar as jaux
 import josecommon as jcommon
 import decimal
-from random import SystemRandom()
+
+from random import SystemRandom
 random = SystemRandom()
 
 class JoseCoin(jaux.Auxiliar):
@@ -57,16 +58,14 @@ class JoseCoin(jaux.Auxiliar):
             return
 
         amount = random.choice(jcommon.JC_REWARDS)
-        acc_to = josecoin.get(author_id)[1]
-
         if amount != 0:
-            res = self.jcoin.transfer(josecoin.jose_id, author_id,\
-                amount, josecoin.LEDGER_PATH)
+            res = self.jcoin.transfer(self.jcoin.jose_id, author_id, \
+                amount, self.jcoin.LEDGER_PATH)
 
             if res[0]:
                 # delay because ratelimits???? need to study that
                 await asyncio.sleep(0.5)
-                await client.add_reaction(message, '💰')
+                await self.client.add_reaction(message, '💰')
             else:
                 jcommon.logger.error("do_josecoin->jc->err: %s", res[1])
                 await cxt.say("jc->err: %s", (res[1],))
