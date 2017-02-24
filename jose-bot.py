@@ -10,6 +10,7 @@ import time
 import re
 import traceback
 import logging
+import inspect
 from random import SystemRandom
 random = SystemRandom()
 
@@ -20,7 +21,6 @@ import ext.jose as jose_bot
 import jcoin.josecoin as josecoin
 import joseconfig as jconfig
 import joseerror as je
-from inspect import signature
 
 logging.basicConfig(level=logging.INFO)
 
@@ -33,13 +33,6 @@ jcommon.set_client(client) # to jcommon
 # initialize jose instance
 jose = jose_bot.JoseBot(client)
 env = jose.env
-
-GAMBLING_LAST_BID = 0.0
-
-# JASM enviroment
-jasm_env = {}
-
-help_josecoin = jcommon.make_func(josecoin.JOSECOIN_HELP_TEXT)
 
 async def jcoin_control(id_user, amnt):
     '''
@@ -157,6 +150,7 @@ def load_module(n, n_cl):
 def load_all_modules():
     # essential stuff
     load_module('joselang', 'JoseLanguage')
+    load_module('josehelp', 'JoseHelp')
     load_module('josespeak', 'JoseSpeak')
     load_module('josestats', 'JoseStats')
     load_module('josemagicword', 'JoseMagicWord')
@@ -292,7 +286,7 @@ async def do_command(method, message, args, cxt, t_start, st):
     # but first, repeat the recv steps
     await jose.mod_recv(message)
     try:
-        sig = signature(jose_method)
+        sig = inspect.signature(jose_method)
         # if function can receive the Context, do it
         # else just do it normally
         if len(sig.parameters) == 3:
