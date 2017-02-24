@@ -544,7 +544,7 @@ class JoseSpeak(jcommon.Extension):
 
         await cxt.send_typing()
         ecxt = jcommon.EmptyContext(self.client, message)
-        await self.c_speaktrigger(message, args, ecxt)
+        await self.c_speaktrigger(message, [], ecxt)
         res = await ecxt.getall()
         await cxt.say("<@127296623779774464> wormhole send %s", (res,))
 
@@ -556,7 +556,7 @@ class JoseSpeak(jcommon.Extension):
 
         await cxt.send_typing()
         ecxt = jcommon.EmptyContext(self.client, message)
-        await self.c_speaktrigger(message, args, ecxt)
+        await self.c_speaktrigger(message, [], ecxt)
         res = await ecxt.getall()
         await cxt.say("^%s", (res,))
 
@@ -578,7 +578,7 @@ class JoseSpeak(jcommon.Extension):
         tempo_to_use = 120
 
         ecxt = jcommon.EmptyContext(self.client, message)
-        await self.c_speaktrigger(message, args, ecxt)
+        await self.c_speaktrigger(message, [], ecxt)
         generated_str = await ecxt.getall()
 
         try:
@@ -621,14 +621,10 @@ class JoseSpeak(jcommon.Extension):
                 # get letter after the letter
                 try:
                     modifier = res[index + 1]
-                    if modifier == " ":
-                        duration = 2
-                    elif modifier == ",":
-                        duration = 3
-                    elif modifier == ".":
-                        duration = 4
-                    else:
-                        duration = 1
+                    if modifier == " ": duration = 2
+                    elif modifier == ",": duration = 3
+                    elif modifier == ".": duration = 4
+                    else: duration = 1
                 except IndexError:
                     duration = 1
 
