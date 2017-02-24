@@ -63,10 +63,9 @@ class joseXtra(jaux.Auxiliar):
         self.msgcount += 1
 
     async def c_xkcd(self, message, args, cxt):
-        '''`j!xkcd` - procura tirinhas do XKCD
-        `j!xkcd` - mostra a tirinha mais recente
-        `j!xkcd [num]` - mostra a tirinha de número `num`
-        `j!xkcd rand` - tirinha aleatória
+        '''`j!xkcd` - latest xkcd
+        `j!xkcd [num]` - xkcd number `num`
+        `j!xkcd rand` - random xkcd
         '''
         n = False
         if len(args) > 1:
@@ -107,6 +106,7 @@ class joseXtra(jaux.Auxiliar):
         await cxt.say("nao")
 
     async def c_report(self, message, args, cxt):
+        '''`j!report` - show important stuff'''
         res = []
 
         # get memory usage
@@ -124,14 +124,19 @@ class joseXtra(jaux.Auxiliar):
         # num of users
         res.append("Members: %s" % len(list(self.client.get_all_members())))
 
+        members = [m for m in self.client.get_all_members() if not m.bot]
+
         # num of actual numbers that aren't bots
-        res.append("Users: %s" % len([m for m in \
-            self.client.get_all_members() if not m.bot]))
+        res.append("Users: %s" % len(members))
+
+        # unique users
+        res.append("Unique Users: %s" % len(set(members)))
 
         await cxt.say(self.codeblock("", '\n'.join(res)))
 
     async def c_status(self, message, args, cxt):
-        # ping discordapp one time
+        '''`j!status` get josé's status to some servers'''
+        await self.is_admin(message.author.id)
 
         msg = await self.client.send_message(message.channel, "Status:")
 

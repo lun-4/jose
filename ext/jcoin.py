@@ -43,8 +43,8 @@ class JoseCoin(jaux.Auxiliar):
             await self.josecoin_save(message, False)
             self.counter = 0
 
-    async def c_saldo(self, message, args, cxt):
-        '''`j!saldo [@mention]` - your wallet(or other person's wallet)'''
+    async def c_wallet(self, message, args, cxt):
+        '''`j!wallet [@mention]` - your wallet(or other person's wallet)'''
         args = message.content.split(' ')
 
         id_check = None
@@ -60,8 +60,8 @@ class JoseCoin(jaux.Auxiliar):
         else:
             await cxt.say('account not found(`id:%s`)' % (id_check))
 
-    async def c_conta(self, message, args, cxt):
-        '''`j!conta` - create a new JoséCoin account'''
+    async def c_account(self, message, args, cxt):
+        '''`j!account` - create a new JoséCoin account'''
         self.logger.info("new jc account, id = %s" % message.author.id)
 
         res = self.jcoin.new_acc(message.author.id, str(message.author))
@@ -93,8 +93,8 @@ class JoseCoin(jaux.Auxiliar):
         self.logger.info("%s Wrote %.2fJC to Account %s" % \
             (str(message.author), new_amount, id_from))
 
-    async def c_enviar(self, message, args, cxt):
-        '''`j!enviar @mention quantidade` - envia JCoins para uma conta'''
+    async def c_jcsend(self, message, args, cxt):
+        '''`j!jcsend @mention amount` - send JoséCoins to someone'''
 
         if len(args) != 3:
             await cxt.say(self.c_enviar.__doc__)
@@ -122,6 +122,7 @@ class JoseCoin(jaux.Auxiliar):
             await cxt.say('jc_err: `%s`' % res[1])
 
     async def c_ltop10(self, message, args, cxt):
+        '''`j!ltop10` - local top 10 people who have high josecoins'''
         if message.server is None:
             await cxt.say("You're not in a server, dummy!")
             return
