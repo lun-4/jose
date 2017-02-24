@@ -6,11 +6,9 @@ sys.path.append("..")
 import josecommon as jcommon
 
 import os
-import re
 import random
 import subprocess
 import json
-import io
 import time
 from midiutil.MidiFile import MIDIFile
 import markovify
@@ -18,26 +16,6 @@ import markovify
 logger = None
 MESSAGE_LIMIT = 10000 # 10k messages
 LETTER_TO_PITCH = jcommon.LETTER_TO_PITCH
-
-def fix_caps(word):
-    if word.isupper() and (word != "I" or word != "Eu"):
-        word = word.lower()
-    elif word[0].isupper():
-        word = word.lower().capitalize()
-    else:
-        word = word.lower()
-    return word
-
-def toHashKey(lst):
-    return tuple(lst)
-
-def wordlist(filename, file_object=None):
-    if file_object is None:
-        file_object = open(filename, 'r')
-
-    wordlist = [fix_caps(w) for w in re.findall(r"[\w']+|[.,!?;]", file_object.read())]
-    file_object.close()
-    return wordlist
 
 async def make_texter(textpath=None, markov_length=2, text=None):
     t = NewTexter(textpath, markov_length, text)
@@ -99,123 +77,6 @@ class NewTexter:
 
     async def clear(self):
         del self.text_model
-
-class Texter:
-    def __init__(self, textpath, markov_length, text=None):
-        self.tempMapping = {}
-        self.mapping = {}
-        self.starts = []
-        self.refcount = 1
-
-        t_start = time.time()
-
-        if textpath is None:
-            text_object = io.StringIO(text)
-            self.build_mapping(wordlist(None, text_object), markov_length)
-        else:
-            self.build_mapping(wordlist(textpath), markov_length)
-
-        t_taken = (time.time() - t_start) * 1000
-        if logger:
-            logger.info("Texter: build_mapping took %.2fms" % t_taken)
-        else:
-            print("Texter: build_mapping took %.2fms" % t_taken)
-
-    def __repr__(self):
-        return 'Texter(refcount=%d)' % self.refcount
-
-    def add_temp_mapping(self, history, word):
-        while len(history) > 0:
-            first = toHashKey(history)
-            if first in self.tempMapping:
-                if word in self.tempMapping[first]:
-                    self.tempMapping[first][word] += 1.0
-                else:
-                    self.tempMapping[first][word] = 1.0
-            else:
-                self.tempMapping[first] = {}
-                self.tempMapping[first][word] = 1.0
-            history = history[1:]
-
-    def build_mapping(self, wordlist, markovLength):
-        self.starts.append(wordlist[0])
-        for i in range(1, len(wordlist) - 1):
-            if i <= markovLength:
-                history = wordlist[: i + 1]
-            else:
-                history = wordlist[i - markovLength + 1 : i + 1]
-            follow = wordlist[i + 1]
-            # if the last elt was a period, add the next word to the start list
-            if history[-1] == "." and follow not in ".,!?;":
-                self.starts.append(follow)
-            self.add_temp_mapping(history, follow)
-
-        # Normalize the values in tempMapping, put them into mapping
-        for first, followset in self.tempMapping.items():
-            total = sum(followset.values())
-            # Normalizing here:
-            self.mapping[first] = dict([(k, v / total) for k, v in followset.items()])
-
-    def next_word(self, prevList):
-        sum = 0.0
-        retval = ""
-        index = random.random()
-        # Shorten prevList until it's in mapping
-        while toHashKey(prevList) not in self.mapping:
-            if len(prevList) == 0:
-                if logger:
-                    logger.error("Texter.next_word: len(prevList) == 0")
-                else:
-                    print("Texter.next_word: len(prevList) == 0")
-                return None
-            else:
-                prevList.pop(0)
-
-        # Get a random word from the mapping, given prevList
-        for k, v in self.mapping[toHashKey(prevList)].items():
-            sum += v
-            if sum >= index and retval == "":
-                retval = k
-
-        return retval
-
-    async def gen_sentence(self, markovLength, word_limit):
-        # Start with a random "starting word"
-        curr = random.choice(self.starts)
-        sent = curr.capitalize()
-        prevList = [curr]
-        word_count = 0
-        # Keep adding words until we hit a period
-        while (curr not in "."):
-            if word_count > word_limit:
-                break
-            curr = self.next_word(prevList)
-
-            if curr is None:
-                # fallback behavior
-                return 'None'
-
-            prevList.append(curr)
-
-            # if the prevList has gotten too long, trim it
-            if len(prevList) > markovLength:
-                prevList.pop(0)
-
-            if (curr not in ".,!?;"):
-                sent += " " # Add spaces between words (but not punctuation)
-
-            sent += curr
-            word_count += 1
-
-        if self.refcount <= 2:
-            # max value refcount can be is 3
-            self.refcount += 1
-
-        return sent
-
-    async def clear(self):
-        # clear the stuff, or at least signal Python to remove them
-        del self.tempMapping, self.mapping, self.starts
 
 class JoseSpeak(jcommon.Extension):
     def __init__(self, cl):
