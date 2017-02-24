@@ -34,81 +34,6 @@ jcommon.set_client(client) # to jcommon
 jose = jose_bot.JoseBot(client)
 env = jose.env
 
-async def jcoin_control(id_user, amnt):
-    '''
-    returns True if user can access
-    '''
-    return josecoin.transfer(id_user, josecoin.jose_id, \
-        amnt, josecoin.LEDGER_PATH)
-
-def sanitize_data(data):
-    data = re.sub(r'<@!?([0-9]+)>', '', data)
-    data = re.sub(r'<#!?([0-9]+)>', '', data)
-    data = re.sub(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', '', data)
-    data = data.replace("@jose-bot", '')
-    return data
-
-async def add_sentence(content, author):
-    data = content
-    sd = sanitize_data(data)
-    jcommon.logger.debug("write %r from %s" % (sd, author))
-    if len(sd.strip()) > 1:
-        with open('jose-data.txt', 'a') as f:
-            f.write(sd+'\n')
-    else:
-        jcommon.logger.debug("add_sentence: ignoring len(sd.strip) < 1")
-
-async def learn_data(message):
-    res = await jcoin_control(message.author.id, jcommon.LEARN_PRICE)
-    if not res[0]:
-        await client.send_message(message.channel,
-            "PermError: %s" % res[1])
-        raise je.PermissionError()
-
-    auth = await jcommon.check_roles(jcommon.LEARN_ROLE, message.author.roles)
-    if not auth:
-        await client.send_message(message.channel,
-            "JCError: usuário não autorizado a usar o !learn")
-        raise je.PermissionError()
-
-    args = message.content.split(' ')
-    data_to_learn = ' '.join(args[1:])
-    await add_sentence(data_to_learn, message.author)
-    feedback = 'texto inserido no jose-data.txt!\n'
-
-    # quick'n'easy solution
-    line_count = data_to_learn.count('\n')
-    word_count = data_to_learn.count(' ')
-    byte_count = len(data_to_learn)
-    feedback += "%d linhas, %d palavras e %d bytes foram inseridos\n" % (line_count, word_count, byte_count)
-    await jose.say(feedback)
-    return
-
-async def show_price(message):
-    res = ''
-
-    for k in jcommon.PRICE_TABLE:
-        d = jcommon.PRICE_TABLE[k]
-        res += "%r: %s > %.2f\n" % (k, d[0], d[1])
-
-    await jose.say(res)
-    return
-
-show_pior_bot = jcommon.make_func("me tree :christmas_tree: me spam :christmas_tree: no oxygen :christmas_tree:  if ban\n" * 4)
-
-exact_commands = {
-    'melhor bot': jcommon.show_shit,
-    'pior bot': show_pior_bot,
-}
-
-commands_start = {
-    'learn': learn_data,
-    'ahelp': jcommon.show_gambling_full,
-    'adummy': jcommon.show_gambling,
-    'awoo': jcommon.make_func("https://cdn.discordapp.com/attachments/202055538773721099/257717450135568394/awooo.gif"),
-    'price': show_price,
-}
-
 commands_match = {
     'baladinha top':    jcommon.show_top,
     'que tampa':        jcommon.show_tampa,
@@ -129,14 +54,6 @@ commands_match = {
 }
 
 counter = 0
-
-def from_dict(f):
-    async def a(m, args):
-        await f(m)
-    return a
-
-for cmd in commands_start:
-    setattr(jose, 'c_%s' % cmd, from_dict(commands_start[cmd]))
 
 def load_module(n, n_cl):
     t_start = time.time()
@@ -201,11 +118,6 @@ async def check_message(message):
     return True
 
 async def do_command_table(message):
-    if message.content in exact_commands:
-        func = exact_commands[message.content]
-        await func(message)
-        return True
-
     for command in commands_match:
         if command in message.content:
             func = commands_match[command]

@@ -167,3 +167,9 @@ class JoseGambling(jcommon.Extension):
             await cxt.say("http://i.imgur.com/oPc1siM.jpg") # coroa
         else:
             await cxt.say("http://i.imgur.com/u4Gem8A.png") # empate
+
+    async def c_adummy(self, message, args, cxt):
+        await cxt.say(jcommon.GAMBLING_HELP_TEXT_SMALL)
+
+    async def c_ahelp(self, message, args, cxt):
+        await cxt.say(jcommon.GAMBLING_HELP_TEXT)

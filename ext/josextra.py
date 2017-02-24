@@ -105,6 +105,10 @@ class joseXtra(jaux.Auxiliar):
     async def c_loteria(self, message, args, cxt):
         await cxt.say("nao")
 
+    async def c_awoo(self, message, args, cxt):
+        await cxt.say("https://cdn.discordapp.com/attachments/\
+202055538773721099/257717450135568394/awooo.gif")
+
     async def c_report(self, message, args, cxt):
         '''`j!report` - show important stuff'''
         res = []

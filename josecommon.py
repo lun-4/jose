@@ -258,12 +258,6 @@ aviaos = [
     'http://i.imgur.com/AIbjvX7.jpg',
 ]
 
-async def show_gambling_full(message):
-    await client.send_message(message.author, GAMBLING_HELP_TEXT)
-
-async def show_gambling(message):
-    await client.send_message(message.author, GAMBLING_HELP_TEXT_SMALL)
-
 async def show_top(message):
     await client.send_message(message.channel, "BALADINHA TOPPER %s %s" % (
         (":joy:" * random.randint(1,5)),
