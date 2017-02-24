@@ -5,6 +5,8 @@ sys.path.append("..")
 import jauxiliar as jaux
 import josecommon as jcommon
 import decimal
+from random import SystemRandom()
+random = SystemRandom()
 
 class JoseCoin(jaux.Auxiliar):
     def __init__(self, cl):
@@ -42,6 +44,32 @@ class JoseCoin(jaux.Auxiliar):
         if self.counter > 11:
             await self.josecoin_save(message, False)
             self.counter = 0
+
+    async def e_on_message(self, message, cxt):
+        if random.random() > jcommon.jc_probabiblity:
+            return
+
+        if message.channel.is_private:
+            return
+
+        author_id = str(message.author.id)
+        if author_id not in self.jcoin.data:
+            return
+
+        amount = random.choice(jcommon.JC_REWARDS)
+        acc_to = josecoin.get(author_id)[1]
+
+        if amount != 0:
+            res = self.jcoin.transfer(josecoin.jose_id, author_id,\
+                amount, josecoin.LEDGER_PATH)
+
+            if res[0]:
+                # delay because ratelimits???? need to study that
+                await asyncio.sleep(0.5)
+                await client.add_reaction(message, '💰')
+            else:
+                jcommon.logger.error("do_josecoin->jc->err: %s", res[1])
+                await cxt.say("jc->err: %s", (res[1],))
 
     async def c_wallet(self, message, args, cxt):
         '''`j!wallet [@mention]` - your wallet(or other person's wallet)'''

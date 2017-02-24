@@ -214,36 +214,6 @@ async def do_command_table(message):
 
     return False
 
-async def do_josecoin(message, t_start):
-    if random.random() < jcommon.jc_probabiblity:
-        if not message.channel.is_private:
-
-            # only if author has account
-            if str(message.author.id) in josecoin.data:
-                cxt = jcommon.Context(client, message, t_start, jose)
-
-                author_id = str(message.author.id)
-                amount = random.choice(jcommon.JC_REWARDS)
-                acc_to = josecoin.get(author_id)[1]
-
-                if amount != 0:
-                    res = josecoin.transfer(josecoin.jose_id, author_id,\
-                        amount, josecoin.LEDGER_PATH)
-                    if res[0]:
-                        emoji_res = await jcommon.random_emoji(3)
-                        if message.server.id == "271378126234320897":
-                            await cxt.say('%s %.2fJC > %s' % (emoji_res, \
-                                amount, acc_to['name']))
-
-                        # delay because ratelimits
-                        await asyncio.sleep(0.4)
-                        await client.add_reaction(message, '💰')
-                    else:
-                        jcommon.logger.error("do_josecoin->jc->err: %s", res[1])
-                        await cxt.say("jc->err: %s", (res[1],))
-        else:
-            return True
-
 async def do_docstring(message, args, cxt, command):
     # load helptext
     cmd_ht = 'docstring'
@@ -419,10 +389,6 @@ async def on_message(message):
 
     # handle e_on_message
     await do_event('on_message', message)
-
-    jcstop = await do_josecoin(message, t_start)
-    if jcstop:
-        return
 
     await jcommon.gorila_routine(message.channel)
 
