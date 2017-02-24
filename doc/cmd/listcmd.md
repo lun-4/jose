@@ -8,21 +8,12 @@ Command | Description | Example | Alias
 `j!info`       | Shows Info | |
 `j!ping`       | Pings José | `j!ping` |
 `j!rand min max` | Generates a Random Number from `min` to `max` | `j!rand 0 10` |
-`j!money quantity base to` | Converts currency, use `j!money list` to see available currencies | `j!money 1 AUD USD` |
-`j!yt search_terms` | Search YouTube | `j!yt Tunak Tunak Tun sped up every time they say Tunak` |
-`j!sndc search_terms` | Search Soundcloud | `j!sndc Tunak Tunak Tun` |
-`j!fullwidth text` | Makes a text ｆｕｌｌｗｉｄｔｈ | `j!fw hello world` | `j!fw`
 `j!escolha a;b;c` | Chooses between any amount of choices | `j!escolha A;B;C` | `j!pick`
 `j!version` | Shows José version | |
 `j!modlist` | Shows all loaded modules | |
 `j!clist` | List commands that a module creates | |
+`j!report` | Makes a report on some stuff | |
 `j!uptime` | Shows uptime | | |
-
-### `josedatamosh`
-
-Command | Description | Example | Alias
-------------- | ------------- | ------------- | -------------
-`j!datamosh url` | Datamoshes a file | `j!datamosh https://discordapp.com/api/users/202587271679967232/avatars/93ac51b863fde7c38578693947dab6bc.jpg` |
 
 ### `joselang`
 
@@ -39,8 +30,10 @@ Command | Description | Example | Alias
 
 Command | Description | Example | Alias
 ------------- | ------------- | ------------- | -------------
-| `j!wolframalpha terms` | Sends a request to [WolframAlpha](http://wolframalpha.com/) | `j!wolframalpha average dick size` | `j!wa` |
-| `j!temperature location` | Requests current temperature of a place using [OpenWeatherMap](openweathermap.org) | `j!temperature Sydney, Australia` | `j!temp`, `j!therm` |
+`j!wolframalpha terms` | Sends a request to [WolframAlpha](http://wolframalpha.com/) | `j!wolframalpha average dick size` | `j!wa`
+`j!temperature location` | Requests current temperature of a place using [OpenWeatherMap](openweathermap.org) | `j!temperature Sydney, Australia` | `j!temp`, `j!therm`
+`j!money quantity base to` | Converts currency, use `j!money list` to see available currencies | `j!money 1 AUD USD` |
+`j!roll <amount>d<sides>` | Rolls `amount` dice of `sides` sides | `j!roll 20d6` |
 
 ### `josememes`
 
@@ -53,6 +46,9 @@ Command | Description | Example | Alias
 `j!blackmiror` | SHOWS VERY BLACK MIRROR STUFF | |
 `j!wiki search_terms` | Searches Wikipedia | `j!wiki Discord (software)` |
 `j!deswiki search_terms` | Searches desciclopédia | `j!deswiki Pinto` |
+`j!8ball stuff` | Asks 8ball. | `j!8ball Is the universe going to die?` |
+`j!fullwidth text` | Makes a text ｆｕｌｌｗｉｄｔｈ | `j!fw hello world` | `j!fw`
+`j!ri text` | Converts text to *Regional Indicators* | `j!ri hello world` |
 
 ### `josespeak`
 
@@ -70,4 +66,33 @@ Command | Description | Example | Alias
 `j!tm text` | Transform a Text In A Trademark™ | `j!tm Hell` |
 `j!status` | Status of josé, with results from pings to Discord and Google | |
 `j!report` | José Report | |
-`j!docs [topic]` | Shows documentation for josé | |
+`j!docs [topic | "list"]` | Shows documentation for josé | |
+`j!yt search_terms` | Search YouTube | `j!yt Tunak Tunak Tun sped up every time they say Tunak` |
+`j!sndc search_terms` | Search Soundcloud | `j!sndc Tunak Tunak Tun` |
+
+### `jcoin`
+
+[Documentation for JoséCoin](https://github.com/lkmnds/jose/blob/master/doc/jcoin.md)
+
+### `joseimages`
+
+Some commands in `joseimages` have special syntax:
+ * `-latest` gets the latest post from an image board
+ * `-random` gets a random post from an image board
+
+Command | Description | Example | Alias
+------------- | ------------- | ------------- | -------------
+`j!hypno tags` | Searches *HypnoHub* | |
+`j!e621 tags` | Searches *e621* | |
+`j!yandere tags` | Searches *yande.re* | |
+`j!derpibooru tags` | Searches *Derpibooru* | |
+`j!urban stuff` | Searches the Urban Dictionary | `j!urban kys` |
+
+### `josedatamosh`
+
+Command | Description | Example | Alias
+------------- | ------------- | ------------- | -------------
+`j!datamosh url` | Datamoshes a file | `j!datamosh https://discordapp.com/api/users/202587271679967232/avatars/93ac51b863fde7c38578693947dab6bc.jpg` |
+
+### `josegambling`
+# TODO THIS
