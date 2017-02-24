@@ -8,6 +8,7 @@ import jauxiliar as jaux
 
 MARKDOWN_HELP_FILES = [
     'doc/cmd/listcmd.md',
+    'doc/cmd/admin.md',
     'doc/josespeak.md',
 ]
 
