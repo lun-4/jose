@@ -7,7 +7,6 @@ asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 from pympler import tracker
 
 import time
-import re
 import traceback
 import logging
 import inspect
@@ -158,13 +157,12 @@ async def do_command(method, message, args, cxt, t_start, st):
 
     del t_start
 
-    end = time.time()
-    delta = end - st
-    if delta > 13:
-        jcommon.logger.warning("Something is takind longer than expected, delta=%.4fs", delta)
+    delta = time.time() - st
+    if delta > 10:
+        jcommon.logger.warning("HIGH DELTA OF COMMAND PROCESSING: %.4fs", delta)
 
     # signal python to clean this shit
-    del delta, st, end, jose_method
+    del delta, st, jose_method
 
     # kthxbye
     return

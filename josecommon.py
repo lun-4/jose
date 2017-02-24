@@ -452,7 +452,6 @@ class Extension:
         from this class.
         '''
         self.client = cl
-        self.current = None
         self.loop = cl.loop
         self.logger = logger
         self._callbacks = {}
@@ -461,25 +460,22 @@ class Extension:
     async def say(self, msg, channel=None):
         logger.warning("Extension.say: DEPRECATED API: %s", msg)
 
-    async def debug(self, msg, flag=True):
-        await jose_debug(self.current, msg, flag)
-
-    async def rolecheck(self, correct_role):
-        c = [role.name == correct_role for role in self.current.author.roles]
+    async def rolecheck(self, cxt, correct_role):
+        c = [role.name == correct_role for role in cxt.message.author.roles]
         if not (True in c):
             raise je.PermissionError()
         else:
             return True
 
-    async def is_admin(self, id):
-        if id in ADMIN_IDS:
+    async def is_admin(self, uid):
+        if uid in ADMIN_IDS:
             return True
         else:
             raise je.PermissionError()
 
-    async def brolecheck(self, correct_role):
+    async def brolecheck(self, cxt, correct_role):
         try:
-            return (await self.rolecheck(correct_role))
+            return (await self.rolecheck(cxt, correct_role))
         except je.PermissionError:
             return False
 
@@ -491,9 +487,6 @@ class Extension:
 
     def noasync(self, func, args):
         return asyncio.ensure_future(func(*args), loop=self.loop)
-
-    def is_owner(self):
-        return self.current.id in ADMIN_IDS
 
     def cbk_new(self, callback_id, func, timer_sec):
         logger.info("New callback %s every %d seconds", callback_id, timer_sec)

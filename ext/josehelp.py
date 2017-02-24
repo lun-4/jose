@@ -87,7 +87,7 @@ class JoseHelp(jaux.Auxiliar):
             pass
 
         if cmd_ht == 'docstring':
-            await cxt.say(help_helptext)
+            await cxt.say(self.c_docstring.__doc__)
             return
 
         cmd_method = getattr(cxt.jose, 'c_%s' % cmd_ht, None)
