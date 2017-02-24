@@ -263,15 +263,6 @@ class JoseBot(jcommon.Extension):
             except:
                 sys.exit(0)
 
-    async def mod_recv(self, message):
-        await self.recv(message)
-        for module in list(self.modules.values()):
-            if getattr(module['inst'], 'recv', False):
-                await module['inst'].recv(message)
-            else:
-                jcommon.logger.warning("%s doesn't implement recv method",
-                    module['class'])
-
     async def c_reload(self, message, args, cxt):
         '''`j!reload module` - recarrega um módulo do josé'''
         await self.is_admin(message.author.id)

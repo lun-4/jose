@@ -343,13 +343,6 @@ def speak_filter(message):
                     if ending_tag == -1:
                         raise Exception("ending_tag == -1, wtf?")
                     i += ending_tag + 1
-        elif char == ';':
-            if i+1 < len(message):
-                if message[i+1] == ';':
-                    i += len(message)
-        elif char == '!' and i == 0:
-            #jose command, skip it
-            i += len(message)
         else:
             filtered_message += char
         i += 1
@@ -358,7 +351,7 @@ def speak_filter(message):
 
 # Callbacks
 
-# one table to have the relationship ID => Function
+# one table relationing callback ID to its function
 callbacks = {}
 
 class Callback:
@@ -466,20 +459,10 @@ class Extension:
         self.dbapi = DatabaseAPI(self.client)
 
     async def say(self, msg, channel=None):
-        if channel is None:
-            channel = self.current.channel
-
-        if len(msg) > 2000:
-            await self.client.send_message(channel, ":elephant: Mensagem muito grande :elephant:")
-        else:
-            logger.warning("Extension.say: DEPRECATED API: %s", msg)
-            await self.client.send_message(channel, ":warning: This message is using a deprecated API!! :warning:")
+        logger.warning("Extension.say: DEPRECATED API: %s", msg)
 
     async def debug(self, msg, flag=True):
         await jose_debug(self.current, msg, flag)
-
-    async def recv(self, msg):
-        self.current = msg
 
     async def rolecheck(self, correct_role):
         c = [role.name == correct_role for role in self.current.author.roles]

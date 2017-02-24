@@ -133,8 +133,6 @@ async def do_command(method, message, args, cxt, t_start, st):
     except AttributeError:
         return
 
-    # but first, repeat the recv steps
-    await jose.mod_recv(message)
     try:
         sig = inspect.signature(jose_method)
         # if function can receive the Context, do it
