@@ -173,10 +173,10 @@ def load_all_modules():
     jose.ev_empty()
     jose.ev_load(True)
 
-async def do_event(event_name, **args):
+async def do_event(event_name, args):
     for handler in jose.event_tbl[event_name]:
-        if isinstance(args[1], discord.Message):
-            cxt = jcommon.Context(client, args[1], time.time(), jose)
+        if isinstance(args[0], discord.Message):
+            cxt = jcommon.Context(client, args[0], time.time(), jose)
             await handler(cxt.message, cxt)
         else:
             await handler(**args)
@@ -348,7 +348,7 @@ async def on_message(message):
     await jose.recv(message) # at least
 
     # any_message event
-    await do_event('any_message', message)
+    await do_event('any_message', [message])
 
     # get command and push it to jose
     if message.content.startswith(jcommon.JOSE_PREFIX):
@@ -388,7 +388,7 @@ async def on_message(message):
             f.write('%s\n' % jcommon.speak_filter(message.content))
 
     # handle e_on_message
-    await do_event('on_message', message)
+    await do_event('on_message', [message])
 
     await jcommon.gorila_routine(message.channel)
 
@@ -425,7 +425,7 @@ async def on_ready():
     jcommon.logger.info("josé ready, name = %s, id = %s", client.user.name, client.user.id)
     print('='*25)
 
-    await do_event('client_ready', client)
+    await do_event('client_ready', [client])
     await timer_playing()
     t_allowed = False
 
@@ -433,7 +433,7 @@ async def on_ready():
 async def on_server_join(server):
     for channel in server.channels:
         if channel.is_default:
-            await do_event('server_join', server, channel)
+            await do_event('server_join', [server, channel])
 
             jcommon.logger.info("New server: %s" % server.id)
             await client.send_message(channel, jcommon.WELCOME_MESSAGE)
