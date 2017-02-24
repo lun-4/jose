@@ -248,16 +248,18 @@ class JoseSpeak(jcommon.Extension):
             return
 
         t_start = time.time()
+        total_lines = 0
         for serverid in servers:
             ok = await self.new_generator(serverid, MESSAGE_LIMIT)
+            total_lines += self.last_texter_mcount
             if not ok:
                 await cxt.say(":poop: Error creating Texter for %s", (serverid,))
                 return
 
         t_taken = (time.time() - t_start) * 1000
 
-        await cxt.say("`Created %d Texters. Took %.2fms`", \
-            (len(servers), t_taken))
+        await cxt.say("`Created %d Texters. %d lines Took %.2fms`", \
+            (len(servers), total_lines, t_taken))
 
     async def c_texclean(self, message, args, cxt):
         await self.is_admin(message.author.id)
