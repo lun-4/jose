@@ -32,7 +32,7 @@ logger.addHandler(handler)
 
 
 JOSE_PREFIX = "j!"
-JOSE_VERSION = '1.4.1'
+JOSE_VERSION = '1.4.2'
 
 MARKOV_LENGTH_PATH = 'db/wordlength.json'
 MARKOV_MESSAGES_PATH = 'db/messages.json'
