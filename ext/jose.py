@@ -34,7 +34,8 @@ class JoseBot(jcommon.Extension):
         self.event_tbl = {
             'on_message': [],
             'any_message': [],
-            'logout': [], # TODO logout event
+            'server_join': [],
+            ''
         }
 
     def ev_load(self, dflag=False):

@@ -439,9 +439,11 @@ async def _timer_playing():
     await client.change_presence(game = g)
 
 async def timer_playing():
+    global t_allowed
     if t_allowed:
         while True:
             await _timer_playing()
+            t_allowed = False
             sec = random.randint(jcommon.PL_MIN_MINUTES * 60, \
                 jcommon.PL_MAX_MINUTES * 60)
 
@@ -458,6 +460,7 @@ async def on_ready():
     jcommon.logger.info("josé ready, name = %s, id = %s", client.user.name, client.user.id)
     print('='*25)
 
+    await do_event('client_ready', client)
     await timer_playing()
     t_allowed = False
 
@@ -465,6 +468,8 @@ async def on_ready():
 async def on_server_join(server):
     for channel in server.channels:
         if channel.is_default:
+            await do_event('server_join', server, channel)
+
             jcommon.logger.info("New server: %s" % server.id)
             await client.send_message(channel, jcommon.WELCOME_MESSAGE)
 
