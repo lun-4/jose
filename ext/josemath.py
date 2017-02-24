@@ -143,13 +143,9 @@ class JoseMath(jaux.Auxiliar):
 
         await cxt.say(self.codeblock("", list(self.lewd(n))))
 
-    async def c_plot(self, message, args, cxt):
-        '''`j!plot func` - plot f(x) functions'''
-        pass
-
     async def c_money(self, message, args, cxt):
-        '''`j!money quantity base to` - converte dinheiro usando cotações etc
-        `!money list` - lista todas as moedas disponíveis'''
+        '''`j!money amount base to` - Converts money, with `base` and `to` being currencies.
+`!money list` - list all available currencies'''
 
         if len(args) > 1:
             if args[1] == 'list':
@@ -166,7 +162,7 @@ class JoseMath(jaux.Auxiliar):
         try:
             amount = float(args[1])
         except Exception as e:
-            await cxt.say("Error parsing `quantity`")
+            await cxt.say("Error parsing `amount`")
             return
 
         currency_from = args[2]
@@ -178,11 +174,11 @@ class JoseMath(jaux.Auxiliar):
         data = json.loads(content)
 
         if 'error' in data:
-            await cxt.say("!money: %s", (data['error'],))
+            await cxt.say("money API error: %s", (data['error'],))
             return
 
         if currency_to not in data['rates']:
-            await cxt.say("Invalid currency to convert to")
+            await cxt.say("Invalid currency to convert to: %s", (currency_to,))
             return
 
         rate = data['rates'][currency_to]

@@ -186,7 +186,7 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
         topic = ' '.join(args[1:])
 
         if topic == 'list':
-            topics = ' '.join(self.docs)
+            topics = ' '.join(sorted(self.docs))
             await cxt.say(topics)
         else:
             if topic in self.docs:
