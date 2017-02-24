@@ -152,31 +152,32 @@ def load_module(n, n_cl):
     loop.run_until_complete(jose.load_ext(n, n_cl, None))
 
     time_taken_ms = (time.time() - t_start) * 1000
-    jcommon.logger.info("%s took %.3fms", n, time_taken_ms)
+    jcommon.logger.info("%s took %.3fms to load", n, time_taken_ms)
 
-# essential stuff
-load_module('joselang', 'JoseLanguage')
-load_module('josespeak', 'JoseSpeak')
-load_module('josestats', 'JoseStats')
-load_module('josemagicword', 'JoseMagicWord')
-load_module('jcoin', 'JoseCoin')
+def load_all_modules():
+    # essential stuff
+    load_module('joselang', 'JoseLanguage')
+    load_module('josespeak', 'JoseSpeak')
+    load_module('josestats', 'JoseStats')
+    load_module('josemagicword', 'JoseMagicWord')
+    load_module('jcoin', 'JoseCoin')
 
-# fun stuff
-load_module('josememes', 'JoseMemes')
-load_module('joseimages', 'JoseImages')
-load_module('josedatamosh', 'JoseDatamosh')
-load_module('josextra', 'joseXtra')
-load_module('josegambling', 'JoseGambling')
+    # fun stuff
+    load_module('josememes', 'JoseMemes')
+    load_module('joseimages', 'JoseImages')
+    load_module('josedatamosh', 'JoseDatamosh')
+    load_module('josextra', 'joseXtra')
+    load_module('josegambling', 'JoseGambling')
 
-# etc
-load_module('joseassembly', 'JoseAssembly')
-load_module('joseibc', 'JoseIBC')
-load_module('josemath', 'JoseMath')
+    # etc
+    load_module('joseassembly', 'JoseAssembly')
+    load_module('joseibc', 'JoseIBC')
+    load_module('josemath', 'JoseMath')
 
 
-# load events
-jose.ev_empty()
-jose.ev_load(True)
+    # load events
+    jose.ev_empty()
+    jose.ev_load(True)
 
 async def do_event(event_name, **args):
     for handler in jose.event_tbl[event_name]:
@@ -497,6 +498,9 @@ async def main_task():
 
 def main():
     tr = tracker.SummaryTracker()
+
+    # load all josé's modules
+    load_all_modules()
 
     loop = asyncio.get_event_loop()
     try:
