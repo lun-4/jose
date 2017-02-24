@@ -173,20 +173,24 @@ load_module('joseassembly', 'JoseAssembly')
 load_module('joseibc', 'JoseIBC')
 load_module('josemath', 'JoseMath')
 
-help_helptext = """
-`j!docstring` - docsrings for commands
-`j!docstring command` - get docstring for a command
-Exemplos: `j!docstring docstring`, `j!docstring pstatus`, `j!docstring ap`, `j!docstring wa`, etc.
-"""
 
 # load events
 jose.ev_empty()
 jose.ev_load(True)
 
-async def do_event(event_name, message):
+async def do_event(event_name, **args):
     for handler in jose.event_tbl[event_name]:
-        cxt = jcommon.Context(client, message, time.time(), jose)
-        await handler(message, cxt)
+        if isinstance(args[1], discord.Message):
+            cxt = jcommon.Context(client, message, time.time(), jose)
+            await handler(message, cxt)
+        else:
+            await handler(**args)
+
+help_helptext = """
+`j!docstring` - docsrings for commands
+`j!docstring command` - get docstring for a command
+Exemplos: `j!docstring docstring`, `j!docstring pstatus`, `j!docstring ap`, `j!docstring wa`, etc.
+"""
 
 async def check_message(message):
     # we do not want the bot to reply to itself
