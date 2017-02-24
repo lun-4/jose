@@ -172,9 +172,7 @@ class JoseSpeak(jcommon.Extension):
         return True
 
     async def texter_collection(self):
-
         if len(self.text_generators) <= 0:
-            logger.debug("no texters available")
             return
 
         t_start = time.time()
@@ -191,16 +189,16 @@ class JoseSpeak(jcommon.Extension):
         deadtexters = len(sid_to_clear)
         if deadtexters > 0:
             self.txcleaned = deadtexters
-            logger.info("Cleaning %d dead Texters, was %d", deadtexters, \
-                len(self.text_generators))
+            logger.info("%d down to %d Texters", len(self.text_generators), \
+                deadtexters)
 
-        for serverid in sid_to_clear:
-            del self.text_generators[serverid]
+            for serverid in sid_to_clear:
+                del self.text_generators[serverid]
 
-        time_taken_ms = (time.time() - t_start) * 1000
-        logger.info("Texter cleaning took %.4fms", time_taken_ms)
+            time_taken_ms = (time.time() - t_start) * 1000
+            logger.info("Texter cleaning took %.4fms", time_taken_ms)
 
-        del sid_to_clear, t_start, time_taken_ms
+            del sid_to_clear, t_start, time_taken_ms
 
     async def save_databases(self):
         self.logger.info("Save josespeak database")
