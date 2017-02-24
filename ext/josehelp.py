@@ -71,3 +71,35 @@ class JoseHelp(jaux.Auxiliar):
         else:
             await cxt.say("No helptext was found for `%s`, try `j!docstring`", (command,))
         return
+
+    async def c_docstring(self, message, args, cxt):
+        '''`j!docstring command` - get the docstring for that command'''
+
+        # load helptext
+        cmd_ht = 'docstring'
+        try:
+            if args[1] == 'docstring':
+                await cxt.say(self.c_docstring.__doc__)
+                return
+            else:
+                cmd_ht = args[1]
+        except:
+            pass
+
+        if cmd_ht == 'docstring':
+            await cxt.say(help_helptext)
+            return
+
+        cmd_method = getattr(cxt.jose, 'c_%s' % cmd_ht, None)
+        if cmd_method is None:
+            await cxt.say("%s: Command not found" % cmd_ht)
+            return
+
+        try:
+            docstring = cmd_method.__doc__
+            if docstring is None:
+                await cxt.say("Command found, docstring not found")
+            else:
+                await cxt.say(docstring)
+        except Exception as e:
+            await cxt.say("Error getting docstring for %s: %r" % (cmd_ht, repr(e)))

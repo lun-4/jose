@@ -126,38 +126,6 @@ async def do_command_table(message):
 
     return False
 
-async def do_docstring(message, args, cxt, command):
-    # load helptext
-    cmd_ht = 'docstring'
-    try:
-        if args[1] == 'docstring':
-            await cxt.say(help_helptext)
-            return True
-        else:
-            cmd_ht = args[1]
-    except:
-        pass
-
-    if cmd_ht == 'docstring':
-        await cxt.say(help_helptext)
-        return True
-
-    cmd_method = getattr(jose, 'c_%s' % cmd_ht, None)
-    if cmd_method is None:
-        await cxt.say("%s: Command not found" % cmd_ht)
-        return True
-
-    try:
-        docstring = cmd_method.__doc__
-        if docstring is None:
-            await cxt.say("Docstring not found")
-        else:
-            await cxt.say(docstring)
-    except Exception as e:
-        await cxt.say("error getting docstring for %s: %r" % (command, repr(e)))
-
-    return True
-
 async def do_command(method, message, args, cxt, t_start, st):
     # try/except is WAY FASTER than checking if/else
     try:
@@ -272,14 +240,13 @@ async def on_message(message):
         if command == '':
             return
 
-        stop = await do_cooldown(message, cxt)
-        if stop:
-            return
-
-        if command == 'docstring':
-            needs_stop = await do_docstring(message, args, cxt, command)
-            if needs_stop:
+        try:
+            getattr(jose, method)
+            stop = await do_cooldown(message, cxt)
+            if stop:
                 return
+        except AttributeError:
+            return
 
         try:
             # do a barrel roll
