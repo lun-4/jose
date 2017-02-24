@@ -24,7 +24,11 @@ class JoseHelp(jaux.Auxiliar):
                     if line.find('|'):
                         data = [sp.strip() for sp in line.split('|')]
                         if len(data) == 4:
-                            cmd = data[0]
+                            raw_cmd = data[0]
+                            c = cmd.find('`')
+                            a_cmd = cmd[c+1:cmd.find('`', c+1)]
+                            a_cmd = a_cmd.split()
+                            cmd = '`%s`' % (a_cmd[0])
                             desc = data[1]
                             examples = data[2]
                             aliases = data[3]
@@ -65,5 +69,5 @@ class JoseHelp(jaux.Auxiliar):
 
             await cxt.say('\n'.join(res))
         else:
-            await cxt.say("No helptext was found for `j!%s`, try `j!docstring`", (command,))
+            await cxt.say("No helptext was found for `%s`, try `j!docstring`", (command,))
         return
