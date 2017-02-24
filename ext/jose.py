@@ -122,7 +122,6 @@ class JoseBot(jcommon.Extension):
 
         for method in methods:
             if method.startswith('c_'):
-                self.logger.debug("add %s", method)
                 setattr(self, method, getattr(inst, method))
                 self.modules[n]['methods'].append(method)
 
@@ -138,7 +137,7 @@ class JoseBot(jcommon.Extension):
                 ok = await mod['inst'].ext_unload()
                 if not ok[0]:
                     self.logger.error("Error on ext_unload(%s): %s", name, ok[1])
-                    sys.exit(0)
+                    return False
             except Exception as e:
                 self.logger.warn("Almost unloaded %s: %s", name, repr(e))
                 return False
@@ -167,7 +166,7 @@ class JoseBot(jcommon.Extension):
                 ok = await instance.ext_load()
                 if not ok[0]:
                     self.logger.error("Error happened on ext_load(%s): %s", name, ok[1])
-                    sys.exit(0)
+                    return False
                 else:
                     return instance
             except Exception as e:
@@ -192,13 +191,11 @@ class JoseBot(jcommon.Extension):
             stw = str.startswith
             if stw(method, 'c_'):
                 # command
-                self.logger.debug("EAPI command %s", method)
                 setattr(self, method, getattr(instance, method))
                 methods.append(method)
 
             elif stw(method, 'e_'):
                 # Event handler
-                self.logger.debug("EAPI ev handler %s", method)
                 handlers.append(method)
 
         # copy them and kill them

@@ -63,9 +63,9 @@ class JoseHelp(jaux.Auxiliar):
             helpdata = self.help[command]
 
             res.append("Command: `%s`" % command)
-            res.append("**Description**: `%s`" % helpdata['description'])
-            res.append("Example: `%s`" % helpdata['examples'])
-            res.append("Aliases: `%s`" % helpdata['aliases'])
+            res.append("**Description**: %s" % helpdata['description'])
+            res.append("Example: %s" % helpdata['examples'])
+            res.append("Aliases: %s" % helpdata['aliases'])
 
             await cxt.say('\n'.join(res))
         else:
