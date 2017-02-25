@@ -46,23 +46,14 @@ OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&perm
 
 #configuration things
 chattiness = .25
-LEARN_ROLE = 'cult'
 ADMIN_IDS = ['162819866682851329', '144377237997748224', \
     '191334773744992256', '142781100152848384']
-
-#just for 0.6.6.6 and 6.6.6 or any demon version
-DEMON_MODE = False
-
-#mode changes
-MAINTENANCE_MODE = False
-GAMBLING_MODE = False
 
 COOLDOWN_SECONDS = 5
 PIRU_ACTIVITY = .0000069
 jc_probabiblity = .01
 JC_REWARDS = [0, 0, 0.2, 0.6, 1, 1.2, 1.5]
 
-PORN_LIMIT = 14
 GAMBLING_FEE = 5 # 5 percent
 TOTAL = 10.0
 IMAGE_MEMBERS = 0.3
