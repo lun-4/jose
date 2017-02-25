@@ -236,8 +236,6 @@ async def on_message(message):
 
     st = time.time()
 
-    await jose.recv(message) # at least
-
     # any_message event
     await do_event('any_message', [message])
 
