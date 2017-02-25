@@ -219,7 +219,7 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
 
         # run in a thread
         future_re = loop.run_in_executor(None, re.findall, \
-            r'href=\"\/watch\?v=(.{11})', html_content.read().decode())
+            r'href=\"\/watch\?v=(.{11})', html_content)
         search_results = await future_re
 
         if len(search_results) < 2:
