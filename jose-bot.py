@@ -85,7 +85,6 @@ def load_all_modules():
     load_module('joseibc', 'JoseIBC')
     load_module('josemath', 'JoseMath')
 
-
     # load events
     jose.ev_empty()
     jose.ev_load(True)
@@ -97,12 +96,6 @@ async def do_event(event_name, args):
             await handler(cxt.message, cxt)
         else:
             await handler(**args)
-
-help_helptext = """
-`j!docstring` - docsrings for commands
-`j!docstring command` - get docstring for a command
-Exemplos: `j!docstring docstring`, `j!docstring pstatus`, `j!docstring ap`, `j!docstring wa`, etc.
-"""
 
 async def check_message(message):
     # we do not want the bot to reply to itself
