@@ -326,6 +326,9 @@ def speak_filter(message):
     # remove discord mentions
     message = re.sub(r'<@(\!)?\d+>', '', message)
 
+    # remove discord channels
+    message = re.sub(r'<#(\!)?\d+>', '', message)
+
     # remove josé commands
     # REMEMBER TO CHANGE THIS IF COMMAND PREFIX CHANGE HAPPENS
     message = re.sub(r'j!\w+', '', message)
