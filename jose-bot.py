@@ -115,7 +115,7 @@ async def check_message(message):
             return False
 
         # Ignore non-admins
-        if message.author.id not in ADMIN_IDS:
+        if message.author.id not in jcommon.ADMIN_IDS:
             return False
 
     if jose.command_lock:
