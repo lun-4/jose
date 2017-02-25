@@ -115,7 +115,7 @@ async def check_message(message):
             return False
 
         # Ignore non-admins
-        if cxt.message.author.id not in ADMIN_IDS
+        if cxt.message.author.id not in ADMIN_IDS:
             return False
 
     if jose.command_lock:
