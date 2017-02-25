@@ -315,8 +315,6 @@ async def parse_id(data, message):
         return
 
 def speak_filter(message):
-    filtered_message = ""
-
     # remove URLs
     message = re.sub(r'https?:\/\/([\/\?\w\.\&\;\=\-])+', '', message, flags=re.MULTILINE)
 
@@ -333,21 +331,7 @@ def speak_filter(message):
     # REMEMBER TO CHANGE THIS IF COMMAND PREFIX CHANGE HAPPENS
     message = re.sub(r'j!\w+', '', message)
 
-    i = 0
-    while i < len(message):
-        char = message[i]
-        if char == '<':
-            if i+1 > len(message):
-                if message[i+1] == '@':
-                    ending_tag = message.find('>', i+1)
-                    if ending_tag == -1:
-                        raise Exception("ending_tag == -1, wtf?")
-                    i += ending_tag + 1
-        else:
-            filtered_message += char
-        i += 1
-
-    return filtered_message
+    return message
 
 # Callbacks
 
