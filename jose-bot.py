@@ -110,8 +110,12 @@ async def check_message(message):
         return False
 
     if jose.dev_mode:
-        # ignore messages from other servers if in dev mode
+        # Ignore messages from other servers
         if message.server != jcommon.JOSE_DEV_SERVER_ID:
+            return False
+
+        # Ignore non-admins
+        if cxt.message.author.id not in ADMIN_IDS
             return False
 
     if jose.command_lock:
@@ -316,6 +320,7 @@ async def on_ready():
     if not jose.dev_mode:
         await timer_playing()
     else:
+        jcommon.logger.info("Developer Mode Enabled")
         g = discord.Game(name = 'JOSÉ IN MAINTENANCE', url = 'fuck you')
         await client.change_presence(game = g)
 

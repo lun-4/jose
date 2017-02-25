@@ -39,6 +39,7 @@ MARKOV_MESSAGES_PATH = 'db/messages.json'
 STAT_DATABASE_PATH = 'db/stats.json'
 CONFIGDB_PATH = 'db/languages.json'
 
+JOSE_DEV_SERVER_ID = '273863625590964224'
 JOSE_ID = '202587271679967232'
 JOSE_APP_ID = '202586824013643777'
 OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=67259457' % JOSE_APP_ID
