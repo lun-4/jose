@@ -6,6 +6,7 @@ asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 # profiling
 from pympler import tracker
 
+import sys
 import time
 import traceback
 import logging
@@ -107,6 +108,11 @@ async def check_message(message):
     # we do not want the bot to reply to itself
     if message.author == client.user:
         return False
+
+    if jose.dev_mode:
+        # ignore messages from other servers if in dev mode
+        if message.server != jcommon.JOSE_DEV_SERVER_ID:
+            return False
 
     if jose.command_lock:
         return False
@@ -306,7 +312,13 @@ async def on_ready():
     print('='*25)
 
     await do_event('client_ready', [client])
-    await timer_playing()
+
+    if not jose.dev_mode:
+        await timer_playing()
+    else:
+        g = discord.Game(name = 'JOSÉ IN MAINTENANCE', url = 'fuck you')
+        await client.change_presence(game = g)
+
     t_allowed = False
 
 @client.event
@@ -336,8 +348,17 @@ async def main_task():
     jcommon.logger.info("Starting Client")
     await client.start(jconfig.discord_token)
 
-def main():
+def main(args):
+    try:
+        mode = args[1]
+    except:
+        mode = 'normal'
+
     tr = tracker.SummaryTracker()
+
+    if mode == 'dev':
+        print("===ENTERING DEVELOPER MODE===")
+        jose.dev_mode = True
 
     # load all josé's modules
     load_all_modules()
@@ -367,4 +388,4 @@ def main():
     logging.shutdown()
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)
