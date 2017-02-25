@@ -638,14 +638,10 @@ serverid %s servername %s chname #%s" % (server.id, server.name, channel.name))
                 logger.info("Loading configuration database @ cxt.say")
                 await load_configdb()
 
-            if self.message.server is None:
-                # in a DM
-                ret = await self.client.send_message(channel, (string % tup))
-                return ret
+            lang = 'default'
+            if self.message.server is not None:
+                lang = await langdb_get(self.message.server.id)
 
-            # since 'default' doesn't exist in the language table
-            # it will go back to fallback and just send the message already
-            lang = await langdb_get(self.message.server.id)
             translated = await get_translated(lang, string)
 
             if tup is not None:
