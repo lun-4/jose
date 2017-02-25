@@ -432,8 +432,8 @@ class Extension:
         '''
         Extension - A general extension used by josé
 
-        The Extension class defines the API for josé's modules, all modules inherit
-        from this class.
+        The Extension class defines the API for josé's modules,
+        all modules inherit from this class.
         '''
         self.client = cl
         self.loop = cl.loop

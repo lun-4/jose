@@ -432,24 +432,36 @@ class JoseBot(jcommon.Extension):
         '''`j!pick` - alias for `!escolha`'''
         await self.c_escolha(message, args, cxt)
 
-    async def c_nick(self, message, args, cxt):
-        '''`j!nick [nick]` - only admins'''
+    async def c_gnick(self, message, args, cxt):
+        '''`j!gnick [nick]` - only admins'''
         await self.is_admin(message.author.id)
 
         if len(args) < 2:
-            self.nick = 'josé'
-        else:
-            self.nick = ' '.join(args[1:])
+            await cxt.say(self.c_lnick.__doc__)
+            return
 
-        if message.server is None:
-            for s in self.client.servers:
-                m = s.get_member(jcommon.JOSE_ID)
-                await self.client.change_nickname(m, self.nick)
-        else:
-            m = message.server.get_member(jcommon.JOSE_ID)
+        self.nick = ' '.join(args[1:])
+
+        guilds = 0
+        for server in self.client.servers:
+            m = server.get_member(jcommon.JOSE_ID)
             await self.client.change_nickname(m, self.nick)
+            guilds += 1
 
-        return
+        await cxt.say("Changed nickname to `%r` in %d guilds", (self.nick, guilds))
+
+    async def c_lnick(self, message, args, cxt):
+        '''`j!lnick nick` - change josé\'s nickname for this server'''
+
+        if len(args) < 2:
+            await cxt.say(self.c_lnick.__doc__)
+            return
+
+        nick = ' '.join(args[1:])
+
+        m = message.server.get_member(jcommon.JOSE_ID)
+        await self.client.change_nickname(m, nick)
+        await cxt.say("Nickname changed to `%r`", (nick,))
 
     async def c_distatus(self, message, args, cxt):
         '''`j!distatus` - mostra alguns dados para mostrar se o Discord está funcionando corretamente'''
@@ -515,7 +527,7 @@ class JoseBot(jcommon.Extension):
         minutes = int((sec % HOUR) / MINUTE)
         seconds = int(sec % MINUTE)
 
-        fmt = "`Uptime: %d dias, %d horas, %d minutos, %d segundos`"
+        fmt = "`Uptime: %d days, %d hours, %d minutes, %d seconds`"
         await cxt.say(fmt % (days, hours, minutes, seconds))
 
     async def c_eval(self, message, args, cxt):
