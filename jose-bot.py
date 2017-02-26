@@ -10,7 +10,6 @@ import sys
 import time
 import traceback
 import logging
-import inspect
 from random import SystemRandom
 random = SystemRandom()
 
@@ -141,15 +140,7 @@ async def do_command(method, message, args, cxt, t_start, st):
         return
 
     try:
-        sig = inspect.signature(jose_method)
-        # if function can receive the Context, do it
-        # else just do it normally
-        if len(sig.parameters) == 3:
-            await jose_method(message, args, cxt)
-        else:
-            jcommon.logger.warning("%r is not using Context protocol", \
-                jose_method)
-            await jose_method(message, args)
+        await jose_method(message, args, cxt)
 
     except je.PermissionError:
         jcommon.logger.warning("thrown PermissionError at author %s", \
@@ -176,7 +167,6 @@ async def do_command(method, message, args, cxt, t_start, st):
     return
 
 async def do_cooldown(message, cxt):
-    # cooldown system top notch :ok_hand:
     # Check for cooldowns from the author of the command
     authorid = message.author.id
     now = time.time()
@@ -236,11 +226,10 @@ async def on_message(message):
     if message.content.startswith(jcommon.JOSE_PREFIX):
         # use jcommon.parse_command
         command, args, method = jcommon.parse_command(message)
+        if len(command.strip()) == '':
+            return
 
         cxt = jcommon.Context(client, message, t_start, jose)
-
-        if command == '':
-            return
 
         try:
             getattr(jose, method)
@@ -255,6 +244,8 @@ async def on_message(message):
             await do_command(method, message, args, cxt, t_start, st)
             return
         except Exception as e:
+            jcommon.logger.error("Exception at %s", method, exc_info=True)
+            # signal user
             await cxt.say("jose.py_err: ```%s```" % traceback.format_exc())
 
         return

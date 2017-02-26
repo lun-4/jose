@@ -27,13 +27,12 @@ def make_textmodel(textdata, markov_length):
     return tmodel
 
 def get_sentence(textmodel):
-    text = text_model.make_sentence()
+    text = textmodel.make_sentence()
     return text
 
 class NewTexter:
     def __init__(self, textpath, markov_length, text, loop=None):
         self.refcount = 1
-        t_start = time.time()
         self.markov_length = markov_length
         self.textdata = ''
 
@@ -76,7 +75,7 @@ class NewTexter:
         count = 0
         while res is None:
             if count > 3: break
-            future_textmodel = self.loop.run_in_executor(get_sentence, \
+            future_sentence = self.loop.run_in_executor(get_sentence, \
                 self.text_model)
             res = await future_sentence
             count += 1
