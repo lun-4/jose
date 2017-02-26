@@ -540,7 +540,7 @@ def get_defaultcdb():
         'botblock': True,
         'language': 'en',
 
-        # TODO: use and change those
+        # TODO: use them????
         'imgchannel': None,
         'prefix': JOSE_PREFIX,
     }
@@ -583,9 +583,20 @@ async def load_configdb():
         with open(CONFIGDB_PATH, 'w') as f:
             f.write('{}')
 
+    sanity_save = False
     logger.info("load:config")
     try:
         configdb = json.load(open(CONFIGDB_PATH, 'r'))
+        # check sanity
+        for serverid in configdb:
+            protocdb = configdb[serverid]
+            if isinstance(protocdb, str): # old langdb
+                configdb[serverid] = get_defaultcdb()
+                configdb[serverid]['language'] = protocdb
+                sanity_save = true
+
+        if sanity_save:
+            await save_configdb()
     except Exception as e:
         return False, repr(e)
 
