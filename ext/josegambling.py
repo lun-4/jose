@@ -11,6 +11,17 @@ import jauxiliar as jaux
 BETTING_FEE = 5
 PERCENTAGE_WIN = 100
 
+JCROULETTE_HELP_TEXT = '''
+JoséCoin Roulette, abbreviated as JC Roulette, is a form of russian roulette
+where people create a JCR session, they pay josé, and josé chooses, by random,
+a winner that will win all the money everyone paid.
+
+`j!jrstart` to start a session
+`j!jrbet` to pay josé, 5%% of this amount will be fees
+`j!jrdo` does the roulette, when everyone wants to know who wins
+`j!jreport` shows if JCR is on or off in your server
+'''
+
 class JoseGambling(jcommon.Extension):
     def __init__(self, cl):
         jaux.Auxiliar.__init__(self, cl)
@@ -188,8 +199,5 @@ class JoseGambling(jcommon.Extension):
         else:
             await cxt.say("http://i.imgur.com/u4Gem8A.png") # empate
 
-    async def c_adummy(self, message, args, cxt):
-        await cxt.say(jcommon.GAMBLING_HELP_TEXT_SMALL)
-
-    async def c_ahelp(self, message, args, cxt):
-        await cxt.say(jcommon.GAMBLING_HELP_TEXT)
+    async def c_jcrhelp(self, message, args, cxt):
+        await cxt.say(JCROULETTE_HELP_TEXT)
