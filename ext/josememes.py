@@ -62,11 +62,11 @@ BLACK_MIRROR_MESSAGES = [
 
 class JoseMemes(jcommon.Extension):
     def __init__(self, cl):
+        jcommon.Extension.__init__(self, cl)
         self.memes = {}
         self.WIDE_MAP = dict((i, i + 0xFEE0) for i in range(0x21, 0x7F))
         self.WIDE_MAP[0x20] = 0x3000
         self.patterns = ['fbcdn.net', 'akamaihd.net']
-        jcommon.Extension.__init__(self, cl)
 
     async def ext_load(self):
         r = await self.load_memes()

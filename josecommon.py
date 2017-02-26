@@ -1,20 +1,18 @@
 import asyncio
-import discord
 import time
 import re
 import json
 import os
 import sqlite3
-
-import randemoji as emoji
-
+import logging
 from random import SystemRandom
 random = SystemRandom()
 
 import joseerror as je
 import jplaying_phrases as playing_phrases
+import randemoji as emoji
 
-import logging
+import discord
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -45,7 +43,6 @@ JOSE_APP_ID = '202586824013643777'
 OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=67259457' % JOSE_APP_ID
 
 #configuration things
-chattiness = .25
 ADMIN_IDS = ['162819866682851329', '144377237997748224', \
     '191334773744992256', '142781100152848384']
 
@@ -54,7 +51,6 @@ PIRU_ACTIVITY = .0000069
 jc_probabiblity = .01
 JC_REWARDS = [0, 0, 0.2, 0.6, 1, 1.2, 1.5]
 
-GAMBLING_FEE = 5 # 5 percent
 TOTAL = 10.0
 IMAGE_MEMBERS = 0.3
 LEARN_MEMBERS = 1.0
@@ -233,10 +229,7 @@ async def debug_log(string):
 async def jose_debug(message, dbg_msg, flag=True):
     message_banner = '%s[%s]: %r' % (message.author, message.channel, message.content)
     dbg_msg = '%s -> %s' % (message_banner, str(dbg_msg))
-    debug_logs.append(dbg_msg)
-    await debug_log('%s : %s' % (time.strftime("%d-%m-%Y %H:%M:%S"), dbg_msg))
-    if flag:
-        await client.send_message(message.channel, "jdebug: {}".format(dbg_msg))
+    logger.info(dbg_msg)
 
 aviaos = [
     'https://www.aboutcar.com/car-advice/wp-content/uploads/2011/02/Spoiler.jpg',
@@ -253,8 +246,8 @@ aviaos = [
 
 async def show_top(message):
     await client.send_message(message.channel, "BALADINHA TOPPER %s %s" % (
-        (":joy:" * random.randint(1,5)),
-        (":ok_hand:" * random.randint(1,6))))
+        (":joy:" * random.randint(1, 5)),
+        (":ok_hand:" * random.randint(1, 6))))
 
 async def check_roles(correct, rolelist):
     c = [role.name == correct for role in rolelist]
@@ -312,7 +305,7 @@ async def parse_id(data, message):
 
 def speak_filter(message):
     # remove URLs
-    message = re.sub(r'https?:\/\/([\/\?\w\.\&\;\=\-])+', '', message, flags=re.MULTILINE)
+    message = re.sub(r'https?:\/\/([\/\?\w\.\&\;\=\-])+', '', message)
 
     # remove numbers
     message = re.sub(r'\d+', '', message)
@@ -368,16 +361,16 @@ async def cbk_call(callback_id):
     if callback_id not in callbacks:
         return None
 
-    c = callbacks[callback_id]
-    res = await c.func()
+    callback = callbacks[callback_id]
+    res = await callback.func()
     return res
 
 async def cbk_remove(callback_id):
     if callback_id not in callbacks:
         return None
 
-    c = callbacks[callback_id]
-    c.stop()
+    callback = callbacks[callback_id]
+    callback.stop()
     del callbacks[callback_id]
     return True
 
@@ -442,7 +435,7 @@ class Extension:
 
     async def rolecheck(self, cxt, correct_role):
         c = [role.name == correct_role for role in cxt.message.author.roles]
-        if not (True in c):
+        if not True in c:
             raise je.PermissionError()
         else:
             return True
@@ -455,7 +448,8 @@ class Extension:
 
     async def brolecheck(self, cxt, correct_role):
         try:
-            return (await self.rolecheck(cxt, correct_role))
+            res = await self.rolecheck(cxt, correct_role)
+            return res
         except je.PermissionError:
             return False
 
@@ -516,7 +510,11 @@ PT_LANGUAGE_PATH = './locale/jose.pt.json'
 
 class LangObject:
     def __init__(self, fpath):
+        self.path = fpath
         self.db = json.load(open(fpath, 'r'))
+
+    def reload_db(self):
+        self.db = json.load(open(self.path, 'r'))
 
     def gettext(self, msgid):
         res = self.db.get(msgid, "")
@@ -566,8 +564,8 @@ async def save_configdb():
     logger.info("savedb:config")
     try:
         json.dump(configdb, open(CONFIGDB_PATH, 'w'))
-    except Exception as e:
-        return False, repr(e)
+    except Exception as err:
+        return False, repr(err)
 
     return True, ''
 
@@ -576,8 +574,8 @@ async def load_configdb():
     if not os.path.isfile(CONFIGDB_PATH):
         # recreate
         logger.info("Recreating config database")
-        with open(CONFIGDB_PATH, 'w') as f:
-            f.write('{}')
+        with open(CONFIGDB_PATH, 'w') as rawconfig_db:
+            rawconfig_db.write('{}')
 
     sanity_save = False
     logger.info("load:config")
@@ -593,8 +591,8 @@ async def load_configdb():
 
         if sanity_save:
             await save_configdb()
-    except Exception as e:
-        return False, repr(e)
+    except Exception as err:
+        return False, repr(err)
 
     return True, ''
 
@@ -624,7 +622,7 @@ class Context:
             server = self.message.server
             channel = self.message.channel
             logger.info("Context.send_typing: got err Forbidden from\
-serverid %s servername %s chname #%s" % (server.id, server.name, channel.name))
+serverid %s servername %s chname #%s", server.id, server.name, channel.name)
 
     async def say(self, string, _channel=None, tup=None):
         channel = None
@@ -658,8 +656,8 @@ serverid %s servername %s chname #%s" % (server.id, server.name, channel.name))
                 ret = await self.client.send_message(channel, translated)
                 return ret
             except discord.Forbidden:
-                logger.info("discord.Forbidden: %r %r %r" % \
-                    (channel, channel.server.id, channel.server.name))
+                logger.info("discord.Forbidden: %r %r %r", channel, \
+                    channel.server.id, channel.server.name)
 
 class EmptyContext:
     def __init__(self, client, message):
@@ -670,8 +668,17 @@ class EmptyContext:
     async def send_typing(self):
         return None
 
-    async def say(self, string, channel=None):
-        self.messages.append(string)
+    async def say(self, string, _channel=None, tup=None):
+        if isinstance(_channel, tuple):
+            tup = _channel
+
+        lang = 'default'
+
+        translated = await get_translated(lang, string)
+        if tup is not None:
+            translated = translated % tup
+
+        self.messages.append(translated)
 
     async def getall(self):
         return '\n'.join(self.messages)
