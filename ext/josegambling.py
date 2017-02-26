@@ -73,7 +73,7 @@ class JoseGambling(jcommon.Extension):
             return
 
         if amount < session['last_bid']:
-            await cxt.say("Your bet needs to be higher than %.2fJC", (self.last_bid,))
+            await cxt.say("Your bet needs to be higher than `%.2fJC`", (self.last_bid,))
             return
 
         fee_amount = decimal.Decimal(amount) * decimal.Decimal(BETTING_FEE/100.)
@@ -81,7 +81,7 @@ class JoseGambling(jcommon.Extension):
 
         a = self.jcoin.get(id_from)[1]
         if a['amount'] <= atleast:
-            await cxt.say("No sufficient funds(need %.2fJC in total, you have %.2fJC, needs %.2fJC)", \
+            await cxt.say("No sufficient funds(need `%.2fJC` in total, you have `%.2fJC`, needs `%.2fJC`)", \
                 (atleast, a['amount'], decimal.Decimal(atleast) - a['amount']))
             return
 
@@ -96,7 +96,7 @@ class JoseGambling(jcommon.Extension):
             val = session['betters'][id_from]
             session['last_bid'] = amount
 
-            await cxt.say("jcroulette: Total bet of %.2fJC from <@%s>\nJC report: %s", \
+            await cxt.say("jcroulette: Total bet of `%.2fJC` from <@%s>\nJC report: %s", \
                 (val, id_from, res[1]))
         else:
             await cxt.say('jc->err: %s', (res[1],))
@@ -119,31 +119,32 @@ class JoseGambling(jcommon.Extension):
 
         K = list(betters.keys())
         if len(K) < 2:
-            await cxt.say("Session without 2 or more players, closing down.")
+            await cxt.say("Session without 2 or more players, closing session.")
             del self.session[message.server.id], session, betters
             return
 
         winner = random.choice(K)
 
-        M = sum(betters.values(), decimal.Decimal(0)) # total
-        P = (M * decimal.Decimal(PERCENTAGE_WIN))
+        # total stuff
+        total_amount = sum(betters.values(), decimal.Decimal(0))
 
-        if self.jcoin.data[self.jcoin.jose_id]['amount'] < M:
+        if self.jcoin.data[self.jcoin.jose_id]['amount'] < total_amount:
             await cxt.err("jc->check: **THIS IS BAD, JOSÉ DOESNT HAVE ENOUGH FUNDS FOR TRANSACTION**")
 
         report = ''
 
-        res = self.jcoin.transfer(self.jcoin.jose_id, winner, P, self.jcoin.LEDGER_PATH)
+        res = self.jcoin.transfer(self.jcoin.jose_id, winner, total_amount, self.jcoin.LEDGER_PATH)
         if res[0]:
-            report += "**WINNER:** <@%s> won %.2fJC!\n" % (winner, P)
+            report += "**WINNER:** <@%s> won `%.2fJC`!\n" % (winner, total_amount)
         else:
             await self.debug("jc_jcroulette->jc: %s\naborting jr mode" % res[1])
+            del self.session[message.server.id], session, betters
             return
 
         # http://i.imgur.com/huUlJhR.jpg
         await cxt.say("%s\nJC roulette is off!\n", (report,))
 
-        del del self.session[message.server.id], session, betters
+        del self.session[message.server.id], session, betters
         return
 
     async def c_jreport(self, message, args, cxt):
@@ -158,17 +159,18 @@ class JoseGambling(jcommon.Extension):
 
         session = self.sessions[message.server.id]
 
-        res = ''
+        res = []
         total = decimal.Decimal(0)
-        for apostador in session['betters']:
-            res += '<@%s> bet %.2fJC\n' % (apostador, self.gambling_env[apostador])
-            total += decimal.Decimal(self.gambling_env[apostador])
-        res += 'Total of %.2fJC' % (total)
+        for userid in session['betters']:
+            val = session['betters'][userid]
+            res.append('<@%s> used `%.2fJC`' % (userid, val))
+            total += decimal.Decimal(val)
 
-        await cxt.say(res)
+        res.append('Total of `%.2fJC`' % (total))
+        await cxt.say('\n'.join(res))
 
     async def c_jrcheck(self, message, args, cxt):
-        '''`j!jrcheck` - mostra se o modo aposta tá ligado ou não'''
+        '''`j!jrcheck` - shows if jcroulette is on or not'''
         if message.channel.is_private:
             await cxt.say("DMs can't use JC Roulette")
             return
