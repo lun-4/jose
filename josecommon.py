@@ -111,46 +111,6 @@ Recomenado a leitura da lista de comandos, em inglês:
 https://github.com/lkmnds/jose/blob/master/doc/cmd/listcmd.md
 '''
 
-GAMBLING_HELP_TEXT = '''O que é: Função que permite dois (ou mais) usuários apostarem josecoins por esporte.
-
-Como funciona:
- * Primeiro, ativar o "modo aposta" do jose-bot com o comando: !aposta (qualquer um pode começar uma aposta)
- * jose-bot printa a mensagem "Modo aposta ativado. Joguem suas granas!" ou algo do tipo
- * Enquanto o "modo aposta" estiver ativado, qualquer um que !ap josecoins para o jose-bot entra na aposta, o jose-bot grava o nome da pessoa
-temporariamente como se fosse um "acesso a memória RAM"
- * As apostas são cumulativas, ou seja, se uma mesma pessoa !enviar 20 e depois !enviar 40, é como se ela apostasse 60 josecoins de uma vez
- * Quando todos tiverem feito suas apostas, inserir o comando !rolar (ou outro nome sla), o que fará com que o jose-bot sorteie aleatoriamente uma pessoa com base na fórmula: n = 1/x (x sendo o número de pessoas que entraram na aposta)
- * A pessoa sorteada ganha a aposta, recebendo 76.54% do montante, e os outros apostadores ficam com o que sobrou, que será dividido igualmente.
- * Após o pagamento, o modo aposta se desativa automaticamente(editado)
-
-Exemplo:
-Número de apostadores = 3 (pessoas A, B e C, respectivamente)
-Inserindo o comando ---> j!aposta
-jose-bot printa: "Modo aposta ativado. Joguem suas granas!"
-A pessoa A aposta 50 josecoins ---> j!ap 50
-A pessoa B aposta 30 josecoins ---> j!ap 30
-A pessoa C aposta 20 josecoins ---> j!ap 20
-"Rolando o dado" ---> j!rolar
-
-Cálculo do prêmio:
-M = montante acumulado de todas as apostas
-P = total de josecoins que o vencedor da aposta ganha
-p = total de josecoins que cada um dos perdedores da aposta ganha
-x = número de pessoas que entraram na aposta
-
-P = M * 0.7654
-p = M * 0.2346 / x
-Pegando os valores anteriores, o montante é 50+30+20=100
-A pessoa B ganhou a aposta, sendo assim ela ganha 76.54 josecoins, sobrando 23.46 josecoins.
-Desses 23.46 josecoins, as pessoas A e C vão receber, cada uma, 11.73 josecoins.
-'''
-
-GAMBLING_HELP_TEXT_SMALL = '''Aposta for Dummies:
-j!aposta - inicia modo de aposta do jose
-j!ap <quantidade> - aposta propiamente dita
-j!rolar - quando você já está pronto pra ver quem é o ganhador
-'''
-
 LETTER_TO_PITCH = {
     "a": 34,
     "A": 35,
