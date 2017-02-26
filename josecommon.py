@@ -37,7 +37,7 @@ JOSE_VERSION = '1.4.2'
 MARKOV_LENGTH_PATH = 'db/wordlength.json'
 MARKOV_MESSAGES_PATH = 'db/messages.json'
 STAT_DATABASE_PATH = 'db/stats.json'
-LANGUAGES_PATH = 'db/languages.json'
+CONFIGDB_PATH = 'db/languages.json'
 
 JOSE_ID = '202587271679967232'
 JOSE_APP_ID = '202586824013643777'
@@ -96,7 +96,7 @@ def set_client(cl):
     client = cl
 
 # Language database
-langdb = None
+configdb = None
 
 # Phrases that will be shown randomly when jose starts
 JOSE_PLAYING_PHRASES = playing_phrases.JOSE_PLAYING_PHRASES
@@ -551,58 +551,53 @@ langobjects = {
     'pt': LangObject(PT_LANGUAGE_PATH),
 }
 
+def get_defaultcdb():
+    return {
+        'botblock': False,
+        'language': 'en',
+    }
+
 async def configdb_set(sid, key, value):
-    if sid not in langdb:
-        langdb[sid] = {
-            'botblock': False,
-            'language': 'en',
-        }
-    langdb[sid][key] = value
+    global configdb
+    if sid not in configdb:
+        configdb[sid] = get_defaultcdb()
+    configdb[sid][key] = value
 
 async def configdb_get(sid, key, defaultval=None):
-    if sid not in langdb:
-        langdb[sid] = {}
-        return defaultval
-
-    return langdb[sid].get(key, defaultval)
+    global configdb
+    if sid not in configdb:
+        configdb[sid] = get_defaultcdb()
+    return configdb[sid].get(key, defaultval)
 
 # langdb stuff
 async def langdb_set(sid, lang):
-    global langdb
     await configdb_set(sid, 'language', lang)
 
 async def langdb_get(sid):
-    global langdb
-    cdb = langdb[sid]
-    if not isinstance(cdb, dict):
-        langdb[sid] = {
-            'language': cdb
-        }
-
     res = await configdb_get(sid, 'language', 'default')
     return res
 
 async def save_configdb():
-    global langdb
-    logger.info("Saving language database")
+    global configdb
+    logger.info("savedb:config")
     try:
-        json.dump(langdb, open(LANGUAGES_PATH, 'w'))
+        json.dump(configdb, open(CONFIGDB_PATH, 'w'))
     except Exception as e:
         return False, repr(e)
 
     return True, ''
 
 async def load_configdb():
-    global langdb
-    if not os.path.isfile(LANGUAGES_PATH):
+    global configdb
+    if not os.path.isfile(CONFIGDB_PATH):
         # recreate
-        logger.info("Recreating language database")
-        with open(LANGUAGES_PATH, 'w') as f:
+        logger.info("Recreating config database")
+        with open(CONFIGDB_PATH, 'w') as f:
             f.write('{}')
 
-    logger.info("Loading language database")
+    logger.info("load:config")
     try:
-        langdb = json.load(open(LANGUAGES_PATH, 'r'))
+        configdb = json.load(open(CONFIGDB_PATH, 'r'))
     except Exception as e:
         return False, repr(e)
 
@@ -637,8 +632,6 @@ class Context:
 serverid %s servername %s chname #%s" % (server.id, server.name, channel.name))
 
     async def say(self, string, _channel=None, tup=None):
-        global langdb
-
         channel = None
         if isinstance(_channel, tuple):
             tup = _channel
@@ -653,12 +646,12 @@ serverid %s servername %s chname #%s" % (server.id, server.name, channel.name))
             await self.client.send_message(channel, \
                 ":elephant: Mensagem muito grande :elephant:")
         else:
-            if langdb is None:
+            if configdb is None:
                 logger.info("Loading language database @ cxt.say")
-                await load_langdb()
+                await load_configdb()
 
             if self.message.server is not None:
-                if self.message.server.id not in langdb:
+                if self.message.server.id not in configdb:
                     await self.client.send_message(channel, \
                         ":warning: No language has been defined for this\
 server, use `!language` to set up :warning:")
