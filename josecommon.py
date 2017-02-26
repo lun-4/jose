@@ -593,7 +593,7 @@ async def load_configdb():
             if isinstance(protocdb, str): # old langdb
                 configdb[serverid] = get_defaultcdb()
                 configdb[serverid]['language'] = protocdb
-                sanity_save = true
+                sanity_save = True
 
         if sanity_save:
             await save_configdb()
