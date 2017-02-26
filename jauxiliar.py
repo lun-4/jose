@@ -12,7 +12,6 @@ class Auxiliar(jcommon.Extension):
         jcommon.Extension.__init__(self, cl)
         self.jcommon = jcommon
         self.jcoin = jcoin
-        # self.jc = jcoin.JoseCoin(cl)
 
-    async def jc_control(self, id_user, amnt):
-        return jcoin.transfer(id_user, jcoin.jose_id, amnt, jcoin.LEDGER_PATH)
+    async def jc_control(self, id_user, amnt, ledger_path=None):
+        return jcoin.transfer(id_user, jcoin.jose_id, amnt, ledger_path)

@@ -67,7 +67,10 @@ def gen():
         acc = data[acc_id]
         yield (acc_id, acc['name'], acc['amount'])
 
-def transfer(id_from, id_to, amnt, file_name=LEDGER_PATH):
+def transfer(id_from, id_to, amnt, file_name=None):
+    if file_name is None:
+        file_name = LEDGER_PATH
+
     amnt = decimal.Decimal(str(amnt))
 
     if amnt < 0:

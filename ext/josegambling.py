@@ -144,7 +144,7 @@ class JoseGambling(jcommon.Extension):
 
         report = ''
 
-        res = self.jcoin.transfer(self.jcoin.jose_id, winner, total_amount, self.jcoin.LEDGER_PATH)
+        res = self.jcoin.transfer(self.jcoin.jose_id, winner, total_amount)
         if res[0]:
             report += "**WINNER:** <@%s> won `%.2fJC`!\n" % (winner, total_amount)
         else:
