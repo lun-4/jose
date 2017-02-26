@@ -55,8 +55,8 @@ class JoseStats(jaux.Auxiliar):
             self.statistics = {}
             if not os.path.isfile(self.db_stats_path):
                 # recreate
-                with open(self.db_stats_path, 'w') as f:
-                    f.write(DEFAULT_STATS_FILE)
+                with open(self.db_stats_path, 'w') as statsfile:
+                    statsfile.write(DEFAULT_STATS_FILE)
 
             self.statistics = json.load(open(self.db_stats_path, 'r'))
 
@@ -73,8 +73,8 @@ class JoseStats(jaux.Auxiliar):
                 self.statistics['gl_queries'] = 0
 
             return True, ''
-        except Exception as e:
-            return False, str(e)
+        except Exception as err:
+            return False, str(err)
 
     async def ext_unload(self):
         try:
@@ -85,8 +85,8 @@ class JoseStats(jaux.Auxiliar):
             self.cbk_remove('jstats.savedb')
 
             return True, ''
-        except Exception as e:
-            return False, str(e)
+        except Exception as err:
+            return False, str(err)
 
     async def db_fsizes(self):
         return {
@@ -117,8 +117,7 @@ class JoseStats(jaux.Auxiliar):
                 "messages": {}
             }
 
-        # USE AS REFERENCE, NOT TO WRITE
-        # probably that's what caused the "query delay until reload"
+        # USE AS REFERENCE TO READ, NOT TO WRITE
         serverdb = self.statistics[serverid]
 
         if authorid not in serverdb['messages']:
@@ -181,8 +180,7 @@ https://github.com/lkmnds/jose/blob/master/doc/queries-pt.md'''
                 await cxt.say("`j!query this` not available for DMs")
                 return
 
-            sid = message.server.id
-            sdb = self.statistics[sid]
+            sdb = self.statistics[message.server.id]
 
             total_msg = 0
             for authorid in sdb['messages']:
@@ -213,10 +211,9 @@ https://github.com/lkmnds/jose/blob/master/doc/queries-pt.md'''
                 await cxt.say("`j!query ltopcmd` not available for DMs")
                 return
 
-            sid = message.server.id
-            sdb = self.statistics[sid]
+            sdb = self.statistics[message.server.id]
             sorted_gcmd = sorted(sdb['commands'].items(), \
-                key=operator.itemgetter(1))
+                key=operator.itemgetter(1), reverse=True)
 
             response = '\n'.join(['%s - %d times' % \
                 (x, y) for (x, y) in sorted_gcmd[:10]])

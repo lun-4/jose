@@ -15,9 +15,9 @@ José Configuration:
 class JoseLanguage(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
-        self.LANGLIST = [
+        self.langlist = (
             'pt', 'en'
-        ]
+        )
 
     async def savedb(self):
         await jcommon.save_configdb()
@@ -57,7 +57,7 @@ class JoseLanguage(jaux.Auxiliar):
 
         language = args[1]
 
-        if language not in self.LANGLIST:
+        if language not in self.langlist:
             await cxt.say("%s: Language not found", (language,))
             return
 
@@ -72,7 +72,7 @@ class JoseLanguage(jaux.Auxiliar):
             await cxt.say("Language support is not available for DMs")
             return
 
-        llist = self.codeblock("", " ".join(self.LANGLIST))
+        llist = self.codeblock("", " ".join(self.langlist))
         serverlang = await jcommon.langdb_get(message.server.id)
         await cxt.say("This server's language: `%s`\nAvailable languages: %s", \
             (serverlang, llist))
