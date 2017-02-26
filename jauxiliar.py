@@ -8,8 +8,16 @@ import josecommon as jcommon
 import jcoin.josecoin as jcoin
 
 class Auxiliar(jcommon.Extension):
-    def __init__(self, cl):
-        jcommon.Extension.__init__(self, cl)
+    '''
+    Auxiliar - auxiliar functions and modules
+    All modules that inherit from this class have access to things that wouldn't
+    be possible if they were inheriting from jcommon.Extension.
+
+    For example josecoin, josecoin imports from josecommon, but if josecommon
+    imported josecoin into its Extension class, it would make a circular import.
+    '''
+    def __init__(self, client):
+        jcommon.Extension.__init__(self, client)
         self.jcommon = jcommon
         self.jcoin = jcoin
 
