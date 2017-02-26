@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 
-import asyncio
-import sys
-sys.path.append("..")
-import josecommon as jcommon
-
 import os
 import random
 import subprocess
 import json
 import time
+import asyncio
+import sys
+sys.path.append("..")
+import josecommon as jcommon
+
 from midiutil.MidiFile import MIDIFile
 import markovify
 
@@ -18,9 +18,9 @@ MESSAGE_LIMIT = 10000 # 10k messages
 LETTER_TO_PITCH = jcommon.LETTER_TO_PITCH
 
 async def make_texter(textpath=None, markov_length=2, text=None):
-    t = NewTexter(textpath, markov_length, text)
-    await t.mktexter()
-    return t
+    texter = NewTexter(textpath, markov_length, text)
+    await texter.mktexter()
+    return texter
 
 def make_textmodel(textdata, markov_length):
     tmodel = markovify.NewlineText(textdata, markov_length)
@@ -44,8 +44,8 @@ class NewTexter:
         if textpath is None:
             self.textdata = text
         else:
-            with open(textpath, 'r') as f:
-                self.textdata = f.read()
+            with open(textpath, 'r') as textfile:
+                self.textdata = textfile.read()
 
         self.text_model = None
 
@@ -154,12 +154,12 @@ class JoseSpeak(jcommon.Extension):
 
     async def server_messages(self, serverid, limit=None):
         cur = await self.dbapi.do('SELECT message FROM markovdb WHERE serverid=?', (serverid,))
-        r = [row[0] for row in cur.fetchall()]
+        rows = [row[0] for row in cur.fetchall()]
         if limit is not None:
-            pos = len(r) - limit
-            r = r[pos:]
+            pos = len(rows) - limit
+            rows = rows[pos:]
 
-        return r
+        return rows
 
     async def server_messages_string(self, serverid, limit=None):
         r = await self.server_messages(serverid, limit)
@@ -234,20 +234,6 @@ class JoseSpeak(jcommon.Extension):
         '''`j!spt` - alias para `!speaktrigger`'''
         await self.c_speaktrigger(message, args, cxt)
 
-    async def c_getmsg(self, message, args, cxt):
-        '''`j!getmsg serverid amount`'''
-        await self.is_admin(message.author.id)
-
-        try:
-            serverid = args[1]
-            amount = int(args[2])
-        except:
-            await cxt.say(self.c_getmsg.__doc__)
-            return
-
-        msg = await self.server_messages(serverid, amount)
-        await cxt.say(self.codeblock("python", repr(msg)))
-
     async def c_ntexter(self, message, args, cxt):
         '''`j!ntexter serverid1 serverid2 ...` - Create Texters **[ADMIN COMMAND]**'''
         await self.is_admin(message.author.id)
@@ -269,7 +255,7 @@ class JoseSpeak(jcommon.Extension):
 
         t_taken = (time.time() - t_start) * 1000
 
-        await cxt.say("`Created %d Texters. %d lines Took %.2fms`", \
+        await cxt.say("`Created %d Texters with %d lines in total. Took %.2fms`", \
             (len(servers), total_lines, t_taken))
 
     async def c_texclean(self, message, args, cxt):
@@ -333,7 +319,6 @@ class JoseSpeak(jcommon.Extension):
 
         if random.random() < 0.03 or self.flag:
             self.flag = False
-            self.current = message
             await cxt.send_typing()
 
             # default 5 words
@@ -469,7 +454,7 @@ class JoseSpeak(jcommon.Extension):
         else:
             res = generated_str
 
-        mf = MIDIFile(1)
+        midi_file = MIDIFile(1)
         track = 0
         st_time = 0
         mf.addTrackName(track, st_time, "Jose")
@@ -500,8 +485,8 @@ class JoseSpeak(jcommon.Extension):
                 pitch = LETTER_TO_PITCH[letter]
 
                 # run that in a thread
-                future = self.loop.run_in_executor(None, mf.addNote, track, \
-                    channel, pitch, st_time, duration, volume)
+                future = self.loop.run_in_executor(None, midi_file.addNote, \
+                    track, channel, pitch, st_time, duration, volume)
                 await future
 
         t_taken_ms = (time.time() - t_start) * 1000
@@ -509,7 +494,7 @@ class JoseSpeak(jcommon.Extension):
 
         fname = '%s.mid' % generated_str
         with open(fname, 'wb') as outf:
-            future = self.loop.run_in_executor(None, mf.writeFile, outf)
+            future = self.loop.run_in_executor(None, midi_file.writeFile, outf)
             await future
 
         # send file
