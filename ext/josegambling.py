@@ -112,11 +112,7 @@ class JoseGambling(jcommon.Extension):
             await cxt.say("No session found for this server, use `j!jrstart`")
             return
 
-        PERCENTAGE_WIN = 76.54
-        PERCENTAGE_OTHERS = 100 - PERCENTAGE_WIN
-
         PERCENTAGE_WIN /= 100
-        PERCENTAGE_OTHERS /= 100
 
         session = self.sesison[message.server.id]
         betters = session['betters']
@@ -124,18 +120,16 @@ class JoseGambling(jcommon.Extension):
         K = list(betters.keys())
         if len(K) < 2:
             await cxt.say("Session without 2 or more players, closing down.")
-            del self.session[message.server.id], session
+            del self.session[message.server.id], session, betters
             return
 
         winner = random.choice(K)
 
         M = sum(betters.values(), decimal.Decimal(0)) # total
-        len_betters = len(betters) - 1 # remove one because of the winner
         P = (M * decimal.Decimal(PERCENTAGE_WIN))
-        p = (M * decimal.Decimal(PERCENTAGE_OTHERS)) / decimal.Decimal(len_betters)
 
         if self.jcoin.data[self.jcoin.jose_id]['amount'] < M:
-            await self.debug("aposta->jc: **THIS IS BAD, JOSÉ DOESNT HAVE ENOUGH FUNDS FOR TRANSACTION**")
+            await cxt.err("jc->check: **THIS IS BAD, JOSÉ DOESNT HAVE ENOUGH FUNDS FOR TRANSACTION**")
 
         report = ''
 
@@ -145,19 +139,6 @@ class JoseGambling(jcommon.Extension):
         else:
             await self.debug("jc_jcroulette->jc: %s\naborting jr mode" % res[1])
             return
-
-        del self.session[message.server.id]['betters'][winner]
-        del session['betters'][winner]
-        del betters[winner]
-
-        # going well...
-        for bet_user in betters:
-            res = self.jcoin.transfer(self.jcoin.jose_id, apostador, p, self.jcoin.LEDGER_PATH)
-            if res[0]:
-                report += "<@%s> won %.2fJC!\n" % (apostador, p)
-            else:
-                await self.debug("jc_aposta->self.jcoin: %s" % res[1])
-                return
 
         # http://i.imgur.com/huUlJhR.jpg
         await cxt.say("%s\nJC roulette is off!\n", (report,))
