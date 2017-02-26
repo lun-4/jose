@@ -553,7 +553,7 @@ langobjects = {
 
 def get_defaultcdb():
     return {
-        'botblock': False,
+        'botblock': True,
         'language': 'en',
     }
 
@@ -647,7 +647,7 @@ serverid %s servername %s chname #%s" % (server.id, server.name, channel.name))
                 ":elephant: Mensagem muito grande :elephant:")
         else:
             if configdb is None:
-                logger.info("Loading language database @ cxt.say")
+                logger.info("Loading configuration database @ cxt.say")
                 await load_configdb()
 
             if self.message.server is None:

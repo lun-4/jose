@@ -6,6 +6,12 @@ sys.path.append("..")
 import jauxiliar as jaux
 import josecommon as jcommon
 
+CONFIG_HELP = """
+José Configuration:
+ * `botblock`, if True, blocks all bot messages, use `j!botblock`
+ * `language`, string representing the server's language, use `j!language`
+"""
+
 class JoseLanguage(jaux.Auxiliar):
     def __init__(self, cl):
         jaux.Auxiliar.__init__(self, cl)
@@ -29,6 +35,9 @@ class JoseLanguage(jaux.Auxiliar):
         await self.savedb()
         await jcommon.load_configdb()
         await cxt.say(":speech_left: configdb reloaded")
+
+    async def c_confighelp(self, message, args, cxt):
+        await cxt.say(CONFIG_HELP)
 
     async def c_botblock(self, message, args, cxt):
         '''`j!botblock` - toggles bot block'''
