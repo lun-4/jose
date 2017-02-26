@@ -284,8 +284,8 @@ show_vinheta = make_func('http://prntscr.com/bvcbju')
 show_agira = make_func("http://docs.unity3d.com/uploads/Main/SL-DebugNormals.png")
 show_casa = make_func("https://thumbs.dreamstime.com/z/locais-de-trabalho-em-um-escrit%C3%B3rio-panor%C3%A2mico-moderno-opini%C3%A3o-de-new-york-city-das-janelas-tabelas-pretas-e-cadeiras-de-couro-59272285.jpg")
 
-async def str_xor(s, t):
-    return "".join(chr(ord(a) ^ ord(b)) for a, b in zip(s, t))
+async def str_xor(string, other):
+    return "".join(chr(ord(a) ^ ord(b)) for a, b in zip(string, other))
 
 JCRYPT_KEY = 'vcefodaparabensfrozen2meuovomeuovinhoayylmaogordoquaseexploderindo'
 
@@ -430,12 +430,9 @@ class Extension:
         self._callbacks = {}
         self.dbapi = DatabaseAPI(self.client)
 
-    async def say(self, msg, channel=None):
-        logger.warning("Extension.say: DEPRECATED API: %s", msg)
-
     async def rolecheck(self, cxt, correct_role):
-        c = [role.name == correct_role for role in cxt.message.author.roles]
-        if not True in c:
+        roles = [role.name == correct_role for role in cxt.message.author.roles]
+        if not True in roles:
             raise je.PermissionError()
         else:
             return True
@@ -466,22 +463,25 @@ class Extension:
         logger.info("New callback %s every %d seconds", callback_id, timer_sec)
 
         self._callbacks[callback_id] = Callback(callback_id, func, timer_sec)
-        ok = self.noasync(run_callback, [callback_id, self._callbacks[callback_id]])
-        if ok is None:
+
+        status = self.noasync(run_callback, [callback_id, \
+            self._callbacks[callback_id]])
+
+        if status is None:
             logger.error("Error happened in callback %s", callback_id)
 
         logger.info("Callback %s finished", callback_id)
 
     async def cbk_call(self, callback_id):
-        ok = await cbk_call(callback_id)
-        if ok is None:
+        status = await cbk_call(callback_id)
+        if status is None:
             logger.error("Error calling callback %s", callback_id)
             return
         logger.info("called callback %s", callback_id)
 
     def cbk_remove(self, callback_id):
-        ok = self.noasync(cbk_remove, [callback_id])
-        if ok is None:
+        status = self.noasync(cbk_remove, [callback_id])
+        if status is None:
             logger.error("Error removing callback %s", callback_id)
             return
 
@@ -511,20 +511,20 @@ PT_LANGUAGE_PATH = './locale/jose.pt.json'
 class LangObject:
     def __init__(self, fpath):
         self.path = fpath
-        self.db = json.load(open(fpath, 'r'))
+        self.database = json.load(open(fpath, 'r'))
 
     def reload_db(self):
-        self.db = json.load(open(self.path, 'r'))
+        self.database = json.load(open(self.path, 'r'))
 
     def gettext(self, msgid):
-        res = self.db.get(msgid, "")
+        res = self.database.get(msgid, "")
         if len(res) == 0:
             return msgid
         else:
             return res
 
 # initialize language object for each language
-langobjects = {
+LANGUAGE_OBJECTS = {
     'en': LangObject(EN_LANGUAGE_PATH),
     'pt': LangObject(PT_LANGUAGE_PATH),
 }
@@ -598,7 +598,7 @@ async def load_configdb():
 
 
 async def get_translated(langid, string):
-    lang = langobjects.get(langid, None)
+    lang = LANGUAGE_OBJECTS.get(langid, None)
     if lang is None:
         # fallback, just return the same string
         return string
