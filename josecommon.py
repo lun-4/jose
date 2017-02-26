@@ -650,12 +650,7 @@ serverid %s servername %s chname #%s" % (server.id, server.name, channel.name))
                 logger.info("Loading language database @ cxt.say")
                 await load_configdb()
 
-            if self.message.server is not None:
-                if self.message.server.id not in configdb:
-                    await self.client.send_message(channel, \
-                        ":warning: No language has been defined for this\
-server, use `!language` to set up :warning:")
-            else:
+            if self.message.server is None:
                 # in a DM
                 ret = await self.client.send_message(channel, (string % tup))
                 return ret
