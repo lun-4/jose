@@ -457,8 +457,8 @@ class JoseSpeak(jcommon.Extension):
         midi_file = MIDIFile(1)
         track = 0
         st_time = 0
-        mf.addTrackName(track, st_time, "Jose")
-        mf.addTempo(track, st_time, tempo_to_use)
+        midi_file.addTrackName(track, st_time, "Jose")
+        midi_file.addTempo(track, st_time, tempo_to_use)
 
         # add some notes
         channel = 0
