@@ -1,18 +1,11 @@
 # -*- coding: utf-8 -*-
+import sys
+import time
 import asyncio
 import uvloop
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-
-# profiling
-from pympler import tracker
-
-import sys
-import time
 import traceback
 import logging
-from random import SystemRandom
-random = SystemRandom()
-
 import discord
 
 import josecommon as jcommon
@@ -20,6 +13,11 @@ import ext.jose as jose_bot
 import jcoin.josecoin as josecoin
 import joseconfig as jconfig
 import joseerror as je
+
+# profiling
+from pympler import tracker
+from random import SystemRandom
+random = SystemRandom()
 
 logging.basicConfig(level=logging.INFO)
 
@@ -272,8 +270,8 @@ async def _timer_playing():
         len(client.servers), jcommon.JOSE_PREFIX)
 
     jcommon.logger.info("Playing %r", playing_name)
-    g = discord.Game(name = playing_name, url = playing_name)
-    await client.change_presence(game = g)
+    g = discord.Game(name=playing_name, url=playing_name)
+    await client.change_presence(game=g)
 
 async def timer_playing():
     global t_allowed
@@ -303,8 +301,8 @@ async def on_ready():
         await timer_playing()
     else:
         jcommon.logger.info("Developer Mode Enabled")
-        g = discord.Game(name = 'JOSÉ IN MAINTENANCE', url = 'fuck you')
-        await client.change_presence(game = g)
+        g = discord.Game(name='JOSÉ IN MAINTENANCE', url='fuck you')
+        await client.change_presence(game=g)
 
     t_allowed = False
 
