@@ -22,12 +22,25 @@ async def make_texter(textpath=None, markov_length=2, text=None):
     await t.mktexter()
     return t
 
+def make_textmodel(textdata, markov_length):
+    tmodel = markovify.NewlineText(textdata, markov_length)
+    return tmodel
+
+def get_sentence(textmodel):
+    text = text_model.make_sentence()
+    return text
+
 class NewTexter:
-    def __init__(self, textpath, markov_length, text):
+    def __init__(self, textpath, markov_length, text, loop=None):
         self.refcount = 1
         t_start = time.time()
         self.markov_length = markov_length
         self.textdata = ''
+
+        # custom asyncio event loop
+        self.loop = loop
+        if self.loop is None:
+            self.loop = asyncio.get_event_loop()
 
         if textpath is None:
             self.textdata = text
@@ -37,20 +50,19 @@ class NewTexter:
 
         self.text_model = None
 
-        t_taken = (time.time() - t_start) * 1000
-        if logger:
-            logger.info("NewTexter: markovify took %.2fms" % t_taken)
-        else:
-            print("NewTexter: markovify took %.2fms" % t_taken)
-
     async def mktexter(self):
-        '''
-        loop = asyncio.get_event_loop()
-        future_textmodel = loop.run_in_executor(markovify.NewlineText, self.textdata, self.markov_length)
+        t_start = time.time()
+
+        future_textmodel = self.loop.run_in_executor(make_textmodel, \
+            self.textdata, self.markov_length)
 
         self.text_model = await future_textmodel
-        '''
-        self.text_model = markovify.NewlineText(self.textdata, self.markov_length)
+
+        t_taken = (time.time() - t_start) * 1000
+        if logger:
+            logger.info("NewTexter: mktexter took %.2fms", t_taken)
+        else:
+            print("NewTexter: mktexter took %.2fms" % t_taken)
 
     def __repr__(self):
         return 'Texter(refcount=%s)' % self.refcount
@@ -64,7 +76,9 @@ class NewTexter:
         count = 0
         while res is None:
             if count > 3: break
-            res = self.text_model.make_sentence()
+            future_textmodel = self.loop.run_in_executor(get_sentence, \
+                self.text_model)
+            res = await future_sentence
             count += 1
 
         return str(res)
