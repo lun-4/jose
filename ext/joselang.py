@@ -14,21 +14,27 @@ class JoseLanguage(jaux.Auxiliar):
         ]
 
     async def savedb(self):
-        await jcommon.save_langdb()
+        await jcommon.save_configdb()
 
     async def ext_load(self):
         await self.dbapi.initializedb()
-        status = await jcommon.load_langdb()
+        status = await jcommon.load_configdb()
         return status
 
     async def ext_unload(self):
-        status = await jcommon.save_langdb()
+        status = await jcommon.save_configdb()
         return status
 
-    async def c_reloadlangdb(self, message, args, cxt):
+    async def c_reloadcdb(self, message, args, cxt):
         await self.savedb()
-        await jcommon.load_langdb()
-        await cxt.say(":speech_left: langdb reloaded")
+        await jcommon.load_configdb()
+        await cxt.say(":speech_left: configdb reloaded")
+
+    async def c_botblock(self, message, args, cxt):
+        '''`j!botblock` - toggles bot block'''
+        cur = jcommon.configdb_get(message.server.id, 'botblock', False)
+        await jcommon.configdb_set(message.server.id, 'botblock', not cur)
+        await cxt.say("Botblock defined to %s", (not cur,))
 
     async def c_language(self, message, args, cxt):
         '''`j!language lang` - sets language for a server(use `!listlang` for available languages)'''

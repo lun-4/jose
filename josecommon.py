@@ -551,16 +551,35 @@ langobjects = {
     'pt': LangObject(PT_LANGUAGE_PATH),
 }
 
+async def configdb_set(sid, key, value):
+    if sid not in langdb:
+        langdb[sid] = {}
+    langdb[sid][key] = value
+
+async def configdb_get(sid, key, defaultval=None):
+    if sid not in langdb:
+        langdb[sid] = {}
+        return defaultval
+
+    return langdb[sid].get(key, defaultval)
+
 # langdb stuff
 async def langdb_set(sid, lang):
     global langdb
-    langdb[sid] = lang
+    await configdb_set(sid, 'language', lang)
 
 async def langdb_get(sid):
     global langdb
-    return langdb.get(sid, 'default')
+    cdb = langdb[sid]
+    if not isinstance(cdb, dict):
+        langdb[sid] = {
+            'language': cdb
+        }
 
-async def save_langdb():
+    res = await configdb_get(sid, 'language', 'default')
+    return res
+
+async def save_configdb():
     global langdb
     logger.info("Saving language database")
     try:
@@ -570,7 +589,7 @@ async def save_langdb():
 
     return True, ''
 
-async def load_langdb():
+async def load_configdb():
     global langdb
     if not os.path.isfile(LANGUAGES_PATH):
         # recreate
@@ -628,7 +647,8 @@ serverid %s servername %s chname #%s" % (server.id, server.name, channel.name))
             channel = self.message.channel
 
         if len(string) > 2000:
-            await self.client.send_message(channel, ":elephant: Mensagem muito grande :elephant:")
+            await self.client.send_message(channel, \
+                ":elephant: Mensagem muito grande :elephant:")
         else:
             if langdb is None:
                 logger.info("Loading language database @ cxt.say")
@@ -637,7 +657,8 @@ serverid %s servername %s chname #%s" % (server.id, server.name, channel.name))
             if self.message.server is not None:
                 if self.message.server.id not in langdb:
                     await self.client.send_message(channel, \
-                        ":warning: No Language has been defined for this server, use `!language` to set up :warning:")
+                        ":warning: No language has been defined for this\
+server, use `!language` to set up :warning:")
             else:
                 # in a DM
                 ret = await self.client.send_message(channel, (string % tup))

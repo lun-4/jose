@@ -114,6 +114,11 @@ async def check_message(message):
     if len(message.content) <= 0:
         return False
 
+    # configdb is langdb but with more bits
+    cdb = await jcommon.configdb_get(message.server.id)
+    if cdb['botblock']:
+        return False
+
     return True
 
 async def do_command_table(message):
