@@ -105,9 +105,10 @@ WELCOME_MESSAGE = '''
 Thanks for implementing José v{} into your server!
 Jose is a bot that learns to speak based on conversations that happen in your server.
 **See `j!docs josespeak` to learn more about this.**
-To start off, you need to generate at least 100 messages, just talk and watch the magic happen!
+To start off, you need to generate at least 100+ messages, just talk and watch the magic happens!
 When he's ready, you can use `j!speaktrigger` or `j!spt` to hear what he has to say.
 
+Use `j!botblock` if you want to block/unblock bot messages coming into José.
 Use `j!language en` to set your language to English or `j!language pt` to set your language to Portuguese.
 '''.format(JOSE_VERSION)
 
