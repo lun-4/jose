@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 
 import decimal
-import sys
 from random import SystemRandom
 random = SystemRandom()
 
+import sys
 sys.path.append("..")
-import josecommon as jcommon
-import jcoin.josecoin as jcoin
+import jauxiliar as jaux
 
 class JoseGambling(jcommon.Extension):
     def __init__(self, cl):
-        jcommon.Extension.__init__(self, cl)
+        jaux.Auxiliar.__init__(self, cl)
         self.last_bid = 0.0
         self.gambling_mode = False
         self.gambling_env = {}
@@ -49,11 +48,11 @@ class JoseGambling(jcommon.Extension):
             return
 
         id_from = message.author.id
-        id_to = jcoin.jose_id
+        id_to = self.jcoin.jose_id
         amount = decimal.Decimal(0)
         try:
             if args[1] == 'all':
-                from_amnt = jcoin.get(id_from)[1]['amount'] - 0.1
+                from_amnt = self.jcoin.get(id_from)[1]['amount'] - 0.1
                 fee_amnt = from_amnt * decimal.Decimal(jcommon.GAMBLING_FEE/100.)
                 amount = from_amnt - fee_amnt
             else:
@@ -69,14 +68,14 @@ class JoseGambling(jcommon.Extension):
             await cxt.say("sua aposta tem que ser maior do que a última, que foi %.2fJC", (self.last_bid,))
             return
 
-        a = jcoin.get(id_from)[1]
+        a = self.jcoin.get(id_from)[1]
         if a['amount'] <= atleast:
             await cxt.say("sua conta não possui fundos suficientes para apostar(%.2fJC são necessários, você tem %.2fJC, faltam %.2fJC)", \
                 (atleast, a['amount'], decimal.Decimal(atleast) - a['amount']))
             return
 
-        res = jcoin.transfer(id_from, id_to, atleast, jcoin.LEDGER_PATH)
-        await jcoin.raw_save()
+        res = self.jcoin.transfer(id_from, id_to, atleast, self.jcoin.LEDGER_PATH)
+        await self.jcoin.raw_save()
         if res[0]:
             await cxt.say(res[1])
             # use jenv
@@ -112,12 +111,12 @@ class JoseGambling(jcommon.Extension):
         P = (M * decimal.Decimal(PORCENTAGEM_GANHADOR))
         p = (M * decimal.Decimal(PORCENTAGEM_OUTROS)) / decimal.Decimal(apostadores)
 
-        if jcoin.data[jcoin.jose_id]['amount'] < M:
+        if self.jcoin.data[self.jcoin.jose_id]['amount'] < M:
             await self.debug("aposta->jc: **JOSÉ NÃO POSSUI FUNDOS SUFICIENTES PARA A APOSTA**")
 
         report = ''
 
-        res = jcoin.transfer(jcoin.jose_id, winner, P, jcoin.LEDGER_PATH)
+        res = self.jcoin.transfer(self.jcoin.jose_id, winner, P, self.jcoin.LEDGER_PATH)
         if res[0]:
             report += "**GANHADOR:** <@%s> ganhou %.2fJC!\n" % (winner, P)
         else:
@@ -128,11 +127,11 @@ class JoseGambling(jcommon.Extension):
 
         # going well...
         for apostador in self.gambling_env:
-            res = jcoin.transfer(jcoin.jose_id, apostador, p, jcoin.LEDGER_PATH)
+            res = self.jcoin.transfer(self.jcoin.jose_id, apostador, p, self.jcoin.LEDGER_PATH)
             if res[0]:
                 report += "<@%s> ganhou %.2fJC nessa aposta!\n" % (apostador, p)
             else:
-                await self.debug("jc_aposta->jcoin: %s" % res[1])
+                await self.debug("jc_aposta->self.jcoin: %s" % res[1])
                 return
 
         await cxt.say("%s\nModo aposta desativado!\nhttp://i.imgur.com/huUlJhR.jpg", (report,))
