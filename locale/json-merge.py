@@ -7,9 +7,11 @@ def main(args):
 
     basejson, langjson = None, None
     with open(basefile, 'r') as f:
+        print("load basejson", basefile)
         basejson = json.load(f)
 
     with open(langfile, 'r') as f:
+        print("load langfile", langfile)
         langjson = json.load(f)
 
     # best merge ever!!!

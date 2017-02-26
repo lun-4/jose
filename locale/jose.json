@@ -181,5 +181,5 @@
 	"preciso de mais coisas para pesquisar(length < 3)": "",
 	"sndc: error: status code != 200(st = %d)": "",
 	"sndc: py_err %s": "",
-	"No results found": "",
+	"No results found": ""
 }
