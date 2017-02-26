@@ -555,6 +555,10 @@ def get_defaultcdb():
     return {
         'botblock': True,
         'language': 'en',
+
+        # TODO: use and change those
+        'imgchannel': None,
+        'prefix': JOSE_PREFIX,
     }
 
 async def configdb_set(sid, key, value):
