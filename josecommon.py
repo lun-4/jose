@@ -553,7 +553,10 @@ langobjects = {
 
 async def configdb_set(sid, key, value):
     if sid not in langdb:
-        langdb[sid] = {}
+        langdb[sid] = {
+            'botblock': False,
+            'language': 'en',
+        }
     langdb[sid][key] = value
 
 async def configdb_get(sid, key, defaultval=None):
