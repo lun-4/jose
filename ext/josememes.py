@@ -580,7 +580,7 @@ class JoseMemes(jcommon.Extension):
 
         for (index, char) in enumerate(inputstr):
             if char.isalpha():
-                inputstr[index] = ':regional_indicator_%s:' % char
+                inputstr[index] = ':regional_indicator_%s: ' % char
             elif char in RI_TABLE:
                 inputstr[index] = RI_TABLE[char]
 
