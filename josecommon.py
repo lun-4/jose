@@ -48,7 +48,7 @@ ADMIN_IDS = ['162819866682851329', '144377237997748224', \
 
 COOLDOWN_SECONDS = 5
 PIRU_ACTIVITY = .0000069
-jc_probabiblity = .01
+JC_PROBABILITY = .01
 JC_REWARDS = [0, 0, 0.2, 0.6, 1, 1.2, 1.5]
 
 TOTAL = 10.0
@@ -59,7 +59,8 @@ LEARN_MEMBERS = 1.0
 '''
 P = len_recompensas * (recompensa * prob) / TOTAL
 '''
-BASE_PRICE = 3 * ((len(JC_REWARDS) * (JC_REWARDS[len(JC_REWARDS)-1] * jc_probabiblity)) / TOTAL)
+BASE_PRICE = 3 * ((len(JC_REWARDS) * (JC_REWARDS[len(JC_REWARDS)-1] * \
+    JC_PROBABILITY)) / TOTAL)
 
 IMG_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / IMAGE_MEMBERS)
 LEARN_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / LEARN_MEMBERS)
@@ -79,9 +80,9 @@ ascii_to_wide.update({0x20: u'\u3000', 0x2D: u'\u2212'})  # space and minus
 
 client = None
 
-def set_client(cl):
+def set_client(_client):
     global client
-    client = cl
+    client = _client
 
 # Language database
 configdb = None
@@ -178,20 +179,12 @@ LETTER_TO_PITCH = {
     "9": 95,
 }
 
-debug_logs = []
-
-async def debug_log(string):
-    logger.debug(string)
-    today_str = time.strftime("%d-%m-%Y")
-    with open("logs/jose_debug-%s.log" % today_str, 'a') as f:
-        f.write(string+'\n')
-
-async def jose_debug(message, dbg_msg, flag=True):
+async def jose_debug(message, dbg_msg):
     message_banner = '%s[%s]: %r' % (message.author, message.channel, message.content)
     dbg_msg = '%s -> %s' % (message_banner, str(dbg_msg))
     logger.info(dbg_msg)
 
-aviaos = [
+AVIAOS = [
     'https://www.aboutcar.com/car-advice/wp-content/uploads/2011/02/Spoiler.jpg',
     'http://i.imgur.com/eL2hUyd.jpg',
     'http://i.imgur.com/8kS03gI.jpg',
@@ -210,21 +203,21 @@ async def show_top(message):
         (":ok_hand:" * random.randint(1, 6))))
 
 async def check_roles(correct, rolelist):
-    c = [role.name == correct for role in rolelist]
-    return True in c
+    roles = [role.name == correct for role in rolelist]
+    return True in roles
 
 async def random_emoji(maxn):
     return ''.join((str(emoji.random_emoji()) for i in range(maxn)))
 
-atividade = [
+ATIVIDADE = [
     'http://i.imgur.com/lkZVh3K.jpg',
     'http://imgur.com/a/KKwId',
     'http://imgur.com/a/ekrmK'
 ]
 
-async def gorila_routine(ch):
+async def gorila_routine(channel):
     if random.random() < PIRU_ACTIVITY:
-        await client.send_message(ch, random.choice(atividade))
+        await client.send_message(channel, random.choice(ATIVIDADE))
 
 def make_func(res):
     async def response(message):
@@ -308,13 +301,13 @@ class Callback:
     def start(self):
         self.run = True
 
-async def run_callback(callback_id, c):
+async def run_callback(callback_id, callback):
     if callback_id in callbacks:
         return None
 
-    callbacks[callback_id] = c
-    c.start()
-    await c.do()
+    callbacks[callback_id] = callback
+    callback.start()
+    await callback.do()
     return True
 
 async def cbk_call(callback_id):
@@ -359,8 +352,8 @@ async def do_stmt(stmt, params=None):
     return cur
 
 class DatabaseAPI:
-    def __init__(self, cl):
-        self.client = cl
+    def __init__(self, _client):
+        self.client = _client
 
     async def initializedb(self):
         await init_db(self.client)
@@ -377,15 +370,15 @@ class DatabaseAPI:
         return cur
 
 class Extension:
-    def __init__(self, cl):
+    def __init__(self, _client):
         '''
         Extension - A general extension used by josé
 
         The Extension class defines the API for josé's modules,
         all modules inherit from this class.
         '''
-        self.client = cl
-        self.loop = cl.loop
+        self.client = _client
+        self.loop = client.loop
         self.logger = logger
         self._callbacks = {}
         self.dbapi = DatabaseAPI(self.client)
@@ -566,12 +559,12 @@ async def get_translated(langid, string):
         return lang.gettext(string)
 
 class Context:
-    def __init__(self, client, message, t_creation=None, jose=None):
+    def __init__(self, _client, message, t_creation=None, jose=None):
         if t_creation is None:
             t_creation = time.time()
 
         self.message = message
-        self.client = client
+        self.client = _client
         self.t_creation = t_creation
         self.jose = jose
 
@@ -620,8 +613,8 @@ serverid %s servername %s chname #%s", server.id, server.name, channel.name)
                     channel.server.id, channel.server.name)
 
 class EmptyContext:
-    def __init__(self, client, message):
-        self.client = client
+    def __init__(self, _client, message):
+        self.client = _client
         self.message = message
         self.messages = []
 

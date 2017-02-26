@@ -48,7 +48,7 @@ class JoseCoin(jaux.Auxiliar):
             self.counter = 0
 
     async def e_on_message(self, message, cxt):
-        if random.random() > jcommon.jc_probabiblity:
+        if random.random() > jcommon.JC_PROBABILITY:
             return
 
         if message.channel.is_private:
