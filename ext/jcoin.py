@@ -11,8 +11,8 @@ from random import SystemRandom
 random = SystemRandom()
 
 class JoseCoin(jaux.Auxiliar):
-    def __init__(self, cl):
-        jaux.Auxiliar.__init__(self, cl)
+    def __init__(self, _client):
+        jaux.Auxiliar.__init__(self, _client)
         self.counter = 0
 
     async def ext_load(self):

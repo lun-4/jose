@@ -38,8 +38,8 @@ DEFAULT_STATS_FILE = '''{
 '''
 
 class JoseStats(jaux.Auxiliar):
-    def __init__(self, cl):
-        jaux.Auxiliar.__init__(self, cl)
+    def __init__(self, _client):
+        jaux.Auxiliar.__init__(self, _client)
         self.statistics = {}
         self.db_stats_path = jcommon.STAT_DATABASE_PATH
 

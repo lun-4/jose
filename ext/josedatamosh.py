@@ -70,8 +70,8 @@ async def datamosh_jpg(source_image, iterations):
     return output_image
 
 class JoseDatamosh(jaux.Auxiliar):
-    def __init__(self, cl):
-        jaux.Auxiliar.__init__(self, cl)
+    def __init__(self, _client):
+        jaux.Auxiliar.__init__(self, _client)
 
     async def ext_load(self):
         return True, ''

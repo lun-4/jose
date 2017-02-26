@@ -15,8 +15,8 @@ import pyowm
 import traceback
 
 class JoseMath(jaux.Auxiliar):
-    def __init__(self, cl):
-        jaux.Auxiliar.__init__(self, cl)
+    def __init__(self, _client):
+        jaux.Auxiliar.__init__(self, _client)
         self.wac = wolframalpha.Client(jconfig.WOLFRAMALPHA_APP_ID)
         self.owm = pyowm.OWM(jconfig.OWM_APIKEY)
 

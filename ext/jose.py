@@ -18,8 +18,8 @@ import joseerror as je
 jose_debug = jcommon.jose_debug
 
 class JoseBot(jcommon.Extension):
-    def __init__(self, cl):
-        jcommon.Extension.__init__(self, cl)
+    def __init__(self, _client):
+        jcommon.Extension.__init__(self, _client)
         self.nick = 'jose-bot'
         self.modules = {}
         self.env = {

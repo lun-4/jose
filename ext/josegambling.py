@@ -22,8 +22,8 @@ a winner that will win all the money everyone paid.
 '''
 
 class JoseGambling(jaux.Extension):
-    def __init__(self, cl):
-        jaux.Auxiliar.__init__(self, cl)
+    def __init__(self, _client):
+        jaux.Auxiliar.__init__(self, _client)
         self.sessions = {}
 
     async def ext_load(self):

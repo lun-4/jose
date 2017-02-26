@@ -12,8 +12,8 @@ MARKDOWN_HELP_FILES = [
 ]
 
 class JoseHelp(jaux.Auxiliar):
-    def __init__(self, cl):
-        jaux.Auxiliar.__init__(self, cl)
+    def __init__(self, _client):
+        jaux.Auxiliar.__init__(self, _client)
         self.help = {}
 
     def load_helpfiles(self):

@@ -30,17 +30,17 @@ def parse(string, message):
 
     return ''.join(res)
 
-async def mw_response(mw, message):
-    return parse(mw['response'], message)
+async def mw_response(magicword, message):
+    return parse(magicword['response'], message)
 
-async def mw_match(mw, string):
-    for word in mw['words']:
+async def mw_match(magicword, string):
+    for word in magicword['words']:
         if word in string:
             return True
 
 class JoseMagicWord(jaux.Auxiliar):
-    def __init__(self, cl):
-        jaux.Auxiliar.__init__(self, cl)
+    def __init__(self, _client):
+        jaux.Auxiliar.__init__(self, _client)
         self.db_magicword_path = jconfig.MAGICWORD_PATH
         self.magicwords = {}
         self.counter = 0

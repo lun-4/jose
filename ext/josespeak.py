@@ -86,9 +86,9 @@ class NewTexter:
         del self.text_model
 
 class JoseSpeak(jcommon.Extension):
-    def __init__(self, cl):
+    def __init__(self, _client):
         global logger
-        jcommon.Extension.__init__(self, cl)
+        jcommon.Extension.__init__(self, _client)
         logger = self.logger
 
         self.flag = False

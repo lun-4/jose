@@ -16,8 +16,8 @@ random = SystemRandom()
 IMAGE_LIMIT = 14
 
 class JoseImages(jcommon.Extension):
-    def __init__(self, cl):
-        jcommon.Extension.__init__(self, cl)
+    def __init__(self, _client):
+        jcommon.Extension.__init__(self, _client)
 
     async def ext_load(self):
         return True, ''

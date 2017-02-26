@@ -61,8 +61,8 @@ BLACK_MIRROR_MESSAGES = [
 ]
 
 class JoseMemes(jcommon.Extension):
-    def __init__(self, cl):
-        jcommon.Extension.__init__(self, cl)
+    def __init__(self, _client):
+        jcommon.Extension.__init__(self, _client)
         self.memes = {}
         self.WIDE_MAP = dict((i, i + 0xFEE0) for i in range(0x21, 0x7F))
         self.WIDE_MAP[0x20] = 0x3000

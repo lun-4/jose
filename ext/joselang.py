@@ -13,8 +13,8 @@ José Configuration:
 """
 
 class JoseLanguage(jaux.Auxiliar):
-    def __init__(self, cl):
-        jaux.Auxiliar.__init__(self, cl)
+    def __init__(self, _client):
+        jaux.Auxiliar.__init__(self, _client)
         self.LANGLIST = [
             'pt', 'en'
         ]
