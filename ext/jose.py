@@ -338,19 +338,19 @@ class JoseBot(jcommon.Extension):
         auth = await self.is_admin(cxt.message.author.id)
         if auth:
             self.command_lock = True
-            f(cxt)
+            await f(cxt)
             self.command_lock = False
         else:
             raise je.PermissionError()
 
-    def turnoff(self, cxt):
+    async def turnoff(self, cxt):
         await self.modules['jcoin']['inst'].josecoin_save(cxt.message)
         await self.unload_all()
         await cxt.say(":wave: kthxbye :wave:")
         await self.client.logout()
         sys.exit(0)
 
-    def update(self, cxt):
+    async def update(self, cxt):
         await self.modules['jcoin']['inst'].josecoin_save(cxt.message)
         await self.unload_all()
 
