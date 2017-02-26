@@ -9,7 +9,6 @@ sys.path.append("..")
 import jauxiliar as jaux
 
 BETTING_FEE = 5
-PERCENTAGE_WIN = 100
 
 JCROULETTE_HELP_TEXT = '''
 JoséCoin Roulette, abbreviated as JC Roulette, is a form of russian roulette
@@ -122,8 +121,6 @@ class JoseGambling(jcommon.Extension):
         if message.server.id not in self.sessions:
             await cxt.say("No session found for this server, use `j!jrstart`")
             return
-
-        PERCENTAGE_WIN /= 100
 
         session = self.sesison[message.server.id]
         betters = session['betters']

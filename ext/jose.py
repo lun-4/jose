@@ -338,21 +338,37 @@ class JoseBot(jcommon.Extension):
         auth = await self.is_admin(cxt.message.author.id)
         if auth:
             self.command_lock = True
-            await f(cxt)
+            f(cxt)
             self.command_lock = False
         else:
             raise je.PermissionError()
 
-    async def turnoff(self, cxt):
+    def turnoff(self, cxt):
         await self.modules['jcoin']['inst'].josecoin_save(cxt.message)
         await self.unload_all()
         await cxt.say(":wave: kthxbye :wave:")
         await self.client.logout()
         sys.exit(0)
 
+    def update(self, cxt):
+        await self.modules['jcoin']['inst'].josecoin_save(cxt.message)
+        await self.unload_all()
+
+        out = subprocess.check_output("git pull", shell=True, \
+            stderr=subprocess.STDOUT)
+        res = out.decode("utf-8")
+        await cxt.say("`git pull`: ```%s```\n", (res,))
+
+        await self.client.logout()
+        sys.exit(0)
+
     async def c_shutdown(self, message, args, cxt):
-        '''`j!shutdown` - desliga o josé'''
+        '''`j!shutdown` - turns off josé'''
         await self.sec_auth(self.turnoff, cxt)
+
+    async def c_update(self, message, args, cxt):
+        '''`j!update` - Updates josé to latest from github'''
+        await self.sec_auth(self.update, cxt)
 
     async def c_ping(self, message, args, cxt):
         '''`j!ping` - pong'''
