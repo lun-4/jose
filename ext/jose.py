@@ -449,12 +449,17 @@ class JoseBot(jcommon.Extension):
         '''`j!pick` - alias for `!escolha`'''
         await self.c_escolha(message, args, cxt)
 
+    async def c_nick(self, message, args, cxt):
+        '''`j!nick nickname` - splitted'''
+        await cxt.say("Use `j!gnick` for global nickname change(you don't want that)\
+use `j!lnick` for local nickname")
+
     async def c_gnick(self, message, args, cxt):
         '''`j!gnick [nick]` - only admins'''
         await self.is_admin(message.author.id)
 
         if len(args) < 2:
-            await cxt.say(self.c_lnick.__doc__)
+            await cxt.say(self.c_gnick.__doc__)
             return
 
         self.nick = ' '.join(args[1:])
