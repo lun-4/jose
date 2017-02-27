@@ -582,6 +582,9 @@ class JoseMemes(jcommon.Extension):
                 inputstr[index] = RI_TABLE[char]
 
         res = ''.join(inputstr)
+        if len(res) < 1:
+            await cxt.say("Can't make R.I. out from nothing")
+            return
         await cxt.say(res)
 
     async def c_pupper(self, message, args, cxt):
