@@ -582,10 +582,6 @@ class JoseMemes(jcommon.Extension):
                 inputstr[index] = RI_TABLE[char]
 
         res = ''.join(inputstr)
-        if len(res.strip()) == 0:
-            await cxt.say("Can't send empty message")
-            return
-
         await cxt.say(res)
 
     async def c_pupper(self, message, args, cxt):

@@ -609,10 +609,6 @@ serverid %s servername %s chname #%s", server.id, server.name, channel.name)
                 translated = translated % tup
 
             try:
-                if len(translated) < 1:
-                    ret = await self.client.send_message(channel, \
-                        "**[DEBUG]** empty message")
-                    return ret
                 ret = await self.client.send_message(channel, translated)
                 return ret
             except discord.Forbidden:
