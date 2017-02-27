@@ -171,7 +171,7 @@ https://github.com/lkmnds/jose/blob/master/doc/queries-pt.md'''
 
         elif querytype == 'dbsize':
             sizes = await self.db_fsizes()
-            for db in sizes:
+            for db in sorted(sizes):
                 sizes[db] = '%.3f' % (sizes[db] / 1024)
             response = "\n".join(": ".join(_) + "KB" for _ in sizes.items())
         elif querytype == 'this':

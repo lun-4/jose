@@ -56,7 +56,7 @@ class joseXtra(jaux.Auxiliar):
 
     async def message_count(self):
         if self.msgcount > 0:
-            self.logger.info("Processed %d messages/minute" % self.msgcount)
+            self.logger.info("Processed %d messages/minute", self.msgcount)
         self.msgcount = 0
 
     async def e_any_message(self, message, cxt):

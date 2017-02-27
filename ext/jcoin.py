@@ -125,7 +125,7 @@ class JoseCoin(jaux.Auxiliar):
         '''`j!jcsend @mention amount` - send JoséCoins to someone'''
 
         if len(args) != 3:
-            await cxt.say(self.c_enviar.__doc__)
+            await cxt.say(self.c_jcsend.__doc__)
             return
 
         id_to = args[1]
