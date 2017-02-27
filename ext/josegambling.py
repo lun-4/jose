@@ -35,7 +35,7 @@ class JoseGambling(jaux.Auxiliar):
     async def empty_session(self):
         return {
             'betters': {},
-            'last_bet': 0.0,
+            'last_bid': 0.0,
         }
 
     async def c_jrstart(self, message, args, cxt):
