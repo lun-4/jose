@@ -360,6 +360,8 @@ async def main_task():
     if jose.off_mode:
         msgid = random.getrandbits(80)
         userid = str(random.getrandbits(80))
+        jcommon.ADMIN_IDS.append(userid)
+
         user_dis = str(random.randint(1111, 9999))
         channelid = str(random.getrandbits(80))
         serverid = str(random.getrandbits(80))
