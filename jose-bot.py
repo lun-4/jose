@@ -6,6 +6,7 @@ import uvloop
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 import traceback
 import logging
+import readline
 import discord
 
 import josecommon as jcommon

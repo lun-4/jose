@@ -66,7 +66,7 @@ class JoseGambling(jaux.Auxiliar):
             await cxt.say(self.c_jrbet.__doc__)
             return
 
-        session = self.sesisons[message.server.id]
+        session = self.sessions[message.server.id]
 
         id_from = message.author.id
         id_to = self.jcoin.jose_id
@@ -128,7 +128,7 @@ class JoseGambling(jaux.Auxiliar):
         K = list(betters.keys())
         if len(K) < 2:
             await cxt.say("Session without 2 or more players, closing session.")
-            del self.session[message.server.id], session, betters
+            del self.sessions[message.server.id], session, betters
             return
 
         winner = random.choice(K)
@@ -146,13 +146,13 @@ class JoseGambling(jaux.Auxiliar):
             report += "**WINNER:** <@%s> won `%.2fJC`!\n" % (winner, total_amount)
         else:
             await self.debug("jc_jcroulette->jc: %s\naborting jr mode" % res[1])
-            del self.session[message.server.id], session, betters
+            del self.sessions[message.server.id], session, betters
             return
 
         # http://i.imgur.com/huUlJhR.jpg
         await cxt.say("%s\nJC roulette is off!\n", (report,))
 
-        del self.session[message.server.id], session, betters
+        del self.sessions[message.server.id], session, betters
         return
 
     async def c_jreport(self, message, args, cxt):
