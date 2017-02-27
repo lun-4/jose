@@ -115,8 +115,8 @@ async def check_message(message):
         return False
 
     # configdb is langdb but with more bits
-    cdb = await jcommon.configdb_get(message.server.id)
-    if cdb['botblock']:
+    botblock = await jcommon.configdb_get(message.server.id, 'botblock')
+    if botblock and message.author.bot:
         return False
 
     return True
@@ -211,6 +211,9 @@ async def on_message(message):
     is_good = await check_message(message)
     if not is_good:
         return
+
+    if jose.off_mode:
+        print("Recv message: %s" % message.content)
 
     if message.author.id in josecoin.data:
         josecoin.data[message.author.id]['name'] = str(message.author)
@@ -332,27 +335,28 @@ async def main_task():
     jcommon.logger.info("--- STARTUP TOOK %.2f SECONDS ---", startupdelta)
     jcommon.logger.info("Starting Client")
     if jose.off_mode:
-        msgid = random.getrandbits(70)
-        userid = str(random.getrandbits(70))
+        msgid = random.getrandbits(80)
+        userid = str(random.getrandbits(80))
         user_dis = str(random.randint(1111, 9999))
-        channelid = str(random.getrandbits(70))
-        serverid = str(random.getrandbits(70))
+        channelid = str(random.getrandbits(80))
+        serverid = str(random.getrandbits(80))
 
         # create discord objects
         _server = discord.Server(name='Offline José Mode', id=serverid)
 
-        _user = discord.User(name='Offline Admin', id=userid, \
-            discriminator=user_dis, avatar=None, bot=False, server=_server)
-
-        user = discord.Member(user=_user)
+        userdict = {'name': 'Offline Admin', 'id': userid, \
+            'discriminator': user_dis, 'avatar': None, 'bot': False, \
+            'server': _server}
 
         _channel = discord.Channel(name='talking', server=_server, \
             id=channelid, is_private=False, is_defualt=True)
 
+        jcommon.logger.info("You are %s#%s", userdict['name'], \
+            userdict['discriminator'])
         while True:
             msg = input("José> ")
             message = discord.Message(content=msg, channel=_channel, \
-                author=user, id=str(msgid))
+                author=userdict, id=str(msgid), reactions=[])
             msgid += 1
             await on_message(message)
     else:
@@ -369,9 +373,11 @@ def main(args):
     if mode == 'dev':
         print("===ENTERING DEVELOPER MODE===")
         jose.dev_mode = True
+        logging.basicConfig(level=logging.DEBUG)
     elif mode == 'offline':
         print("===OFFLINE/TEST MODE===")
         jose.off_mode = True
+        logging.basicConfig(level=logging.DEBUG)
 
     # load all josé's modules
     load_all_modules()

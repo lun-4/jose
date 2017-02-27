@@ -109,6 +109,13 @@ joseconfig.py
 
 # Databases from extensions
 db/*.json
+db/jose-data.txt
+db/languages.json
+db/magicwords.json
+db/messages.json
+db/stats.json
+db/wordlength.json
+db/zelao.txt
 ext/*.db
 database.db
 jose.db

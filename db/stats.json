@@ -1,1 +1,1 @@
-{"gl_messages": 0, "gl_commands": {}, "gl_queries": 0}
+{"gl_messages": 2, "gl_commands": {"ping": 1}, "gl_queries": 0, "562828796225316753353": {"commands": {"ping": 1}, "messages": {"1128630361611170437434": 1}}, "973159911752830332430": {"commands": {}, "messages": {"1036025971980210372691": 1}}}
