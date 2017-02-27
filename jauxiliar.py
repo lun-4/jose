@@ -6,6 +6,7 @@ jauxiliar.py - Auxiliar stuff for Jose modules
 
 import josecommon as jcommon
 import jcoin.josecoin as jcoin
+import joseerror as je
 
 class Auxiliar(jcommon.Extension):
     '''
@@ -23,3 +24,13 @@ class Auxiliar(jcommon.Extension):
 
     async def jc_control(self, id_user, amnt, ledger_path=None):
         return jcoin.transfer(id_user, jcoin.jose_id, amnt, ledger_path)
+
+    async def json_load(self, string):
+        future_json = self.loop.run_in_executor(None, json.loads, string)
+
+        try:
+            res = await future_json
+        except Exception as err:
+            raise je.CommonError("Error parsing JSON data")
+
+        return res

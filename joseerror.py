@@ -5,3 +5,6 @@ class PermissionError(Exception):
 
 class LimitError(Exception):
     pass
+
+class CommonError(Exception):
+    pass

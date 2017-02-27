@@ -4,6 +4,7 @@ import sys
 sys.path.append("..")
 import jauxiliar as jaux
 import joseconfig as jconfig
+import joseerror as je
 
 from random import SystemRandom
 random = SystemRandom()
@@ -151,7 +152,7 @@ class JoseMath(jaux.Auxiliar):
             if args[1] == 'list':
                 r = await aiohttp.request('GET', "http://api.fixer.io/latest")
                 content = await r.text()
-                data = json.loads(content)
+                data = await self.json_load(content)
                 await cxt.say(self.codeblock("", " ".join(data["rates"])))
                 return
 
@@ -171,7 +172,8 @@ class JoseMath(jaux.Auxiliar):
         url = "http://api.fixer.io/latest?base={}".format(currency_from.upper())
         r = await aiohttp.request('GET', url)
         content = await r.text()
-        data = json.loads(content)
+        data = await self.json_load(content)
+
 
         if 'error' in data:
             await cxt.say("money API error: %s", (data['error'],))

@@ -151,6 +151,8 @@ async def do_command(method, message, args, cxt, t_start, st):
         jcommon.logger.error("RuntimeError happened with %s", \
             str(message.author), exc_info=True)
         await cxt.say(':interrobang: RuntimeError: %s' % repr(e))
+    except je.CommonError as err:
+        await cxt.say('```\nCommonError: %r```', err)
     except je.LimitError:
         pass
 
