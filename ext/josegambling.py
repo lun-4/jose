@@ -89,10 +89,14 @@ class JoseGambling(jaux.Auxiliar):
         fee_amount = decimal.Decimal(amount) * decimal.Decimal(BETTING_FEE/100.)
         atleast = (decimal.Decimal(amount) + fee_amount)
 
-        a = self.jcoin.get(id_from)[1]
-        if a['last_bid'] <= atleast:
+        ok, acc = self.jcoin.get(id_from)
+        if not ok:
+            await cxt.say("jc->err: %s", acc)
+            return
+
+        if acc['amount'] <= atleast:
             await cxt.say("No sufficient funds(need `%.2fJC` in total, you have `%.2fJC`, needs `%.2fJC`)", \
-                (atleast, a['amount'], decimal.Decimal(atleast) - a['amount']))
+                (atleast, acc['amount'], decimal.Decimal(atleast) - acc['amount']))
             return
 
         res = self.jcoin.transfer(id_from, id_to, atleast)
