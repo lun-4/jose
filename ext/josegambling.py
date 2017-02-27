@@ -122,7 +122,7 @@ class JoseGambling(jaux.Auxiliar):
             await cxt.say("No session found for this server, use `j!jrstart`")
             return
 
-        session = self.sesison[message.server.id]
+        session = self.sesisons[message.server.id]
         betters = session['betters']
 
         K = list(betters.keys())
@@ -183,7 +183,7 @@ class JoseGambling(jaux.Auxiliar):
             await cxt.say("DMs can't use JC Roulette")
             return
 
-        session = self.session.get(message.server.id, False)
+        session = self.sessions.get(message.server.id, False)
         await cxt.say("JC Roulette: %s", (["off", "on"][session],))
 
     async def c_flip(self, message, args, cxt):
