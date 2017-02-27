@@ -330,7 +330,13 @@ async def on_error(event, *args, **kwargs):
             (message.server.id, message.server.name))
 
 async def offline_message(channel, string):
-    print("%s to %s" % (string, channel))
+    jcommon.logger.info("[msg] %r => #%s", string, channel)
+    return discord.Message(content=string, channel=channel, \
+        author=channel.server.me, id='0', reactions=[])
+
+async def off_edit_message(msg, new):
+    jcommon.logger.info("[msg.edit] %r became %r => #%s", \
+        msg.content, new, msg.channel)
 
 def overwrite_discord_client():
     jcommon.MARKOV_LENGTH_PATH = 'db/wordlength.json.other'
@@ -340,6 +346,7 @@ def overwrite_discord_client():
     jconfig.jcoin_path = 'jcoin/josecoin.db.other'
     jconfig.MAGICWORD_PATH = 'db/magicwords.json.other'
     client.send_message = offline_message
+    client.edit_message = off_edit_message
 
 async def main_task():
     global client
