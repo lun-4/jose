@@ -501,7 +501,7 @@ class JoseMemes(jcommon.Extension):
             return
 
         response_text = await response.text()
-        wiki_json = json.loads(response_text)
+        wiki_json = await self.json_load(response_text)
 
         if using_query:
             self.logger.debug("Wiki: Use query method")

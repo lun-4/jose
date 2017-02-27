@@ -75,7 +75,7 @@ class joseXtra(jaux.Auxiliar):
         r = await aiohttp.request('GET', url)
         content = await r.text()
 
-        info_latest = info = json.loads(content)
+        info_latest = info = await self.json_load(content)
         info = None
         try:
             if not n:
@@ -88,12 +88,12 @@ class joseXtra(jaux.Auxiliar):
                 r = await aiohttp.request('GET', url)
                 content = await r.text()
 
-                info = json.loads(content)
+                info = await self.json_load(content)
             else:
                 url = "http://xkcd.com/{0}/info.0.json".format(n)
                 r = await aiohttp.request('GET', url)
                 content = await r.text()
-                info = json.loads(content)
+                info = await self.json_load(content)
             await cxt.say('xkcd %s : %s', (n, info['img']))
 
         except Exception as e:
