@@ -567,6 +567,7 @@ class Context:
         self.client = _client
         self.t_creation = t_creation
         self.jose = jose
+        self.env = {}
 
     async def send_typing(self):
         try:

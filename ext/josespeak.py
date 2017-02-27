@@ -52,7 +52,7 @@ class NewTexter:
     async def mktexter(self):
         t_start = time.time()
 
-        future_textmodel = self.loop.run_in_executor(make_textmodel, \
+        future_textmodel = self.loop.run_in_executor(None, make_textmodel, \
             self.textdata, self.markov_length)
 
         self.text_model = await future_textmodel
@@ -75,7 +75,7 @@ class NewTexter:
         count = 0
         while res is None:
             if count > 3: break
-            future_sentence = self.loop.run_in_executor(get_sentence, \
+            future_sentence = self.loop.run_in_executor(None, get_sentence, \
                 self.text_model)
             res = await future_sentence
             count += 1
@@ -227,7 +227,7 @@ class JoseSpeak(jcommon.Extension):
 
     async def c_speaktrigger(self, message, args, cxt):
         """`j!speaktrigger` - trigger jose's speaking code"""
-        self.flag = True
+        cxt.env['flag'] = True
         await self.e_on_message(message, cxt)
 
     async def c_spt(self, message, args, cxt):
@@ -317,8 +317,12 @@ class JoseSpeak(jcommon.Extension):
                 await self.dbapi.do("INSERT INTO markovdb (serverid, message) \
                     VALUES (?, ?)", (sid, filtered_line))
 
-        if random.random() < 0.03 or self.flag:
-            self.flag = False
+        r = random.random()
+        print(r, cxt.env['flag'])
+        if r < 0.03 or cxt.env['flag']:
+            cxt.env['flag'] = False
+
+            print("send_typing")
             await cxt.send_typing()
 
             # default 5 words
@@ -326,10 +330,12 @@ class JoseSpeak(jcommon.Extension):
             if sid in self.text_lengths:
                 length = int(self.text_lengths[sid])
 
+            print("load")
             # ensure the server already has its texter loaded up
             if sid not in self.text_generators:
                 await self.new_generator(sid, MESSAGE_LIMIT)
 
+            print('speak')
             await self.speak(self.text_generators[sid], length, cxt)
 
     async def speak(self, texter, length_words, cxt):

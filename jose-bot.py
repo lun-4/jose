@@ -88,9 +88,11 @@ def load_all_modules():
     jose.ev_load(True)
 
 async def do_event(event_name, args):
+    print("Event %s < %s" % (event_name, args))
     for handler in jose.event_tbl[event_name]:
         if isinstance(args[0], discord.Message):
             cxt = jcommon.Context(client, args[0], time.time(), jose)
+            print("Call with CXT")
             await handler(cxt.message, cxt)
         else:
             await handler(**args)

@@ -219,7 +219,7 @@ class JoseBot(jcommon.Extension):
 
         # get the class that represents the module
         module_class = getattr(module, class_name, None)
-        if module_class is None:
+        if not module_class:
             if cxt is not None:
                 await cxt.say(":train:")
             self.logger.error("class instance is None")
@@ -227,8 +227,8 @@ class JoseBot(jcommon.Extension):
 
         # instantiate and ext_load it
         instance = await self.mod_instance(name, module_class)
-        if instance is None:
-            self.logger.error("instance is None")
+        if not instance: # catches False and None
+            self.logger.error("instance isn't good")
             return False
 
         if name in self.modules:
