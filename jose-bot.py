@@ -335,7 +335,7 @@ OFF_JOSE_USERDICT = {'name': 'José', 'id': '0', \
 OFF_JOSE_USER = discord.User(**OFF_JOSE_USERDICT)
 
 async def offline_message(channel, string):
-    jcommon.logger.info("[msg] %r => #%s", string, channel)
+    jcommon.logger.info("[msg: #%s] %s", channel, string)
     return discord.Message(content=string, channel=channel, \
         author=OFF_JOSE_USERDICT, id='0', reactions=[])
 
