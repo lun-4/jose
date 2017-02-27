@@ -202,8 +202,9 @@ class JoseSpeak(jcommon.Extension):
         deadtexters = len(sid_to_clear)
         if deadtexters > 0:
             self.txcleaned = deadtexters
-            logger.info("%d down to %d Texters", len(self.text_generators), \
-                deadtexters)
+            lentg = len(self.text_generators)
+            logger.info("%d down to %d Texters", lentg, \
+                (lentg - deadtexters))
 
             for serverid in sid_to_clear:
                 del self.text_generators[serverid]
@@ -269,8 +270,8 @@ class JoseSpeak(jcommon.Extension):
 
         newamount = len(self.text_generators)
 
-        await cxt.say("`Took %.5fms cleaning %d Texters out of %d`", \
-            (t_taken, oldamount - newamount, oldamount))
+        await cxt.say("`Took %.5fms cleaning %d Texters out of %d, now I have %d`", \
+            (t_taken, oldamount - newamount, oldamount, newamount))
 
     async def c_texstat(self, message, args, cxt):
         '''`j!texstat` - Texter Stats'''
