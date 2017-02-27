@@ -629,6 +629,7 @@ class EmptyContext:
         self.client = _client
         self.message = message
         self.messages = []
+        self.env = {}
 
     async def send_typing(self):
         return None
