@@ -342,6 +342,16 @@ async def off_edit_message(msg, new):
     jcommon.logger.info("[msg.edit] %r became %r => #%s", \
         msg.content, new, msg.channel)
 
+async def off_del_message(msg):
+    jcommon.logger.info("[msg.del] %r", msg.content)
+
+async def off_add_reaction(msg, reaction):
+    msg.reactions.append(reaction)
+    jcommon.logger.info("[msg.react] %r < %s", msg.content, reaction)
+
+async def off_logout():
+    sys.exit(0)
+
 def overwrite_discord_client():
     jcommon.MARKOV_LENGTH_PATH = 'db/wordlength.json.other'
     jcommon.MARKOV_MESSAGES_PATH = 'db/messages.json.other'
@@ -351,6 +361,9 @@ def overwrite_discord_client():
     jconfig.MAGICWORD_PATH = 'db/magicwords.json.other'
     client.send_message = offline_message
     client.edit_message = off_edit_message
+    client.delete_message = off_del_message
+    client.add_reaction = off_add_reaction
+    client.logout = off_logout
 
 async def main_task():
     global client
