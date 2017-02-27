@@ -7,6 +7,7 @@ jauxiliar.py - Auxiliar stuff for Jose modules
 import josecommon as jcommon
 import jcoin.josecoin as jcoin
 import joseerror as je
+import json
 
 class Auxiliar(jcommon.Extension):
     '''

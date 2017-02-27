@@ -4,13 +4,11 @@ import sys
 sys.path.append("..")
 import jauxiliar as jaux
 import joseconfig as jconfig
-import joseerror as je
 
 from random import SystemRandom
 random = SystemRandom()
 
 import aiohttp
-import json
 import wolframalpha
 import pyowm
 import traceback

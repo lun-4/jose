@@ -61,7 +61,7 @@ class JoseLanguage(jaux.Auxiliar):
         if n_botblock is None:
             self.logger.warning("Botblock is None... again")
 
-        if n_botblock == not botblock:
+        if n_botblock == (not botblock):
             await cxt.say("Botblock from %s to %s", (botblock, not botblock))
         else:
             await cxt.say("No changes to botblock")
