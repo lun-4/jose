@@ -496,13 +496,18 @@ async def configdb_set(sid, key, value):
     global configdb
     if sid not in configdb:
         configdb[sid] = get_defaultcdb()
-    configdb[sid][key] = value
+    try:
+        configdb[sid][key] = value
+        return True
+    except Exception as err:
+        logger.error('configdb_set(%s, %s)', sid, key, exc_info=True)
+        return False
 
 async def configdb_get(sid, key, defaultval=None):
     global configdb
     if sid not in configdb:
         configdb[sid] = get_defaultcdb()
-    return configdb[sid].get(key, defaultval)
+    return configdb[sid].get(key)
 
 # langdb stuff
 async def langdb_set(sid, lang):

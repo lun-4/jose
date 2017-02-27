@@ -41,9 +41,30 @@ class JoseLanguage(jaux.Auxiliar):
 
     async def c_botblock(self, message, args, cxt):
         '''`j!botblock` - toggles bot block'''
-        cur = jcommon.configdb_get(message.server.id, 'botblock', False)
-        await jcommon.configdb_set(message.server.id, 'botblock', not cur)
-        await cxt.say("Botblock defined to %s", (not cur,))
+        if message.server is None:
+            await cxt.say("Why are you here?")
+            return
+
+        sid = message.server.id
+
+        botblock = jcommon.configdb_get(sid, 'botblock')
+        if botblock is None:
+            self.logger.warning("Botblock is None")
+
+        done = await jcommon.configdb_set(sid, 'botblock', not botblock)
+        if not done:
+            await cxt.say("Error when chainging `botblock` for this server.")
+            return
+
+        # sanity check
+        n_botblock = jcommon.configdb_get(sid, 'botblock')
+        if n_botblock is None:
+            self.logger.warning("Botblock is None... again")
+
+        if n_botblock == not botblock:
+            await cxt.say("Botblock from %s to %s", (botblock, not botblock))
+        else:
+            await cxt.say("No changes to botblock")
 
     async def c_language(self, message, args, cxt):
         '''`j!language lang` - sets language for a server(use `!listlang` for available languages)'''

@@ -116,9 +116,10 @@ async def check_message(message):
         return False
 
     # configdb is langdb but with more bits
-    botblock = await jcommon.configdb_get(message.server.id, 'botblock')
-    if botblock and message.author.bot:
-        return False
+    if message.server is not None:
+        botblock = await jcommon.configdb_get(message.server.id, 'botblock')
+        if botblock and message.author.bot:
+            return False
 
     return True
 
