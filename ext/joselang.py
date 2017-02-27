@@ -53,7 +53,7 @@ class JoseLanguage(jaux.Auxiliar):
 
         done = await jcommon.configdb_set(sid, 'botblock', not botblock)
         if not done:
-            await cxt.say("Error when chainging `botblock` for this server.")
+            await cxt.say("Error when changing `botblock` for this server.")
             return
 
         # sanity check
