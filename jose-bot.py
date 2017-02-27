@@ -329,10 +329,14 @@ async def on_error(event, *args, **kwargs):
         jcommon.logger.error("Message error happened at ServerID %s name %r" % \
             (message.server.id, message.server.name))
 
+OFF_JOSE_USERDICT = {'name': 'José', 'id': '0', \
+    'discriminator': '666', 'avatar': None, 'bot': True}
+OFF_JOSE_USER = discord.User(**OFF_JOSE_USERDICT)
+
 async def offline_message(channel, string):
     jcommon.logger.info("[msg] %r => #%s", string, channel)
     return discord.Message(content=string, channel=channel, \
-        author=channel.server.me, id='0', reactions=[])
+        author=OFF_JOSE_USERDICT, id='0', reactions=[])
 
 async def off_edit_message(msg, new):
     jcommon.logger.info("[msg.edit] %r became %r => #%s", \
