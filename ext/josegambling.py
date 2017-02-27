@@ -122,7 +122,7 @@ class JoseGambling(jaux.Auxiliar):
             await cxt.say("No session found for this server, use `j!jrstart`")
             return
 
-        session = self.sesisons[message.server.id]
+        session = self.sessions[message.server.id]
         betters = session['betters']
 
         K = list(betters.keys())
