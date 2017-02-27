@@ -577,6 +577,8 @@ class Context:
             channel = self.message.channel
             logger.info("Context.send_typing: got err Forbidden from\
 serverid %s servername %s chname #%s", server.id, server.name, channel.name)
+        except Exception as err:
+            logger.error('send_typing', exc_info=True)
 
     async def say(self, string, _channel=None, tup=None):
         channel = None

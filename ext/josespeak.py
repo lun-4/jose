@@ -317,12 +317,7 @@ class JoseSpeak(jcommon.Extension):
                 await self.dbapi.do("INSERT INTO markovdb (serverid, message) \
                     VALUES (?, ?)", (sid, filtered_line))
 
-        r = random.random()
-        print(r, cxt.env['flag'])
-        if r < 0.03 or cxt.env['flag']:
-            cxt.env['flag'] = False
-
-            print("send_typing")
+        if random.random() < 0.03 or cxt.env.get('flag', False):
             await cxt.send_typing()
 
             # default 5 words
@@ -330,12 +325,10 @@ class JoseSpeak(jcommon.Extension):
             if sid in self.text_lengths:
                 length = int(self.text_lengths[sid])
 
-            print("load")
             # ensure the server already has its texter loaded up
             if sid not in self.text_generators:
                 await self.new_generator(sid, MESSAGE_LIMIT)
 
-            print('speak')
             await self.speak(self.text_generators[sid], length, cxt)
 
     async def speak(self, texter, length_words, cxt):
