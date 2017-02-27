@@ -108,6 +108,7 @@ joseconfig.py
 *.profile
 
 # Databases from extensions
+db/*.other
 db/*.json
 db/jose-data.txt
 db/languages.json

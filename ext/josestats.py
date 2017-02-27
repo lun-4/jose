@@ -41,24 +41,23 @@ class JoseStats(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
         self.statistics = {}
-        self.db_stats_path = jcommon.STAT_DATABASE_PATH
 
         # every 2 minutes, save databases
         self.cbk_new('jstats.savedb', self.savedb, 180)
 
     async def savedb(self):
         self.logger.info("savedb:stats")
-        json.dump(self.statistics, open(self.db_stats_path, 'w'))
+        json.dump(self.statistics, open(jcommon.STAT_DATABASE_PATH, 'w'))
 
     async def ext_load(self):
         try:
             self.statistics = {}
-            if not os.path.isfile(self.db_stats_path):
+            if not os.path.isfile(jcommon.STAT_DATABASE_PATH):
                 # recreate
-                with open(self.db_stats_path, 'w') as statsfile:
+                with open(jcommon.STAT_DATABASE_PATH, 'w') as statsfile:
                     statsfile.write(DEFAULT_STATS_FILE)
 
-            self.statistics = json.load(open(self.db_stats_path, 'r'))
+            self.statistics = json.load(open(jcommon.STAT_DATABASE_PATH, 'r'))
 
             # make sure i'm making sane things
             # also make the checks in ext_load (instead of any_message)

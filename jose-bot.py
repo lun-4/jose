@@ -329,6 +329,18 @@ async def on_error(event, *args, **kwargs):
         jcommon.logger.error("Message error happened at ServerID %s name %r" % \
             (message.server.id, message.server.name))
 
+async def offline_message(channel, string):
+    print("%s to %s" % (string, channel))
+
+def overwrite_discord_client():
+    jcommon.MARKOV_LENGTH_PATH = 'db/wordlength.json.other'
+    jcommon.MARKOV_MESSAGES_PATH = 'db/messages.json.other'
+    jcommon.STAT_DATABASE_PATH = 'db/stats.json.other'
+    jcommon.CONFIGDB_PATH = 'db/languages.json.other'
+    jconfig.jcoin_path = 'jcoin/josecoin.db.other'
+    jconfig.MAGICWORD_PATH = 'db/magicwords.json.other'
+    client.send_message = offline_message
+
 async def main_task():
     global client
     startupdelta = time.time() - jose.start_time
@@ -353,6 +365,9 @@ async def main_task():
 
         jcommon.logger.info("You are %s#%s", userdict['name'], \
             userdict['discriminator'])
+
+        # am I really doing this?
+        overwrite_discord_client()
         while True:
             msg = input("José> ")
             message = discord.Message(content=msg, channel=_channel, \
