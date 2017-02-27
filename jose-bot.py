@@ -331,7 +331,32 @@ async def main_task():
     startupdelta = time.time() - jose.start_time
     jcommon.logger.info("--- STARTUP TOOK %.2f SECONDS ---", startupdelta)
     jcommon.logger.info("Starting Client")
-    await client.start(jconfig.discord_token)
+    if jose.off_mode:
+        msgid = random.getrandbits(70)
+        userid = str(random.getrandbits(70))
+        user_dis = str(random.randint(1111, 9999))
+        channelid = str(random.getrandbits(70))
+        serverid = str(random.getrandbits(70))
+
+        # create discord objects
+        _server = discord.Server(name='Offline José Mode', id=serverid)
+
+        _user = discord.User(name='Offline Admin', id=userid, \
+            discriminator=user_dis, avatar=None, bot=False, server=_server)
+
+        user = discord.Member(user=_user)
+
+        _channel = discord.Channel(name='talking', server=_server, \
+            id=channelid, is_private=False, is_defualt=True)
+
+        while True:
+            msg = input("José> ")
+            message = discord.Message(content=msg, channel=_channel, \
+                author=user, id=str(msgid))
+            msgid += 1
+            await on_message(message)
+    else:
+        await client.start(jconfig.discord_token)
 
 def main(args):
     try:
@@ -344,6 +369,9 @@ def main(args):
     if mode == 'dev':
         print("===ENTERING DEVELOPER MODE===")
         jose.dev_mode = True
+    elif mode == 'offline':
+        print("===OFFLINE/TEST MODE===")
+        jose.off_mode = True
 
     # load all josé's modules
     load_all_modules()

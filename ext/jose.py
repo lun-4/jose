@@ -29,6 +29,7 @@ class JoseBot(jcommon.Extension):
         self.start_time = time.time()
         self.command_lock = False
         self.dev_mode = False
+        self.off_mode = False
         self.ev_empty()
 
     def ev_empty(self):

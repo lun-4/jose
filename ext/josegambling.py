@@ -21,7 +21,7 @@ a winner that will win all the money everyone paid.
 `j!jreport` shows if JCR is on or off in your server
 '''
 
-class JoseGambling(jaux.Extension):
+class JoseGambling(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
         self.sessions = {}

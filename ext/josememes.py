@@ -74,10 +74,7 @@ class JoseMemes(jcommon.Extension):
 
     async def ext_unload(self):
         # supress every kind of debug to self.say
-        old_cur = self.current
-        self.current = None
         ok = await self.save_memes()
-        self.currrent = old_cur
         return ok, ""
 
     async def load_memes(self):
