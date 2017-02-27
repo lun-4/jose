@@ -90,7 +90,7 @@ class JoseGambling(jaux.Auxiliar):
         atleast = (decimal.Decimal(amount) + fee_amount)
 
         a = self.jcoin.get(id_from)[1]
-        if a['amount'] <= atleast:
+        if a['last_bid'] <= atleast:
             await cxt.say("No sufficient funds(need `%.2fJC` in total, you have `%.2fJC`, needs `%.2fJC`)", \
                 (atleast, a['amount'], decimal.Decimal(atleast) - a['amount']))
             return
