@@ -10,6 +10,7 @@ import discord
 
 sys.path.append("..")
 import josecommon as jcommon
+import jauxiliar as jaux
 import joseerror as je
 
 import re
@@ -60,9 +61,9 @@ BLACK_MIRROR_MESSAGES = [
     'https://pbs.twimg.com/media/CxkgKCZXgAAlkO2.jpg',
 ]
 
-class JoseMemes(jcommon.Extension):
+class JoseMemes(jaux.Auxiliar):
     def __init__(self, _client):
-        jcommon.Extension.__init__(self, _client)
+        jaux.Auxiliar.__init__(self, _client)
         self.memes = {}
         self.WIDE_MAP = dict((i, i + 0xFEE0) for i in range(0x21, 0x7F))
         self.WIDE_MAP[0x20] = 0x3000
@@ -73,7 +74,6 @@ class JoseMemes(jcommon.Extension):
         return r
 
     async def ext_unload(self):
-        # supress every kind of debug to self.say
         ok = await self.save_memes()
         return ok, ""
 
