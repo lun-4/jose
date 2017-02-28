@@ -181,14 +181,15 @@ class JoseMath(jaux.Auxiliar):
             await cxt.say("Error parsing `amount`")
             return
 
-        currency_from = args[2]
-        currency_to = args[3]
+        try:
+            currency_from = args[2].upper()
+            currency_to = args[3].upper()
+        except:
+            await cxt.say(self.c_money.__doc__)
+            return
 
         url = "http://api.fixer.io/latest?base={}".format(currency_from.upper())
-        r = await aiohttp.request('GET', url)
-        content = await r.text()
-        data = await self.json_load(content)
-
+        data = await self.json_from_url(url)
 
         if 'error' in data:
             await cxt.say("money API error: %s", (data['error'],))

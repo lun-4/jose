@@ -33,12 +33,16 @@ class Auxiliar(jcommon.Extension):
         try:
             res = await future_json
         except Exception as err:
-            raise je.CommonError("Error parsing JSON data")
+            raise je.JSONError("Error parsing JSON data")
 
         return res
 
-    async def json_from_url(url):
-        resp = await aiohttp.request('GET', url)
-        content = await resp.text()
+    async def json_from_url(self, url):
+        try:
+            resp = await aiohttp.request('GET', url)
+            content = await resp.text()
+        except Exception as err:
+            raise je.AioHttpError(repr(err))
+
         data = await self.json_load(content)
         return data

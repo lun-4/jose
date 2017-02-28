@@ -8,3 +8,9 @@ class LimitError(Exception):
 
 class CommonError(Exception):
     pass
+
+class JSONError(Exception):
+    pass
+
+class AioHttpError(Exception):
+    pass
