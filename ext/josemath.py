@@ -8,7 +8,6 @@ import joseconfig as jconfig
 from random import SystemRandom
 random = SystemRandom()
 
-import aiohttp
 import wolframalpha
 import pyowm
 import traceback

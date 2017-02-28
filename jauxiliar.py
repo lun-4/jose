@@ -4,6 +4,7 @@
 jauxiliar.py - Auxiliar stuff for Jose modules
 '''
 
+import asyncio
 import josecommon as jcommon
 import jcoin.josecoin as jcoin
 import joseerror as je
@@ -37,12 +38,20 @@ class Auxiliar(jcommon.Extension):
 
         return res
 
-    async def json_from_url(self, url):
-        try:
-            resp = await aiohttp.request('GET', url)
-            content = await resp.text()
-        except Exception as err:
-            raise je.AioHttpError(repr(err))
+    async def http_get(self, url, **kwargs):
+        timeout = kwargs.get('timeout', 5)
 
+        try:
+            response = await asyncio.wait_for(aiohttp.request('GET', url), timeout)
+            content = await response.text()
+        except Exception as err:
+            self.logger.error(exc_info=True)
+            # bump it up through the chain
+            raise err
+
+        return content
+
+    async def json_from_url(self, url, **kwargs):
+        content = await self.http_get(url, **kwargs)
         data = await self.json_load(content)
         return data

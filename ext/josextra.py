@@ -2,7 +2,6 @@
 
 import asyncio
 import aiohttp
-import json
 import urllib.parse
 import urllib.request
 import subprocess

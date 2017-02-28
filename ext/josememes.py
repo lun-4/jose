@@ -593,12 +593,10 @@ class JoseMemes(jcommon.Extension):
     async def c_8ball(self, message, args, cxt):
         '''`j!8ball` - 8ball'''
         try:
-            response = await asyncio.wait_for(aiohttp.request('GET', \
-                'https://api.rtainc.co/twitch/8ball?format=[0]'), 4)
+            answer = await self.http_get('https://api.rtainc.co/twitch/8ball?format=[0]', timeout=4)
         except asyncio.TimeoutError:
             await cxt.say("`[8ball] Timeout reached`")
             return
 
-        answer = await response.text()
         await cxt.say("**%s**, :8ball: said %s", (str(message.author.name), \
             answer))
