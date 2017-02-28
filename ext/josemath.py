@@ -165,9 +165,7 @@ class JoseMath(jaux.Auxiliar):
 
         if len(args) > 1:
             if args[1] == 'list':
-                r = await aiohttp.request('GET', "http://api.fixer.io/latest")
-                content = await r.text()
-                data = await self.json_load(content)
+                data = await self.json_from_url("http://api.fixer.io/latest")
                 await cxt.say(self.codeblock("", " ".join(data["rates"])))
                 return
 
