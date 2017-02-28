@@ -133,4 +133,13 @@ JOSE_PLAYING_PHRASES = [
     'Neural Networks',
     'Inter Bot Communication',
     'ShitPostBot 5000',
+    'Pharmercy best ship',
+    'Fetichism',
+    'asyncio',
+    'COBOL',
+    'Magalzão Show',
+    'Talk Show',
+    'Death',
+    '♬ Cape Coral - Lovely Slut',
+    '♬ Ｆｉ７ｉ-  Eclipse'
 ]
