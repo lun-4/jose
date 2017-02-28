@@ -45,7 +45,7 @@ class Auxiliar(jcommon.Extension):
             response = await asyncio.wait_for(aiohttp.request('GET', url), timeout)
             content = await response.text()
         except Exception as err:
-            self.logger.error(exc_info=True)
+            self.logger.error('http_get', exc_info=True)
             # bump it up through the chain
             raise err
 

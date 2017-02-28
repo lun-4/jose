@@ -274,3 +274,25 @@ class JoseMath(jaux.Auxiliar):
 
         await cxt.say("%s: `%s` => %d", (dicestr, \
             ', '.join(str(r) for r in dices), sum(dices)))
+
+    async def c_percent(self, message, args, cxt):
+        '''`j!percent percentage amount` - Calculate percentages out of stuff'''
+
+        if len(args) < 3:
+            await cxt.say(self.c_percent.__doc__)
+            return
+
+        try:
+            percentage = float(args[1])
+        except:
+            await cxt.say("Error parsing `percentage`")
+            return
+
+        try:
+            amount = float(args[2])
+        except:
+            await cxt.say("Error parsing `amount`")
+            return
+
+        res = (percentage / amount) * 100
+        await cxt.say("%f%% out of %f => %f", (percentage, amount, res))

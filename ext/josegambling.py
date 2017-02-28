@@ -8,7 +8,8 @@ import sys
 sys.path.append("..")
 import jauxiliar as jaux
 
-BETTING_FEE = 5
+BETTING_FEE = 3
+JCR_MIN_AMNT = decimal.Decimal(0.1)
 
 JCROULETTE_HELP_TEXT = '''
 JoséCoin Roulette, abbreviated as JC Roulette, is a form of russian roulette
@@ -73,7 +74,7 @@ class JoseGambling(jaux.Auxiliar):
         amount = None
         try:
             if args[1] == 'all':
-                from_amnt = self.jcoin.get(id_from)[1]['amount'] - 0.1
+                from_amnt = self.jcoin.get(id_from)[1]['amount'] - JCR_MIN_AMNT
                 fee_amnt = from_amnt * decimal.Decimal(BETTING_FEE/100.)
                 amount = from_amnt - fee_amnt
             else:
