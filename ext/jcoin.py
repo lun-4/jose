@@ -88,6 +88,14 @@ class JoseCoin(jaux.Auxiliar):
         else:
             await cxt.say('account not found(`id:%s`)' % (id_check))
 
+    async def c_balance(self, message, args, cxt):
+        '''`j!balance [@mention]` - alias to `j!wallet`'''
+        await self.c_wallet(message, args, cxt)
+
+    async def c_bal(self, message, args, cxt):
+        '''`j!balance [@mention]` - alias to `j!wallet`'''
+        await self.c_wallet(message, args, cxt)
+
     async def c_account(self, message, args, cxt):
         '''`j!account` - create a new JoséCoin account'''
         self.logger.info("new jc account, id = %s" % message.author.id)

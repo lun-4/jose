@@ -83,7 +83,8 @@ class JoseGambling(jaux.Auxiliar):
             return
 
         if amount < session['last_bid']:
-            await cxt.say("Your bet needs to be higher than `%.2fJC`", (self.last_bid,))
+            await cxt.say("Your bet needs to be higher than `%.2fJC`", \
+                (session['last_bid'],))
             return
 
         fee_amount = decimal.Decimal(amount) * decimal.Decimal(BETTING_FEE/100.)
@@ -106,9 +107,9 @@ class JoseGambling(jaux.Auxiliar):
             if id_from not in session['betters']:
                 session['betters'][id_from] = decimal.Decimal(0)
 
-            session['betters'][id_from] += decimal.Decimal(amount)
+            self.sessions[message.server.id]['betters'][id_from] += decimal.Decimal(amount)
             val = session['betters'][id_from]
-            session['last_bid'] = amount
+            self.sessions[message.server.id]['last_bid'] = amount
 
             await cxt.say("jcroulette: Total bet of `%.2fJC` from <@%s>\nJC report: %s", \
                 (val, id_from, res[1]))
