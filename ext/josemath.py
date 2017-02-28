@@ -8,6 +8,7 @@ import joseconfig as jconfig
 from random import SystemRandom
 random = SystemRandom()
 
+import asyncio
 import wolframalpha
 import pyowm
 import traceback
@@ -57,7 +58,10 @@ class JoseMath(jaux.Auxiliar):
 
         future = self.loop.run_in_executor(None, \
             self.wac.query, term_to_wolfram)
-        res = await future
+        try:
+            res = await asyncio.wait_for(future, 13)
+        except asyncio.TimeoutError:
+            await cxt.say("`[wolframalpha] Timeout reached`")
 
         if getattr(res, 'results', False):
             try:
