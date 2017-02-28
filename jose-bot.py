@@ -140,7 +140,6 @@ async def do_command(method, message, args, cxt, t_start, st):
         return
 
     try:
-        await cxt.send_typing()
         await jose_method(message, args, cxt)
 
     except je.PermissionError:
