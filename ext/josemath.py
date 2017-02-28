@@ -28,7 +28,10 @@ class JoseMath(jaux.Auxiliar):
     async def ext_load(self):
         # try to get from coindesk supported currencies
         try:
-            currency_data = await self.json_from_url(COINDESK_CURRENCYLIST_URL)
+            try:
+                currency_data = await self.json_from_url(COINDESK_CURRENCYLIST_URL)
+            except:
+                currency_data = [{'currency': 'USD'}, {'currency': 'GBP'}, {'currency': 'EUR'}]
 
             for currency in currency_data:
                 currency_symbol = currency['currency']
