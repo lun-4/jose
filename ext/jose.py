@@ -658,3 +658,25 @@ don't want (unless I'm skynet)")
 
         await cxt.say("Last `%d` lines from José.log said: \n```%s```" % \
             (linestoget, res))
+
+    async def c_sysping(self, message, args, cxt):
+        '''`j!sysping host` - ping from josebox'''
+        await self.is_admin(message.author.id)
+
+        if len(args) < 1:
+            await cxt.say(self.c_sysping.__doc__)
+            return
+
+        host = ' '.join(args[1:])
+
+        ping = subprocess.Popen(
+            ["ping", "-c", "6", host],
+            stdout = subprocess.PIPE,
+            stderr = subprocess.PIPE
+        )
+
+        _out, _error = ping.communicate()
+        out = self.codeblock("", _out.decode('utf-8'))
+        error = self.codeblock("", _error.decode('utf-8'))
+
+        await cxt.say("OUT:%s\nERR:%s", (out, error))
