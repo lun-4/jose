@@ -8,6 +8,7 @@ import josecommon as jcommon
 import jcoin.josecoin as jcoin
 import joseerror as je
 import json
+import aiohttp
 
 class Auxiliar(jcommon.Extension):
     '''
@@ -35,3 +36,9 @@ class Auxiliar(jcommon.Extension):
             raise je.CommonError("Error parsing JSON data")
 
         return res
+
+    async def json_from_url(url):
+        resp = await aiohttp.request('GET', url)
+        content = await resp.text()
+        data = await self.json_load(content)
+        return data

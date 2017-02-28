@@ -13,16 +13,33 @@ import wolframalpha
 import pyowm
 import traceback
 
+COINDESK_API = 'https://api.coindesk.com/v1/bpi'
+COINDESK_CURRENT_URL = '{}/currentprice.json'.format(COINDESK_API)
+COINDESK_CURRENCYLIST_URL = '{}/supported-currencies.json'.format(COINDESK_API)
+COINDESK_CURRENCY_URL = '{}/currentprice/%s.json'.format(COINDESK_API)
+
 class JoseMath(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
         self.wac = wolframalpha.Client(jconfig.WOLFRAMALPHA_APP_ID)
         self.owm = pyowm.OWM(jconfig.OWM_APIKEY)
+        self.btc_supported = []
 
     async def ext_load(self):
-        return True, ''
+        # try to get from coindesk supported currencies
+        try:
+            currency_data = await self.json_from_url(COINDESK_CURRENCYLIST_URL)
+
+            for currency in currency_data:
+                currency_symbol = currency['currency']
+                self.btc_supported.append(currency_symbol)
+
+            return True, ''
+        except Exception as err:
+            return False, repr(err)
 
     async def ext_unload(self):
+        del self.wac, self.owm, self.btc_supported
         return True, ''
 
     async def c_wolframalpha(self, message, args, cxt):
@@ -187,6 +204,42 @@ class JoseMath(jaux.Auxiliar):
         await cxt.say('{} {} = {} {}'.format(
             amount, currency_from, res, currency_to
         ))
+
+    async def c_bitcoin(self, message, args, cxt):
+        '''`j!bitcoin [amount=1] [currency=USD]` - Get XBP price info'''
+
+        # parse args
+        try:
+            btc_amount = int(args[1])
+        except:
+            btc_amount = 1
+
+        try:
+            currency = args[2].upper()
+        except:
+            currency = 'USD'
+
+        # get data from coindesk
+        self.logger.info("[bitcoin] %d BTC to %s", btc_amount, currency)
+        data = await self.json_from_url(COINDESK_CURRENT_URL)
+
+        if currency not in ['USD', 'GBP', 'EUR']:
+            if currency not in self.btc_supported:
+                await cxt.say("%s: Currency not supported", (currency,))
+                return
+
+            data = await self.json_from_url(COINDESK_CURRENCY_URL % currency)
+
+        rate = float(data['bpi'][currency]['rate_float'])
+        desc = data['bpi'][currency]['description']
+        amount = rate * btc_amount
+
+        await cxt.say("{} BTC = {} {}(*{}*), Powered by https://coindesk.com/price" \
+            .format(btc_amount, amount, currency, desc))
+
+    async def c_btc(self, message, args, cxt):
+        '''`j!btc` - alias for `j!bitcoin`'''
+        await self.c_bitcoin(message, args, cxt)
 
     async def c_roll(self, message, args, cxt):
         '''`j!roll <amount>d<sides>` - roll fucking dice'''
