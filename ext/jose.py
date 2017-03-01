@@ -345,13 +345,16 @@ class JoseBot(jcommon.Extension):
             raise je.PermissionError()
 
     async def turnoff(self, cxt):
+        self.logger.info("Turning Off from %s", str(cxt.message.author))
         await self.modules['jcoin']['inst'].josecoin_save(cxt.message)
         await self.unload_all()
         await cxt.say(":wave: kthxbye :wave:")
         await self.client.logout()
+        self.logger.info("Logged out")
         sys.exit(0)
 
     async def update(self, cxt):
+        self.logger.info("Do update from %s", str(cxt.message.author))
         await self.modules['jcoin']['inst'].josecoin_save(cxt.message)
         await self.unload_all()
 
@@ -361,6 +364,7 @@ class JoseBot(jcommon.Extension):
         await cxt.say("`git pull`: ```%s```\n", (res,))
 
         await self.client.logout()
+        self.logger.info("Logged out")
         sys.exit(0)
 
     async def c_shutdown(self, message, args, cxt):
