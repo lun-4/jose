@@ -32,7 +32,7 @@ class JoseMath(jaux.Auxiliar):
             try:
                 currency_data = await self.json_from_url(COINDESK_CURRENCYLIST_URL)
             except Exception as err:
-                self.logger("[jmath:currency_list] err, going fallback", exc_info=True)
+                self.logger.warning("[jmath:currency_list] err, going fallback", exc_info=True)
                 currency_data = [{'currency': 'USD'}, {'currency': 'GBP'}, {'currency': 'EUR'}]
 
             for currency in currency_data:
