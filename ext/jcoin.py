@@ -473,7 +473,7 @@ class JoseCoin(jaux.Auxiliar):
                 await cxt.say("jc->err: %s", ok[1])
             else:
                 await cxt.say("`[res: %.2f < prob: %.2f]` Stealing went well, nobody noticed, you thief. Got %.2fJC from %s, \n`%s`", \
-                    (amount, target_account['name'], ok[1]))
+                    (res, chance, amount, target_account['name'], ok[1]))
 
                 await cxt.say(":gun: You got robbed! The thief(%s) stole `%.2fJC` from you. 2 hour grace period", \
                     target_user, (str(thief_user), amount))
@@ -483,7 +483,8 @@ class JoseCoin(jaux.Auxiliar):
 
         else:
             # type 0 cooldown, you got arrested
-            await cxt.say(":cop: Arrested! got 24h cooldown on `j!steal`.")
+            await cxt.say("`[res: %.2f < prob: %.2f]` :cop: Arrested! got 24h cooldown on `j!steal`.", \
+                (res, chance))
             self.stealdb['cdown'][message.author.id] = (time.time() + 86400, 0)
 
         await self.save_steal_db()
