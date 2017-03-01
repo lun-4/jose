@@ -365,6 +365,7 @@ class JoseCoin(jaux.Auxiliar):
         res.append("**%s**, you have %d stealing points" % (str(message.author), points))
         if cooldown is not None:
             cooldown_sec, cooldown_type = cooldown
+            cooldown_sec -= time.time()
             if cooldown_type == 0:
                 res.append(":cop: you're in prison, %d seconds remaining" % (cooldown_sec,))
             elif cooldown_type == 1:
@@ -373,6 +374,7 @@ class JoseCoin(jaux.Auxiliar):
                 res.append(":warning: unkown cooldown type")
 
         if grace_period is not None:
+            grace_period -= time.time()
             res.append(":angel: you're in grace period, %d seconds remaining" % (grace_period,))
 
         await cxt.say('\n'.join(res))
