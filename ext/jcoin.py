@@ -26,7 +26,7 @@ PRICE_TABLE = {
 }
 
 # 1%
-BASE_CHANCE = 1
+BASE_CHANCE = decimal.Decimal(1)
 STEALDB_PATH = 'db/steal.json'
 
 DEFAULT_STEALDB = '''{
@@ -449,8 +449,9 @@ class JoseCoin(jaux.Auxiliar):
             await cxt.say(":cop: Arrested because you tried to steal more than the target has, got 24h jailtime.")
             self.stealdb['cdown'][thief_id] = (time.time() + 86400, 0)
 
-        chance = (BASE_CHANCE + (target_amount / amount)) * 0.3
-        res = random.random() * 100
+        D = decimal.Decimal
+        chance = (BASE_CHANCE + (target_amount / amount)) * D(0.3)
+        res = random.random() * 10
 
         if res < chance:
             self.logger.info("Stealing %.2fJC from %s[%s] to %s[%s]", \
