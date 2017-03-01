@@ -375,6 +375,18 @@ class JoseBot(jcommon.Extension):
         '''`j!update` - Updates josé to latest from github'''
         await self.sec_auth(self.update, cxt)
 
+    async def c_shell(self, message, args, cxt):
+        '''`j!shell command` - execute shell commands'''
+        await self.is_admin(cxt.message.author.id)
+
+        command = ' '.join(args[1])
+
+        out = subprocess.check_output(command, shell=True, \
+            stderr=subprocess.STDOUT)
+        res = out.decode("utf-8")
+
+        await cxt.say("`%s`: ```%s```\n", (command, res,))
+
     async def c_ping(self, message, args, cxt):
         '''`j!ping` - pong'''
         t_init = time.time()
