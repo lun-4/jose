@@ -422,12 +422,13 @@ class JoseCoin(jaux.Auxiliar):
             self.stealdb['points'][thief_id] = stealuses = 3
 
         thief_user = await self.client.get_user_info(thief_id)
+        target_user = await self.client.get_user_info(target_id)
 
-        grace_period = (time.time() - self.stealdb['period'].get(target_id, 0))
+        grace_period = (self.stealdb['period'].get(target_id, 0) - time.time())
         if grace_period > 0:
-            await cxt.say("Target is in :angel: grace period :grace:")
+            await cxt.say("Target is in :angel: grace period :angel:")
             await cxt.say("%s tried to steal %.2fJC from you, but you have %d seconds of grace period", \
-                (str(thief_user), amount, grace_period))
+                (str(thief_user), amount, grace_period), target_user)
             return
 
         if stealuses < 1:
@@ -465,7 +466,6 @@ class JoseCoin(jaux.Auxiliar):
                 await cxt.say("Good one! Stealing went well, nobody noticed, you thief. Got %.2fJC from %s, \n`%s`", \
                     (amount, target_account['name'], ok[1]))
 
-                target_user = await self.client.get_user_info(target_id)
                 await cxt.say(":gun: You got robbed! The thief(%s) stole `%.2fJC` from you. 2 hour grace period", \
                     (str(thief_user), amount), target_user)
 
