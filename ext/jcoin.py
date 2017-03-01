@@ -39,7 +39,7 @@ HELPTEXT_JC_STEAL = """
 `j!steal` allows you to steal an arbritary amount of money from anyone.
 use `j!stealstat` to see your status in the stealing business.
 
-The chance of getting caught increases faster than the amount you want to steal
+The chance of getting caught increases more the more you steal.
 """
 
 class JoseCoin(jaux.Auxiliar):
