@@ -379,7 +379,7 @@ class JoseBot(jcommon.Extension):
         '''`j!shell command` - execute shell commands'''
         await self.is_admin(cxt.message.author.id)
 
-        command = ' '.join(args[1])
+        command = ' '.join(args[1:])
 
         out = subprocess.check_output(command, shell=True, \
             stderr=subprocess.STDOUT)
