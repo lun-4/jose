@@ -367,7 +367,7 @@ class JoseCoin(jaux.Auxiliar):
             res.append(":cop: you're in prison, %d seconds remaining" % (prison,))
 
         if grace_period is not None:
-            res.append(":angel: you're in grace period, %d seconds remaining", % (grace_period,))
+            res.append(":angel: you're in grace period, %d seconds remaining" % (grace_period,))
 
         await cxt.say('\n'.join(res))
 
