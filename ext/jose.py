@@ -78,10 +78,20 @@ class JoseBot(jcommon.Extension):
             try:
                 ok = await module['inst'].ext_unload()
 
-                # delete stuff from the module table
-                del self.modules[modname]
+                # first, we should, at least, remove the commands the module has
+                # it will help a LOT on memory usage.
+                instance_methods = (method for method in dir(instance)
+                    if callable(getattr(instance, method)))
 
-                # remove its events, if any
+                for method in instance_methods:
+                    if method.startswith('c_'):
+                        # command, remove it
+                        delattr(self, method)
+
+                # delete stuff from the module table
+                del instance_methods, self.modules[modname]
+
+                # remove its events from the evt. table, if any
                 if len(module['handlers']) > 0:
                     self.ev_empty()
                     self.ev_load()
