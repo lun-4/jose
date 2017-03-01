@@ -26,12 +26,20 @@ PRICE_TABLE = {
 }
 
 # 1%
-BASE_CHANCE = decimal.Decimal(1)
+BASE_CHANCE = 1
 STEALDB_PATH = 'db/steal.json'
+
+DEFAULT_STEALDB = '''{
+    'points': {},
+    'cdown': {},
+    'period': {}
+}'''
 
 HELPTEXT_JC_STEAL = """
 `j!steal` allows you to steal an arbritary amount of money from anyone.
-The chance of stealing increases faster than the amount you want to steal increases
+use `j!stealstat` to see your status in the stealing business.
+
+The chance of getting caught increases faster than the amount you want to steal
 """
 
 class JoseCoin(jaux.Auxiliar):
@@ -71,7 +79,7 @@ class JoseCoin(jaux.Auxiliar):
             self.stealdb = {}
             if not os.path.isfile(STEALDB_PATH):
                 with open(STEALDB_PATH, 'w') as stealdbfile:
-                    stealdbfile.write('{}')
+                    stealdbfile.write(DEFAULT_STEALDB)
 
             self.stealdb = json.load(open(STEALDB_PATH, 'r'))
 
@@ -344,6 +352,25 @@ class JoseCoin(jaux.Auxiliar):
     async def c_hsteal(self, message, args, cxt):
         await cxt.say(HELPTEXT_JC_STEAL)
 
+    async def c_stealstat(self, message, args, cxt):
+        # get status from person
+        personid = message.author.id
+
+        res = []
+
+        points = self.stealdb['points'].get(personid, 3)
+        prison = self.stealdb['cdown'].get(personid, None)
+        grace_period = self.stealdb['period'].get(personid, None)
+
+        res.append("**%s**, you have %d stealing points", str(message.author), points)
+        if prison is not None:
+            res.append(":cop: you're in prison, %d seconds remaining", prison)
+
+        if grace_period is not None:
+            res.append(":angel: you're in grace period, %d seconds remaining", grace_period)
+
+        await cxt.say("")
+
     async def c_steal(self, message, args, cxt):
         '''`j!steal @target amount` - Steal JoséCoins from someone'''
 
@@ -394,6 +421,15 @@ class JoseCoin(jaux.Auxiliar):
         if stealuses is None:
             self.stealdb['points'][thief_id] = stealuses = 3
 
+        thief_user = await self.client.get_user_info(thief_id)
+
+        grace_period = (time.time() - self.stealdb['period'].get(target_id, 0))
+        if grace_period > 0:
+            await cxt.say("Target is in :angel: grace period :grace:")
+            await cxt.say("%s tried to steal %.2fJC from you, but you have %d seconds of grace period", \
+                (str(thief_user), amount, grace_period))
+            return
+
         if stealuses < 1:
             await cxt.say("You don't have any more stealing points, wait 24 hours to get more.")
             self.stealdb['cdown'][thief_id] = (time.time() + 86400, 1)
@@ -426,15 +462,23 @@ class JoseCoin(jaux.Auxiliar):
             if not ok[0]:
                 await cxt.say("jc->err: %s", ok[1])
             else:
-                await cxt.say("Good one! Stealing went well, you thief. Got %.2fJC from %s, \n`%s`", \
+                await cxt.say("Good one! Stealing went well, nobody noticed, you thief. Got %.2fJC from %s, \n`%s`", \
                     (amount, target_account['name'], ok[1]))
 
+                target_user = await self.client.get_user_info(target_id)
+                await cxt.say(":gun: You got robbed! The thief(%s) stole `%.2fJC` from you. 2 hour grace period", \
+                    (thief_account['name'], amount), target_user)
+
+                self.stealdb['period'][target_id] = time.time() + 10800
                 self.stealdb['points'][message.author.id] -= 1
 
         else:
             # type 0 cooldown, you got arrested
-
             await cxt.say(":cop: Arrested! got 24h cooldown on `j!steal`.")
             self.stealdb['cdown'][message.author.id] = (time.time() + 86400, 0)
 
         await self.save_steal_db()
+
+    async def c_roubar(self, message, args, cxt):
+        '''`j!roubar @target amount` - alias for `j!steal`'''
+        await self.c_steal(message, args, cxt)
