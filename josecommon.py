@@ -203,29 +203,20 @@ async def gorila_routine(channel):
     if random.random() < PIRU_ACTIVITY:
         await client.send_message(channel, random.choice(ATIVIDADE))
 
-def make_func(res):
-    async def response(message):
-        await client.send_message(message.channel, res)
-
-    return response
-
 async def str_xor(string, other):
     return "".join(chr(ord(a) ^ ord(b)) for a, b in zip(string, other))
 
 JCRYPT_KEY = 'vcefodaparabensfrozen2meuovomeuovinhoayylmaogordoquaseexploderindo'
 
 async def parse_id(data, message):
-    '''
-    <@196461455569059840>
-    <@!162819866682851329>
-    '''
     if data[0:2] == '<@':
         if data[2] == '!':
             return data[3:-1]
         else:
             return data[2:-1]
     else:
-        await jose_debug(message, "error parsing id %s" % data)
+        await client.send_message(message.channel, \
+            "error parsing data `%r`" % data)
         return
 
 def speak_filter(message):
