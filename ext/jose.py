@@ -76,7 +76,8 @@ class JoseBot(jcommon.Extension):
         # if ext_unload exists
         if getattr(module['inst'], 'ext_unload', False):
             try:
-                ok = await module['inst'].ext_unload()
+                instance = module['inst']
+                ok = await instance.ext_unload()
 
                 # first, we should, at least, remove the commands the module has
                 # it will help a LOT on memory usage.
