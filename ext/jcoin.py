@@ -8,6 +8,7 @@ import josecommon as jcommon
 import decimal
 import json
 import os
+import time
 
 from random import SystemRandom
 random = SystemRandom()
@@ -70,7 +71,7 @@ class JoseCoin(jaux.Auxiliar):
             self.stealdb = {}
             if not os.path.isfile(STEALDB_PATH):
                 with open(STEALDB_PATH, 'w') as stealdbfile:
-                    statsfile.write('{}')
+                    stealdbfile.write('{}')
 
             self.stealdb = json.load(open(STEALDB_PATH, 'r'))
 
@@ -344,7 +345,7 @@ class JoseCoin(jaux.Auxiliar):
         await cxt.say(HELPTEXT_JC_STEAL)
 
     async def c_steal(self, message, args, cxt):
-        '''`j!steal @mention amount` - Steal JoséCoins from someone'''
+        '''`j!steal @target amount` - Steal JoséCoins from someone'''
 
         if len(args) < 2:
             await cxt.say(self.c_steal.__doc__)
@@ -352,9 +353,9 @@ class JoseCoin(jaux.Auxiliar):
 
         # parse mention
         try:
-            userid = await jcommon.parse_id(args[1])
+            target_id = await jcommon.parse_id(args[1])
         except:
-            await cxt.say("Error parsing `@mention`")
+            await cxt.say("Error parsing `@target`")
             return
 
         try:
@@ -399,10 +400,7 @@ class JoseCoin(jaux.Auxiliar):
             return
 
         target_account = self.jcoin.get(target_id)
-        thief_account = self.jcoin.get(thief_id)
-
         chance = (BASE_CHANCE + (target_account['amount'] / amount)) * 0.9
-
         res = random.random() * 100
 
         if res < chance:
