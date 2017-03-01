@@ -17,10 +17,10 @@ where people create a JCR session, they pay josé, and josé chooses, by random,
 a winner that will win all the money everyone paid.
 
 `j!jrstart` to start a session
-`j!jrbet` to pay josé, 5%% of this amount will be fees
+`j!jrbet` to pay josé, %.2f%% of this amount will be fees
 `j!jrdo` does the roulette, when everyone wants to know who wins
 `j!jreport` shows if JCR is on or off in your server
-'''
+''' % (BETTING_FEE)
 
 class JoseGambling(jaux.Auxiliar):
     def __init__(self, _client):
@@ -53,7 +53,7 @@ class JoseGambling(jaux.Auxiliar):
         await cxt.say("Session created!")
 
     async def c_jrbet(self, message, args, cxt):
-        '''`j!jrbet value` bet in JoséCoin Roulette :tm:, 3% fee'''
+        '''`j!jrbet value` bet in JoséCoin Roulette :tm:'''
 
         if message.channel.is_private:
             await cxt.say("DMs can't use JC Roulette")

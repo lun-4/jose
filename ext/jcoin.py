@@ -87,7 +87,7 @@ class JoseCoin(jaux.Auxiliar):
         '''`j!prices` - show price categories'''
         res = []
 
-        for cat in PRICE_TABLE:
+        for cat in sorted(PRICE_TABLE):
             data = PRICE_TABLE[cat]
             desc = data[0]
             price = data[1]
@@ -96,7 +96,7 @@ class JoseCoin(jaux.Auxiliar):
             _cmdlist = ['j!{}'.format(cmd) for cmd in commands]
             cmdlist = ', '.join(_cmdlist)
 
-            res.append("`%s`: %.2fJC, %s, `%s`" % (cat, price, desc, cmdlist))
+            res.append("`%s`: %.2fJC, *%s*, `%s`" % (cat, price, desc, cmdlist))
 
         await cxt.say('\n'.join(res))
 

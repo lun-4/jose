@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import asyncio
 import aiohttp
 import urllib.parse
 import urllib.request
