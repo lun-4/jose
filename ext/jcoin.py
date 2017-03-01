@@ -380,7 +380,7 @@ class JoseCoin(jaux.Auxiliar):
 
         # parse mention
         try:
-            target_id = await jcommon.parse_id(args[1])
+            target_id = await jcommon.parse_id(args[1], message)
         except:
             await cxt.say("Error parsing `@target`")
             return
