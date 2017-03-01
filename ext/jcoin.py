@@ -371,7 +371,7 @@ class JoseCoin(jaux.Auxiliar):
             elif cooldown_type == 1:
                 res.append(":alarm_clock: you're waiting for stealing points, %d seconds remaining" % (cooldown_sec,))
             else:
-                res.append(":warning: unkown cooldown type")
+                res.append(":warning: unknown cooldown type")
 
         if grace_period is not None:
             grace_period -= time.time()
@@ -472,7 +472,7 @@ class JoseCoin(jaux.Auxiliar):
             if not ok[0]:
                 await cxt.say("jc->err: %s", ok[1])
             else:
-                await cxt.say("Good one! Stealing went well, nobody noticed, you thief. Got %.2fJC from %s, \n`%s`", \
+                await cxt.say("`[res: %.2f < prob: %.2f]` Stealing went well, nobody noticed, you thief. Got %.2fJC from %s, \n`%s`", \
                     (amount, target_account['name'], ok[1]))
 
                 await cxt.say(":gun: You got robbed! The thief(%s) stole `%.2fJC` from you. 2 hour grace period", \
