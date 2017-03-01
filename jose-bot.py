@@ -104,9 +104,6 @@ async def check_message(message):
 
     return True
 
-async def do_command_table(message):
-    return False
-
 async def do_command(method, message, args, cxt, t_start, st):
     # try/except is WAY FASTER than checking if/else
     try:
@@ -232,10 +229,6 @@ async def on_message(message):
             # signal user
             await cxt.say("jose.py_err: ```%s```" % traceback.format_exc())
 
-        return
-
-    should_stop = await do_command_table(message)
-    if should_stop:
         return
 
     # a normal message, put it in the global text
