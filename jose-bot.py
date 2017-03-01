@@ -87,7 +87,7 @@ async def check_message(message):
             return False
 
         # Ignore messages from other servers
-        if message.server != jcommon.JOSE_DEV_SERVER_ID:
+        if message.server.id != jcommon.JOSE_DEV_SERVER_ID:
             return False
 
         # Ignore non-admins
