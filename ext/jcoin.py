@@ -369,7 +369,7 @@ class JoseCoin(jaux.Auxiliar):
         if grace_period is not None:
             res.append(":angel: you're in grace period, %d seconds remaining", grace_period)
 
-        await cxt.say("")
+        await cxt.say('\n'.join(res))
 
     async def c_steal(self, message, args, cxt):
         '''`j!steal @target amount` - Steal JoséCoins from someone'''
@@ -467,7 +467,7 @@ class JoseCoin(jaux.Auxiliar):
 
                 target_user = await self.client.get_user_info(target_id)
                 await cxt.say(":gun: You got robbed! The thief(%s) stole `%.2fJC` from you. 2 hour grace period", \
-                    (thief_account['name'], amount), target_user)
+                    (str(thief_user), amount), target_user)
 
                 self.stealdb['period'][target_id] = time.time() + 10800
                 self.stealdb['points'][message.author.id] -= 1
