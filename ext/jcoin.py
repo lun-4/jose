@@ -30,9 +30,9 @@ BASE_CHANCE = 1
 STEALDB_PATH = 'db/steal.json'
 
 DEFAULT_STEALDB = '''{
-    'points': {},
-    'cdown': {},
-    'period': {}
+    "points": {},
+    "cdown": {},
+    "period": {}
 }'''
 
 HELPTEXT_JC_STEAL = """
