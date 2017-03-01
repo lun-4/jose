@@ -96,9 +96,9 @@ class JoseCoin(jaux.Auxiliar):
             _cmdlist = ['j!{}'.format(cmd) for cmd in commands]
             cmdlist = ', '.join(_cmdlist)
 
-            res.append("`%s`: %.2fJC, %s, `%s`\n" % (cat, price, desc, cmdlist))
+            res.append("`%s`: %.2fJC, %s, `%s`" % (cat, price, desc, cmdlist))
 
-        await cxt.say(res)
+        await cxt.say('\n'.join(res))
 
     async def c_wallet(self, message, args, cxt):
         '''`j!wallet [@mention]` - your wallet(or other person's wallet)'''
