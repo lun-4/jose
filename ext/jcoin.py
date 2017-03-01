@@ -396,11 +396,23 @@ class JoseCoin(jaux.Auxiliar):
 
         if stealuses < 1:
             await cxt.say("You don't have any more stealing points, wait 24 hours to get more.")
-            self.stealdb['cdown'][message.author.id] = (time.time() + 86400, 1)
+            self.stealdb['cdown'][thief_id] = (time.time() + 86400, 1)
+            return
+
+        if target_id == self.jcoin.jose_id:
+            await cxt.say(":cop: You can't steal from José. Arrested for 24h")
+            self.stealdb['cdown'][thief_id] = (time.time() + 86400, 0)
             return
 
         target_account = self.jcoin.get(target_id)
-        chance = (BASE_CHANCE + (target_account['amount'] / amount)) * 0.9
+        target_amount = target_account['amount']
+
+        if amount > target_amount:
+            # automatically in prison
+            await cxt.say(":cop: Arrested because you tried to steal more than the target has, got 24h jailtime.")
+            self.stealdb['cdown'][thief_id] = (time.time() + 86400, 0)
+
+        chance = (BASE_CHANCE + (target_amount / amount)) * 0.3
         res = random.random() * 100
 
         if res < chance:
