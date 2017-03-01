@@ -28,6 +28,13 @@ class Auxiliar(jcommon.Extension):
     async def jc_control(self, id_user, amnt, ledger_path=None):
         return jcoin.transfer(id_user, jcoin.jose_id, amnt, ledger_path)
 
+    async def jcoin_pricing(self, cxt, amount):
+        res = jcoin.transfer(cxt.message.author.id, jcoin.jose_id, amount, None)
+        if res[0]:
+            return True
+        else:
+            raise je.JoseCoinError(res[1])
+
     async def json_load(self, string):
         future_json = self.loop.run_in_executor(None, json.loads, string)
 

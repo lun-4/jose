@@ -51,26 +51,10 @@ PIRU_ACTIVITY = .0000069
 JC_PROBABILITY = .01
 JC_REWARDS = [0, 0, 0.2, 0.6, 1, 1.2, 1.5]
 
-TOTAL = 10.0
-IMAGE_MEMBERS = 0.3
-LEARN_MEMBERS = 1.0
-
-# prices
-'''
-P = len_recompensas * (recompensa * prob) / TOTAL
-'''
-BASE_PRICE = 3 * ((len(JC_REWARDS) * (JC_REWARDS[len(JC_REWARDS)-1] * \
-    JC_PROBABILITY)) / TOTAL)
-
-IMG_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / IMAGE_MEMBERS)
-LEARN_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / LEARN_MEMBERS)
-OP_TAX_PRICE = (BASE_PRICE) * ((TOTAL-1.0) / TOTAL)
-
-PRICE_TABLE = {
-    'img': ("Imagens", IMG_PRICE),
-    'learn': ("Comandos relacionados ao josé aprender textos", LEARN_PRICE),
-    'operational': ("Taxa operacional de alguns comandos(normalmente relacionados a muito processamento)", OP_TAX_PRICE)
-}
+IMG_PRICE = 1
+LEARN_PRICE = 10
+OP_TAX_PRICE = 0.60
+API_TAX_PRICE = 0.40
 
 PL_MIN_MINUTES = 2
 PL_MAX_MINUTES = 7

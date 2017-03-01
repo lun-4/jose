@@ -70,6 +70,8 @@ class joseXtra(jaux.Auxiliar):
         if len(args) > 1:
             n = args[1]
 
+        await self.jcoin_pricing(cxt, jcommon.API_TAX_PRICE)
+
         url = "http://xkcd.com/info.0.json"
         r = await aiohttp.request('GET', url)
         content = await r.text()
@@ -205,27 +207,26 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
 
         search_term = ' '.join(args[1:])
 
-        loop = asyncio.get_event_loop()
-
         self.logger.info("Youtube request @ %s : %s", \
             message.author, search_term)
 
         query_string = urllib.parse.urlencode({"search_query" : search_term})
 
-        url = "http://www.youtube.com/results?" + query_string
-        r = await aiohttp.request('GET', url)
-        html_content = await r.text()
+        await self.jcoin_pricing(cxt, jcommon.OP_TAX_PRICE)
+
+        url = "http://www.youtube.com/results?{}".format(query_string)
+        html_content = await self.http_get(url)
 
         # run in a thread
-        future_re = loop.run_in_executor(None, re.findall, \
+        future_re = self.loop.run_in_executor(None, re.findall, \
             r'href=\"\/watch\?v=(.{11})', html_content)
         search_results = await future_re
 
         if len(search_results) < 2:
-            await cxt.say("!yt: Nenhum resultado encontrado.")
+            await cxt.say("!yt: No results found.")
             return
 
-        await cxt.say("http://www.youtube.com/watch?v=" + search_results[0])
+        await cxt.say("http://www.youtube.com/watch?v={}".format(search_results[0]))
 
     async def c_sndc(self, message, args, cxt):
         '''`j!sndc [stuff]` - Soundcloud search'''
@@ -240,6 +241,8 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
         if len(query) < 3:
             await cxt.say("preciso de mais coisas para pesquisar(length < 3)")
             return
+
+        await self.jcoin_pricing(cxt, jcommon.API_TAX_PRICE)
 
         search_url = 'https://api.soundcloud.com/search?q=%s&facet=model&limit=10&offset=0&linked_partitioning=1&client_id='+jconfig.soundcloud_id
         url = search_url % urllib.parse.quote(query)

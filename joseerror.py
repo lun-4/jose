@@ -14,3 +14,6 @@ class JSONError(Exception):
 
 class AioHttpError(Exception):
     pass
+
+class JoseCoinError(Exception):
+    pass

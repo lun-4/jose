@@ -10,6 +10,18 @@ import decimal
 from random import SystemRandom
 random = SystemRandom()
 
+PRICE_TABLE = {
+    'api': ('Tax for Commands that use APIs', jcommon.API_TAX_PRICE, \
+            ('wolframalpha', 'temperature', 'money', 'bitcoin', '8ball', \
+                'xkcd', 'sndc')),
+
+    'img': ('Price for all commands in `joseimages`', jcommon.IMG_PRICE, \
+            ('derpibooru', 'hypno', 'e621', 'yandere')),
+
+    'opr': ('Operational tax for commands that use a lot of processing', jcommon.OP_TAX_PRICE, \
+            ('datamosh', 'yt'))
+}
+
 class JoseCoin(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
@@ -70,6 +82,23 @@ class JoseCoin(jaux.Auxiliar):
             else:
                 jcommon.logger.error("do_josecoin->jc->err: %s", res[1])
                 await cxt.say("jc->err: %s", (res[1],))
+
+    async def c_prices(self, message, args, cxt):
+        '''`j!prices` - show price categories'''
+        res = []
+
+        for cat in PRICE_TABLE:
+            data = PRICE_TABLE[cat]
+            desc = data[0]
+            price = data[1]
+            commands = data[2]
+
+            _cmdlist = ['j!{}'.format(cmd) for cmd in commands]
+            cmdlist = ', '.join(_cmdlist)
+
+            res.append("`%s`: %.2fJC, %s, `%s`\n" % (cat, price, desc, cmdlist))
+
+        await cxt.say(res)
 
     async def c_wallet(self, message, args, cxt):
         '''`j!wallet [@mention]` - your wallet(or other person's wallet)'''

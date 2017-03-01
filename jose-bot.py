@@ -152,7 +152,11 @@ async def do_command(method, message, args, cxt, t_start, st):
             str(message.author), exc_info=True)
         await cxt.say(':interrobang: RuntimeError: %s' % repr(e))
     except je.CommonError as err:
-        await cxt.say('```\nCommonError: %r```', err)
+        await cxt.say('```\nCommonError: %r```', (err,))
+    except je.JoseCoinError as err:
+        await cxt.say('err: `%r`', (err,))
+    except asyncio.TimeoutError as err:
+        await cxt.say("`[timeout] Timeout Reached`")
     except je.LimitError:
         pass
 

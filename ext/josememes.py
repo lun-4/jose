@@ -592,6 +592,8 @@ class JoseMemes(jaux.Auxiliar):
 
     async def c_8ball(self, message, args, cxt):
         '''`j!8ball` - 8ball'''
+        await self.jcoin_pricing(cxt, jcommon.API_TAX_PRICE)
+
         try:
             answer = await self.http_get('https://api.rtainc.co/twitch/8ball?format=[0]', timeout=4)
         except asyncio.TimeoutError:

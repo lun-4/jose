@@ -53,7 +53,7 @@ class JoseGambling(jaux.Auxiliar):
         await cxt.say("Session created!")
 
     async def c_jrbet(self, message, args, cxt):
-        '''`j!jrbet value` bet in JoséCoin Roulette :tm:'''
+        '''`j!jrbet value` bet in JoséCoin Roulette :tm:, 3% fee'''
 
         if message.channel.is_private:
             await cxt.say("DMs can't use JC Roulette")

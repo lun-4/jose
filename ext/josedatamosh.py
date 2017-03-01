@@ -4,6 +4,7 @@ import aiohttp
 import sys
 import io
 sys.path.append("..")
+import josecommon as jcommon
 
 from PIL import Image
 from random import SystemRandom
@@ -104,6 +105,8 @@ Resultados de fotos jogadas ao !datamosh:
         if iterations > 129:
             await cxt.say("*engracadinho*")
             return
+
+        await self.jcoin_pricing(cxt, jcommon.OP_TAX_PRICE)
 
         data = await get_data(args[1])
 

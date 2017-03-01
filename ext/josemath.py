@@ -2,6 +2,7 @@
 
 import sys
 sys.path.append("..")
+import josecommon as jcommon
 import jauxiliar as jaux
 import joseconfig as jconfig
 
@@ -58,6 +59,8 @@ class JoseMath(jaux.Auxiliar):
             await cxt.say("haha no")
             return
 
+        await self.jcoin_pricing(cxt, jcommon.API_TAX_PRICE)
+
         self.logger.info("Wolfram|Alpha: %s", term_to_wolfram)
 
         future = self.loop.run_in_executor(None, \
@@ -100,13 +103,15 @@ class JoseMath(jaux.Auxiliar):
         await self.c_wolframalpha(message, args, cxt)
 
     async def c_temperature(self, message, args, cxt):
-        '''`j!temperature location` - OpenWeatherMap'''
+        '''`j!temperature location` - temperature data from OpenWeatherMap'''
         # ratelimit 60/minute
         if len(args) < 2:
             await cxt.say(self.c_temperature.__doc__)
             return
 
         location = ' '.join(args[1:])
+
+        await self.jcoin_pricing(cxt, jcommon.API_TAX_PRICE)
 
         try:
             future = self.loop.run_in_executor(None, \
@@ -193,6 +198,8 @@ class JoseMath(jaux.Auxiliar):
             await cxt.say(self.c_money.__doc__)
             return
 
+        await self.jcoin_pricing(cxt, jcommon.API_TAX_PRICE)
+
         url = "http://api.fixer.io/latest?base={}".format(currency_from.upper())
         data = await self.json_from_url(url)
 
@@ -227,6 +234,8 @@ class JoseMath(jaux.Auxiliar):
 
         # get data from coindesk
         self.logger.info("[bitcoin] %d BTC to %s", btc_amount, currency)
+        await self.jcoin_pricing(cxt, jcommon.API_TAX_PRICE)
+
         data = await self.json_from_url(COINDESK_CURRENT_URL)
 
         if currency not in ['USD', 'GBP', 'EUR']:
