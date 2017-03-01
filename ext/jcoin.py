@@ -441,7 +441,7 @@ class JoseCoin(jaux.Auxiliar):
             self.stealdb['cdown'][thief_id] = (time.time() + 86400, 0)
             return
 
-        target_account = self.jcoin.get(target_id)
+        target_account = self.jcoin.get(target_id)[1]
         target_amount = target_account['amount']
 
         if amount > target_amount:
