@@ -359,12 +359,18 @@ class JoseCoin(jaux.Auxiliar):
         res = []
 
         points = self.stealdb['points'].get(personid, 3)
-        prison = self.stealdb['cdown'].get(personid, None)
+        cooldown = self.stealdb['cdown'].get(personid, None)
         grace_period = self.stealdb['period'].get(personid, None)
 
         res.append("**%s**, you have %d stealing points" % (str(message.author), points))
-        if prison is not None:
-            res.append(":cop: you're in prison, %d seconds remaining" % (prison,))
+        if cooldown is not None:
+            cooldown_sec, cooldown_type = cooldown
+            if cooldown_type == 0:
+                res.append(":cop: you're in prison, %d seconds remaining" % (cooldown_sec,))
+            elif cooldown_type == 1:
+                res.append(":alarm_clock: you're waiting for stealing points, %d seconds remaining" % (cooldown_sec,))
+            else:
+                res.append(":warning: unkown cooldown type")
 
         if grace_period is not None:
             res.append(":angel: you're in grace period, %d seconds remaining" % (grace_period,))
