@@ -362,12 +362,12 @@ class JoseCoin(jaux.Auxiliar):
         prison = self.stealdb['cdown'].get(personid, None)
         grace_period = self.stealdb['period'].get(personid, None)
 
-        res.append("**%s**, you have %d stealing points", str(message.author), points)
+        res.append("**%s**, you have %d stealing points" % (str(message.author), points))
         if prison is not None:
-            res.append(":cop: you're in prison, %d seconds remaining", prison)
+            res.append(":cop: you're in prison, %d seconds remaining" % (prison,))
 
         if grace_period is not None:
-            res.append(":angel: you're in grace period, %d seconds remaining", grace_period)
+            res.append(":angel: you're in grace period, %d seconds remaining", % (grace_period,))
 
         await cxt.say('\n'.join(res))
 
