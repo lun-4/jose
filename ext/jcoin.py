@@ -6,6 +6,8 @@ sys.path.append("..")
 import jauxiliar as jaux
 import josecommon as jcommon
 import decimal
+import json
+import os
 
 from random import SystemRandom
 random = SystemRandom()
@@ -22,36 +24,81 @@ PRICE_TABLE = {
             ('datamosh', 'yt'))
 }
 
+# 1%
+BASE_CHANCE = decimal.Decimal(1)
+STEALDB_PATH = 'db/steal.json'
+
+HELPTEXT_JC_STEAL = """
+`j!steal` allows you to steal an arbritary amount of money from anyone.
+The chance of stealing increases faster than the amount you want to steal increases
+"""
+
 class JoseCoin(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
         self.counter = 0
 
-    async def ext_load(self):
-        return (await self.josecoin_load(None))
-
-    async def ext_unload(self):
-        return (await self.josecoin_save(None))
-
     async def josecoin_save(self, message, dbg_flag=True):
         res = self.jcoin.save('jcoin/josecoin.db')
         if not res[0]:
+            self.logger.error("jcerr: %r", res)
             if message is not None:
                 await self.client.send_message(message.channel, \
                     "jcerr: `%r`" % res)
-            else:
-                self.logger.error("jcerr: %r" % res)
         return res
 
     async def josecoin_load(self, message, dbg_flag=True):
         res = self.jcoin.load('jcoin/josecoin.db')
         if not res[0]:
+            self.logger.error("jcerr: %r", res)
             if message is not None:
                 await self.client.send_message(message.channel, \
                     "jcerr: `%r`" % res)
-            else:
-                self.logger.error("jcerr: %r" % res)
         return res
+
+    async def save_steal_db(self):
+        try:
+            self.logger.info("savedb:stealdb")
+            json.dump(self.stealdb, open(STEALDB_PATH, 'w'))
+
+            return True, ''
+        except Exception as err:
+            return False, str(err)
+
+    async def load_steal_db(self):
+        try:
+            self.stealdb = {}
+            if not os.path.isfile(STEALDB_PATH):
+                with open(STEALDB_PATH, 'w') as stealdbfile:
+                    statsfile.write('{}')
+
+            self.stealdb = json.load(open(STEALDB_PATH, 'r'))
+
+            return True, ''
+        except Exception as err:
+            return False, str(err)
+
+    async def ext_load(self):
+        res_jc = await self.josecoin_load(None)
+        if not res_jc[0]:
+            return res_jc
+
+        res_sdb = await self.load_steal_db()
+        if not res_sdb[0]:
+            return res_sdb
+
+        return True, ''
+
+    async def ext_unload(self):
+        res_jc = await self.josecoin_load(None)
+        if not res_jc[0]:
+            return res_jc
+
+        res_sdb = await self.save_steal_db()
+        if not res_sdb[0]:
+            return res_sdb
+
+        return True, ''
 
     async def e_any_message(self, message, cxt):
         self.counter += 1
@@ -292,3 +339,92 @@ class JoseCoin(jaux.Auxiliar):
 
         await cxt.say('\n'.join(order))
         return
+
+    async def c_hsteal(self, message, args, cxt):
+        await cxt.say(HELPTEXT_JC_STEAL)
+
+    async def c_steal(self, message, args, cxt):
+        '''`j!steal @mention amount` - Steal JoséCoins from someone'''
+
+        if len(args) < 2:
+            await cxt.say(self.c_steal.__doc__)
+            return
+
+        # parse mention
+        try:
+            userid = await jcommon.parse_id(args[1])
+        except:
+            await cxt.say("Error parsing `@mention`")
+            return
+
+        try:
+            amount = decimal.Decimal(args[2])
+        except:
+            await cxt.say("Error parsing `amount`")
+            return
+
+        if message.author.id not in self.jcoin.data:
+            await cxt.say("You don't have a josécoin account.")
+            return
+
+        if target_id not in self.jcoin.data:
+            await cxt.say("The person you're trying to steal from doesn't have a JoséCoin account")
+            return
+
+        thief_id = message.author.id
+
+        # check if thief has cooldowns in place
+        cdown = self.stealdb['cdown'].get(thief_id, None)
+        if cdown is not None:
+            cooldown_end, cooldown_type = cdown
+            remaining = cooldown_end - time.time()
+            if cooldown_type == 0:
+                await cxt.say(":cop: You are still in prison, wait %d seconds", (remaining,))
+            elif cooldown_type == 1:
+                if remaining > 1:
+                    await cxt.say("Wait %d seconds to regenerate your stealing points", (remaining,))
+                else:
+                    await cxt.say("Stealing points regenerated!")
+                    del self.stealdb['points'][thief_id]
+                    await self.save_steal_db()
+            return
+
+        stealuses = self.stealdb['points'].get(thief_id, None)
+        if stealuses is None:
+            self.stealdb['points'][thief_id] = stealuses = 3
+
+        if stealuses < 1:
+            await cxt.say("You don't have any more stealing points, wait 24 hours to get more.")
+            self.stealdb['cdown'][message.author.id] = (time.time() + 86400, 1)
+            return
+
+        target_account = self.jcoin.get(target_id)
+        thief_account = self.jcoin.get(thief_id)
+
+        chance = (BASE_CHANCE + (target_account['amount'] / amount)) * 0.9
+
+        res = random.random() * 100
+
+        if res < chance:
+            self.logger.info("Stealing %.2fJC from %s[%s] to %s[%s]", \
+                amount, target_account['name'], target_id, message.author, thief_id)
+
+            # steal went good, make transfer
+            ok = self.jcoin.transfer(target_id, thief_id, amount)
+
+            # check transfer status
+            if not ok[0]:
+                await cxt.say("jc->err: %s", ok[1])
+            else:
+                await cxt.say("Good one! Stealing went well, you thief. Got %.2fJC from %s, \n`%s`", \
+                    (amount, target_account['name'], ok[1]))
+
+                self.stealdb['points'][message.author.id] -= 1
+
+        else:
+            # type 0 cooldown, you got arrested
+
+            await cxt.say(":cop: Arrested! got 24h cooldown on `j!steal`.")
+            self.stealdb['cdown'][message.author.id] = (time.time() + 86400, 0)
+
+        await self.save_steal_db()
