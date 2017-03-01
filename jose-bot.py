@@ -32,25 +32,6 @@ jcommon.set_client(client) # to jcommon
 jose = jose_bot.JoseBot(client)
 env = jose.env
 
-commands_match = {
-    'baladinha top':    jcommon.show_top,
-    'que tampa':        jcommon.show_tampa,
-    'tijolo':           jcommon.show_tijolo,
-    "mc gorila":        jcommon.show_mc,
-    'frozen 2':         jcommon.show_frozen_2,
-    'emule':            jcommon.show_emule,
-    'vinheta':          jcommon.show_vinheta,
-    "vtnc jose":        jcommon.show_vtnc,
-    'que rodeio':       jcommon.rodei_teu_cu,
-    'anal giratorio':   jcommon.show_agira,
-    'lenny face':       jcommon.make_func("( ͡° ͜ʖ ͡°)"),
-    'janela':           jcommon.show_casa,
-    'frozen3':          jcommon.make_func("https://thumbs.dreamstime.com/t/construo-refletiu-nas-janelas-do-prdio-de-escritrios-moderno-contra-47148949.jpg"),
-    'q fita':           jcommon.make_func("http://i.imgur.com/DQ3YnI0.jpg"),
-    'compiuter':        jcommon.make_func("https://i.ytimg.com/vi/cU3330gwoh8/hqdefault.jpg"),
-    'Parabéns':         jcommon.make_func("http://i.imgur.com/L0VlX0m.jpg")
-}
-
 counter = 0
 
 def load_module(n, n_cl):
@@ -124,12 +105,6 @@ async def check_message(message):
     return True
 
 async def do_command_table(message):
-    for command in commands_match:
-        if command in message.content:
-            func = commands_match[command]
-            await func(message)
-            return True
-
     return False
 
 async def do_command(method, message, args, cxt, t_start, st):

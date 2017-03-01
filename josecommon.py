@@ -209,18 +209,6 @@ def make_func(res):
 
     return response
 
-rodei_teu_cu = make_func("RODEI MEU PAU NO TEU CU")
-show_tampa = make_func("A DO TEU CU\nHÁ, TROLEI")
-show_vtnc = make_func("OQ VC DISSE?\nhttp://i.imgur.com/Otky963.jpg")
-show_emule = make_func("http://i.imgur.com/GO90sEv.png")
-show_frozen_2 = make_func('http://i.imgur.com/HIcjyoW.jpg')
-
-show_tijolo = make_func("http://www.ceramicabelem.com.br/produtos/TIJOLO%20DE%2006%20FUROS.%209X14X19.gif")
-show_mc = make_func("https://cdn.discordapp.com/attachments/202055538773721099/203989039504687104/unknown.png")
-show_vinheta = make_func('http://prntscr.com/bvcbju')
-show_agira = make_func("http://docs.unity3d.com/uploads/Main/SL-DebugNormals.png")
-show_casa = make_func("https://thumbs.dreamstime.com/z/locais-de-trabalho-em-um-escrit%C3%B3rio-panor%C3%A2mico-moderno-opini%C3%A3o-de-new-york-city-das-janelas-tabelas-pretas-e-cadeiras-de-couro-59272285.jpg")
-
 async def str_xor(string, other):
     return "".join(chr(ord(a) ^ ord(b)) for a, b in zip(string, other))
 
