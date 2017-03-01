@@ -686,7 +686,7 @@ don't want (unless I'm skynet)")
         host = ' '.join(args[1:])
 
         ping = subprocess.Popen(
-            ["ping", "-c", "6", host],
+            ["ping", "-c", "2", host],
             stdout = subprocess.PIPE,
             stderr = subprocess.PIPE
         )
