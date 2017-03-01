@@ -386,7 +386,7 @@ class JoseCoin(jaux.Auxiliar):
             return
 
         try:
-            amount = decimal.Decimal(args[2], message)
+            amount = decimal.Decimal(args[2])
         except:
             await cxt.say("Error parsing `amount`")
             return
