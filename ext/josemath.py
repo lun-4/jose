@@ -224,7 +224,7 @@ class JoseMath(jaux.Auxiliar):
 
         # parse args
         try:
-            btc_amount = int(args[1])
+            btc_amount = float(args[1])
         except:
             btc_amount = 1
 
