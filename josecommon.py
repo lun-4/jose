@@ -253,7 +253,12 @@ class Callback:
         logger.info("%s: Running Callback", self.cid)
         while self.run:
             logger.debug("%s: called", self.cid)
-            await self.func()
+
+            try:
+                await self.func()
+            except:
+                logger.error('Error at cbk %s.do', self.cid, exc_info=True)
+
             await asyncio.sleep(self.sec)
         logger.debug("%s: ended", self.cid)
 
