@@ -9,6 +9,7 @@ import joseconfig as jconfig
 from random import SystemRandom
 random = SystemRandom()
 
+import decimal
 import asyncio
 import wolframalpha
 import pyowm
@@ -23,6 +24,7 @@ COMMONCRYPTO = ['BTC', 'ETH', 'DASH', 'LTC', 'XMR', 'XRP', 'DOGE', 'REP', 'LSK']
 COMMON_WORLD = ['USD', 'GBP', 'EUR', 'JPY', 'CAD']
 COMMON_CURRENCIES = COMMONCRYPTO + COMMON_WORLD
 
+CRYPTOAPI_HELPURL = 'https://www.cryptocompare.com/api'
 CRYPTOAPI_MULTIPRICE = 'https://min-api.cryptocompare.com/data/pricemulti?fsyms=%s&tsyms=%s'
 CRYPTOAPI_ONEPRICE = 'https://min-api.cryptocompare.com/data/price?fsym=%s&tsyms=%s'
 
@@ -322,8 +324,8 @@ class JoseMath(jaux.Auxiliar):
             return
 
         result = decimal.Decimal(amount * rate)
-        await cxt.say("{:.4g} {} = {0:.4g} {}".format(amount, \
-            from_currency, result, to_currency))
+        await cxt.say("{:.4g} {} = {0:.4g} {}, Powered by: {}".format(amount, \
+            from_currency, result, to_currency, CRYPTOAPI_HELPURL))
 
     async def c_roll(self, message, args, cxt):
         '''`j!roll <amount>d<sides>` - roll fucking dice'''
