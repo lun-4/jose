@@ -33,7 +33,7 @@ where no one can steal from the victim again.
  * The victim gets notified when someone steals from them
  * You don't have a cooldown when you aren't arrested
  * You are arrested if you try to steal from José, or steal a higher amount than the victim's wallet
- * If you use `j!steal` 3 times in a row and succeed in all 3 of them, you'll then have to wait 8 hours to get 3 more uses.
+ * If you use `j!steal` 3 times in a row and succeed in all 3 of them, you'll then have to use `j!steal` again and wait 8 hours to get 3 more uses.
 
 `j!hsteal` for more details.
 

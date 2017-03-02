@@ -34,6 +34,7 @@ docsdict = {
     "josespeak": "{}/doc/josespeak.md".format(JOSE_URL),
 
     "contributing": "{}/CONTRIBUTING.md".format(JOSE_URL),
+    "jcoin": "{}/doc/jcoin.md".format(JOSE_URL),
 }
 
 class joseXtra(jaux.Auxiliar):
