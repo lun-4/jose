@@ -646,8 +646,8 @@ class JoseCoin(jaux.Auxiliar):
             storagebank_total[1] += account['fakemoney']
 
         res.append("Total in Taxbank: %.2fJC" % (sum(tbank['taxpayers'].values())))
-        res.append("Total in Storagebank: %.2fJC" % storagebank_total[0])
-        res.append("What storagebank should have: %.2fJC" % storagebank_total[1])
+        res.append("Total in Storagebank: %.2fJC, should have %.2fJC" % \
+            (storagebank_total[0], storagebank_total[1]))
 
         account = None
         _account = self.jcoin.get(message.author.id)
@@ -655,7 +655,7 @@ class JoseCoin(jaux.Auxiliar):
             account = _account[1]
 
         if account is not None:
-            res.append("Total in personal bank: %.2fJC" % account['actualmoney'])
-            res.append("What personal bank should have: %.2fJC" % account['fakemoney'])
+            res.append("Total in personal bank: %.2fJC, should have %.2fJC" % \
+                (account['actualmoney'], account['fakemoney']))
 
         await cxt.say(self.codeblock("", '\n'.join(res)))
