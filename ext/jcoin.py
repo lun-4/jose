@@ -436,7 +436,7 @@ class JoseCoin(jaux.Auxiliar):
         if stealuses is None:
             self.stealdb['points'][thief_id] = stealuses = 3
 
-        thief_user = await self.client.get_user_info(thief_id)
+        thief_user = message.author
         target_user = await self.client.get_user_info(target_id)
 
         grace_period = (self.stealdb['period'].get(target_id, 0) - time.time())
