@@ -19,12 +19,28 @@ COINDESK_CURRENT_URL = '{}/currentprice.json'.format(COINDESK_API)
 COINDESK_CURRENCYLIST_URL = '{}/supported-currencies.json'.format(COINDESK_API)
 COINDESK_CURRENCY_URL = '{}/currentprice/%s.json'.format(COINDESK_API)
 
+COMMONCRYPTO = ['BTC', 'ETH', 'DASH', 'LTC', 'XMR', 'XRP', 'DOGE', 'REP', 'LSK']
+COMMONCURRENCIES = ['USD', 'GBP', 'EUR', 'JPY', 'CAD']
+CRYPTOAPI_MULTIPRICE = 'https://min-api.cryptocompare.com/data/pricemulti?fsyms=%s&tsyms=%s'
+
 class JoseMath(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
         self.wac = wolframalpha.Client(jconfig.WOLFRAMALPHA_APP_ID)
         self.owm = pyowm.OWM(jconfig.OWM_APIKEY)
         self.btc_supported = []
+        self.btc_cache = None
+
+        # 30 minutes
+        self.cbk_new('jmath.cryptocache', self.crypto_cache, 1800)
+
+    async def crypto_cache(self):
+        cryptostr = ','.join(COMMONCRYPTO)
+        currencystr = ','.join(COMMONCURRENCIES)
+        url = CRYPTOAPI_MULTIPRICE % (cryptostr, currencystr)
+
+        priceinfo = await self.json_from_url(url)
+        self.btc_cache = priceinfo
 
     async def ext_load(self):
         # try to get from coindesk supported currencies
@@ -44,6 +60,7 @@ class JoseMath(jaux.Auxiliar):
             return False, repr(err)
 
     async def ext_unload(self):
+        self.cbk_remove('jmath.cryptocache')
         del self.wac, self.owm, self.btc_supported
         return True, ''
 
