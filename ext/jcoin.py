@@ -502,7 +502,7 @@ class JoseCoin(jaux.Auxiliar):
             # automatically in prison
             arrest = await self.do_arrest(thief_id, amount)
             await cxt.say(":cop: Arrested because you tried to steal more than the target has, 8h jail time.\n`%s`", \
-                (arrest[1]))
+                (arrest[1],))
 
         D = decimal.Decimal
         chance = (BASE_CHANCE + (target_amount / amount)) * D(0.3)
