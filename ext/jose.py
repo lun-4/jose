@@ -730,3 +730,6 @@ don't want (unless I'm skynet)")
             self.dev_mode = False
         elif mode == 'dev':
             self.dev_mode = True
+            await self.do_dev_mode()
+
+        await cxt.say("mode changed to `%r`", (mode,))
