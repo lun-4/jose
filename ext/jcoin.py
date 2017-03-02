@@ -494,7 +494,7 @@ class JoseCoin(jaux.Auxiliar):
             # type 0 cooldown, you got arrested
             await cxt.say("`[res: %.2f > prob: %.2f]` :cop: Arrested! got 8h cooldown.", \
                 (res, chance))
-            self.stealdb['cdown'][message.author.id] = (time.time() + 86400, 0)
+            self.stealdb['cdown'][message.author.id] = (time.time() + 28800, 0)
 
         await self.save_steal_db()
 
