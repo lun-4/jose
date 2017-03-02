@@ -383,6 +383,7 @@ class JoseCoin(jaux.Auxiliar):
         if cooldown is not None:
             cooldown_sec, cooldown_type = cooldown
             cooldown_sec -= time.time()
+
             if cooldown_type == 0:
                 res.append(":cop: you're in prison, %.2f hours remaining" % (self.to_hours(cooldown_sec),))
             elif cooldown_type == 1:
@@ -438,14 +439,24 @@ class JoseCoin(jaux.Auxiliar):
         if cdown is not None:
             cooldown_end, cooldown_type = cdown
             remaining = cooldown_end - time.time()
+
             if cooldown_type == 0:
-                await cxt.say(":cop: You are still in prison, wait %.2f hours", (self.to_hours(remaining),))
+                if remaining > 1:
+                    await cxt.say(":cop: You are still in prison, wait %.2f hours", \
+                        (self.to_hours(remaining),))
+                else:
+                    await cxt.say(":helicopter: You got out of prison")
+                    del self.stealdb['cdown'][thief_id]
+                    await self.save_steal_db()
+
             elif cooldown_type == 1:
                 if remaining > 1:
-                    await cxt.say("Wait %.2f hours to regenerate your stealing points", (self.to_hours(remaining),))
+                    await cxt.say("Wait %.2f hours to regenerate your stealing points", \
+                        (self.to_hours(remaining),))
                 else:
                     await cxt.say("Stealing points regenerated!")
                     del self.stealdb['points'][thief_id]
+                    del self.stealdb['cdown'][thief_id]
                     await self.save_steal_db()
             return
 
