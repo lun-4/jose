@@ -25,11 +25,23 @@ class Auxiliar(jcommon.Extension):
         self.jcommon = jcommon
         self.jcoin = jcoin
 
+    def tbank_fmt(self, cxt):
+        return 'tbank#%s' % (cxt.message.server.id)
+
     async def jc_control(self, id_user, amnt, ledger_path=None):
         return jcoin.transfer(id_user, jcoin.jose_id, amnt, ledger_path)
 
     async def jcoin_pricing(self, cxt, amount):
-        res = jcoin.transfer(cxt.message.author.id, jcoin.jose_id, amount, None)
+        # taxing
+        # ensure taxbank exists
+        tbank_id = self.tbank_fmt(cxt)
+        if tbank_id not in self.jcoin.data:
+            # type 1 account = taxbank
+            self.jcoin.data[jose_id] = self.jcoin.empty_acc(tbank_id, \
+                decimal.Decimal("0"), 1)
+
+        # make transfer
+        res = self.jcoin.transfer(cxt.message.author.id, tbank_id, amount)
         if res[0]:
             return True
         else:
