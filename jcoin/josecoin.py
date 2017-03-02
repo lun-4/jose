@@ -40,21 +40,34 @@ def ledger_data(fpath, data):
         f.write(data)
     return
 
-def empty_acc(name, amnt):
-    return {
-        'amount': amnt,
-        'name': name
-    }
+def empty_acc(name, amnt, acctype=0):
+    if acctype == 0 :
+        # user account
+        return {
+            'type': 0,
+            'amount': amnt,
+            'name': name
+        }
+    elif acctype == 1:
+        # tax bank
+        return {
+            # taxpayers example
+            # userid: taxpaid,
+            # otheruser: taxpaid,
+            # etc
+            'type': 1,
+            'taxpayers': {}
+        }
 
-def new_acc(id_acc, name, init_amnt=None):
-    if init_amnt is None:
+def new_acc(id_acc, name, init_amnt=None, acctype=0):
+    if init_amnt is None and acctype == 0:
         # the readjust gave so little prices I need to lower this
         init_amnt = decimal.Decimal('3')
 
     if id_acc in data:
         return False, 'account already exists'
 
-    data[id_acc] = empty_acc(name, init_amnt)
+    data[id_acc] = empty_acc(name, init_amnt, acctype)
     return True, 'account made with success'
 
 def get(id_acc):
@@ -91,15 +104,35 @@ def transfer(id_from, id_to, amnt, file_name=None):
     logger.info("%s > %.6fJC > %s", \
         acc_from['name'], amnt, acc_to['name'])
 
-    if not (acc_from['amount'] >= amnt):
-        return False, "account doesn't have enough funds to make this transaction"
+    if acc_to['type'] == 1:
+        # tax transfer
+        if not (acc_from['amount'] >= amnt):
+            return False, "account doesn't have enough funds to make this transaction"
 
-    acc_to['amount'] += amnt
-    acc_from['amount'] -= amnt
+        # first time paying tax
+        if id_from not in acc_to['taxpayers']:
+            acc_to['taxpayers'][id_from] = 0
 
-    ledger_data(file_name, "%f;TR;%s;%s;%s\n" % (time.time(), id_from, id_to, amnt))
+        # mk transfer
+        acc_to['taxpayers'][id_from] += amnt
+        acc_from['amount'] -= amnt
 
-    return True, "%s was sent from %s to %s" % (amnt, acc_from['name'], acc_to['name'])
+        ledger_data(file_name, "%f;TAXTR;%s;%s;%s\n" % \
+            (time.time(), id_from, id_to, amnt))
+
+        return True, "%s was sent from %s to %s" % (amnt, acc_from['name'], acc_to['name'])
+    else:
+
+        if not (acc_from['amount'] >= amnt):
+            return False, "account doesn't have enough funds to make this transaction"
+
+        acc_to['amount'] += amnt
+        acc_from['amount'] -= amnt
+
+        ledger_data(file_name, "%f;TR;%s;%s;%s\n" % \
+            (time.time(), id_from, id_to, amnt))
+
+        return True, "%s was sent from %s to %s" % (amnt, acc_from['name'], acc_to['name'])
 
 def load(fname):
     global data
@@ -109,7 +142,11 @@ def load(fname):
     except Exception as e:
         return False, str(e)
 
-    data[jose_id] = empty_acc('jose-bot', decimal.Decimal('1000000'))
+    for acc_id in data:
+        if 'name' in data[acc_id]:
+            data[acc_id]['type'] = 0
+
+    data[jose_id] = empty_acc('jose-bot', decimal.Decimal('Inf'), 0)
     #ledger_data(fname.replace('db', 'journal'), '%f;LOAD;%r\n' % (time.time(), data))
     return True, "load %s" % fname
 
