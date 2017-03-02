@@ -629,3 +629,32 @@ class JoseCoin(jaux.Auxiliar):
 
         await cxt.say("Transferred %.2fJC from personal bank to %s.", \
             (to_withdraw, account['name']))
+
+    async def c_bank(self, message, args, cxt):
+        '''`j!bank` - show bank status'''
+        tbank_id = self.tbank_fmt(cxt)
+        self.ensure_tbank(tbank_id)
+
+        res = []
+        tbank = self.jcoin.get(tbank_id)[1]
+
+        storagebank_total = [0, 0]
+        members_list = (m for m in message.server.members if m.id in self.jcoin.data)
+        for member in members_list:
+            storagebank_total[0] += member['actualmoney']
+            storagebank_total[1] += member['fakemoney']
+
+        account = None
+        _account = self.jcoin.get(message.author.id)
+        if _account[0]:
+            account = _account[1]
+
+        res.append("Total in Taxbank: %.2fJC" % (sum(tbank['taxpayers'].values())))
+        res.append("Total in Storagebank: %.2fJC" % storagebank_total[0])
+        res.append("What storagebank should have: %.2fJC" % storagebank_total[1])
+
+        if account is not None:
+            res.append("Total in personal bank: %.2fJC" % account['actualmoney'])
+            res.append("What personal bank should have: %.2fJC" % account['fakemoney'])
+
+        await cxt.say(self.codeblock("", '\n'.join(res)))
