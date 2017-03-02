@@ -95,4 +95,13 @@ Command | Description | Example | Alias
 `j!datamosh url` | Datamoshes a file | `j!datamosh https://discordapp.com/api/users/202587271679967232/avatars/93ac51b863fde7c38578693947dab6bc.jpg` |
 
 ### `josegambling`
-# TODO THIS
+
+Command | Description | Example | Alias
+------------- | ------------- | ------------- | -------------
+`j!jcrhelp` | Help about JoséCoin Roulette :tm: | |
+`j!jrstart` | Starts a JoséCoin Roulette :tm: session in your server | |
+`j!jrbet amount` | Bet on the currently running JCR :tm: session | `j!jrbet 1` |
+`j!jrdo` | Do the JCR :tm: aka see the winner | |
+`j!jreport` | JCR :tm: report, shows what amount each one paid in the session | |
+`j!jrcheck` | Shows if a JCR :tm: session is on/off | |
+`j!flip` | Flips a coin. | |

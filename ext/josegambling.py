@@ -17,9 +17,10 @@ where people create a JCR session, they pay josé, and josé chooses, by random,
 a winner that will win all the money everyone paid.
 
 `j!jrstart` to start a session
-`j!jrbet` to pay josé, %.2f%% of this amount will be fees
+`j!jrbet amount` to pay josé, %.2f%% of this amount will be fees
 `j!jrdo` does the roulette, when everyone wants to know who wins
-`j!jreport` shows if JCR is on or off in your server
+`j!jreport` shows the amount of money spent on the current session
+`j!jrcheck` checks if a JCR session is on/off
 ''' % (BETTING_FEE)
 
 class JoseGambling(jaux.Auxiliar):
