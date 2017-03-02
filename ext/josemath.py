@@ -303,13 +303,23 @@ class JoseMath(jaux.Auxiliar):
             from_currency, to_currency)
 
         await self.jcoin_pricing(cxt, jcommon.API_TAX_PRICE)
+        data = copy.copy(self.crypto_cache)
+        nocache = False
+        rate = None
 
         # up do date data
-        if from_currency not in COMMON_CURRENCIES:
-            pass
+        if (from_currency not in COMMON_CURRENCIES) or (to_currency not in COMMON_CURRENCIES):
+            data = await self.json_from_url(CRYPTOAPI_ONEPRICE % (from_currency, to_currency))
+            nocache = True
 
-        if to_currency not in COMMON_CURRENCIES:
-            pass
+        if nocache:
+            rate = decimal.Decimal(data[to_currency])
+        else:
+            rate = decimal.Decimal(data[from_currency][to_currency])
+
+        result = decimal.Decimal(amount * rate)
+        await cxt.say("{:.4g} {} = {0:.4g} {}".format(amount, \
+            from_currency, result, to_currency))
 
     async def c_roll(self, message, args, cxt):
         '''`j!roll <amount>d<sides>` - roll fucking dice'''
