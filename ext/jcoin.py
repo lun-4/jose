@@ -564,3 +564,33 @@ class JoseCoin(jaux.Auxiliar):
             res.append("%s -> %.2fJC in taxes" % (str(member), val))
 
         await cxt.say(self.codeblock("", "\n".join(res)))
+
+    async def c_store(self, message, args, cxt):
+        '''`j!store amount` - Store JCs in bank'''
+
+        if len(args) < 2:
+            await cxt.say(self.c_store.__doc__)
+            return
+
+        try:
+            to_store = decimal.Decimal(args[1])
+        except:
+            await cxt.say("Error parsing `amount`")
+            return
+
+        acc_id = message.author.id
+        ok = self.join.get(acc_id)
+        if not ok[0]:
+            await cxt.say('jc->err: `%s`' % ok[1])
+            return
+
+        account = ok[1]
+
+        account['amount'] -= to_store
+
+        # user's personal bank
+        account['fakemoney'] += to_store
+        account['actualmoney'] += to_store
+
+        await cxt.say("Transferred %.2fJC from %s account to personal bank.", \
+            (to_store, account['name']))
