@@ -283,9 +283,7 @@ async def on_ready():
     if not jose.dev_mode:
         await timer_playing()
     else:
-        jcommon.logger.info("Developer Mode Enabled")
-        g = discord.Game(name='JOSÉ IN MAINTENANCE', url='fuck you')
-        await client.change_presence(game=g)
+        await jose.do_dev_mode()
 
     t_allowed = False
 

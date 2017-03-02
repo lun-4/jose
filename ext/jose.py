@@ -32,6 +32,11 @@ class JoseBot(jcommon.Extension):
         self.off_mode = False
         self.ev_empty()
 
+    async def do_dev_mode(self):
+        self.logger.info("Developer Mode Enabled")
+        g = discord.Game(name='JOSÉ IN MAINTENANCE', url='fuck you')
+        await self.client.change_presence(game=g)
+
     def ev_empty(self):
         self.event_tbl = {
             'on_message': [],
@@ -710,3 +715,18 @@ don't want (unless I'm skynet)")
         error = self.codeblock("", _error.decode('utf-8'))
 
         await cxt.say("OUT:%s\nERR:%s", (out, error))
+
+    async def c_mode(self, message, args, cxt):
+        '''`j!mode normal|dev` - change jose mode'''
+        await self.is_admin(message.author.id)
+
+        if len(args) < 1:
+            await cxt.say(self.c_mode.__doc__)
+            return
+
+        mode = args[1]
+
+        if mode == 'normal':
+            self.dev_mode = False
+        elif mode == 'dev':
+            self.dev_mode = True
