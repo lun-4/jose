@@ -382,7 +382,7 @@ class JoseCoin(jaux.Auxiliar):
 
         if grace_period is not None:
             grace_period -= time.time()
-            res.append(":angel: you're in grace period, %.2f hours remaining" % (self.to_hours(cooldown_sec),))
+            res.append(":angel: you're in grace period, %.2f hours remaining" % (self.to_hours(grace_period),))
 
         await cxt.say('\n'.join(res))
 
