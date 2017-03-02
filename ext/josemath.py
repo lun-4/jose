@@ -303,7 +303,7 @@ class JoseMath(jaux.Auxiliar):
             from_currency, to_currency)
 
         await self.jcoin_pricing(cxt, jcommon.API_TAX_PRICE)
-        data = dict(self.crypto_cache)
+        data = dict(self.btc_cache)
         nocache = False
         rate = None
 
