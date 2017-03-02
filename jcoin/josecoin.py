@@ -56,6 +56,7 @@ def empty_acc(name, amnt, acctype=0):
             # otheruser: taxpaid,
             # etc
             'type': 1,
+            'name': name,
             'taxpayers': {}
         }
 
@@ -143,8 +144,11 @@ def load(fname):
         return False, str(e)
 
     for acc_id in data:
-        if 'name' in data[acc_id]:
+        if 'amount' in data[acc_id]:
             data[acc_id]['type'] = 0
+
+        if 'taxpayers' in data[acc_id]:
+            data[acc_id]['name'] = acc_id
 
     data[jose_id] = empty_acc('jose-bot', decimal.Decimal('Inf'), 0)
     #ledger_data(fname.replace('db', 'journal'), '%f;LOAD;%r\n' % (time.time(), data))
