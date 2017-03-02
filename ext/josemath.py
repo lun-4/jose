@@ -367,16 +367,16 @@ class JoseMath(jaux.Auxiliar):
             return
 
         try:
-            percentage = float(args[1])
+            percentage = decimal.Decimal(args[1])
         except:
             await cxt.say("Error parsing `percentage`")
             return
 
         try:
-            amount = float(args[2])
+            amount = decimal.Decimal(args[2])
         except:
             await cxt.say("Error parsing `amount`")
             return
 
-        res = (percentage * amount) / 100
-        await cxt.say("%.4f%% out of %.4f => %.4f", (percentage, amount, res))
+        res = (percentage * amount) / decimal.Decimal(100)
+        await cxt.say("%.2f%% out of %.2f = **%.4f**", (percentage, amount, res))
