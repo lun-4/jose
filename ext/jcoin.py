@@ -466,6 +466,8 @@ class JoseCoin(jaux.Auxiliar):
 
         D = decimal.Decimal
         chance = (BASE_CHANCE + (target_amount / amount)) * D(0.3)
+        if chance > 8: chance = 5
+
         res = random.random() * 10
 
         if res < chance:
