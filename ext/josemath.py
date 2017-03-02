@@ -312,10 +312,14 @@ class JoseMath(jaux.Auxiliar):
             data = await self.json_from_url(CRYPTOAPI_ONEPRICE % (from_currency, to_currency))
             nocache = True
 
-        if nocache:
-            rate = decimal.Decimal(data[to_currency])
-        else:
-            rate = decimal.Decimal(data[from_currency][to_currency])
+        try:
+            if nocache:
+                rate = decimal.Decimal(data[to_currency])
+            else:
+                rate = decimal.Decimal(data[from_currency][to_currency])
+        except Exception as err:
+            await cxt.say('`%r`', (err,))
+            return
 
         result = decimal.Decimal(amount * rate)
         await cxt.say("{:.4g} {} = {0:.4g} {}".format(amount, \
