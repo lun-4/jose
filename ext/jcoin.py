@@ -541,3 +541,18 @@ class JoseCoin(jaux.Auxiliar):
     async def c_roubar(self, message, args, cxt):
         '''`j!roubar @target amount` - alias for `j!steal`'''
         await self.c_steal(message, args, cxt)
+
+    async def c_taxes(self, message, args, cxt):
+        '''`j!taxes` - show taxes from the server'''
+        tbank_id = self.tbank_fmt(cxt)
+        self.ensure_tbank(tbank_id)
+
+        tbank = self.jcoin.get(tbank_id)
+        res = []
+
+        for tpayer_id in tbank['taxpayers']:
+            val = tbank['taxpayers'][tpayer_id]
+            member = cxt.message.server.get_member(tpayer_id)
+            res.append("%s -> %.2fJC in taxes" % (str(member), val))
+
+        await cxt.say(self.codeblock("", "\n".join(res)))

@@ -46,7 +46,11 @@ def empty_acc(name, amnt, acctype=0):
         return {
             'type': 0,
             'amount': amnt,
-            'name': name
+            'name': name,
+
+            # personal bank thing
+            'fakemoney': decimal.Decimal(0),
+            'actualmoney': decimal.Decimal(0),
         }
     elif acctype == 1:
         # tax bank
@@ -57,6 +61,7 @@ def empty_acc(name, amnt, acctype=0):
             # etc
             'type': 1,
             'name': name,
+            'amount': decimal.Decimal(-1),
             'taxpayers': {}
         }
 
@@ -144,11 +149,13 @@ def load(fname):
         return False, str(e)
 
     for acc_id in data:
-        if 'amount' in data[acc_id]:
-            data[acc_id]['type'] = 0
+        if data[acc_id]['type'] == 0:
+            data[acc_id]['fakemoney'] = decimal.Decimal(0)
+            data[acc_id]['actualmoney'] = decimal.Decimal(0)
 
-        if 'taxpayers' in data[acc_id]:
+        if data[acc_id]['type'] == 1:
             data[acc_id]['name'] = acc_id
+            data[acc_id]['amount'] = decimal.Decimal(-1)
 
     data[jose_id] = empty_acc('jose-bot', decimal.Decimal('Inf'), 0)
     #ledger_data(fname.replace('db', 'journal'), '%f;LOAD;%r\n' % (time.time(), data))
