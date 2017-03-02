@@ -547,7 +547,15 @@ class JoseCoin(jaux.Auxiliar):
         tbank_id = self.tbank_fmt(cxt)
         self.ensure_tbank(tbank_id)
 
-        tbank = self.jcoin.get(tbank_id)
+        tbank = None
+        _tbank = self.jcoin.get(tbank_id)
+        if _tbank[1]:
+            tbank = _tbank[2]
+
+        if tbank is None:
+            await cxt.say("tbank not found.")
+            return
+
         res = []
 
         for tpayer_id in tbank['taxpayers']:
