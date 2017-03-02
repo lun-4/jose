@@ -20,8 +20,11 @@ COINDESK_CURRENCYLIST_URL = '{}/supported-currencies.json'.format(COINDESK_API)
 COINDESK_CURRENCY_URL = '{}/currentprice/%s.json'.format(COINDESK_API)
 
 COMMONCRYPTO = ['BTC', 'ETH', 'DASH', 'LTC', 'XMR', 'XRP', 'DOGE', 'REP', 'LSK']
-COMMONCURRENCIES = ['USD', 'GBP', 'EUR', 'JPY', 'CAD']
+COMMON_WORLD = ['USD', 'GBP', 'EUR', 'JPY', 'CAD']
+COMMON_CURRENCIES = COMMONCRYPTO + COMMON_WORLD
+
 CRYPTOAPI_MULTIPRICE = 'https://min-api.cryptocompare.com/data/pricemulti?fsyms=%s&tsyms=%s'
+CRYPTOAPI_ONEPRICE = 'https://min-api.cryptocompare.com/data/price?fsym=%s&tsyms=%s'
 
 class JoseMath(jaux.Auxiliar):
     def __init__(self, _client):
@@ -36,7 +39,7 @@ class JoseMath(jaux.Auxiliar):
 
     async def crypto_cache(self):
         cryptostr = ','.join(COMMONCRYPTO)
-        currencystr = ','.join(COMMONCURRENCIES)
+        currencystr = ','.join(COMMON_WORLD)
         url = CRYPTOAPI_MULTIPRICE % (cryptostr, currencystr)
 
         priceinfo = await self.json_from_url(url)
@@ -273,6 +276,40 @@ class JoseMath(jaux.Auxiliar):
     async def c_btc(self, message, args, cxt):
         '''`j!btc` - alias for `j!bitcoin`'''
         await self.c_bitcoin(message, args, cxt)
+
+    async def c_crypto(self, message, args, cxt):
+        '''`j!crypto amount from to` - converts cryptocurrencies pricing'''
+
+        if len(args) < 3:
+            await cxt.say(self.c_crypto.__doc__)
+            return
+
+        try:
+            amount = decimal.Decimal(args[1])
+        except:
+            await cxt.say("Error parsing `amount`")
+
+        try:
+            from_currency = args[2].upper()
+        except:
+            await cxt.say("Error parsing `from`")
+
+        try:
+            to_currency = args[3].upper()
+        except:
+            await cxt.say("Error parsing `amount`")
+
+        self.logger.info("[crypto] %.2f %s to %s", amount, \
+            from_currency, to_currency)
+
+        await self.jcoin_pricing(cxt, jcommon.API_TAX_PRICE)
+
+        # up do date data
+        if from_currency not in COMMON_CURRENCIES:
+            pass
+
+        if to_currency not in COMMON_CURRENCIES:
+            pass
 
     async def c_roll(self, message, args, cxt):
         '''`j!roll <amount>d<sides>` - roll fucking dice'''
