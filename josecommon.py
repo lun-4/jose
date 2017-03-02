@@ -215,8 +215,7 @@ async def parse_id(data, message):
         else:
             return data[2:-1]
     else:
-        await client.send_message(message.channel, \
-            "error parsing data `%r`" % data)
+        logger.error("parse_id: %s", data)
         return
 
 def speak_filter(message):

@@ -48,8 +48,7 @@ class JoseMath(jaux.Auxiliar):
         return True, ''
 
     async def c_wolframalpha(self, message, args, cxt):
-        '''`j!wolframalpha terms` - make a request to Wolfram|Alpha
-        **ratelimit GLOBAL: 2 chamadas por hora**'''
+        '''`j!wolframalpha terms` - make a request to Wolfram|Alpha'''
         if len(args) < 2:
             await cxt.say(self.c_wolframalpha.__doc__)
             return
@@ -62,6 +61,8 @@ class JoseMath(jaux.Auxiliar):
         await self.jcoin_pricing(cxt, jcommon.API_TAX_PRICE)
 
         self.logger.info("Wolfram|Alpha: %s", term_to_wolfram)
+
+        await cxt.send_typing()
 
         future = self.loop.run_in_executor(None, \
             self.wac.query, term_to_wolfram)
