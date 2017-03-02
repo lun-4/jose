@@ -542,8 +542,10 @@ use `j!lnick` for local nickname")
     async def c_version(self, message, args, cxt):
         '''`j!version` - mostra a versão do jose'''
         pyver = '%d.%d.%d' % (sys.version_info[:3])
-        await cxt.say("`José v%s py:%s discord.py:%s`", (jcommon.JOSE_VERSION
-            , pyver, discord.__version__))
+        head_id = subprocess.check_output("git rev-parse --short HEAD", shell=True)[:7]
+
+        await cxt.say("`José v%s git:%s py:%s d.py:%s`", (jcommon.JOSE_VERSION, \
+            head_id, pyver, discord.__version__))
 
     async def c_jose_add(self, message, args, cxt):
         await cxt.say("José pode ser adicionado para outro servidor usando este link:\n```%s```", (jcommon.OAUTH_URL,))
