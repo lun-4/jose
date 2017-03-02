@@ -10,6 +10,7 @@ import jcoin.josecoin as jcoin
 import joseerror as je
 import json
 import aiohttp
+import decimal
 
 class Auxiliar(jcommon.Extension):
     '''
