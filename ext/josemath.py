@@ -376,5 +376,5 @@ class JoseMath(jaux.Auxiliar):
             await cxt.say("Error parsing `amount`")
             return
 
-        res = (percentage / amount) * 100
-        await cxt.say("%f%% out of %f => %f", (percentage, amount, res))
+        res = (percentage * amount) * 100
+        await cxt.say("%.4f%% out of %.4f => %.4f", (percentage, amount, res))
