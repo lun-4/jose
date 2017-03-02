@@ -324,7 +324,7 @@ class JoseMath(jaux.Auxiliar):
             return
 
         result = decimal.Decimal(amount * rate)
-        await cxt.say("{:.4g} {} = {0:.4g} {}, Powered by: {}".format(amount, \
+        await cxt.say("{:.4g} {} = {:.4g} {}, Powered by: {}".format(amount, \
             from_currency, result, to_currency, CRYPTOAPI_HELPURL))
 
     async def c_roll(self, message, args, cxt):
