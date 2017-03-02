@@ -38,7 +38,7 @@ class Auxiliar(jcommon.Extension):
         tbank_id = self.tbank_fmt(cxt)
         if tbank_id not in self.jcoin.data:
             # type 1 account = taxbank
-            self.jcoin.data[jose_id] = self.jcoin.empty_acc(tbank_id, \
+            self.jcoin.data[tbank_id] = self.jcoin.empty_acc(tbank_id, \
                 decimal.Decimal("0"), 1)
 
         # make transfer
