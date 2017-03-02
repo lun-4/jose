@@ -401,8 +401,7 @@ class JoseCoin(jaux.Auxiliar):
         if arrest_type == 0:
             # pay half the amount
             fine = amount / decimal.Decimal(2)
-            res = await self.jcoin.transfer(thief_id, self.jcoin.jose_id, fine)
-            return res
+            return self.jcoin.transfer(thief_id, self.jcoin.jose_id, fine)
 
     async def c_steal(self, message, args, cxt):
         '''`j!steal @target amount` - Steal JoséCoins from someone'''
