@@ -565,6 +565,15 @@ class JoseCoin(jaux.Auxiliar):
 
         await cxt.say(self.codeblock("", "\n".join(res)))
 
+    async def sw_parse(self, message, args, cxt):
+        try:
+            amount = decimal.Decimal(args[1])
+        except:
+            await cxt.say("Error parsing `amount`")
+            return None, None
+
+        return amount
+
     async def c_store(self, message, args, cxt):
         '''`j!store amount` - Store JCs in bank'''
 
@@ -572,19 +581,17 @@ class JoseCoin(jaux.Auxiliar):
             await cxt.say(self.c_store.__doc__)
             return
 
-        try:
-            to_store = decimal.Decimal(args[1])
-        except:
-            await cxt.say("Error parsing `amount`")
+        to_store = await self.sw_parse(message, args, cxt)
+        if to_store is None:
             return
 
-        acc_id = message.author.id
-        ok = self.join.get(acc_id)
-        if not ok[0]:
-            await cxt.say('jc->err: `%s`' % ok[1])
+        account = self.jcoin.data.get(message.author.id, None)
+        if account is None:
             return
 
-        account = ok[1]
+        if account['amount'] < to_store:
+            await cxt.say(":octagonal_sign: You can't deposit more than what you have.")
+            return
 
         account['amount'] -= to_store
 
@@ -594,3 +601,31 @@ class JoseCoin(jaux.Auxiliar):
 
         await cxt.say("Transferred %.2fJC from %s account to personal bank.", \
             (to_store, account['name']))
+
+    async def c_withdraw(self, message, args, cxt):
+        '''`j!withdraw amount` - get JCs from your personal bank'''
+
+        if len(args) < 2:
+            await cxt.say(self.c_store.__doc__)
+            return
+
+        to_withdraw = await self.sw_parse(message, args, cxt)
+        if to_withdraw is None:
+            return
+
+        account = self.jcoin.data.get(message.author.id, None)
+        if account is None:
+            return
+
+        if account['actualmoney'] < to_withdraw:
+            await cxt.say(":octagonal_sign: You can't withdraw more than what your personal bank has.")
+            return
+
+        # user's personal bank
+        account['fakemoney'] -= to_withdraw
+        account['actualmoney'] -= to_withdraw
+
+        account['amount'] += to_withdraw
+
+        await cxt.say("Transferred %.2fJC from personal bank to %s.", \
+            (to_withdraw, account['name']))
