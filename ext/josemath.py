@@ -278,7 +278,7 @@ class JoseMath(jaux.Auxiliar):
         await self.c_bitcoin(message, args, cxt)
 
     async def c_crypto(self, message, args, cxt):
-        '''`j!crypto amount from to` - converts cryptocurrencies pricing'''
+        '''`j!crypto amount=1 from=BTC to=USD` - converts cryptocurrencies pricing'''
 
         if len(args) < 3:
             await cxt.say(self.c_crypto.__doc__)
@@ -287,17 +287,17 @@ class JoseMath(jaux.Auxiliar):
         try:
             amount = decimal.Decimal(args[1])
         except:
-            await cxt.say("Error parsing `amount`")
+            amount = 1
 
         try:
             from_currency = args[2].upper()
         except:
-            await cxt.say("Error parsing `from`")
+            from_currency = 'BTC'
 
         try:
             to_currency = args[3].upper()
         except:
-            await cxt.say("Error parsing `amount`")
+            to_currency = 'USD'
 
         self.logger.info("[crypto] %.2f %s to %s", amount, \
             from_currency, to_currency)
