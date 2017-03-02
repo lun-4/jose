@@ -73,11 +73,8 @@ def transfer(id_from, id_to, amnt, file_name=None):
 
     amnt = decimal.Decimal(str(amnt))
 
-    if amnt < 0:
-        return False, "values less than zero aren't permitted"
-
-    if amnt == 0:
-        return False, "sending zero is prohibited"
+    if amnt <= 0:
+        return False, "transfering zero or less than is prohibited"
 
     if not (id_from in data):
         return False, "account to get funds doesn't exist"
