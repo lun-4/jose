@@ -384,16 +384,27 @@ class JoseCoin(jaux.Auxiliar):
             cooldown_sec, cooldown_type = cooldown
             cooldown_sec -= time.time()
 
+            if cooldown_sec <= 0:
+                res.append("Your cooldown has terminated %.2f hours ago, use `j!steal` to update" % \
+                    (-self.to_hours(grace_period)))
+
             if cooldown_type == 0:
-                res.append(":cop: you're in prison, %.2f hours remaining" % (self.to_hours(cooldown_sec),))
+                res.append(":cop: you're in prison, %.2f hours remaining" % \
+                    (self.to_hours(cooldown_sec),))
             elif cooldown_type == 1:
-                res.append(":alarm_clock: you're waiting for stealing points, %.2f hours remaining" % (self.to_hours(cooldown_sec),))
+                res.append(":alarm_clock: you're waiting for stealing points, %.2f hours remaining" % \
+                    (self.to_hours(cooldown_sec),))
             else:
                 res.append(":warning: unknown cooldown type")
 
         if grace_period is not None:
             grace_period -= time.time()
-            res.append(":angel: you're in grace period, %.2f hours remaining" % (self.to_hours(grace_period),))
+            if grace_period > 0:
+                res.append(":angel: you're in grace period, %.2f hours remaining" % \
+                    (self.to_hours(grace_period),))
+            else:
+                res.append(":angel: you lost your grace period %.2f hours ago" % \
+                    (-self.to_hours(grace_period)))
 
         await cxt.say('\n'.join(res))
 
