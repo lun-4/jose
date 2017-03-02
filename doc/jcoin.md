@@ -35,6 +35,9 @@ where no one can steal from the victim again.
  * You are arrested if you try to steal from José, or steal a higher amount than the victim's wallet
  * If you use `j!steal` 3 times in a row and succeed in all 3 of them, you'll then have to use `j!steal` again and wait 8 hours to get 3 more uses.
 
+When you get arrested, you pay half the amount you want to steal to José,
+and your chances of getting more JoséCoins per message halves.
+
 `j!hsteal` for more details.
 
 Command | Description | Example | Alias
