@@ -377,7 +377,7 @@ class JoseCoin(jaux.Auxiliar):
 
         try:
             userid = args[1]
-        else:
+        except:
             await cxt.say("Error parsing userid")
             return
 
