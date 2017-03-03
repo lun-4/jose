@@ -291,9 +291,9 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
                 self.jcoin.data[userid]['amount'])
 
             guildrank = 1
-            while cur != message.author.id:
+            for userid in guildaccounts:
+                if userid == message.author.id: break
                 guildrank += 1
-                cur = next(guildaccounts)
 
             globalrank = 1
             for userid in self.jcoin.data:
