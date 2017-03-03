@@ -672,15 +672,13 @@ class JoseCoin(jaux.Auxiliar):
         try:
             loan = decimal.Decimal(args[1])
         except:
-            if args[1] != 'pay':
-                await cxt.say("Error parsing `amount`")
-                return
             elif args[1] == 'pay':
                 pay = True
             elif args[1] == 'see':
                 see = True
             else:
-                await cxt.say("No arguments provided")
+                await cxt.say("Error parsing arguments")
+                return
 
         tbank = None
         _tbank = self.jcoin.get(tbank_id)
@@ -705,7 +703,7 @@ class JoseCoin(jaux.Auxiliar):
                 return
 
             # make loan
-            ok = self.jcoin.transfer(tbank_id, message.author.id)
+            ok = self.jcoin.transfer(tbank_id, message.author.id, loan)
             if not ok[0]:
                 await cxt.say("jc->err: %s", (ok[1],))
                 return
@@ -713,14 +711,12 @@ class JoseCoin(jaux.Auxiliar):
             tbank['loans'][message.author.id] = loan
             await cxt.say("Loan successful. `%r`", (ok[1],))
         else:
-
-            need_to_pay = tbank['loans'].get(message.author.id, 0)
-
-            if need_to_pay:
+            need_to_pay = tbank['loans'].get(message.author.id, None)
+            if need_to_pay is None:
                 await cxt.say("You don't need to pay nothing.")
                 return
 
-            ok = self.jcoin.transfer(message.author.id, tbank_id)
+            ok = self.jcoin.transfer(message.author.id, tbank_id, need_to_pay)
             if not ok[0]:
                 await cxt.say("jc->err: %s", (ok[1],))
                 return
