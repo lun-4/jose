@@ -271,7 +271,7 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             await cxt.say("No results found")
             return
 
-    async def mkcolor(self, name):
+    def mkcolor(self, name):
         colorval = int(hashlib.md5(name.encode("utf-8")).hexdigest()[:6], 16)
         return discord.Colour(colorval)
 
