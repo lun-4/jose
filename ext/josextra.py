@@ -276,7 +276,8 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             message.author.name))
 
         if message.author.id in self.jcoin.data:
-            em.add_field(name='JoséCoin Rank', value='')
+            account = self.jcoin.data.get(message.author.id)
+            em.add_field(name='JoséCoin Rank', value='#TODO')
             em.add_field(name='JoséCoin Wallet', value='{}'.format(account['amount']))
             em.add_field(name='Tax paid', value='{}'.format(account['taxpaid']))
 
