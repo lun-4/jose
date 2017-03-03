@@ -125,11 +125,11 @@ def transfer(id_from, id_to, amnt, file_name=None):
             acc_from['amount'] -= amnt
 
         elif acc_from['type'] == 1:
-            if not (acc_to['taxes'] >= amnt):
+            if not (acc_from['taxes'] >= amnt):
                 return False, "account doesn't have enough funds to make this transaction"
 
-            acc_to['taxes'] -= amnt
-            acc_from['amount'] += amnt
+            acc_from['taxes'] -= amnt
+            acc_to['amount'] += amnt
 
         ledger_data(file_name, "%f;TAXTR;%s;%s;%s\n" % \
             (time.time(), id_from, id_to, amnt))
