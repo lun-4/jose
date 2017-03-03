@@ -201,6 +201,9 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             else:
                 await cxt.say("%s: tópico não encontrado", (topic,))
 
+    async def c_commands(self, message, args, cxt):
+        await cxt.say(self.docs['commands'])
+
     async def c_yt(self, message, args, cxt):
         '''`j!yt tunak tunak tun` - youtube searches'''
         if len(args) < 2:
