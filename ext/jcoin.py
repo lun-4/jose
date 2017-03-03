@@ -654,9 +654,20 @@ class JoseCoin(jaux.Auxiliar):
         await cxt.say(self.codeblock("", '\n'.join(res)))
 
     async def c_loan(self, message, args, cxt):
-        '''`j!loan amount|"pay"` - l'''
+        '''`j!loan amount|"pay"|"see"` - loan money from your taxbank'''
+        tbank_id = self.tbank_fmt(cxt)
+        self.ensure_tbank(tbank_id)
+
+        if len(args) < 2:
+            await cxt.say(self.c_loan.__doc__)
+            return
+
+        if message.author.id not in self.jcoin.data:
+            await cxt.say("You don't have a JC Account.")
+            return
 
         pay = False
+        see = False
 
         try:
             loan = decimal.Decimal(args[1])
@@ -664,8 +675,55 @@ class JoseCoin(jaux.Auxiliar):
             if args[1] != 'pay':
                 await cxt.say("Error parsing `amount`")
                 return
-            else:
+            elif args[1] == 'pay':
                 pay = True
+            elif args[1] == 'see':
+                see = True
+            else:
+                await cxt.say("No arguments provided")
 
-        pass
-        #self.jcoin.transfer('')
+        tbank = None
+        _tbank = self.jcoin.get(tbank_id)
+        if _tbank[0]:
+            tbank = _tbank[1]
+
+        if see:
+            if message.author.id in tbank['loans']:
+                await cxt.say("You loaned %.2fJC from this taxbank" % \
+                    (tbank['loans'][message.author.id],))
+            else:
+                await cxt.say("You didn't loan from this taxbank.")
+            return
+
+        if not pay:
+            if loan > tbank['taxes']:
+                await cxt.say("You can't loan more than what taxbank has.")
+                return
+
+            if tbank['loans'].get(message.author.id, False):
+                await cxt.say("You can't make another loan")
+                return
+
+            # make loan
+            ok = self.jcoin.transfer(tbank_id, message.author.id)
+            if not ok[0]:
+                await cxt.say("jc->err: %s", (ok[1],))
+                return
+
+            tbank['loans'][message.author.id] = loan
+            await cxt.say("Loan successful. `%r`", (ok[1],))
+        else:
+
+            need_to_pay = tbank['loans'].get(message.author.id, 0)
+
+            if need_to_pay:
+                await cxt.say("You don't need to pay nothing.")
+                return
+
+            ok = self.jcoin.transfer(message.author.id, tbank_id)
+            if not ok[0]:
+                await cxt.say("jc->err: %s", (ok[1],))
+                return
+
+            del tbank['loans'][message.author.id]
+            await cxt.say("Thanks! `%r`", (ok[1],))
