@@ -174,7 +174,10 @@ class JoseImages(jcommon.Extension):
         await self.c_derpibooru(message, args, cxt)
 
     async def c_urban(self, message, args, cxt):
+        '''`j!urban stuff` - Urban Dictionary'''
         term = ' '.join(args[1:])
+
+        await self.jcoin_pricing(cxt, jcommon.API_TAX_PRICE)
 
         url = 'http://api.urbandictionary.com/v0/define?term=%s' % urllib.parse.quote(term)
         resp = await aiohttp.request('GET', url)
