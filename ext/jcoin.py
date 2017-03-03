@@ -553,17 +553,10 @@ class JoseCoin(jaux.Auxiliar):
             tbank = _tbank[1]
 
         if tbank is None:
-            await cxt.say("tbank not found.")
+            await cxt.say(":interrobang: tbank not found.")
             return
 
-        res = []
-
-        for tpayer_id in tbank['taxpayers']:
-            val = tbank['taxpayers'][tpayer_id]
-            member = cxt.message.server.get_member(tpayer_id)
-            res.append("%s -> %.2fJC in taxes" % (str(member), val))
-
-        await cxt.say(self.codeblock("", "\n".join(res)))
+        await cxt.say("`%.2fJC in taxes`" % tbank['taxes'])
 
     async def sw_parse(self, message, args, cxt):
         try:
@@ -645,7 +638,7 @@ class JoseCoin(jaux.Auxiliar):
             storagebank_total[0] += account['actualmoney']
             storagebank_total[1] += account['fakemoney']
 
-        res.append("Total in Taxbank: %.2fJC" % (sum(tbank['taxpayers'].values())))
+        res.append("Total in Taxbank: %.2fJC" % (tbank['taxes']))
         res.append("Total in Storagebank: %.2fJC, should have %.2fJC" % \
             (storagebank_total[0], storagebank_total[1]))
 
@@ -659,3 +652,20 @@ class JoseCoin(jaux.Auxiliar):
                 (account['actualmoney'], account['fakemoney']))
 
         await cxt.say(self.codeblock("", '\n'.join(res)))
+
+    async def c_loan(self, message, args, cxt):
+        '''`j!loan amount|"pay"` - l'''
+
+        pay = False
+
+        try:
+            loan = decimal.Decimal(args[1])
+        except:
+            if args[1] != 'pay':
+                await cxt.say("Error parsing `amount`")
+                return
+            else:
+                pay = True
+
+        pass
+        #self.jcoin.transfer('')

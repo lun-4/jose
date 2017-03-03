@@ -51,6 +51,9 @@ def empty_acc(name, amnt, acctype=0):
             # personal bank thing
             'fakemoney': decimal.Decimal(0),
             'actualmoney': decimal.Decimal(0),
+
+            # statistics for taxes
+            'taxpaid': decimal.Decimal(0)
         }
     elif acctype == 1:
         # tax bank
@@ -62,12 +65,12 @@ def empty_acc(name, amnt, acctype=0):
             'type': 1,
             'name': name,
             'amount': decimal.Decimal(-1),
-            'taxpayers': {}
+            'taxes': decimal.decimal(0),
+            'loans': {},
         }
 
 def new_acc(id_acc, name, init_amnt=None, acctype=0):
     if init_amnt is None and acctype == 0:
-        # the readjust gave so little prices I need to lower this
         init_amnt = decimal.Decimal('3')
 
     if id_acc in data:
@@ -110,35 +113,30 @@ def transfer(id_from, id_to, amnt, file_name=None):
     logger.info("%s > %.6fJC > %s", \
         acc_from['name'], amnt, acc_to['name'])
 
+    if not (acc_from['amount'] >= amnt):
+        return False, "account doesn't have enough funds to make this transaction"
+
     if acc_to['type'] == 1:
         # tax transfer
-        if not (acc_from['amount'] >= amnt):
-            return False, "account doesn't have enough funds to make this transaction"
-
-        # first time paying tax
-        if id_from not in acc_to['taxpayers']:
-            acc_to['taxpayers'][id_from] = 0
-
-        # mk transfer
-        acc_to['taxpayers'][id_from] += amnt
+        acc_to['taxes'] += amnt
+        acc_from['taxpaid'] += amnt
         acc_from['amount'] -= amnt
 
         ledger_data(file_name, "%f;TAXTR;%s;%s;%s\n" % \
             (time.time(), id_from, id_to, amnt))
 
-        return True, "%s was sent from %s to %s" % (amnt, acc_from['name'], acc_to['name'])
     else:
-
-        if not (acc_from['amount'] >= amnt):
-            return False, "account doesn't have enough funds to make this transaction"
-
         acc_to['amount'] += amnt
         acc_from['amount'] -= amnt
 
         ledger_data(file_name, "%f;TR;%s;%s;%s\n" % \
             (time.time(), id_from, id_to, amnt))
 
-        return True, "%s was sent from %s to %s" % (amnt, acc_from['name'], acc_to['name'])
+    return True, "%s was sent from %s to %s" % (amnt, acc_from['name'], acc_to['name'])
+
+def ensure_exist(acc_id, attribute, val):
+    if attribute not in data[acc_id]:
+        data[acc_id][attribute] = val
 
 def load(fname):
     global data
@@ -150,12 +148,18 @@ def load(fname):
 
     for acc_id in data:
         if data[acc_id]['type'] == 0:
-            data[acc_id]['fakemoney'] = decimal.Decimal(0)
-            data[acc_id]['actualmoney'] = decimal.Decimal(0)
+            ensure_exist(acc_id, 'fakemoney', decimal.Decimal(0))
+            ensure_exist(acc_id, 'actualmoney', decimal.Decimal(0))
+            ensure_exist(acc_id, 'taxpaid', decimal.Decimal(0))
 
         if data[acc_id]['type'] == 1:
-            data[acc_id]['name'] = acc_id
-            data[acc_id]['amount'] = decimal.Decimal(-1)
+            ensure_exist(acc_id, 'name', acc_id)
+            ensure_exist(acc_id, 'amount', decimal.Decimal(-1))
+            ensure_exist(acc_id, 'loans', {})
+            ensure_exist(acc_id, 'taxes', decimal.Decimal(0))
+
+            if 'taxpayers' in data[acc_id]:
+                del data[acc_id]['taxpayers']
 
     data[jose_id] = empty_acc('jose-bot', decimal.Decimal('Inf'), 0)
     #ledger_data(fname.replace('db', 'journal'), '%f;LOAD;%r\n' % (time.time(), data))
