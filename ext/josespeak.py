@@ -14,7 +14,7 @@ from midiutil.MidiFile import MIDIFile
 import markovify
 
 logger = None
-PROB_FULLWIDTH_TEXT = 0.32
+PROB_FULLWIDTH_TEXT = 0.1
 MESSAGE_LIMIT = 10000 # 10k messages
 LETTER_TO_PITCH = jcommon.LETTER_TO_PITCH
 
