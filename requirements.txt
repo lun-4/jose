@@ -1,4 +1,4 @@
-discord.py[voice]==0.16.6
+discord.py[voice]==0.16.7
 uvloop==0.8.0
 Pillow==4.0.0
 wolframalpha==3.0
