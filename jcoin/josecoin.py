@@ -53,7 +53,11 @@ def empty_acc(name, amnt, acctype=0):
             'actualmoney': decimal.Decimal(0),
 
             # statistics for taxes
-            'taxpaid': decimal.Decimal(0)
+            'taxpaid': decimal.Decimal(0),
+
+            # j!steal stuff
+            'times_stolen': 0,
+            'success_steal': 0,
         }
     elif acctype == 1:
         # tax bank
@@ -163,6 +167,8 @@ def load(fname):
             ensure_exist(acc_id, 'fakemoney', decimal.Decimal(0))
             ensure_exist(acc_id, 'actualmoney', decimal.Decimal(0))
             ensure_exist(acc_id, 'taxpaid', decimal.Decimal(0))
+            ensure_exist(acc_id, 'times_stolen', 0)
+            ensure_exist(acc_id, 'success_steal', 0)
 
         if data[acc_id]['type'] == 1:
             ensure_exist(acc_id, 'name', acc_id)

@@ -394,7 +394,7 @@ class JoseCoin(jaux.Auxiliar):
             del self.stealdb['period'][userid]
             res.append('period')
 
-        await cxt.say("Removed %s from databases `%s`", (', '.join(res),))
+        await cxt.say("Removed <@%s> from databases `%s`", (userid, ', '.join(res),))
 
     async def c_stealstat(self, message, args, cxt):
         # get status from person
@@ -519,6 +519,8 @@ class JoseCoin(jaux.Auxiliar):
                 target_user, (str(thief_user), amount, self.to_hours(grace_period)))
             return
 
+        self.jcoin.data[thief_id]['times_stolen'] += 1
+
         if stealuses < 1:
             res = await self.do_arrest(thief_id, amount, 1)
             await cxt.say("You don't have any more stealing points, wait 8 hours to get more.")
@@ -561,6 +563,7 @@ class JoseCoin(jaux.Auxiliar):
                 await cxt.say(":gun: You got robbed! The thief(%s) stole `%.2fJC` from you. 3 hour grace period", \
                     target_user, (str(thief_user), amount))
 
+                self.jcoin.data[thief_id]['times_stolen'] += 1
                 self.stealdb['period'][target_id] = time.time() + 10800
                 self.stealdb['points'][message.author.id] -= 1
 

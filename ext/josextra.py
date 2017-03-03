@@ -301,9 +301,12 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
                 if userid == message.author.id: break
                 globalrank += 1
 
-            em.add_field(name='JoséCoin Rank', value='{}/{} ({}/{} globally)'.format(\
+            em.add_field(name='JoséCoin Rank', value='{}/{} ({}/{} globally)'.format( \
                 guildrank, len(guildaccounts)+1, globalrank, len(self.jcoin.data)+1))
             em.add_field(name='JoséCoin Wallet', value='{}'.format(account['amount']))
-            em.add_field(name='Tax paid', value='{}'.format(account['taxpaid']))
+            em.add_field(name='Tax paid', value=str(account['taxpaid']))
+
+            em.add_field(name='Stealing', value='{} tries, {} success'.format( \
+                account['times_stolen'], account['success_steal']))
 
         await cxt.say_embed(em)
