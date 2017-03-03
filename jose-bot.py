@@ -81,11 +81,11 @@ async def check_message(message):
     if message.author == client.user:
         return False
 
-    if jose.dev_mode:
-        # Ignore DMs in dev mode
-        if message.server is None:
-            return False
+    # Block DMs altogether
+    if message.server is None:
+        return False
 
+    if jose.dev_mode:
         # Ignore messages from other servers
         if message.server.id != jcommon.JOSE_DEV_SERVER_ID:
             return False
