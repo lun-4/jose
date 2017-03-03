@@ -433,7 +433,7 @@ class JoseSpeak(jcommon.Extension):
 
         self.logger.info("madlibs: %s => %s", ' '.join(args[1:]), ' '.join(res))
 
-        return cxt.say(' '.join(res))
+        await cxt.say(' '.join(res))
 
     async def c_midi(self, message, args, cxt):
         '''`j!midi [stuff]` - Make MIDI files made out of josé's generated sentences
