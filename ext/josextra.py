@@ -8,6 +8,7 @@ import subprocess
 import re
 import psutil
 import os
+import hashlib
 
 import sys
 sys.path.append("..")
@@ -270,11 +271,16 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             await cxt.say("No results found")
             return
 
+    async def mkcolor(self, name):
+        discord.Colour.purple()
+        colorval = int(hashlib.md5(name).hexdigest()[:6], 16)
+        return discord.Colour(colorval)
+
     async def c_profile(self, message, args, cxt):
         '''`j!profile` - experimental shit'''
         await cxt.send_typing()
 
-        em = discord.Embed(colour=discord.Colour.purple())
+        em = discord.Embed(colour=self.mkcolor(message.author.name))
         if message.author.nick is not None:
             em.add_field(name='Name', value='{} ({})'.format( \
                 message.author.nick, message.author.name))
