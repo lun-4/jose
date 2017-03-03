@@ -62,6 +62,9 @@ PL_MAX_MINUTES = 7
 ascii_to_wide = dict((i, chr(i + 0xfee0)) for i in range(0x21, 0x7f))
 ascii_to_wide.update({0x20: u'\u3000', 0x2D: u'\u2212'})  # space and minus
 
+WIDE_MAP = dict((i, i + 0xFEE0) for i in range(0x21, 0x7F))
+WIDE_MAP[0x20] = 0x3000
+
 client = None
 
 def set_client(_client):

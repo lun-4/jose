@@ -14,6 +14,7 @@ from midiutil.MidiFile import MIDIFile
 import markovify
 
 logger = None
+PROB_FULLWIDTH_TEXT = 0.32
 MESSAGE_LIMIT = 10000 # 10k messages
 LETTER_TO_PITCH = jcommon.LETTER_TO_PITCH
 
@@ -334,6 +335,8 @@ class JoseSpeak(jcommon.Extension):
 
     async def speak(self, texter, length_words, cxt):
         res = await texter.gen_sentence(length_words)
+        if random.random() < PROB_FULLWIDTH_TEXT:
+            res = res.translate(jcommon.WIDE_MAP)
         await cxt.say(res)
 
     async def c_falar(self, message, args, cxt):

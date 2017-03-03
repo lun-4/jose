@@ -65,8 +65,7 @@ class JoseMemes(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
         self.memes = {}
-        self.WIDE_MAP = dict((i, i + 0xFEE0) for i in range(0x21, 0x7F))
-        self.WIDE_MAP[0x20] = 0x3000
+        self.WIDE_MAP = jcommon.WIDE_MAP
         self.patterns = ['fbcdn.net', 'akamaihd.net']
 
     async def ext_load(self):
