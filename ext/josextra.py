@@ -297,10 +297,10 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
                 if message.server.get_member(userid) is not None]
 
             gacc_sorted = sorted(_gaccounts, key=lambda userid: \
-                self.jcoin.data[userid]['amount'])
+                self.jcoin.data[userid]['amount'], reverse=True)
 
             sorted_data = sorted(self.jcoin.data, key=lambda userid: \
-                self.jcoin.data[userid]['amount'])
+                self.jcoin.data[userid]['amount'], reverse=True)
 
             # index start from 0
             guildrank = gacc_sorted.index(message.author.id) + 1
