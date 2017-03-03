@@ -672,7 +672,7 @@ class JoseCoin(jaux.Auxiliar):
         try:
             loan = decimal.Decimal(args[1])
         except:
-            elif args[1] == 'pay':
+            if args[1] == 'pay':
                 pay = True
             elif args[1] == 'see':
                 see = True
