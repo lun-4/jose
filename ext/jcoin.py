@@ -416,11 +416,19 @@ class JoseCoin(jaux.Auxiliar):
                     (-self.to_hours(cooldown_sec)))
 
             if cooldown_type == 0:
-                res.append(":cop: you're in prison, %.2f hours remaining" % \
-                    (self.to_hours(cooldown_sec),))
+                if cooldown_sec > 0:
+                    res.append(":cop: you're in prison, %.2f hours remaining" % \
+                        (self.to_hours(cooldown_sec),))
+                else:
+                    res.append(":helicopter: you got out of prison, %.2f hours ago" % \
+                        (-self.to_hours(cooldown_sec),))
             elif cooldown_type == 1:
-                res.append(":alarm_clock: you're waiting for stealing points, %.2f hours remaining" % \
-                    (self.to_hours(cooldown_sec),))
+                if cooldown_sec > 0:
+                    res.append(":alarm_clock: you're waiting for stealing points, %.2f hours remaining" % \
+                        (self.to_hours(cooldown_sec),))
+                else:
+                    res.append(":alarm_clock: you got 3 stealing points, %.2f hours ago" % \
+                        (-self.to_hours(cooldown_sec),))
             else:
                 res.append(":warning: unknown cooldown type")
 
