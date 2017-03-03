@@ -455,8 +455,8 @@ class JoseCoin(jaux.Auxiliar):
                 if remaining > 1:
                     await cxt.say(":cop: You are still in prison, wait %.2f hours", \
                         (self.to_hours(remaining),))
+                    return
                 else:
-                    await cxt.say(":helicopter: You got out of prison")
                     del self.stealdb['cdown'][thief_id]
                     await self.save_steal_db()
 
@@ -464,12 +464,11 @@ class JoseCoin(jaux.Auxiliar):
                 if remaining > 1:
                     await cxt.say("Wait %.2f hours to regenerate your stealing points", \
                         (self.to_hours(remaining),))
+                    return
                 else:
-                    await cxt.say("Stealing points regenerated!")
                     del self.stealdb['points'][thief_id]
                     del self.stealdb['cdown'][thief_id]
                     await self.save_steal_db()
-            return
 
         stealuses = self.stealdb['points'].get(thief_id, None)
         if stealuses is None:
