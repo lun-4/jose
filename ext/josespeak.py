@@ -425,6 +425,8 @@ class JoseSpeak(jcommon.Extension):
         serverid = message.server.id
         res = []
 
+        await cxt.send_typing()
+
         for word in args[1:]:
             if word == '---':
                 res.append(await self.server_sentence(serverid, 12))
