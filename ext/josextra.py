@@ -270,8 +270,8 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             await cxt.say("No results found")
             return
 
-    async def c_testprofile(self, message, args, cxt):
-        '''`j!testprofile` - experimental `j!profile`'''
+    async def c_profile(self, message, args, cxt):
+        '''`j!profile` - experimental shit'''
         await cxt.send_typing()
 
         em = discord.Embed(colour=discord.Colour.purple())
@@ -301,7 +301,6 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
 
             globalrank = 2
             for userid in sorted_data:
-                if self.jcoin.data[userid]['type'] != 0: continue
                 if userid == message.author.id: break
                 globalrank += 1
 
