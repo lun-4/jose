@@ -290,6 +290,9 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             guildaccounts = sorted(_gaccounts, key=lambda userid: \
                 self.jcoin.data[userid]['amount'])
 
+            sorted_data = sorted(self.jcoin.data, key=lambda userid: \
+                self.jcoin.data[userid]['amount'])
+
             # josé is always gonna be 1st, count from 2nd
             guildrank = 2
             for userid in guildaccounts:
@@ -297,7 +300,8 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
                 guildrank += 1
 
             globalrank = 2
-            for userid in self.jcoin.data:
+            for userid in sorted_data:
+                if self.jcoin.data[userid]['type'] != 0: continue
                 if userid == message.author.id: break
                 globalrank += 1
 
