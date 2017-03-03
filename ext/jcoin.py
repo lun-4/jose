@@ -563,7 +563,7 @@ class JoseCoin(jaux.Auxiliar):
                 await cxt.say(":gun: You got robbed! The thief(%s) stole `%.2fJC` from you. 3 hour grace period", \
                     target_user, (str(thief_user), amount))
 
-                self.jcoin.data[thief_id]['times_stolen'] += 1
+                self.jcoin.data[thief_id]['success_steal'] += 1
                 self.stealdb['period'][target_id] = time.time() + 10800
                 self.stealdb['points'][message.author.id] -= 1
 

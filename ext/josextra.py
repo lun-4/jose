@@ -272,15 +272,15 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             return
 
     async def mkcolor(self, name):
-        discord.Colour.purple()
-        colorval = int(hashlib.md5(name).hexdigest()[:6], 16)
+        colorval = int(hashlib.md5(name.encode("utf-8")).hexdigest()[:6], 16)
         return discord.Colour(colorval)
 
     async def c_profile(self, message, args, cxt):
-        '''`j!profile` - experimental shit'''
+        '''`j!profile` - profile card'''
         await cxt.send_typing()
 
         em = discord.Embed(colour=self.mkcolor(message.author.name))
+
         if message.author.nick is not None:
             em.add_field(name='Name', value='{} ({})'.format( \
                 message.author.nick, message.author.name))
