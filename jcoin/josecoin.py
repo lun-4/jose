@@ -113,18 +113,21 @@ def transfer(id_from, id_to, amnt, file_name=None):
     logger.info("%s > %.6fJC > %s", \
         acc_from['name'], amnt, acc_to['name'])
 
-    if not (acc_from['amount'] >= amnt):
-        return False, "account doesn't have enough funds to make this transaction"
-
     if acc_to['type'] == 1 or acc_from['type'] == 1:
         # tax transfer
 
         if acc_to['type'] == 1:
+            if not (acc_from['amount'] >= amnt):
+                return False, "account doesn't have enough funds to make this transaction"
+
             acc_to['taxes'] += amnt
             acc_from['taxpaid'] += amnt
             acc_from['amount'] -= amnt
 
         elif acc_from['type'] == 1:
+            if not (acc_to['taxes'] >= amnt):
+                return False, "account doesn't have enough funds to make this transaction"
+
             acc_to['taxes'] -= amnt
             acc_from['amount'] += amnt
 
@@ -132,6 +135,9 @@ def transfer(id_from, id_to, amnt, file_name=None):
             (time.time(), id_from, id_to, amnt))
 
     else:
+        if not (acc_from['amount'] >= amnt):
+            return False, "account doesn't have enough funds to make this transaction"
+
         acc_to['amount'] += amnt
         acc_from['amount'] -= amnt
 
