@@ -53,6 +53,8 @@ class JoseCoin(jaux.Auxiliar):
         self.counter = 0
 
     def to_hours(self, seconds):
+        if seconds is None:
+            return 0
         return seconds / 60 / 60
 
     async def josecoin_save(self, message, dbg_flag=True):
@@ -369,6 +371,31 @@ class JoseCoin(jaux.Auxiliar):
     async def c_hsteal(self, message, args, cxt):
         await cxt.say(HELPTEXT_JC_STEAL)
 
+    async def c_stealreset(self, message, args, cxt):
+        '''`j!stealreset user` - reset an user's status in stealdb'''
+        await self.is_admin(message.author.id)
+
+        try:
+            userid = args[1]
+        else:
+            await cxt.say("Error parsing userid")
+            return
+
+        res = []
+        if userid in self.stealdb['points']:
+            del self.stealdb['points'][userid]
+            res.append('points')
+
+        if userid in self.stealdb['cdown']:
+            del self.stealdb['cdown'][userid]
+            res.append('cdown')
+
+        if userid in self.stealdb['period']:
+            del self.stealdb['period'][userid]
+            res.append('period')
+
+        await cxt.say("Removed %s from databases `%s`", (', '.join(res),))
+
     async def c_stealstat(self, message, args, cxt):
         # get status from person
         personid = message.author.id
@@ -385,8 +412,8 @@ class JoseCoin(jaux.Auxiliar):
             cooldown_sec -= time.time()
 
             if cooldown_sec <= 0:
-                res.append("Your cooldown has terminated %.2f hours ago, use `j!steal` to update" % \
-                    (-self.to_hours(grace_period)))
+                res.append("A cooldown has ended %.2f hours ago, use `j!steal` to update" % \
+                    (-self.to_hours(cooldown_sec)))
 
             if cooldown_type == 0:
                 res.append(":cop: you're in prison, %.2f hours remaining" % \
