@@ -230,6 +230,9 @@ class JoseSpeak(jcommon.Extension):
     async def c_speaktrigger(self, message, args, cxt):
         """`j!speaktrigger` - trigger jose's speaking code"""
         cxt.env['flag'] = True
+        cxt.env['flat_fw'] = False
+        if 'fw' in args:
+            cxt.env['flag_fw'] = True
         await self.e_on_message(message, cxt)
 
     async def c_spt(self, message, args, cxt):
@@ -335,8 +338,10 @@ class JoseSpeak(jcommon.Extension):
 
     async def speak(self, texter, length_words, cxt):
         res = await texter.gen_sentence(length_words)
-        if random.random() < PROB_FULLWIDTH_TEXT:
+
+        if random.random() < PROB_FULLWIDTH_TEXT or cxt.env.get('flag_fw', False):
             res = res.translate(jcommon.WIDE_MAP)
+
         await cxt.say(res)
 
     async def c_falar(self, message, args, cxt):
