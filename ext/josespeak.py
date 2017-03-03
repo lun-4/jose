@@ -362,29 +362,11 @@ class JoseSpeak(jcommon.Extension):
         await cxt.say(res)
 
     async def c_falar(self, message, args, cxt):
-        """`j!falar [wordmax]` - josé fala(wordmax default 10)"""
-        wordlength = 10
-
-        if len(args) > 2:
-            if int(args[1]) > 100:
-                await cxt.say("Nope :tm:")
-                return
-            else:
-                wordlength = int(args[1])
-
+        """`j!falar` - josé fala"""
         await self.speak(self.cult_generator, cxt)
 
     async def c_sfalar(self, message, args, cxt):
-        """`j!sfalar [wordmax]` - falar usando textos do seu servidor atual(wordmax default 10)"""
-        wordlength = 10
-
-        if len(args) > 2:
-            if int(args[1]) > 100:
-                await cxt.say("Nope :tm:")
-                return
-            else:
-                wordlength = int(args[1])
-
+        """`j!sfalar` - falar usando textos do seu servidor atual"""
         # ensure Texter exists
         if message.server.id not in self.text_generators:
             await self.new_generator(message.server.id, MESSAGE_LIMIT)
@@ -392,16 +374,7 @@ class JoseSpeak(jcommon.Extension):
         await self.speak(self.text_generators[message.server.id], cxt)
 
     async def c_gfalar(self, message, args, cxt):
-        """`j!gfalar [wordmax]` - falar usando o texto global(wordmax default 10)"""
-        wordlength = 10
-
-        if len(args) > 2:
-            if int(args[1]) > 100:
-                await cxt.say("Nope :tm:")
-                return
-            else:
-                wordlength = int(args[1])
-
+        """`j!gfalar` - falar usando o texto global"""
         await self.speak(self.global_generator, cxt)
 
     async def c_josetxt(self, message, args, cxt):
