@@ -424,11 +424,16 @@ class JoseSpeak(jcommon.Extension):
 
         serverid = message.server.id
 
-        for index, word in enumerate(args):
+        self.logger.info("madlibs: %s", ' '.join(args[1:]))
+        res = []
+
+        for index, word in enumerate(args[1:]):
             if word == '---':
                 args[index] = await self.server_sentence(serverid, 12)
+            else:
+                res.append(word)
 
-        return ' '.join(args[1:])
+        return ' '.join(res)
 
     async def c_midi(self, message, args, cxt):
         '''`j!midi [stuff]` - Make MIDI files made out of josé's generated sentences
