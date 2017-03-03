@@ -416,24 +416,24 @@ class JoseSpeak(jcommon.Extension):
         await self.c_jwormhole(message, args, cxt)
 
     async def c_madlibs(self, message, args, cxt):
-        '''`j!madlibs succ my ---` - changes `---` in input to a 12-letter sentence'''
+        '''`j!madlibs succ my ---` - changes any `---` in input to a 12-letter sentence'''
 
         if len(args) < 2:
             await cxt.say(self.c_madlibs.__doc__)
             return
 
         serverid = message.server.id
-
-        self.logger.info("madlibs: %s", ' '.join(args[1:]))
         res = []
 
-        for index, word in enumerate(args[1:]):
+        for word in args[1:]:
             if word == '---':
-                args[index] = await self.server_sentence(serverid, 12)
+                res.append(await self.server_sentence(serverid, 12))
             else:
                 res.append(word)
 
-        return ' '.join(res)
+        self.logger.info("madlibs: %s => %s", ' '.join(args[1:]), ' '.join(res))
+
+        return cxt.say(' '.join(res))
 
     async def c_midi(self, message, args, cxt):
         '''`j!midi [stuff]` - Make MIDI files made out of josé's generated sentences
