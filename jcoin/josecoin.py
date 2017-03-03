@@ -65,7 +65,7 @@ def empty_acc(name, amnt, acctype=0):
             'type': 1,
             'name': name,
             'amount': decimal.Decimal(-1),
-            'taxes': decimal.decimal(0),
+            'taxes': decimal.Decimal(0),
             'loans': {},
         }
 
