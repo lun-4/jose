@@ -271,13 +271,37 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             return
 
     async def c_testprofile(self, message, args, cxt):
+        '''`j!testprofile` - experimental `j!profile`'''
+        await cxt.send_typing()
+
         em = discord.Embed(colour=discord.Colour.purple())
-        em.add_field(name='Name', value='{} ({})'.format(message.author.nick, \
-            message.author.name))
+        if message.author.nick is not None:
+            em.add_field(name='Name', value='{} ({})'.format( \
+                message.author.nick, message.author.name))
+        else:
+            em.add_field(name='Name', value='{}'.format(message.author.name))
 
         if message.author.id in self.jcoin.data:
             account = self.jcoin.data.get(message.author.id)
-            em.add_field(name='JoséCoin Rank', value='#TODO')
+
+            _gaccounts = [userid for userid in self.jcoin.data \
+                if message.server.get_member(userid) is not None]
+
+            guildaccounts = sorted(_gaccounts, key=lambda userid: \
+                self.jcoin.data[userid]['amount'])
+
+            guildrank = 1
+            while cur != message.author.id:
+                guildrank += 1
+                cur = next(guildaccounts)
+
+            globalrank = 1
+            for userid in self.jcoin.data:
+                if userid == message.author.id: break
+                globalrank += 1
+
+            em.add_field(name='JoséCoin Rank', value='{}/{} ({}/{} globally)'.format(\
+                guildrank, len(guildaccounts), globalrank, len(self.jcoin.data)))
             em.add_field(name='JoséCoin Wallet', value='{}'.format(account['amount']))
             em.add_field(name='Tax paid', value='{}'.format(account['taxpaid']))
 

@@ -141,5 +141,6 @@ JOSE_PLAYING_PHRASES = [
     'Talk Show',
     'Death',
     '♬ Cape Coral - Lovely Slut',
-    '♬ Ｆｉ７ｉ-  Eclipse'
+    '♬ Ｆｉ７ｉ-  Eclipse',
+    'with dead fish'
 ]
