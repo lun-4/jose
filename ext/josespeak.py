@@ -27,8 +27,13 @@ def make_textmodel(textdata, markov_length):
     tmodel = markovify.NewlineText(textdata, markov_length)
     return tmodel
 
-def get_sentence(textmodel):
-    text = textmodel.make_sentence()
+def get_sentence(textmodel, char_limit=None):
+    text = 'None'
+    if char_limit is not None:
+        text = textmodel.make_short_sentence(char_limit)
+    else:
+        text = textmodel.make_sentence()
+
     return text
 
 class NewTexter:
@@ -67,7 +72,7 @@ class NewTexter:
     def __repr__(self):
         return 'Texter(refcount=%s)' % self.refcount
 
-    async def gen_sentence(self, word_limit=None):
+    async def gen_sentence(self, char_limit=None):
         if self.refcount <= 2:
             # max value refcount can be is 3
             self.refcount += 1
@@ -77,7 +82,7 @@ class NewTexter:
         while res is None:
             if count > 3: break
             future_sentence = self.loop.run_in_executor(None, get_sentence, \
-                self.text_model)
+                self.text_model, char_limit)
             res = await future_sentence
             count += 1
 
@@ -334,10 +339,22 @@ class JoseSpeak(jcommon.Extension):
             if sid not in self.text_generators:
                 await self.new_generator(sid, MESSAGE_LIMIT)
 
-            await self.speak(self.text_generators[sid], length, cxt)
+            await self.speak(self.text_generators[sid], cxt)
 
-    async def speak(self, texter, length_words, cxt):
-        res = await texter.gen_sentence(length_words)
+    async def server_sentence(self, serverid, length=None, flag_fw=False):
+        if serverid not in self.text_generators:
+            await self.new_generator(serverid, MESSAGE_LIMIT)
+
+        texter = self.text_generators[serverid]
+        res = await texter.gen_sentence(length)
+
+        if random.random() < PROB_FULLWIDTH_TEXT or flag_fw:
+            res = res.translate(jcommon.WIDE_MAP)
+
+        return res
+
+    async def speak(self, texter, cxt):
+        res = await texter.gen_sentence()
 
         if random.random() < PROB_FULLWIDTH_TEXT or cxt.env.get('flag_fw', False):
             res = res.translate(jcommon.WIDE_MAP)
@@ -355,7 +372,7 @@ class JoseSpeak(jcommon.Extension):
             else:
                 wordlength = int(args[1])
 
-        await self.speak(self.cult_generator, wordlength, cxt)
+        await self.speak(self.cult_generator, cxt)
 
     async def c_sfalar(self, message, args, cxt):
         """`j!sfalar [wordmax]` - falar usando textos do seu servidor atual(wordmax default 10)"""
@@ -372,7 +389,7 @@ class JoseSpeak(jcommon.Extension):
         if message.server.id not in self.text_generators:
             await self.new_generator(message.server.id, MESSAGE_LIMIT)
 
-        await self.speak(self.text_generators[message.server.id], wordlength, cxt)
+        await self.speak(self.text_generators[message.server.id], cxt)
 
     async def c_gfalar(self, message, args, cxt):
         """`j!gfalar [wordmax]` - falar usando o texto global(wordmax default 10)"""
@@ -385,7 +402,7 @@ class JoseSpeak(jcommon.Extension):
             else:
                 wordlength = int(args[1])
 
-        await self.speak(self.global_generator, wordlength, cxt)
+        await self.speak(self.global_generator, cxt)
 
     async def c_josetxt(self, message, args, cxt):
         '''`j!josetxt` - Mostra a quantidade de linhas, palavras e bytes no db/jose-data.txt'''
@@ -424,6 +441,21 @@ class JoseSpeak(jcommon.Extension):
     async def c_jw(self, message, args, cxt):
         '''`j!jw` - alias para `!jwormhole`'''
         await self.c_jwormhole(message, args, cxt)
+
+    async def c_madlibs(self, message, args, cxt):
+        '''`j!madlibs succ my ---` - changes `---` in input to a 12-letter sentence'''
+
+        if len(args) < 2:
+            await cxt.say(self.c_madlibs.__doc__)
+            return
+
+        serverid = message.server.id
+
+        for index, word in enumerate(args):
+            if word == '---':
+                args[index] = await self.server_sentence(serverid, 12)
+
+        return ' '.join(args[1:])
 
     async def c_midi(self, message, args, cxt):
         '''`j!midi [stuff]` - Make MIDI files made out of josé's generated sentences
