@@ -290,18 +290,19 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             guildaccounts = sorted(_gaccounts, key=lambda userid: \
                 self.jcoin.data[userid]['amount'])
 
-            guildrank = 1
+            # josé is always gonna be 1st, count from 2nd
+            guildrank = 2
             for userid in guildaccounts:
                 if userid == message.author.id: break
                 guildrank += 1
 
-            globalrank = 1
+            globalrank = 2
             for userid in self.jcoin.data:
                 if userid == message.author.id: break
                 globalrank += 1
 
             em.add_field(name='JoséCoin Rank', value='{}/{} ({}/{} globally)'.format(\
-                guildrank, len(guildaccounts), globalrank, len(self.jcoin.data)))
+                guildrank, len(guildaccounts)+1, globalrank, len(self.jcoin.data)+1))
             em.add_field(name='JoséCoin Wallet', value='{}'.format(account['amount']))
             em.add_field(name='Tax paid', value='{}'.format(account['taxpaid']))
 
