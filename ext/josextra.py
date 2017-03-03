@@ -302,16 +302,17 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             sorted_data = sorted(self.jcoin.data, key=lambda userid: \
                 self.jcoin.data[userid]['amount'])
 
-            guildrank = gacc_sorted.index(message.author.id)
-            globalrank = sorted_data.index(message.author.id)
+            # index start from 0
+            guildrank = gacc_sorted.index(message.author.id) + 1
+            globalrank = sorted_data.index(message.author.id) + 1
 
             em.add_field(name='JoséCoin Rank', value='{}/{} ({}/{} globally)'.format( \
                 guildrank, len(gacc_sorted), \
-                globalrank, len(self.jcoin.data))
+                globalrank, len(sorted_data))
             )
 
-            em.add_field(name='JoséCoin Wallet', value='{}'.format(account['amount']))
-            em.add_field(name='Tax paid', value=str(account['taxpaid']))
+            em.add_field(name='JoséCoin Wallet', value='{}JC'.format(account['amount']))
+            em.add_field(name='Tax paid', value='{}JC'.format(account['taxpaid']))
 
             em.add_field(name='Stealing', value='{} tries, {} success'.format( \
                 account['times_stolen'], account['success_steal']))
