@@ -302,11 +302,11 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             sorted_data = sorted(self.jcoin.data, key=lambda userid: \
                 self.jcoin.data[userid]['amount'])
 
-            guildrank = gacc_sorted.index(userid)
-            globalrank = sorted_data.index(userid)
+            guildrank = gacc_sorted.index(message.author.id)
+            globalrank = sorted_data.index(message.author.id)
 
             em.add_field(name='JoséCoin Rank', value='{}/{} ({}/{} globally)'.format( \
-                guildrank, len(guildaccounts), \
+                guildrank, len(gacc_sorted), \
                 globalrank, len(self.jcoin.data))
             )
 
