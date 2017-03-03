@@ -3,6 +3,7 @@
 import sys
 sys.path.append("..")
 import josecommon as jcommon
+import jauxiliar as jaux
 import jcoin.josecoin as jcoin
 
 import aiohttp
@@ -15,9 +16,9 @@ random = SystemRandom()
 
 IMAGE_LIMIT = 14
 
-class JoseImages(jcommon.Extension):
+class JoseImages(jaux.Auxiliar):
     def __init__(self, _client):
-        jcommon.Extension.__init__(self, _client)
+        jaux.Auxiliar.__init__(self, _client)
 
     async def ext_load(self):
         return True, ''
