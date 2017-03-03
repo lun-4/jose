@@ -270,6 +270,14 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             await cxt.say("No results found")
             return
 
-    async def c_testembed(self, message, args, cxt):
-        e = discord.Embed(title=args[1], type='rich', descrption=' '.join(args[2:]))
-        await cxt.say_embed(e)
+    async def c_testprofile(self, message, args, cxt):
+        em = discord.Embed(colour=discord.Colour.purple())
+        em.add_field(name='Name', value='{} ({})'.format(message.author.nick, \
+            message.author.name))
+
+        if message.author.id in self.jcoin.data:
+            em.add_field(name='JoséCoin Rank', value='')
+            em.add_field(name='JoséCoin Wallet', value='{}'.format(account['amount']))
+            em.add_field(name='Tax paid', value='{}'.format(account['taxpaid']))
+
+        await cxt.say_embed(em)
