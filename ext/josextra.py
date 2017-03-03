@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import discord
 import aiohttp
 import urllib.parse
 import urllib.request
@@ -268,3 +269,7 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
 
             await cxt.say("No results found")
             return
+
+    async def c_testembed(self, message, args, cxt):
+        e = discord.Embed(title=args[1], type='rich', descrption=' '.join(args[2:]))
+        await cxt.say_embed(e)

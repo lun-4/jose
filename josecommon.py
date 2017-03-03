@@ -555,6 +555,12 @@ serverid %s servername %s chname #%s", server.id, server.name, channel.name)
         except Exception as err:
             logger.error('send_typing', exc_info=True)
 
+    async def say_embed(self, em, channel=None):
+        if channel is None:
+            channel = self.message.channel
+
+        await self.client.send_message(channel, embed=em)
+
     async def say(self, string, _channel=None, tup=None):
         channel = None
         if isinstance(_channel, tuple):
