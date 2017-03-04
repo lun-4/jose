@@ -18,6 +18,7 @@ import io
 import aiohttp
 import urllib
 import json
+import string
 
 RI_TABLE = {
     '0': ':zero:',
@@ -37,6 +38,12 @@ RI_TABLE = {
     '+': ':heavy_plus_sign:',
     '-': ':heavy_minus_sign:',
 }
+
+# implement letters
+RI_STR = '🇦🇧🇨🇩🇪🇫🇬🇭🇮🇯🇰🇱🇲🇳🇴🇵🇶🇷🇸🇹🇺🇻🇼🇽🇾🇿'
+
+RI_TABLE.update({letter:ri[string.ascii_lowercase.find(letter)] for \
+    letter in string.ascii_lowercase})
 
 MEMES_TECH_HELP = '''
 Então você teve problemas usando `j!m stat` ou `j!m get` ou alguma merda assim?
@@ -572,18 +579,17 @@ class JoseMemes(jaux.Auxiliar):
 
     async def c_ri(self, message, args, cxt):
         inputstr = ' '.join(args[1:]).lower()
+        if len(inputstr) < 1:
+            await cxt.say("Can't make R.I. out from nothing")
+            return
+
         inputstr = list(inputstr)
 
         for (index, char) in enumerate(inputstr):
-            if char.isalpha():
-                inputstr[index] = ':regional_indicator_%s: ' % char
-            elif char in RI_TABLE:
+            if char in RI_TABLE:
                 inputstr[index] = RI_TABLE[char]
 
         res = ''.join(inputstr)
-        if len(res) < 1:
-            await cxt.say("Can't make R.I. out from nothing")
-            return
         await cxt.say(res)
 
     async def c_pupper(self, message, args, cxt):
