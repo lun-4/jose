@@ -58,6 +58,12 @@ def empty_acc(name, amnt, acctype=0):
             # j!steal stuff
             'times_stolen': 0,
             'success_steal': 0,
+
+            # from what taxbank are you loaning from
+            'loaning_from': None,
+
+            # last tbank to get interest from
+            'interest_tbank': '',
         }
     elif acctype == 1:
         # tax bank
@@ -170,6 +176,9 @@ def load(fname):
             ensure_exist(acc_id, 'times_stolen', 0)
             ensure_exist(acc_id, 'success_steal', 0)
 
+            ensure_exist(acc_id, 'loaning_from', None)
+            ensure_exist(acc_id, 'interest_tbank', '')
+
         if data[acc_id]['type'] == 1:
             ensure_exist(acc_id, 'name', acc_id)
             ensure_exist(acc_id, 'amount', decimal.Decimal(-1))
@@ -180,7 +189,6 @@ def load(fname):
                 del data[acc_id]['taxpayers']
 
     data[jose_id] = empty_acc('jose-bot', decimal.Decimal('Inf'), 0)
-    #ledger_data(fname.replace('db', 'journal'), '%f;LOAD;%r\n' % (time.time(), data))
     return True, "load %s" % fname
 
 def save(fname):

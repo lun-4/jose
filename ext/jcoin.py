@@ -127,13 +127,20 @@ class JoseCoin(jaux.Auxiliar):
             self.counter = 0
 
     async def e_on_message(self, message, cxt):
+        author_id = message.author.id
+        if author_id not in self.jcoin.data:
+            return
+
+        if author_id in self.jcoin.data:
+            self.jcoin.data['interest_tbank'] = self.tbank_fmt(cxt)
+
         # TODO: higher probabilities for ppl that do taxes
         probability = jcommon.JC_PROBABILITY
-        if message.author.id in self.stealdb['cdown']:
+        if author_id in self.stealdb['cdown']:
             # get type of cooldown
             # type 0 = arrest
             # type 1 = get more stealing points
-            arrest_data = self.stealdb['cdown'][message.author.id]
+            arrest_data = self.stealdb['cdown'][author_id]
             if arrest_data[1] == 0:
                 probability /= 2
 
@@ -143,18 +150,11 @@ class JoseCoin(jaux.Auxiliar):
         if message.channel.is_private:
             return
 
-        author_id = str(message.author.id)
-        if author_id not in self.jcoin.data:
-            return
-
         amount = random.choice(jcommon.JC_REWARDS)
         if amount != 0:
-            res = self.jcoin.transfer(self.jcoin.jose_id, author_id, \
-                amount, self.jcoin.LEDGER_PATH)
+            res = self.jcoin.transfer(self.jcoin.jose_id, author_id, amount)
 
             if res[0]:
-                # delay because ratelimits???? need to study that
-                await asyncio.sleep(0.5)
                 await self.client.add_reaction(message, '💰')
             else:
                 jcommon.logger.error("do_josecoin->jc->err: %s", res[1])
