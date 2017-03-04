@@ -169,6 +169,11 @@ def load(fname):
         return False, str(e)
 
     for acc_id in data:
+        if acc_id.startswith('tbank'):
+            data[acc_id]['type'] = 1
+        else:
+            data[acc_id]['type'] = 0
+
         if data[acc_id]['type'] == 0:
             ensure_exist(acc_id, 'fakemoney', decimal.Decimal(0))
             ensure_exist(acc_id, 'actualmoney', decimal.Decimal(0))
