@@ -286,9 +286,14 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
         acc_id = message.author.id
 
         try:
-            acc_id = await jcommon.parse_id(args[1])
-        except:
+            _acc_id = await jcommon.parse_id(args[1])
+            if _acc_id is not None:
+                acc_id = _acc_id
+        except IndexError:
             pass
+        except Exception as err:
+            await cxt.say("`%r`", (err,))
+            return
 
         if acc_id != message.author.id:
             user = await self.client.get_user_info(acc_id)
