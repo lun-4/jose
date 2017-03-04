@@ -301,8 +301,11 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
         em = discord.Embed(colour=self.mkcolor(user.name))
 
         if hasattr(user, 'nick'):
-            em.add_field(name='Name', value='{} ({})'.format( \
-                user.nick, user.name))
+            if user.nick is not None:
+                em.add_field(name='Name', value='{} ({})'.format( \
+                    user.nick, user.name))
+            else:
+                em.add_field(name='Name', value='{}'.format(user.name))
         else:
             em.add_field(name='Name', value='{}'.format(user.name))
 
