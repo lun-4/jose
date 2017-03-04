@@ -25,11 +25,13 @@ PRICE_TABLE = {
             ('datamosh', 'yt'))
 }
 
+HOUR = 60 * 60
+
 # 1%
 BASE_CHANCE = decimal.Decimal(1)
 STEAL_CONSTANT = decimal.Decimal(0.42)
 STEALDB_PATH = 'db/steal.json'
-ARREST_TIME = 28800 # 8 hours
+ARREST_TIME = 8 * HOUR
 
 DEFAULT_STEALDB = '''{
     "points": {},
@@ -52,6 +54,7 @@ class JoseCoin(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
         self.counter = 0
+        self.cbk_new('jcoin.interest', self.make_interest, 5 * HOUR)
 
     def to_hours(self, seconds):
         if seconds is None:
@@ -118,6 +121,8 @@ class JoseCoin(jaux.Auxiliar):
         if not res_sdb[0]:
             return res_sdb
 
+        self.cbk_remove('jcoin.interest')
+
         return True, ''
 
     async def e_any_message(self, message, cxt):
@@ -161,6 +166,9 @@ class JoseCoin(jaux.Auxiliar):
             else:
                 jcommon.logger.error("do_josecoin->jc->err: %s", res[1])
                 await cxt.say("jc->err: %s", (res[1],))
+
+    async def make_interest(self):
+        pass
 
     async def c_prices(self, message, args, cxt):
         '''`j!prices` - show price categories'''
