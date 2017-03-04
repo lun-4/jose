@@ -167,7 +167,12 @@ def load(fname):
     for acc_id in data:
         acc = data[acc_id]
         if not isinstance(acc, dict):
-            return False, ('Account ID %s isn\'t a dict, it is %r' % (acc_id, acc))
+            if isinstance(acc, str):
+                if acc_id == 'interest_tbank':
+                    jcommon.logger.info("!!")
+                    del data['interest_tbank']
+
+            return False, ('%s is not an account, it is %r = %r' % (acc_id, type(acc), acc))
 
         if acc_id.startswith('tbank'):
             data[acc_id]['type'] = 1

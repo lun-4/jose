@@ -139,7 +139,7 @@ class JoseCoin(jaux.Auxiliar):
         if author_id in self.jcoin.data:
             tbank_id = self.tbank_fmt(cxt)
             self.ensure_tbank(tbank_id)
-            self.jcoin.data['interest_tbank'] = tbank_id
+            self.jcoin.data[author_id]['interest_bank'] = tbank_id
 
         # TODO: higher probabilities for ppl that do taxes
         probability = jcommon.JC_PROBABILITY
