@@ -478,10 +478,6 @@ class JoseCoin(jaux.Auxiliar):
             await cxt.say("The person you're trying to steal from doesn't have a JoséCoin account")
             return
 
-        if target_id in jcommon.ADMIN_IDS:
-            await cxt.say("You can't steal from a José Admin")
-            return
-
         thief_id = message.author.id
 
         # check if thief has cooldowns in place
@@ -564,11 +560,15 @@ class JoseCoin(jaux.Auxiliar):
                 await cxt.say("`[res: %.2f < prob: %.2f]` Stealing went well, nobody noticed, you thief. \n`%s`", \
                     (res, chance, ok[1]))
 
-                await cxt.say(":gun: You got robbed! The thief(%s) stole `%.2fJC` from you. 3 hour grace period", \
-                    target_user, (str(thief_user), amount))
+                grace_period_hour = 3
+                if target_id not in jcommon.ADMIN_IDS:
+                    grace_period_hour = 6
+
+                await cxt.say(":gun: You got robbed! The thief(%s) stole `%.2fJC` from you. %d hour grace period", \
+                    target_user, (str(thief_user), amount, grace_period_hour))
 
                 self.jcoin.data[thief_id]['success_steal'] += 1
-                self.stealdb['period'][target_id] = time.time() + 10800
+                self.stealdb['period'][target_id] = time.time() + (grace_period_hour * 60 * 60)
                 self.stealdb['points'][message.author.id] -= 1
 
         else:
