@@ -282,18 +282,16 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
         '''`j!profile [@mention]` - profile card stuff'''
         await cxt.send_typing()
 
-        user = None
-        acc_id = None
+        user = message.author
+        acc_id = message.author.id
 
         try:
             acc_id = await jcommon.parse_id(args[1])
         except:
-            acc_id = message.author.id
+            pass
 
         if acc_id != message.author.id:
             user = await self.client.get_user_info(acc_id)
-        else:
-            user = message.author
 
         em = discord.Embed(colour=self.mkcolor(user.name))
 
