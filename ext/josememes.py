@@ -42,7 +42,7 @@ RI_TABLE = {
 # implement letters
 RI_STR = '🇦🇧🇨🇩🇪🇫🇬🇭🇮🇯🇰🇱🇲🇳🇴🇵🇶🇷🇸🇹🇺🇻🇼🇽🇾🇿'
 
-RI_TABLE.update({letter:ri[string.ascii_lowercase.find(letter)] for \
+RI_TABLE.update({letter:RI_STR[string.ascii_lowercase.find(letter)] for \
     letter in string.ascii_lowercase})
 
 MEMES_TECH_HELP = '''
