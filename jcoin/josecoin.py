@@ -164,7 +164,7 @@ def load(fname):
     except Exception as e:
         return False, str(e)
 
-    remove_itbank
+    remove_itbank = False
 
     for acc_id in data:
         acc = data[acc_id]
