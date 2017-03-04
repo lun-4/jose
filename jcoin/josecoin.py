@@ -171,6 +171,7 @@ def load(fname):
                 if acc_id == 'interest_tbank':
                     jcommon.logger.info("!!")
                     del data['interest_tbank']
+                    continue
 
             return False, ('%s is not an account, it is %r = %r' % (acc_id, type(acc), acc))
 
