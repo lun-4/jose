@@ -287,10 +287,7 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
 
         try:
             acc_id = await jcommon.parse_id(args[1])
-            if acc_id is None:
-                acc_id = message.author.id
-                user = message.author
-            else:
+            if acc_id is not None:
                 user = await self.client.get_user_info(acc_id)
         except:
             acc_id = message.author.id
