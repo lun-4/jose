@@ -211,7 +211,7 @@ async def str_xor(string, other):
 
 JCRYPT_KEY = 'vcefodaparabensfrozen2meuovomeuovinhoayylmaogordoquaseexploderindo'
 
-async def parse_id(data, message):
+async def parse_id(data, message=None):
     if data[0:2] == '<@':
         if data[2] == '!':
             return data[3:-1]
