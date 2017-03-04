@@ -627,6 +627,10 @@ class JoseCoin(jaux.Auxiliar):
         if account is None:
             return
 
+        if account['loaning_from'] is not None:
+            await cxt.say("You can't store when you have a loan.")
+            return
+
         if account['amount'] < to_store:
             await cxt.say(":octagonal_sign: You can't deposit more than what you have.")
             return
@@ -653,6 +657,10 @@ class JoseCoin(jaux.Auxiliar):
 
         account = self.jcoin.data.get(message.author.id, None)
         if account is None:
+            return
+
+        if account['loaning_from'] is not None:
+            await cxt.say("You can't withdraw when you have a loan.")
             return
 
         if account['actualmoney'] < to_withdraw:
@@ -713,6 +721,7 @@ class JoseCoin(jaux.Auxiliar):
 
         pay = False
         see = False
+        account = self.jcoin.data[message.author.id]
 
         try:
             loan = decimal.Decimal(args[1])
@@ -729,6 +738,14 @@ class JoseCoin(jaux.Auxiliar):
         _tbank = self.jcoin.get(tbank_id)
         if _tbank[0]:
             tbank = _tbank[1]
+
+        if account['loaning_from'] != tbank_id:
+            await cxt.say("You aren't allowed to use `j!loan` in taxbanks different from the one you loaned from")
+            return
+
+        if account['fakemoney'] > 0:
+            await cxt.say("You can't loan when you're storing money")
+            return
 
         if see:
             if message.author.id in tbank['loans']:
@@ -754,6 +771,8 @@ class JoseCoin(jaux.Auxiliar):
                 return
 
             tbank['loans'][message.author.id] = loan
+            account['loaning_from'] = tbank_id
+
             await cxt.say("Loan successful. `%r`", (ok[1],))
         else:
             need_to_pay = tbank['loans'].get(message.author.id, None)
@@ -767,4 +786,5 @@ class JoseCoin(jaux.Auxiliar):
                 return
 
             del tbank['loans'][message.author.id]
+            account['loaning_from'] = None
             await cxt.say("Thanks! `%r`", (ok[1],))
