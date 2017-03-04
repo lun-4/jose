@@ -164,13 +164,15 @@ def load(fname):
     except Exception as e:
         return False, str(e)
 
+    remove_itbank
+
     for acc_id in data:
         acc = data[acc_id]
         if not isinstance(acc, dict):
             if isinstance(acc, str):
                 if acc_id == 'interest_tbank':
                     jcommon.logger.info("!!")
-                    del data['interest_tbank']
+                    remove_itbank = True
                     continue
 
             return False, ('%s is not an account, it is %r = %r' % (acc_id, type(acc), acc))
@@ -198,6 +200,9 @@ def load(fname):
 
             if 'taxpayers' in data[acc_id]:
                 del data[acc_id]['taxpayers']
+
+    if remove_itbank:
+        del data['interest_tbank']
 
     data[jose_id] = empty_acc('jose-bot', decimal.Decimal('Inf'), 0)
     return True, "load %s" % fname
