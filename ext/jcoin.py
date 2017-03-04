@@ -27,6 +27,7 @@ PRICE_TABLE = {
 
 # 1%
 BASE_CHANCE = decimal.Decimal(1)
+STEAL_CONSTANT = decial.Decimal(0.42)
 STEALDB_PATH = 'db/steal.json'
 ARREST_TIME = 28800 # 8 hours
 
@@ -541,9 +542,8 @@ class JoseCoin(jaux.Auxiliar):
                 (arrest[1],))
             return
 
-        D = decimal.Decimal
-        chance = (BASE_CHANCE + (target_amount / amount)) * D(0.3)
-        if chance > 8: chance = 5
+        chance = (BASE_CHANCE + (target_amount / amount)) * STEAL_CONSTANT
+        if chance > 5: chance = 5
 
         res = random.random() * 10
 
