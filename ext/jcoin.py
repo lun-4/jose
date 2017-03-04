@@ -648,7 +648,7 @@ class JoseCoin(jaux.Auxiliar):
         '''`j!withdraw amount` - get JCs from your personal bank'''
 
         if len(args) < 2:
-            await cxt.say(self.c_store.__doc__)
+            await cxt.say(self.c_withdraw.__doc__)
             return
 
         to_withdraw = await self.sw_parse(message, args, cxt)
@@ -739,7 +739,7 @@ class JoseCoin(jaux.Auxiliar):
         if _tbank[0]:
             tbank = _tbank[1]
 
-        if account['loaning_from'] != tbank_id:
+        if (account['loaning_from'] is not None) and (account['loaning_from'] != tbank_id):
             await cxt.say("You aren't allowed to use `j!loan` in taxbanks different from the one you loaned from")
             return
 
