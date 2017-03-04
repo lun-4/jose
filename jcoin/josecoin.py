@@ -165,6 +165,10 @@ def load(fname):
         return False, str(e)
 
     for acc_id in data:
+        acc = data[acc_id]
+        if not isinstance(acc, dict):
+            return False, 'Account ID %s isn\'t a dict'
+
         if acc_id.startswith('tbank'):
             data[acc_id]['type'] = 1
         else:
