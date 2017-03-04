@@ -478,6 +478,10 @@ class JoseCoin(jaux.Auxiliar):
             await cxt.say("The person you're trying to steal from doesn't have a JoséCoin account")
             return
 
+        if target_id in jcommon.ADMIN_IDS:
+            await cxt.say("You can't steal from a José Admin")
+            return
+
         thief_id = message.author.id
 
         # check if thief has cooldowns in place
