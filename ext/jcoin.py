@@ -561,7 +561,7 @@ class JoseCoin(jaux.Auxiliar):
                     (res, chance, ok[1]))
 
                 grace_period_hour = 3
-                if target_id not in jcommon.ADMIN_IDS:
+                if target_id in jcommon.ADMIN_IDS:
                     grace_period_hour = 6
 
                 await cxt.say(":gun: You got robbed! The thief(%s) stole `%.2fJC` from you. %d hour grace period", \
