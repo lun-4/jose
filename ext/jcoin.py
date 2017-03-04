@@ -545,7 +545,7 @@ class JoseCoin(jaux.Auxiliar):
         chance = (BASE_CHANCE + (target_amount / amount)) * STEAL_CONSTANT
         if chance > 5: chance = 5
 
-        res = random.random() * 10
+        res = random.uniform(0, 10)
 
         if res < chance:
             self.logger.info("Stealing %.2fJC from %s[%s] to %s[%s]", \
