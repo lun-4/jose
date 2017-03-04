@@ -282,16 +282,30 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
         '''`j!profile` - profile card'''
         await cxt.send_typing()
 
-        em = discord.Embed(colour=self.mkcolor(message.author.name))
+        user = None
+        acc_id = None
 
-        if message.author.nick is not None:
+        try:
+            acc_id = await jcommon.parse_id(args[1])
+            if acc_id is None:
+                acc_id = message.author.id
+                user = message.author
+            else:
+                user = await self.client.get_user_info(acc_id)
+        except:
+            acc_id = message.author.id
+            user = await self.client.get_user_info(acc_id)
+
+        em = discord.Embed(colour=self.mkcolor(user.name))
+
+        if user.nick is not None:
             em.add_field(name='Name', value='{} ({})'.format( \
-                message.author.nick, message.author.name))
+                user.nick, user.name))
         else:
-            em.add_field(name='Name', value='{}'.format(message.author.name))
+            em.add_field(name='Name', value='{}'.format(user.name))
 
-        if message.author.id in self.jcoin.data:
-            account = self.jcoin.data.get(message.author.id)
+        if acc_id in self.jcoin.data:
+            account = self.jcoin.data.get(acc_id)
 
             _gaccounts = [userid for userid in self.jcoin.data \
                 if message.server.get_member(userid) is not None]
@@ -303,8 +317,8 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
                 self.jcoin.data[userid]['amount'], reverse=True)
 
             # index start from 0
-            guildrank = gacc_sorted.index(message.author.id) + 1
-            globalrank = sorted_data.index(message.author.id) + 1
+            guildrank = gacc_sorted.index(acc_id) + 1
+            globalrank = sorted_data.index(acc_id) + 1
 
             em.add_field(name='JoséCoin Rank', value='{}/{} ({}/{} globally)'.format( \
                 guildrank, len(gacc_sorted), \
