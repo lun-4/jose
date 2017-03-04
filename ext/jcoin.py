@@ -27,7 +27,7 @@ PRICE_TABLE = {
 
 # 1%
 BASE_CHANCE = decimal.Decimal(1)
-STEAL_CONSTANT = decial.Decimal(0.42)
+STEAL_CONSTANT = decimal.Decimal(0.42)
 STEALDB_PATH = 'db/steal.json'
 ARREST_TIME = 28800 # 8 hours
 
@@ -127,6 +127,7 @@ class JoseCoin(jaux.Auxiliar):
             self.counter = 0
 
     async def e_on_message(self, message, cxt):
+        # TODO: higher probabilities for ppl that do taxes
         probability = jcommon.JC_PROBABILITY
         if message.author.id in self.stealdb['cdown']:
             # get type of cooldown
