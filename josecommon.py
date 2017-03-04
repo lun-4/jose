@@ -219,7 +219,7 @@ async def parse_id(data, message):
             return data[2:-1]
     else:
         logger.error("parse_id: %s", data)
-        return
+        return None
 
 def speak_filter(message):
     # remove URLs

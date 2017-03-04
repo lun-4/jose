@@ -279,7 +279,7 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
         return discord.Colour(colorval)
 
     async def c_profile(self, message, args, cxt):
-        '''`j!profile` - profile card'''
+        '''`j!profile [@mention]` - profile card stuff'''
         await cxt.send_typing()
 
         user = None
@@ -287,9 +287,12 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
 
         try:
             acc_id = await jcommon.parse_id(args[1])
-            user = await self.client.get_user_info(acc_id)
         except:
             acc_id = message.author.id
+
+        if acc_id != message.author.id:
+            user = await self.client.get_user_info(acc_id)
+        else:
             user = message.author
 
         em = discord.Embed(colour=self.mkcolor(user.name))
