@@ -351,6 +351,18 @@ class JoseMath(jaux.Auxiliar):
             await cxt.say("try to do your things better(dice_sides).")
             return
 
+        if dice_amount <= 0 or dice_sides <= 0:
+            await cxt.say("nonono")
+            return
+
+        if dice_amount > 100:
+            await cxt.say("100+ dice? nonono")
+            return
+
+        if dice_sides > 50:
+            await cxt.say("50+ sides? nonono")
+            return
+
         dices = []
         for i in range(dice_amount):
             dice_result = random.randint(1, dice_sides)
