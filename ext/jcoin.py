@@ -167,8 +167,21 @@ class JoseCoin(jaux.Auxiliar):
                 jcommon.logger.error("do_josecoin->jc->err: %s", res[1])
                 await cxt.say("jc->err: %s", (res[1],))
 
+    # TODO: this
     async def make_interest(self):
-        pass
+        # see all accounts
+        for acc_id in self.jcoin.data:
+            account = self.jcoin.data[acc_id]
+            if account['type'] == 0:
+                # user account
+                pass
+            elif account['type'] == 1:
+                # tax bank, see loans
+                for userid in account['loans']:
+                    # apply interest to all loans
+                    pass
+            else:
+                self.logger.warning("We're in trouble, account %s has no type", acc_id)
 
     async def c_prices(self, message, args, cxt):
         '''`j!prices` - show price categories'''

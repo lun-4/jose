@@ -68,10 +68,6 @@ def empty_acc(name, amnt, acctype=0):
     elif acctype == 1:
         # tax bank
         return {
-            # taxpayers example
-            # userid: taxpaid,
-            # otheruser: taxpaid,
-            # etc
             'type': 1,
             'name': name,
             'amount': decimal.Decimal(-1),
