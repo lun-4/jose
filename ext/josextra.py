@@ -294,11 +294,11 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
                 user = await self.client.get_user_info(acc_id)
         except:
             acc_id = message.author.id
-            user = await self.client.get_user_info(acc_id)
+            user = message.author
 
         em = discord.Embed(colour=self.mkcolor(user.name))
 
-        if user.nick is not None:
+        if hasattr(user, 'nick'):
             em.add_field(name='Name', value='{} ({})'.format( \
                 user.nick, user.name))
         else:
