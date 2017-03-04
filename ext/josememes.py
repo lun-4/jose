@@ -587,7 +587,7 @@ class JoseMemes(jaux.Auxiliar):
 
         for (index, char) in enumerate(inputstr):
             if char in RI_TABLE:
-                inputstr[index] = RI_TABLE[char]
+                inputstr[index] = '{} '.format(RI_TABLE[char])
 
         res = ''.join(inputstr)
         await cxt.say(res)
