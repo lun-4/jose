@@ -400,7 +400,22 @@ class JoseCoin(jaux.Auxiliar):
         if arrest_type == 0:
             # pay half the amount
             fine = amount / decimal.Decimal(2)
-            return self.jcoin.transfer(thief_id, self.jcoin.jose_id, fine)
+            ok = self.jcoin.transfer(thief_id, self.jcoin.jose_id, fine)
+            if ok[0]:
+                return ok, 0
+            else:
+                # probably "account doesn't have enough funds to make this transaction" error
+                # zero it
+                thief_account = self.jcoin.data[thief_id]
+                amount = thief_account['amount']
+                ok = self.jcoin.transfer(thief_id, self.jcoin.jose_id, amount)
+                if not ok:
+                    self.logger.error("Error in do_arrest->jc_err: %r", ok)
+                    return ok
+
+                amount = int(amount)
+                self.stealdb['cdown'][thief_id] = (time.time() + ARREST_TIME + amount, arrest_type)
+                return ok, amount
 
     async def c_steal(self, message, args, cxt):
         '''`j!steal @target amount` - Steal JoséCoins from someone'''
@@ -474,13 +489,14 @@ class JoseCoin(jaux.Auxiliar):
         self.jcoin.data[thief_id]['times_stolen'] += 1
 
         if stealuses < 1:
-            res = await self.do_arrest(thief_id, amount, 1)
+            arrest, extra = await self.do_arrest(thief_id, amount, 1)
             await cxt.say("You don't have any more stealing points, wait 8 hours to get more.")
             return
 
         if target_id == self.jcoin.jose_id:
-            arrest = await self.do_arrest(thief_id, amount)
-            await cxt.say(":cop: You can't steal from José. Arrested for 8h\n`%s`", (arrest[1],))
+            arrest, extra = await self.do_arrest(thief_id, amount)
+            await cxt.say(":cop: You can't steal from José. Arrested for %.2fh\n`%s`", \
+                ((8 + extra), arrest[1]))
             return
 
         target_account = self.jcoin.get(target_id)[1]
@@ -488,9 +504,9 @@ class JoseCoin(jaux.Auxiliar):
 
         if amount > target_amount:
             # automatically in prison
-            arrest = await self.do_arrest(thief_id, amount)
-            await cxt.say(":cop: Arrested because you tried to steal more than the target has, 8h jail time.\n`%s`", \
-                (arrest[1],))
+            arrest, extra = await self.do_arrest(thief_id, amount)
+            await cxt.say(":cop: Arrested because you tried to steal more than the target has, %.2fh jail time.\n`%s`", \
+                ((8 + extra), arrest[1]))
             return
 
         chance = (BASE_CHANCE + (target_amount / amount)) * STEAL_CONSTANT
@@ -525,9 +541,9 @@ class JoseCoin(jaux.Auxiliar):
 
         else:
             # type 0 cooldown, you got arrested
-            arrest = await self.do_arrest(thief_id, amount)
-            await cxt.say("`[res: %.2f > prob: %.2f]` :cop: Arrested! got 8h cooldown.\n`%s`", \
-                (res, chance, arrest[1]))
+            arrest, extra = await self.do_arrest(thief_id, amount)
+            await cxt.say("`[res: %.2f > prob: %.2f]` :cop: Arrested! got %.2fh cooldown.\n`%s`", \
+                (res, chance, (8 + extra), arrest[1]))
 
         await self.save_steal_db()
 
