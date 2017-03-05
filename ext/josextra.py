@@ -39,6 +39,16 @@ docsdict = {
     "jcoin": "{}/doc/jcoin.md".format(JOSE_URL),
 }
 
+COLOR_API = 'http://www.colourlovers.com/api'
+
+def hex_to_rgb(value):
+    value = value.lstrip('#')
+    lv = len(value)
+    return tuple(int(value[i:i+lv/3], 16) for i in range(0, lv, lv/3))
+
+def rgb_to_hex(triplet):
+    return '%02x%02x%02x' % rgb
+
 class joseXtra(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
@@ -337,3 +347,61 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
                 account['times_stolen'], account['success_steal']))
 
         await cxt.say_embed(em)
+
+    async def c_color(self, message, args, cxt):
+        '''`j!color "rand"|#aabbcc|red,green,blue` - show colors'''
+
+        if len(args) < 2:
+            await cxt.say(self.c_color.__doc__)
+            return
+
+        await self.jcoin_pricing(cxt, jcommon.API_TAX_PRICE)
+
+        color = (0, 0, 0)
+
+        if args[1] == 'rand':
+            mk_rand = True
+
+        elif args[1].startswith('#'):
+            # parse hex #aabbcc
+            if len(args[1]) > 7:
+                await cxt.say("`#aabbcc` format not recognized")
+                return
+            color = hex_to_rgb(args[1])
+
+        elif args[1].find(','):
+            # parse rgb int,int,int
+            sp = args[1].split(',')
+
+            if len(sp) != 3:
+                await cxt.say("Error parsing rgb(RED, GRN, BLU)")
+                return
+
+            for (i, el) in enumerate(sp):
+                try:
+                    sp[i] = int(el)
+                    if sp[i] < 0 or sp[i] >= 255:
+                        await cxt.say("`%r` out or range 0-255")
+                        return
+                except:
+                    await cxt.say("Error converting `%r` to Integer base 10", \
+                        (el,))
+                    return
+
+            red, green, blue = sp
+            color = (red, green, blue)
+
+        if mk_rand:
+            red = random.randint(0x0, 0xff)
+            green = random.randint(0x0, 0xff)
+            blue = random.randint(0x0, 0xff)
+            color = (red, green, blue)
+
+        # get color from a color api
+        _colordata = await self.json_from_url('{}/color/{}?format=json'.format \
+            (COLOR_API, rgb_to_hex(color)))
+
+        colordata = _colordata[0]
+        url = colordata['imageUrl']
+
+        await cxt.say(url)
