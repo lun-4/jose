@@ -407,7 +407,7 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
 
         try:
             colordata = _colordata[0]
-            url = colordata['imageUrl']
+            imageurl = colordata['imageUrl']
         except Exception as err:
             await cxt.say("```\n%r\n```", (err,))
             return
