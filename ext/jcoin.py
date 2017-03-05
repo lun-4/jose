@@ -309,10 +309,10 @@ class JoseCoin(jaux.Auxiliar):
 
         for (index, account_id) in enumerate(gacc_sorted[:top_finish]):
             account = self.jcoin.data[account_id]
-            res.append('%d. %s -> %.2fJC' % \
+            res.append('%2d. %17s -> %.2f' % \
                 (index, account['name'], account['amount']))
 
-        await cxt.say('\n'.join(res))
+        await cxt.say(self.codeblock("", '\n'.join(res)))
         return
 
     async def c_top10(self, message, args, cxt):
@@ -335,10 +335,10 @@ class JoseCoin(jaux.Auxiliar):
 
         for (index, account_id) in enumerate(sorted_data[:top_finish]):
             account = self.jcoin.data[account_id]
-            res.append('%d. %s -> %.2fJC' % \
+            res.append('%2d. %17s -> %.2f' % \
                 (index, account['name'], account['amount']))
 
-        await cxt.say('\n'.join(res))
+        await cxt.say(self.codeblock("", '\n'.join(res)))
         return
 
     async def c_hsteal(self, message, args, cxt):
