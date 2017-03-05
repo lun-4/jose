@@ -25,7 +25,10 @@ PRICE_TABLE = {
             ('datamosh', 'yt'))
 }
 
+PERCENT = 1 * 100
 HOUR = 60 * 60
+
+LOAN_TAX = 25 * PERCENT
 
 # 1%
 BASE_CHANCE = decimal.Decimal(1)
@@ -715,10 +718,12 @@ class JoseCoin(jaux.Auxiliar):
                 await cxt.say("jc->err: %s", (ok[1],))
                 return
 
+            loan += (loan * LOAN_TAX)
             tbank['loans'][message.author.id] = loan
             account['loaning_from'] = tbank_id
 
-            await cxt.say("Loan successful. `%r`", (ok[1],))
+            await cxt.say("Loan successful. `%r`, you need to pay %.2fJC(loan + 25%% tax) later", \
+                (ok[1], loan))
         else:
             need_to_pay = tbank['loans'].get(message.author.id, None)
             if need_to_pay is None:
