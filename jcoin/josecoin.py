@@ -41,7 +41,7 @@ def ledger_data(fpath, data):
     return
 
 def empty_acc(name, amnt, acctype=0):
-    if acctype == 0 :
+    if acctype == 0:
         # user account
         return {
             'type': 0,
@@ -73,6 +73,18 @@ def empty_acc(name, amnt, acctype=0):
             'amount': decimal.Decimal(-1),
             'taxes': decimal.Decimal(0),
             'loans': {},
+        }
+    elif acctype == 2:
+        # only for _interest
+        return {
+            'type': 2,
+            'name': name,
+            'amount': decimal.Decimal(-10),
+
+            # _interest stuff
+            'timestamp': 0.0,
+            'userbank': decimal.Decimal(0),
+            'loan_profit': decimal.Decimal(0),
         }
 
 def new_acc(id_acc, name, init_amnt=None, acctype=0):
@@ -174,6 +186,8 @@ def load(fname):
                     jcommon.logger.info("!!")
                     remove_itbank = True
                     continue
+                elif acc_id[0] == '_':
+                    continue
 
             return False, ('%s is not an account, it is %r = %r' % (acc_id, type(acc), acc))
 
@@ -205,6 +219,10 @@ def load(fname):
         del data['interest_tbank']
 
     data[jose_id] = empty_acc('jose-bot', decimal.Decimal('Inf'), 0)
+
+    if '_interest' not in data:
+        data['_interest'] = empty_acc('_interest', decimal.Decimal(-10), 2)
+
     return True, "load %s" % fname
 
 def save(fname):

@@ -251,6 +251,7 @@ class Callback:
         self.sec = sec
         self.run = False
         self.cid = cid
+        self.last_run = None
 
     async def do(self):
         logger.info("%s: Running Callback", self.cid)
@@ -258,6 +259,7 @@ class Callback:
             logger.debug("%s: called", self.cid)
 
             try:
+                self.last_run = time.time()
                 await self.func()
             except:
                 logger.error('Error at cbk %s.do', self.cid, exc_info=True)
