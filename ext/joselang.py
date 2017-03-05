@@ -47,7 +47,7 @@ class JoseLanguage(jaux.Auxiliar):
 
         sid = message.server.id
 
-        botblock = jcommon.configdb_get(sid, 'botblock')
+        botblock = await jcommon.configdb_get(sid, 'botblock')
         if botblock is None:
             self.logger.warning("Botblock is None")
 
@@ -57,7 +57,7 @@ class JoseLanguage(jaux.Auxiliar):
             return
 
         # sanity check
-        n_botblock = jcommon.configdb_get(sid, 'botblock')
+        n_botblock = await jcommon.configdb_get(sid, 'botblock')
         if n_botblock is None:
             self.logger.warning("Botblock is None... again")
 
