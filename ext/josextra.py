@@ -47,7 +47,7 @@ def hex_to_rgb(value):
     return tuple(int(value[i:i+lv/3], 16) for i in range(0, lv, lv/3))
 
 def rgb_to_hex(triplet):
-    return '%02x%02x%02x' % rgb
+    return '%02x%02x%02x' % triplet
 
 class joseXtra(jaux.Auxiliar):
     def __init__(self, _client):
