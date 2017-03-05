@@ -56,8 +56,8 @@ class JoseHelp(jaux.Auxiliar):
 
         if message.server.id != jcommon.JOSE_DEV_SERVER_ID:
             em = discord.Embed(title="Having Problems?", colour=discord.Colour.red())
-            em.add_field("José server: ", "{}".format(JOSE_INVITE))
-            em.add_field("what do", "Use `j!helpme` there and find the nearest mod that works with your issue")
+            em.add_field(name="José server: ", value="{}".format(JOSE_INVITE))
+            em.add_field(name="what do", value="Use `j!helpme` there and find the nearest mod that works with your issue")
             await cxt.say_embed(em)
             return
 
