@@ -28,7 +28,7 @@ PRICE_TABLE = {
 PERCENT = 1 * 100
 HOUR = 60 * 60
 
-LOAN_TAX = 25 * PERCENT
+LOAN_TAX = 25 / PERCENT
 
 # 1%
 BASE_CHANCE = decimal.Decimal(1)
