@@ -480,7 +480,7 @@ async def configdb_set(sid, key, value):
         configdb[sid][key] = value
         res = configdb[sid][key]
         if res != value:
-            logger.warning("configdb_set(%s, %s) = %s didn't went through", sid, key, valule)
+            logger.warning("configdb_set(%s, %s) = %s didn't went through", sid, key, value)
             return False
 
         return True
