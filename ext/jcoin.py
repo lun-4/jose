@@ -287,110 +287,56 @@ class JoseCoin(jaux.Auxiliar):
             await cxt.say('jc_err: `%s`' % res[1])
 
     async def c_ltop10(self, message, args, cxt):
-        '''`j!ltop10` - local top 10 people who have high josecoins'''
-        if message.server is None:
-            await cxt.say("You're not in a server, dummy!")
-            return
+        try:
+            top_finish = int(args[1]) + 1
+        except:
+            top_finish = 11
 
-        guild = message.server
-        jcdata = dict(self.jcoin.data) # copy
-
-        range_max = 11 # default 10 users
-        if len(args) > 1:
-            range_max = int(args[1]) + 1
-
-        if range_max > 16:
+        if top_finish > 16:
             await cxt.say("LimitError: values higher than 16 aren't valid")
             return
-        elif range_max <= 0:
+        elif top_finish <= 0:
             await cxt.say("haha no")
             return
 
-        maior = {
-            'id': 0,
-            'name': '',
-            'amount': 0.0,
-        }
+        _gaccounts = [userid for userid in self.jcoin.data \
+            if message.server.get_member(userid) is not None]
 
-        order = []
+        gacc_sorted = sorted(_gaccounts, key=lambda userid: \
+            self.jcoin.data[userid]['amount'], reverse=True)
 
-        for i in range(1,range_max):
-            if len(jcdata) < 1:
-                break
+        res = []
 
-            for member in guild.members:
-                accid = member.id
-                if accid in jcdata:
-                    acc = jcdata[accid]
-                    name, amount = acc['name'], acc['amount']
-                    if amount > maior['amount']:
-                        maior['id'] = accid
-                        maior['name'] = name
-                        maior['amount'] = amount
-                else:
-                    pass
+        for account_id in gacc_sorted[:top_finish]:
+            res.append('%d. %s -> %.2f' % \
+                (i, maior['name'], maior['amount']))
 
-            if maior['id'] in jcdata:
-                del jcdata[maior['id']]
-                order.append('%d. %s -> %.2f' % \
-                    (i, maior['name'], maior['amount']))
-
-                # reset to next
-                maior = {
-                    'id': 0,
-                    'name': '',
-                    'amount': 0.0,
-                }
-
-        await cxt.say('\n'.join(order))
+        await cxt.say('\n'.join(res))
         return
 
     async def c_top10(self, message, args, cxt):
-        jcdata = dict(self.jcoin.data) # copy
+        try:
+            top_finish = int(args[1]) + 1
+        except:
+            top_finish = 11
 
-        range_max = 11 # default 10 users
-        if len(args) > 1:
-            range_max = int(args[1]) + 1
-
-        maior = {
-            'id': 0,
-            'name': '',
-            'amount': 0.0,
-        }
-
-        if range_max > 16:
+        if top_finish > 16:
             await cxt.say("LimitError: values higher than 16 aren't valid")
             return
-        elif range_max <= 0:
+        elif top_finish <= 0:
             await cxt.say("haha no")
             return
 
-        order = []
+        sorted_data = sorted(self.jcoin.data, key=lambda userid: \
+            self.jcoin.data[userid]['amount'], reverse=True)
 
-        for i in range(1,range_max):
-            if len(jcdata) < 1:
-                break
+        res = []
 
-            for accid in jcdata:
-                acc = jcdata[accid]
-                name, amount = acc['name'], acc['amount']
-                if amount > maior['amount']:
-                    maior['id'] = accid
-                    maior['name'] = name
-                    maior['amount'] = amount
-
-            del jcdata[maior['id']]
-            order.append('%d. %s -> %.2f' % \
+        for account_id in sorted_data[:top_finish]:
+            res.append('%d. %s -> %.2f' % \
                 (i, maior['name'], maior['amount']))
 
-            # reset to next
-            maior = {
-                'id': 0,
-                'name': '',
-                'amount': 0.0,
-            }
-
-        await cxt.say('\n'.join(order))
+        await cxt.say('\n'.join(res))
         return
 
     async def c_hsteal(self, message, args, cxt):
