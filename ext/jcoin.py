@@ -54,8 +54,6 @@ class JoseCoin(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
         self.counter = 0
-        self.last_interest = {}
-        self.cbk_new('jcoin.interest', self.make_interest, 1 * HOUR)
 
     def to_hours(self, seconds):
         if seconds is None:
@@ -124,8 +122,6 @@ class JoseCoin(jaux.Auxiliar):
         if not res_sdb[0]:
             return res_sdb
 
-        self.cbk_remove('jcoin.interest')
-
         return True, ''
 
     async def e_any_message(self, message, cxt):
@@ -169,54 +165,6 @@ class JoseCoin(jaux.Auxiliar):
             else:
                 jcommon.logger.error("do_josecoin->jc->err: %s", res[1])
                 await cxt.say("jc->err: %s", (res[1],))
-
-    async def make_interest(self):
-        # check if timestamp is equal or longer INTEREST_PERIOD
-        now = time.time()
-        next_interest_making = self.last_interest['timestamp'] + (INTEREST_PERIOD * HOUR)
-        if now < next_interest_making:
-            self.logger.info("Waiting for next interest calculation period in %.2f hours",
-                (next_interest_making - now))
-            return
-
-        self.last_interest['timestamp'] = time.time()
-
-        loan_profit = 0
-        userbank_made = 0
-
-        # TODO
-        # see all accounts
-        for acc_id in self.jcoin.data:
-            account = self.jcoin.data[acc_id]
-            if account['type'] == 0:
-                # user account
-                pass
-            elif account['type'] == 1:
-                # tax bank, see loans
-                for userid in account['loans']:
-                    # apply interest to all loans
-                    pass
-            else:
-                self.logger.warning("We're in trouble, account %s has no type", acc_id)
-
-        self.last_interest['userbank'] = userbank_made
-        self.last_interest['loan_profit'] = loan_profit
-
-    async def c_interest(self)
-        last_run = time.time() - self.last_interest['timestamp']
-
-        res = []
-
-        res.append(":dollar: Last interest calculations were made %.2f hours ago" % \
-            self.to_hours(last_run))
-
-        res.append(":moneybag: Made %.2fJC out from userbanks" % \
-            (self.last_interest['userbank']))
-
-        res.append(":money_with_wings: Loans made %.2fJC for the taxbanks" % \
-            (self.last_interest['loan_profit']))
-
-        await cxt.say('\n'.join(res))
 
     async def c_prices(self, message, args, cxt):
         '''`j!prices` - show price categories'''
