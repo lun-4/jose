@@ -39,7 +39,7 @@ docsdict = {
     "jcoin": "{}/doc/jcoin.md".format(JOSE_URL),
 }
 
-COLOR_API = 'http://www.colourlovers.com/api'
+COLOR_API = 'http://thecolorapi.com'
 
 _NUMERALS = '0123456789abcdefABCDEF'
 _HEXDEC = {v: int(v, 16) for v in (x+y for x in _NUMERALS for y in _NUMERALS)}
@@ -358,8 +358,6 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             await cxt.say(self.c_color.__doc__)
             return
 
-        await self.jcoin_pricing(cxt, jcommon.API_TAX_PRICE)
-
         color = (0, 0, 0)
         mk_rand = False
 
@@ -401,15 +399,7 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             blue = random.randint(0x0, 0xff)
             color = (red, green, blue)
 
-        # get color from a color api
-        _colordata = await self.json_from_url('{}/color/{}?format=json'.format \
-            (COLOR_API, rgb_to_hex(color)))
-
-        try:
-            colordata = _colordata[0]
-            imageurl = colordata['imageUrl']
-        except Exception as err:
-            await cxt.say("```\nError getting color %r: %r\n```", (color, err,))
-            return
+        imageurl = 'http://placehold.it/100x100.png/{}'.format\
+            (rgb_to_hex(color).upper())
 
         await cxt.say('Color `%s`: %s', (color, imageurl))
