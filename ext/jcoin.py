@@ -756,3 +756,29 @@ class JoseCoin(jaux.Auxiliar):
             del tbank['loans'][message.author.id]
             account['loaning_from'] = None
             await cxt.say("Thanks! `%r`", (ok[1],))
+
+    async def c_loanreset(self, message, args, cxt):
+        '''`j!loanreset userid` - reset an user's status in a taxbank'''
+        await self.is_admin(message.author.id)
+
+        try:
+            userid = args[1]
+        except:
+            await cxt.say("Error parsing userid")
+            return
+
+        tbank_id = self.tbank_fmt(cxt)
+        self.ensure_tbank(tbank_id)
+
+        tbank = None
+        _tbank = self.jcoin.get(tbank_id)
+        if _tbank[0]:
+            tbank = _tbank[1]
+
+        account = self.jcoin.data[message.author.id]
+        need_to_pay = tbank['loans'].get(message.author.id, None)
+        del tbank['loans'][message.author.id]
+        account['loaning_from'] = None
+
+        await cxt.say("Removed <@%s> loan record of %.2fJC to pay", \
+            (userid, need_to_pay,))
