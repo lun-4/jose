@@ -416,6 +416,8 @@ class JoseCoin(jaux.Auxiliar):
                 amount = int(amount)
                 self.stealdb['cdown'][thief_id] = (time.time() + ARREST_TIME + amount, arrest_type)
                 return ok, amount
+        elif arrest_type == 1:
+            return None, 0
 
     async def c_steal(self, message, args, cxt):
         '''`j!steal @target amount` - Steal JoséCoins from someone'''
