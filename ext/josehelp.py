@@ -62,13 +62,12 @@ class JoseHelp(jaux.Auxiliar):
             return
 
         res = []
-        res.append(":large_blue_circle: online admins, :white_circle: idle admins")
 
         for adminid in jcommon.ADMIN_TOPICS:
             topics = jcommon.ADMIN_TOPICS[adminid]
             admin = message.server.get_member(adminid)
             if admin.status == discord.Status.online:
-                res.append(":large_blue_circle: %s, works on %s" % (admin, ', '.join(topics)))
+                res.append(":green_book: %s, works on %s" % (admin, ', '.join(topics)))
             elif admin.status == discord.Status.idle:
                 res.append(":white_circle: %s, works on %s" % (admin, ', '.join(topics)))
             else:

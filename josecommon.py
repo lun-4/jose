@@ -45,7 +45,7 @@ OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&perm
 #configuration things
 ADMIN_TOPICS = {
     # Luna, Corno, Dan and Nat
-    '162819866682851329': ('Development'),
+    '162819866682851329': ('Development',),
     '144377237997748224': ('General Support',),
     '191334773744992256': ('General Support',),
     '142781100152848384': ('Development',),
