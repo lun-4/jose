@@ -41,10 +41,13 @@ docsdict = {
 
 COLOR_API = 'http://www.colourlovers.com/api'
 
-def hex_to_rgb(value):
-    value = value.lstrip('#')
-    lv = len(value)
-    return tuple(int(value[i:i+lv/3], 16) for i in range(0, lv, lv/3))
+_NUMERALS = '0123456789abcdefABCDEF'
+_HEXDEC = {v: int(v, 16) for v in (x+y for x in _NUMERALS for y in _NUMERALS)}
+LOWERCASE, UPPERCASE = 'x', 'X'
+
+def hex_to_rgb(triplet):
+    triplet = triplet.lstrip('#')
+    return _HEXDEC[triplet[0:2]], _HEXDEC[triplet[2:4]], _HEXDEC[triplet[4:6]]
 
 def rgb_to_hex(triplet):
     return '%02x%02x%02x' % triplet
@@ -358,6 +361,7 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
         await self.jcoin_pricing(cxt, jcommon.API_TAX_PRICE)
 
         color = (0, 0, 0)
+        mk_rand = False
 
         if args[1] == 'rand':
             mk_rand = True
@@ -401,7 +405,11 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
         _colordata = await self.json_from_url('{}/color/{}?format=json'.format \
             (COLOR_API, rgb_to_hex(color)))
 
-        colordata = _colordata[0]
-        url = colordata['imageUrl']
+        try:
+            colordata = _colordata[0]
+            url = colordata['imageUrl']
+        except Exception as err:
+            await cxt.say("```\n%r\n```", (err,))
+            return
 
-        await cxt.say(url)
+        await cxt.say('Color `%s`: %s', (color, imageurl))
