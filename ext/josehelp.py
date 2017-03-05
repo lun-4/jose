@@ -11,6 +11,8 @@ MARKDOWN_HELP_FILES = [
     'doc/jcoin.md'
 ]
 
+JOSE_INVITE = 'https://discord.gg/5ASwg4C'
+
 class JoseHelp(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
@@ -46,6 +48,31 @@ class JoseHelp(jaux.Auxiliar):
     async def ext_unload(self):
         del self.help
         return True, ''
+
+    async def c_helpme(self, message, args, cxt):
+        '''`j!helpme` - having problems?'''
+
+        if message.server.id != jcommon.JOSE_DEV_SERVER_ID:
+            em = discord.Embed(title="Having Problems?", colour=discord.Colour.red())
+            em.add_field("José server: ", "{}".format(JOSE_INVITE))
+            em.add_field("what do", "Use `j!helpme` there and find the nearest mod that works with your issue")
+            await cxt.say_embed(em)
+            return
+
+        res.append(":large_blue_circle: online admins, :white_circle: idle admins")
+
+        for adminid in jcommon.ADMIN_TOPICS:
+            topics = jcommon.ADMIN_TOPICS[adminid]
+            admin = message.server.get_member(adminid)
+            if admin.status == discord.Status.online:
+                res.append(":large_blue_circle: %s, works on %s" % (admin, ', '.join(topics)))
+            elif admin.status == discord.Status.idle:
+                res.append(":white_circle: %s, works on %s" % (admin, ', '.join(topics)))
+            else:
+                # admin is Do Not Disturb or Offline, don't show them lol
+                pass
+
+        await cxt.say('\n'.join(res))
 
     async def c_help(self, message, args, cxt):
         '''`j!help cmd` - get help for a command, uses the Markdown helptexts'''

@@ -43,8 +43,15 @@ JOSE_APP_ID = '202586824013643777'
 OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=67259457' % JOSE_APP_ID
 
 #configuration things
-ADMIN_IDS = ['162819866682851329', '144377237997748224', \
-    '191334773744992256', '142781100152848384']
+ADMIN_TOPICS = {
+    # Luna, Corno, Dan and Nat
+    '162819866682851329': ('Development'),
+    '144377237997748224': ('General Support',),
+    '191334773744992256': ('General Support',),
+    '142781100152848384': ('Development',),
+}
+
+ADMIN_IDS = list(ADMIN_TOPICS.keys())
 
 COOLDOWN_SECONDS = 4
 PIRU_ACTIVITY = .0000069
