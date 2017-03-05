@@ -3,6 +3,8 @@
 import sys
 sys.path.append("..")
 import jauxiliar as jaux
+import josecommon as jcommon
+import discord
 
 MARKDOWN_HELP_FILES = [
     'doc/cmd/listcmd.md',
@@ -59,6 +61,7 @@ class JoseHelp(jaux.Auxiliar):
             await cxt.say_embed(em)
             return
 
+        res = []
         res.append(":large_blue_circle: online admins, :white_circle: idle admins")
 
         for adminid in jcommon.ADMIN_TOPICS:
