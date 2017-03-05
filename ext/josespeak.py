@@ -330,11 +330,6 @@ class JoseSpeak(jcommon.Extension):
         if random.random() < 0.03 or cxt.env.get('flag', False):
             await cxt.send_typing()
 
-            # default 5 words
-            length = 5
-            if sid in self.text_lengths:
-                length = int(self.text_lengths[sid])
-
             # ensure the server already has its texter loaded up
             if sid not in self.text_generators:
                 await self.new_generator(sid, MESSAGE_LIMIT)
