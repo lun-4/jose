@@ -16,7 +16,7 @@ random = SystemRandom()
 PRICE_TABLE = {
     'api': ('Tax for Commands that use APIs', jcommon.API_TAX_PRICE, \
             ('wolframalpha', 'temperature', 'money', 'bitcoin', '8ball', \
-                'xkcd', 'sndc', 'urban')),
+                'xkcd', 'sndc', 'urban', 'color')),
 
     'img': ('Price for all commands in `joseimages`', jcommon.IMG_PRICE, \
             ('derpibooru', 'hypno', 'e621', 'yandere')),
