@@ -736,7 +736,7 @@ class JoseCoin(jaux.Auxiliar):
                 await cxt.say("jc->err: %s", (ok[1],))
                 return
 
-            loan += (loan * LOAN_TAX)
+            loan += (loan * decimal.Decimal(LOAN_TAX))
             tbank['loans'][message.author.id] = loan
             account['loaning_from'] = tbank_id
 
