@@ -105,8 +105,6 @@ class JoseCoin(jaux.Auxiliar):
         if not res_jc[0]:
             return res_jc
 
-        self.last_interest = self.jcoin.data['_interest']
-
         res_sdb = await self.load_steal_db()
         if not res_sdb[0]:
             return res_sdb
@@ -134,11 +132,6 @@ class JoseCoin(jaux.Auxiliar):
         author_id = message.author.id
         if author_id not in self.jcoin.data:
             return
-
-        if author_id in self.jcoin.data:
-            tbank_id = self.tbank_fmt(cxt)
-            self.ensure_tbank(tbank_id)
-            self.jcoin.data[author_id]['interest_bank'] = tbank_id
 
         # TODO: higher probabilities for ppl that do taxes
         probability = jcommon.JC_PROBABILITY
