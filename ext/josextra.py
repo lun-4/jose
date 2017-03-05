@@ -311,7 +311,12 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
         if acc_id != message.author.id:
             user = await self.client.get_user_info(acc_id)
 
-        em = discord.Embed(colour=self.mkcolor(user.name))
+        em = discord.Embed(title='Profile card', colour=self.mkcolor(user.name))
+
+        if len(user.avatar_url) > 0:
+            em.set_thumbnail(url=user.avatar_url)
+
+        em.set_footer(text="User ID: {}".format(user.id))
 
         if hasattr(user, 'nick'):
             if user.nick is not None:
