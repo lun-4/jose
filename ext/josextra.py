@@ -409,7 +409,7 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             colordata = _colordata[0]
             imageurl = colordata['imageUrl']
         except Exception as err:
-            await cxt.say("```\n%r\n```", (err,))
+            await cxt.say("```\nError getting color %r: %r\n```", (color, err,))
             return
 
         await cxt.say('Color `%s`: %s', (color, imageurl))
