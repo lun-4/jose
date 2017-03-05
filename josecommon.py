@@ -468,8 +468,14 @@ async def configdb_set(sid, key, value):
     global configdb
     if sid not in configdb:
         configdb[sid] = get_defaultcdb()
+
     try:
         configdb[sid][key] = value
+        res = configdb[sid][key]
+        if res != value:
+            logger.warning("configdb_set(%s, %s) = %s didn't went through", sid, key, valule)
+            return False
+
         return True
     except Exception as err:
         logger.error('configdb_set(%s, %s)', sid, key, exc_info=True)
