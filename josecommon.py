@@ -28,9 +28,9 @@ handler.setFormatter(formatter)
 # add the handlers to the logger
 logger.addHandler(handler)
 
-
-JOSE_PREFIX = "j!"
 JOSE_VERSION = '1.4.5'
+JOSE_PREFIX = "j!"
+LEN_PREFIX = len(JOSE_PREFIX)
 
 MARKOV_LENGTH_PATH = 'db/wordlength.json'
 MARKOV_MESSAGES_PATH = 'db/messages.json'
@@ -426,9 +426,11 @@ def parse_command(message):
 
     if message.startswith(JOSE_PREFIX):
         k = message.find(" ")
-        command = message[len(JOSE_PREFIX):k]
+
+        command = message[LEN_PREFIX:k]
         if k == -1:
-            command = message[len(JOSE_PREFIX):]
+            command = message[LEN_PREFIX:]
+
         args = message.split(' ')
         method = "c_%s" % command
         return command, args, method
