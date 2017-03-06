@@ -56,3 +56,20 @@ The EAPI is a set of methods given to extensions by `jaux.Auxiliar` and `jcommon
       # remove callbacks on unload
       await self.cbk_remove('mydatabase')
   ```
+
+## List of methods given by `jaux.Auxiliar` only
+ * self.json_load(string)
+  * This function is a *coroutine*
+  * Loads a JSON string, raises `joseerror.JSONError` on error
+
+ * self.http_get(url, timeout=5)
+  * This function is a *coroutine*
+  * GETs from an url, raises respective errors
+
+ * self.json_from_url(url, timeout=5)
+  * This function is a *coroutine*
+  * Load JSON from an url
+
+ * self.jcoin_pricing(cxt, amount)
+  * This function is a *coroutine*
+  * Does *taxes*, sends `amount` from `cxt.message.author` to its respective taxbank
