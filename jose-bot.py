@@ -47,10 +47,10 @@ def load_all_modules():
     # essential stuff
     load_module('joselang', 'JoseLanguage')
     load_module('josehelp', 'JoseHelp')
+    load_module('jcoin', 'JoseCoin')
     load_module('josespeak', 'JoseSpeak')
     load_module('josestats', 'JoseStats')
     load_module('josemagicword', 'JoseMagicWord')
-    load_module('jcoin', 'JoseCoin')
 
     # fun stuff
     load_module('josememes', 'JoseMemes')
@@ -123,10 +123,10 @@ async def do_command(method, message, args, cxt, t_start, st):
             str(message.author))
 
         await cxt.say("Permission ¯\_(ツ)_/¯ 💠 ¯\_(ツ)_/¯ Error")
-    except RuntimeError as e:
-        jcommon.logger.error("RuntimeError happened with %s", \
-            str(message.author), exc_info=True)
-        await cxt.say(':interrobang: RuntimeError: %s' % repr(e))
+    except RuntimeError as err:
+        jcommon.logger.error("RuntimeError happened with %s[%s]", \
+            str(message.author), message.author.id, exc_info=True)
+        await cxt.say(':interrobang: RuntimeError: %r' % err)
     except je.CommonError as err:
         await cxt.say('```\nCommonError: %r```', (err,))
     except je.JoseCoinError as err:
@@ -200,7 +200,9 @@ async def on_message(message):
         print("Recv message: %s" % message.content)
 
     if message.author.id in josecoin.data:
-        josecoin.data[message.author.id]['name'] = str(message.author)
+        account = josecoin.data[message.author.id]
+        if str(message.author) != account['name']:
+            account['name'] = str(message.author)
 
     st = time.time()
 
