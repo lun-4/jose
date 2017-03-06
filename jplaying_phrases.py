@@ -142,5 +142,9 @@ JOSE_PLAYING_PHRASES = [
     'Death',
     '♬ Cape Coral - Lovely Slut',
     '♬ Ｆｉ７ｉ-  Eclipse',
-    'with dead fish'
+    'with dead fish',
+    'Virtual Reality',
+    'Other Virtual Reality ( ͡° ͜ʖ ͡°)',
+    'Thinking',
+    'dunno ¯\_(ツ)_/¯'
 ]
