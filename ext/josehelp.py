@@ -14,6 +14,7 @@ MARKDOWN_HELP_FILES = [
 ]
 
 JOSE_INVITE = 'https://discord.gg/5ASwg4C'
+JOSE_LISTCMD_URL = 'https://github.com/lkmnds/jose/blob/master/doc/cmd/listcmd.md'
 
 class JoseHelp(jaux.Auxiliar):
     def __init__(self, _client):
@@ -77,9 +78,14 @@ class JoseHelp(jaux.Auxiliar):
         await cxt.say('\n'.join(res))
 
     async def c_help(self, message, args, cxt):
-        '''`j!help cmd` - get help for a command, uses the Markdown helptexts'''
+        '''`j!help` - send list of commands to you'''
+        await cxt.say("Use `j!helpcmd` for single command help. \n{}".format\
+            (JOSE_LISTCMD_URL))
+
+    async def c_helpcmd(self, message, args, cxt):
+        '''`j!helpcmd cmd` - get help for a command, uses the Markdown documentation'''
         if len(args) < 2:
-            await cxt.say(self.c_help.__doc__)
+            await cxt.say(self.c_helpcmd.__doc__)
             return
 
         command = args[1]
