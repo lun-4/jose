@@ -319,6 +319,9 @@ class JoseCoin(jaux.Auxiliar):
         if top_finish is None:
             return
 
+        _data = [userid for userid in self.jcoin.data if \
+            self.jcoin.data[userid]['type'] == 0]
+
         sorted_data = sorted(self.jcoin.data, key=lambda userid: \
             self.jcoin.data[userid]['taxpaid'], reverse=True)
 
