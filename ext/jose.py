@@ -360,28 +360,35 @@ class JoseBot(jcommon.Extension):
         else:
             raise je.PermissionError()
 
-    async def turnoff(self, cxt):
-        self.logger.info("Turning Off from %s", str(cxt.message.author))
-        await self.modules['jcoin']['inst'].josecoin_save(cxt.message)
+    async def general_shutdown(self, cxt):
+        jcoin = self.modules['jcoin']['inst']
+        await jcoin.josecoin_save(cxt.message)
         await self.unload_all()
-        await cxt.say(":wave: kthxbye :wave:")
         await self.client.logout()
         self.logger.info("Logged out")
         sys.exit(0)
 
+    async def turnoff(self, cxt):
+        self.logger.info("Turning Off from %s", str(cxt.message.author))
+        josextra = self.modules['josextra']['inst']
+
+        await cxt.say(":wave: My best showdown was %d messages/minute, recv %d messages", \
+            (josextra.best_msg_minute, josextra.best_msg_hour))
+        await self.general_shutdown(cxt)
+
     async def update(self, cxt):
         self.logger.info("Do update from %s", str(cxt.message.author))
-        await self.modules['jcoin']['inst'].josecoin_save(cxt.message)
-        await self.unload_all()
+
+        josextra = self.modules['josextra']['inst']
+        shutdown_msg = (":wave: My best showdown was %d messages/minute, recv %d messages" % \
+                    (josextra.best_msg_minute, josextra.best_msg_hour))
 
         out = subprocess.check_output("git pull", shell=True, \
             stderr=subprocess.STDOUT)
         res = out.decode("utf-8")
-        await cxt.say("`git pull`: ```%s```\n", (res,))
+        await cxt.say("`git pull`: ```%s```\n %s", (res, shutdown_msg))
 
-        await self.client.logout()
-        self.logger.info("Logged out")
-        sys.exit(0)
+        await self.general_shutdown(self, cxt)
 
     async def c_shutdown(self, message, args, cxt):
         '''`j!shutdown` - turns off josé'''
