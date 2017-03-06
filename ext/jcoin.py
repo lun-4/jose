@@ -264,7 +264,7 @@ class JoseCoin(jaux.Auxiliar):
         else:
             await cxt.say('jc_err: `%s`' % res[1])
 
-    async def c_ltop10(self, message, args, cxt):
+    async def top10_parse(self, args, cxt):
         try:
             top_finish = int(args[1]) + 1
         except:
@@ -275,6 +275,21 @@ class JoseCoin(jaux.Auxiliar):
             return
         elif top_finish <= 0:
             await cxt.say("haha no")
+            return
+
+        return top_finish
+
+    async def top10_show(self, lst, finish):
+        res = []
+        for (index, account_id) in enumerate(lst[:finish]):
+            account = self.jcoin.data[account_id]
+            res.append('%2d. %25s -> %.2f' % \
+                (index, account['name'], account['amount']))
+        return res
+
+    async def c_ltop10(self, message, args, cxt):
+        top_finish = await self.top10_parse(args)
+        if top_finish is None:
             return
 
         _gaccounts = [userid for userid in self.jcoin.data \
@@ -283,39 +298,19 @@ class JoseCoin(jaux.Auxiliar):
         gacc_sorted = sorted(_gaccounts, key=lambda userid: \
             self.jcoin.data[userid]['amount'], reverse=True)
 
-        res = []
-
-        for (index, account_id) in enumerate(gacc_sorted[:top_finish]):
-            account = self.jcoin.data[account_id]
-            res.append('%2d. %25s -> %.2f' % \
-                (index, account['name'], account['amount']))
-
+        res = await self.top10_show(gacc_sorted, top_finish)
         await cxt.say(self.codeblock("", '\n'.join(res)))
         return
 
     async def c_top10(self, message, args, cxt):
-        try:
-            top_finish = int(args[1]) + 1
-        except:
-            top_finish = 11
-
-        if top_finish > 16:
-            await cxt.say("LimitError: values higher than 16 aren't valid")
-            return
-        elif top_finish <= 0:
-            await cxt.say("haha no")
+        top_finish = await self.top10_parse(args)
+        if top_finish is None:
             return
 
         sorted_data = sorted(self.jcoin.data, key=lambda userid: \
             self.jcoin.data[userid]['amount'], reverse=True)
 
-        res = []
-
-        for (index, account_id) in enumerate(sorted_data[:top_finish]):
-            account = self.jcoin.data[account_id]
-            res.append('%2d. %25s -> %.2f' % \
-                (index, account['name'], account['amount']))
-
+        res = await self.top10_show(gacc_sorted, top_finish)
         await cxt.say(self.codeblock("", '\n'.join(res)))
         return
 
