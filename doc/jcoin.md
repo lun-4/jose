@@ -44,3 +44,9 @@ Command | Description | Example | Alias
 ------------- | ------------- | ------------- | -------------
 `j!steal @mention amount` | Steals from someone | `j!steal @Jose 20` | `j!roubar`
 `j!stealstat` | Your status in the stealing business | |
+`j!stealreset userid` | Resets an user's status in stealdb **[ONLY ADMINS]** | |
+
+## Personal Banks aka userbanks
+
+**TODO**
+`j!store, withdraw, bank, loan`

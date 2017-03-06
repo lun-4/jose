@@ -22,3 +22,6 @@ Tipos de pedidos para o comando `j!query`
 
  * `j!query topcmd`
   * Mostra os comandos mais usados
+
+ * `j!query ltopcmd`
+  * Mostra os comandos mais usados vindos do seu servidor

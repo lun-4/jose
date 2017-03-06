@@ -21,4 +21,7 @@ Query types for the `j!query` command
   * Queries the server where the command originated and shows (almost) the same things as `!query summary`, but using a local database
 
  * `j!query topcmd`
-  * Shows the most used commands in josé
+  * Shows top 10 most used commands in josé
+
+ * `j!query ltopcmd`
+  * Shows top 10 most used commands in your server
