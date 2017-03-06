@@ -237,11 +237,6 @@ async def on_message(message):
 
         return
 
-    # a normal message, put it in the global text
-    if not message.author.bot:
-        with open("zelao.txt", 'a') as f:
-            f.write('%s\n' % jcommon.speak_filter(message.content))
-
     # handle e_on_message
     await do_event('on_message', [message])
 
