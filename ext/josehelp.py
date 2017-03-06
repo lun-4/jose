@@ -75,6 +75,10 @@ class JoseHelp(jaux.Auxiliar):
                 # admin is Do Not Disturb or Offline, don't show them lol
                 pass
 
+        if len(res) == 0:
+            await cxt.say("Sorry, no admin is available to treat your issue.")
+            return
+
         await cxt.say('\n'.join(res))
 
     async def c_help(self, message, args, cxt):
