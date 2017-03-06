@@ -19,7 +19,8 @@ There are 2 extra `Texter`s after the server ones, one is the "cult" generator, 
 Command | Description | Example | Alias
 ------------- | ------------- | ------------- | -------------
 `j!speaktrigger` | Triggers your server's `Texter` to generate text | | `j!spt`
-`j!falar [wordmax]` | Triggers the "cult" generator to generate text(wordmax default is 10) | `j!falar 30` |
-`j!sfalar [wordmax]` | Triggers your server's `Texter` to generate text(wordmax default is 10) | `j!sfalar 40` |
-`j!gfalar [wordmax]` | Triggers the global `Texter` to generate text(wordmax default is 10) | `j!gfalar 20` |
+`j!falar` | Triggers the "cult" generator to generate text | |
+`j!sfalar` | Triggers your server's `Texter` to generate text | |
+`j!gfalar` | Triggers the global `Texter` to generate text | |
 `j!jwormhole` | Uses your server's `Texter` to send messages through Septapus Wormhole | | `j!jw`
+`j!tatsu` | Prefixes output from `j!speaktrigger` with `"^"` | |

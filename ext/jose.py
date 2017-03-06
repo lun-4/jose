@@ -321,7 +321,7 @@ class JoseBot(jcommon.Extension):
         await self.is_admin(message.author.id)
 
         if len(args) < 2:
-            await cxt.say(self.c_reload.__doc__)
+            await cxt.say(self.c_loadmod.__doc__)
             return
 
         # parse class@module

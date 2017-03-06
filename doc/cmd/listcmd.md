@@ -69,6 +69,7 @@ Command | Description | Example | Alias
 `j!docs [topic | "list"]` | Shows documentation for josé | |
 `j!yt search_terms` | Search YouTube | `j!yt Tunak Tunak Tun sped up every time they say Tunak` |
 `j!sndc search_terms` | Search Soundcloud | `j!sndc Tunak Tunak Tun` |
+`j!color "rand"|#aabbcc|red,green,blue` | show colors | `j!color #DEADAF`, `j!color 100,50,100`, `j!color rand` |
 
 ### `jcoin`
 
@@ -86,7 +87,7 @@ Command | Description | Example | Alias
 `j!e621 tags` | Searches *e621* | |
 `j!yandere tags` | Searches *yande.re* | |
 `j!derpibooru tags` | Searches *Derpibooru* | |
-`j!urban stuff` | Searches the Urban Dictionary | `j!urban kys` |
+`j!urban stuff` | Searches the *Urban Dictionary* | `j!urban kys` |
 
 ### `josedatamosh`
 
