@@ -372,7 +372,7 @@ class JoseBot(jcommon.Extension):
         self.logger.info("Turning Off from %s", str(cxt.message.author))
         josextra = self.modules['josextra']['inst']
 
-        await cxt.say(":wave: My best showdown was %d messages/minute, recv %d messages", \
+        await cxt.say(":wave: My best showdown was %d messages/minute, %.2f msg/hour, recv %d messages", \
             (josextra.best_msg_minute, josextra.best_msg_hour, josextra.total_msg))
         await self.general_shutdown(cxt)
 
@@ -380,7 +380,7 @@ class JoseBot(jcommon.Extension):
         self.logger.info("Do update from %s", str(cxt.message.author))
 
         josextra = self.modules['josextra']['inst']
-        shutdown_msg = (":wave: My best showdown was %.2f msg/minute, %.2f msg/hour, recv %d messages" % \
+        shutdown_msg = (":wave: My best showdown was %d msg/minute, %.2f msg/hour, recv %d messages" % \
                     (josextra.best_msg_minute, josextra.best_msg_hour, josextra.total_msg))
 
         out = subprocess.check_output("git pull", shell=True, \

@@ -58,8 +58,13 @@ class joseXtra(jaux.Auxiliar):
         self.docs = docsdict
         self.msgcount = 0
 
+        self.best_msg_minute = 0
+        self.best_msg_hour = 0
+        self.total_msg = 0
+
         # every minute, show josé's usage
-        self.cbk_new("jxtra.msgcount", self.message_count, 60)
+        self.cbk_new("jxtra.msgcount", self.msg_count_minute, 60)
+        self.cbk_new("jxtra.msgcount_hour", self.msg_count_hour, 3600)
 
     async def ext_load(self):
         return True, ''
@@ -68,13 +73,30 @@ class joseXtra(jaux.Auxiliar):
         self.cbk_remove('jxtra.msgcount')
         return True, ''
 
-    async def message_count(self):
-        if self.msgcount > 0:
-            self.logger.info("Processed %d messages/minute", self.msgcount)
-        self.msgcount = 0
+    async def msg_count_minute(self):
+        msgcount_min = self.msgcount_min
+
+        if msgcount_min > 0:
+            if msgcount_min > self.best_msg_minute:
+                self.best_msg_minute = msgcount_min
+            self.logger.info("Received %d messages/minute", msgcount_min)
+
+        self.msgcount_min = 0
+
+    async def msg_count_hour(self):
+        msgcount_hour = self.msgcount_hour
+
+        if msgcount_hour > 0:
+            if msgcount_hour > self.best_msg_hour:
+                self.best_msg_hour = msgcount_hour
+            self.logger.info("Received %d messages/hour", msgcount_hour)
+
+        self.msgcount_hour = 0
 
     async def e_any_message(self, message, cxt):
-        self.msgcount += 1
+        self.msgcount_min += 1
+        self.msgcount_hour += 1
+        self.total_msg += 1
 
     async def c_xkcd(self, message, args, cxt):
         '''`j!xkcd` - latest xkcd
