@@ -279,16 +279,16 @@ class JoseCoin(jaux.Auxiliar):
 
         return top_finish
 
-    async def top10_show(self, lst, finish):
+    async def top10_show(self, lst, finish, entry='amount'):
         res = []
         for (index, account_id) in enumerate(lst[:finish]):
             account = self.jcoin.data[account_id]
             res.append('%2d. %25s -> %.2f' % \
-                (index, account['name'], account['amount']))
+                (index, account['name'], account[entry]))
         return res
 
     async def c_ltop10(self, message, args, cxt):
-        top_finish = await self.top10_parse(args)
+        top_finish = await self.top10_parse(args, cxt)
         if top_finish is None:
             return
 
@@ -303,26 +303,26 @@ class JoseCoin(jaux.Auxiliar):
         return
 
     async def c_top10(self, message, args, cxt):
-        top_finish = await self.top10_parse(args)
+        top_finish = await self.top10_parse(args, cxt)
         if top_finish is None:
             return
 
         sorted_data = sorted(self.jcoin.data, key=lambda userid: \
             self.jcoin.data[userid]['amount'], reverse=True)
 
-        res = await self.top10_show(gacc_sorted, top_finish)
+        res = await self.top10_show(sorted_data, top_finish)
         await cxt.say(self.codeblock("", '\n'.join(res)))
         return
 
     async def c_taxtop10(self, message, args, cxt):
-        top_finish = await self.top10_parse(args)
+        top_finish = await self.top10_parse(args, cxt)
         if top_finish is None:
             return
 
         sorted_data = sorted(self.jcoin.data, key=lambda userid: \
             self.jcoin.data[userid]['taxpaid'], reverse=True)
 
-        res = await self.top10_show(gacc_sorted, top_finish)
+        res = await self.top10_show(sorted_data, top_finish, 'taxpaid')
         await cxt.say(self.codeblock("", '\n'.join(res)))
         return
 
