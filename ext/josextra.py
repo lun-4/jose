@@ -106,7 +106,7 @@ class joseXtra(jaux.Auxiliar):
 
         res.append("In this current session:")
         res.append("Current messages/minute rate: %d msg/min" % (self.msgcount_min))
-        res.append("Current messages/hour rate: %d msg/hour" % (self.msg_count_hour))
+        res.append("Current messages/hour rate: %d msg/hour" % (self.msgcount_hour))
         res.append("Best messages/minute rate: %d msg/min" % (self.best_msg_minute))
         res.append("Best messages/hour rate: %d msg/hour" % (self.best_msg_hour))
         res.append("Total messages received: %d" % (self.total_msg))
