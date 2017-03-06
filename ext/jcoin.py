@@ -322,7 +322,7 @@ class JoseCoin(jaux.Auxiliar):
         _data = [userid for userid in self.jcoin.data if \
             self.jcoin.data[userid]['type'] == 0]
 
-        sorted_data = sorted(self.jcoin.data, key=lambda userid: \
+        sorted_data = sorted(_data, key=lambda userid: \
             self.jcoin.data[userid]['taxpaid'], reverse=True)
 
         res = await self.top10_show(sorted_data, top_finish, 'taxpaid')
