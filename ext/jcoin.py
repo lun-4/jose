@@ -314,6 +314,18 @@ class JoseCoin(jaux.Auxiliar):
         await cxt.say(self.codeblock("", '\n'.join(res)))
         return
 
+    async def c_taxtop10(self, message, args, cxt):
+        top_finish = await self.top10_parse(args)
+        if top_finish is None:
+            return
+
+        sorted_data = sorted(self.jcoin.data, key=lambda userid: \
+            self.jcoin.data[userid]['taxpaid'], reverse=True)
+
+        res = await self.top10_show(gacc_sorted, top_finish)
+        await cxt.say(self.codeblock("", '\n'.join(res)))
+        return
+
     async def c_hsteal(self, message, args, cxt):
         await cxt.say(HELPTEXT_JC_STEAL)
 
