@@ -19,8 +19,9 @@ Command | Description | Example | Alias
 
 Command | Description | Example | Alias
 ------------- | ------------- | ------------- | -------------
-| `j!language lang` | Sets a language for a server | `j!language en` | |
-| `j!listlang` | Shows all available languages for josé | | |
+`j!language lang` | Sets a language for a server | `j!language en` |
+`j!listlang` | Shows all available languages for josé | |
+`j!botblock` | Toggles botblock | |
 
 ### `josemagicword`
 
@@ -34,6 +35,7 @@ Command | Description | Example | Alias
 `j!temperature location` | Requests current temperature of a place using [OpenWeatherMap](openweathermap.org) | `j!temperature Sydney, Australia` | `j!temp`, `j!therm`
 `j!money quantity base to` | Converts currency, use `j!money list` to see available currencies | `j!money 1 AUD USD` |
 `j!roll <amount>d<sides>` | Rolls `amount` dice of `sides` sides | `j!roll 20d6` |
+`j!percent amount total` | Calculates `amount`% out of `total` | `j!percent 50 100` |
 
 ### `josememes`
 
