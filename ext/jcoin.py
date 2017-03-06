@@ -287,7 +287,7 @@ class JoseCoin(jaux.Auxiliar):
 
         for (index, account_id) in enumerate(gacc_sorted[:top_finish]):
             account = self.jcoin.data[account_id]
-            res.append('%2d. %17s -> %.2f' % \
+            res.append('%2d. %25s -> %.2f' % \
                 (index, account['name'], account['amount']))
 
         await cxt.say(self.codeblock("", '\n'.join(res)))
@@ -313,7 +313,7 @@ class JoseCoin(jaux.Auxiliar):
 
         for (index, account_id) in enumerate(sorted_data[:top_finish]):
             account = self.jcoin.data[account_id]
-            res.append('%2d. %17s -> %.2f' % \
+            res.append('%2d. %25s -> %.2f' % \
                 (index, account['name'], account['amount']))
 
         await cxt.say(self.codeblock("", '\n'.join(res)))
