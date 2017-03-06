@@ -56,11 +56,13 @@ class joseXtra(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
         self.docs = docsdict
-        self.msgcount = 0
+
+        self.msgcount_min = 0
+        self.msgcount_hour = 0
+        self.total_msg = 0
 
         self.best_msg_minute = 0
         self.best_msg_hour = 0
-        self.total_msg = 0
 
         # every minute, show josé's usage
         self.cbk_new("jxtra.msgcount", self.msg_count_minute, 60)
