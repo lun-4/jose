@@ -362,7 +362,12 @@ class JoseBot(jcommon.Extension):
 
     async def general_shutdown(self, cxt):
         jcoin = self.modules['jcoin']['inst']
+        josextra = self.modules['josextra']['inst']
+
         await jcoin.josecoin_save(cxt.message)
+        self.logger.info("%d messages in that sesison", josextra.total_msg)
+
+        # unload all shit and shutdown.
         await self.unload_all()
         await self.client.logout()
         self.logger.info("Logged out")
