@@ -100,6 +100,19 @@ class joseXtra(jaux.Auxiliar):
         self.msgcount_hour += 1
         self.total_msg += 1
 
+    async def c_msgstats(self, message, args, cxt):
+        '''`j!msgstats` - Show message rate statistics'''
+        res = []
+
+        res.append("In this current session:")
+        res.append("Current messages/minute rate: %d msg/min" % (self.msgcount_min))
+        res.append("Current messages/hour rate: %d msg/hour" % (self.msg_count_hour))
+        res.append("Best messages/minute rate: %d msg/min" % (self.best_msg_minute))
+        res.append("Best messages/hour rate: %d msg/hour" % (self.best_msg_hour))
+        res.append("Total messages received: %d" % (self.total_msg))
+
+        await cxt.say(self.codeblock("", '\n'.join(res)))
+
     async def c_xkcd(self, message, args, cxt):
         '''`j!xkcd` - latest xkcd
         `j!xkcd [num]` - xkcd number `num`
