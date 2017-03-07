@@ -28,6 +28,7 @@ PERCENT = 1 * 100
 HOUR = 60 * 60
 
 LOAN_TAX = 25 / PERCENT
+TAX_CONSTANT = decimal.Decimal(0.1)
 
 # 1%
 BASE_CHANCE = decimal.Decimal(1)
@@ -139,7 +140,7 @@ class JoseCoin(jaux.Auxiliar):
 
         account = self.jcoin.data[author_id]
         taxpaid = account['taxpaid']
-        increase = 0.1 * taxpaid
+        increase = TAX_CONSTANT * taxpaid
         probability += increase
 
         if author_id in self.stealdb['cdown']:
