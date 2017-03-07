@@ -607,7 +607,7 @@ use `j!lnick` for local nickname")
         if eval_cmd[0] == '`' and eval_cmd[-1] == '`':
             eval_cmd = eval_cmd[1:-1]
 
-        logger.info("%s[%s] is EVALing %r", message.author, \
+        self.logger.info("%s[%s] is EVALing %r", message.author, \
             message.author.id, eval_cmd)
 
         res = eval(eval_cmd)

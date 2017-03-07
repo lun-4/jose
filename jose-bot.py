@@ -232,9 +232,9 @@ async def on_message(message):
             return
         except Exception as e:
             jcommon.logger.error("Exception at %s, made by %s", method, \
-                message.author, exc_info=True)
+                str(message.author), exc_info=True)
             # signal user
-            await cxt.say("jose.py_err: ```%s```" % traceback.format_exc())
+            await cxt.say("jose.py_err: ```%s```", (traceback.format_exc(),))
 
         return
 
