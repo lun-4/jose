@@ -30,6 +30,9 @@ HOUR = 60 * 60
 LOAN_TAX = 25 / PERCENT
 TAX_CONSTANT = decimal.Decimal(0.1)
 
+# 40 minutes of cooldown between rewards
+REWARD_COOLDOWN = 1800
+
 # 1%
 BASE_CHANCE = decimal.Decimal(1)
 STEAL_CONSTANT = decimal.Decimal(0.42)
@@ -57,6 +60,7 @@ class JoseCoin(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
         self.counter = 0
+        self.env = {}
 
     def to_hours(self, seconds):
         if seconds is None:
@@ -136,6 +140,11 @@ class JoseCoin(jaux.Auxiliar):
         if author_id not in self.jcoin.data:
             return
 
+        now = time.time()
+        cooldown = self.reward_env.get(author_id, now + 100)
+        if now <= cooldown:
+            return
+
         # ugly solution, use all decimal
         probability = decimal.Decimal(jcommon.JC_PROBABILITY)
 
@@ -166,6 +175,7 @@ class JoseCoin(jaux.Auxiliar):
             res = self.jcoin.transfer(self.jcoin.jose_id, author_id, amount)
 
             if res[0]:
+                self.reward_env[author_id] = time.time() + REWARD_COOLDOWN
                 await self.client.add_reaction(message, '💰')
             else:
                 jcommon.logger.error("do_josecoin->jc->err: %s", res[1])
