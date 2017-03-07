@@ -231,7 +231,8 @@ async def on_message(message):
             await do_command(method, message, args, cxt, t_start, st)
             return
         except Exception as e:
-            jcommon.logger.error("Exception at %s", method, exc_info=True)
+            jcommon.logger.error("Exception at %s, made by %s", method, \
+                message.author, exc_info=True)
             # signal user
             await cxt.say("jose.py_err: ```%s```" % traceback.format_exc())
 
