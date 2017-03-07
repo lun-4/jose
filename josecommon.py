@@ -58,7 +58,7 @@ PIRU_ACTIVITY = .0000069
 
 # 1 percent
 JC_PROBABILITY = .01
-JC_REWARDS = [0, 0, 0.2, 0.6, 1, 1.2, 1.5]
+JC_REWARDS = [0, 0, 0, 0.6, 0.7, 1, 1.2, 1.5, 1.7]
 
 IMG_PRICE = 1
 LEARN_PRICE = 10
