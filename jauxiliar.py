@@ -55,7 +55,7 @@ class Auxiliar(jcommon.Extension):
         sorted_data = sorted(self.jcoin.data, key=lambda userid: \
             self.jcoin.data[userid]['amount'], reverse=True)
 
-        index = sorted_data.index[authorid]
+        index = sorted_data.index(authorid)
         if index <= 10:
             amount += (amount * RICH_TAX)
 
