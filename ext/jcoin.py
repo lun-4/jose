@@ -136,7 +136,8 @@ class JoseCoin(jaux.Auxiliar):
         if author_id not in self.jcoin.data:
             return
 
-        probability = jcommon.JC_PROBABILITY
+        # ugly solution, use all decimal
+        probability = decimal.Decimal(jcommon.JC_PROBABILITY)
 
         account = self.jcoin.data[author_id]
         taxpaid = account['taxpaid']
@@ -152,9 +153,9 @@ class JoseCoin(jaux.Auxiliar):
 
         # max 4.20%/message
         if probability > 0.0420:
-            probability = 0.0420
+            probability = decimal.Decimal(0.0420)
 
-        if random.random() > probability:
+        if decimal.Decimal(random.random()) > probability:
             return
 
         if message.channel.is_private:
@@ -174,16 +175,16 @@ class JoseCoin(jaux.Auxiliar):
         '''`j!jcprob` - show your JoséCoin probabilities'''
         author_id = message.author.id
 
-        probability = jcommon.JC_PROBABILITY
+        probability = decimal.Decimal(jcommon.JC_PROBABILITY)
 
         account = self.jcoin.data[author_id]
         taxpaid = account['taxpaid']
         increase = TAX_CONSTANT * taxpaid
-        probability += increase
+        probability += decimal.Decimal(increase)
 
         # max 4.20%/message
         if probability > 0.0420:
-            probability = 0.0420
+            probability = decimal.Decimal(0.0420)
 
         await cxt.say("`baseprob: %.2f%%/msg, tax_increase: %.2f%%, prob: %.2f%%/msg`", \
             (jcommon.JC_PROBABILITY * 100, increase * 100, probability * 100))
