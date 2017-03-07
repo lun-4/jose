@@ -141,7 +141,7 @@ class JoseCoin(jaux.Auxiliar):
 
         account = self.jcoin.data[author_id]
         taxpaid = account['taxpaid']
-        increase = TAX_CONSTANT * taxpaid
+        increase = (TAX_CONSTANT * taxpaid) / 100
         probability += decimal.Decimal(increase)
 
         if author_id in self.stealdb['cdown']:
@@ -179,7 +179,7 @@ class JoseCoin(jaux.Auxiliar):
 
         account = self.jcoin.data[author_id]
         taxpaid = account['taxpaid']
-        increase = TAX_CONSTANT * taxpaid
+        increase = (TAX_CONSTANT * taxpaid) / 100
         probability += decimal.Decimal(increase)
 
         # max 4.20%/message
