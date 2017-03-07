@@ -135,15 +135,23 @@ class JoseCoin(jaux.Auxiliar):
         if author_id not in self.jcoin.data:
             return
 
-        # TODO: higher probabilities for ppl that do taxes
         probability = jcommon.JC_PROBABILITY
+
+        account = self.jcoin.data[author_id]
+        taxpaid = account['taxpaid']
+        increase = 0.1 * taxpaid
+        probability += increase
+
         if author_id in self.stealdb['cdown']:
-            # get type of cooldown
-            # type 0 = arrest
-            # type 1 = get more stealing points
             arrest_data = self.stealdb['cdown'][author_id]
+            # type 0 = proper arrest
             if arrest_data[1] == 0:
-                probability /= 2
+                # remove all tax shit
+                probability = jcommon.JC_PROBABILITY / 2
+
+        # max 4.20%/message
+        if probability > 0.0420:
+            probability = 0.0420
 
         if random.random() > probability:
             return
