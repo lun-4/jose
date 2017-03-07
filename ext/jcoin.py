@@ -174,6 +174,8 @@ class JoseCoin(jaux.Auxiliar):
         '''`j!jcprob` - show your JoséCoin probabilities'''
         author_id = message.author.id
 
+        probability = jcommon.JC_PROBABILITY
+
         account = self.jcoin.data[author_id]
         taxpaid = account['taxpaid']
         increase = TAX_CONSTANT * taxpaid
