@@ -393,7 +393,7 @@ class JoseBot(jcommon.Extension):
         res = out.decode("utf-8")
         await cxt.say("`git pull`: ```%s```\n %s", (res, shutdown_msg))
 
-        await self.general_shutdown(self, cxt)
+        await self.general_shutdown(cxt)
 
     async def c_shutdown(self, message, args, cxt):
         '''`j!shutdown` - turns off josé'''
