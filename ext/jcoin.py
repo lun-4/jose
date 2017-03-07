@@ -141,7 +141,7 @@ class JoseCoin(jaux.Auxiliar):
         account = self.jcoin.data[author_id]
         taxpaid = account['taxpaid']
         increase = TAX_CONSTANT * taxpaid
-        probability += increase
+        probability += decimal.Decimal(increase)
 
         if author_id in self.stealdb['cdown']:
             arrest_data = self.stealdb['cdown'][author_id]
@@ -169,6 +169,21 @@ class JoseCoin(jaux.Auxiliar):
             else:
                 jcommon.logger.error("do_josecoin->jc->err: %s", res[1])
                 await cxt.say("jc->err: %s", (res[1],))
+
+    async def c_jcprob(self, message, args, cxt):
+        '''`j!jcprob` - show your JoséCoin probabilities'''
+
+        account = self.jcoin.data[author_id]
+        taxpaid = account['taxpaid']
+        increase = TAX_CONSTANT * taxpaid
+        probability += increase
+
+        # max 4.20%/message
+        if probability > 0.0420:
+            probability = 0.0420
+
+        await cxt.say("`baseprob: %.2f%%/msg, tax_increase: %.2f%%, prob: %.2f%%/msg`", \
+            (jcommon.JC_PROBABILITY, increase, probability))
 
     async def c_prices(self, message, args, cxt):
         '''`j!prices` - show price categories'''
