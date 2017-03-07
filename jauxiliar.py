@@ -48,7 +48,7 @@ class Auxiliar(jcommon.Extension):
         self.ensure_tbank(tbank_id)
 
         authorid = cxt.message.author.id
-        if authorid not in self.jcoin.data
+        if authorid not in self.jcoin.data:
             raise je.JoseCoinError("Account doesn't exist")
 
         # check if account is in top 10 most rich people
