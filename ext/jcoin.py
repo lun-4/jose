@@ -172,6 +172,7 @@ class JoseCoin(jaux.Auxiliar):
 
     async def c_jcprob(self, message, args, cxt):
         '''`j!jcprob` - show your JoséCoin probabilities'''
+        author_id = message.author.id
 
         account = self.jcoin.data[author_id]
         taxpaid = account['taxpaid']
@@ -183,7 +184,7 @@ class JoseCoin(jaux.Auxiliar):
             probability = 0.0420
 
         await cxt.say("`baseprob: %.2f%%/msg, tax_increase: %.2f%%, prob: %.2f%%/msg`", \
-            (jcommon.JC_PROBABILITY, increase, probability))
+            (jcommon.JC_PROBABILITY * 100, increase * 100, probability * 100))
 
     async def c_prices(self, message, args, cxt):
         '''`j!prices` - show price categories'''
