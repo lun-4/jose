@@ -12,6 +12,8 @@ import json
 import aiohttp
 import decimal
 
+RICH_TAX = decimal.Decimal(0.1)
+
 class Auxiliar(jcommon.Extension):
     '''
     Auxiliar - auxiliar functions and modules
@@ -41,11 +43,24 @@ class Auxiliar(jcommon.Extension):
     async def jcoin_pricing(self, cxt, amount):
         # taxing
         # ensure taxbank exists
+        amount = decimal.Decimal(amount)
         tbank_id = self.tbank_fmt(cxt)
         self.ensure_tbank(tbank_id)
 
+        authorid = cxt.message.author.id
+        if authorid not in self.jcoin.data
+            raise je.JoseCoinError("Account doesn't exist")
+
+        # check if account is in top 10 most rich people
+        sorted_data = sorted(self.jcoin.data, key=lambda userid: \
+            self.jcoin.data[userid]['amount'], reverse=True)
+
+        index = sorted_data.index[authorid]
+        if index <= 10:
+            amount += (amount * RICH_TAX)
+
         # make transfer
-        res = self.jcoin.transfer(cxt.message.author.id, tbank_id, amount)
+        res = self.jcoin.transfer(authorid, tbank_id, amount)
         if res[0]:
             return True
         else:
