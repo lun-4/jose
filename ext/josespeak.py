@@ -3,7 +3,6 @@
 import os
 import random
 import subprocess
-import json
 import time
 import asyncio
 import sys

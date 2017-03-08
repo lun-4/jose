@@ -17,7 +17,6 @@ import re
 import io
 import aiohttp
 import urllib
-import json
 import string
 
 RI_TABLE = {

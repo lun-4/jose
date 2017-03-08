@@ -6,7 +6,6 @@ import sys
 sys.path.append("..")
 import jauxiliar as jaux
 import josecommon as jcommon
-import joseerror as je
 
 def pip_freeze():
     out = subprocess.check_output('pip freeze', shell=True)
@@ -49,7 +48,7 @@ class JoseWatch(jaux.Auxiliar):
             r = pkgline.split('==')
             if len(r) != 2:
                 continue
-            pkgname, pkgversion = r[0], r[1]
+            pkgname = r[0]
 
             if pkgname in self.requirements:
                 cur_version = self.requirements[pkgname]

@@ -360,7 +360,7 @@ class Extension:
         '''
         self.client = _client
         self.loop = client.loop
-        self.logger = jcommon.logger.getChild('Extension')
+        self.logger = logger.getChild('Extension')
 
         self._callbacks = {}
         self._databases = {}
@@ -433,14 +433,13 @@ class Extension:
         for database_id in self._databases:
             self.jsondb_save(database_id)
 
-    def jsondb(database_id, **kwargs):
+    def jsondb(self, database_id, **kwargs):
         if database_id in self._databases:
             return None
 
         database_path = kwargs.get('path')
         attribute = kwargs.get('watch', database_id)
         default_file = kwargs.get('default', '{}')
-        cooldown_sec = kwargs.get('cooldown', None)
 
         self._databases[database_id] = {
             'attr': attribute,
