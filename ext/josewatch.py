@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import discord
 import subprocess
 import sys
 sys.path.append("..")
@@ -45,7 +46,10 @@ class JoseWatch(jaux.Auxiliar):
         res = []
 
         for pkgline in packages:
-            pkgname, pkgversion = pkgline.split('==')
+            r = pkgline.split('==')
+            if len(r) != 2:
+                continue
+            pkgname, pkgversion = r[0], r[1]
 
             if pkgname in self.requirements:
                 cur_version = self.requirements[pkgname]
@@ -61,7 +65,7 @@ class JoseWatch(jaux.Auxiliar):
                 if new_version != cur_version:
                     # !!!!!
                     res.append(" * `%r` needs update from %s to %s" % \
-                        (pkgname, curversion, pkgversion))
+                        (pkgname, cur_version, new_version))
 
         await self.say_results(res)
         return res
