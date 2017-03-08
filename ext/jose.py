@@ -130,20 +130,6 @@ class JoseBot(jcommon.Extension):
 
         return True, ''
 
-    def load_gext(self, inst, n):
-        self.logger.info("Loading gext %s", n)
-        methods = (method for method in dir(inst) if callable(getattr(inst, method)))
-
-        self.modules[n] = {'inst': inst, 'methods': [], 'handlers': [], 'class': ''}
-
-        for method in methods:
-            if method.startswith('c_'):
-                setattr(self, method, getattr(inst, method))
-                self.modules[n]['methods'].append(method)
-
-        self.logger.info("Loaded gext %s", n)
-        return True
-
     async def get_module(self, name):
         if name in self.modules:
             # Already loaded module, unload it
@@ -373,14 +359,14 @@ class JoseBot(jcommon.Extension):
 
     async def turnoff(self, cxt):
         self.logger.info("Turning Off from %s", str(cxt.message.author))
-        josextra = self.modules['josextra']['inst']
 
+        josextra = self.modules['josextra']['inst']
         await cxt.say(":wave: My best showdown was %d msgs/minute, %d msgs/hour, recv %d messages", \
             (josextra.best_msg_minute, josextra.best_msg_hour, josextra.total_msg))
         await self.general_shutdown(cxt)
 
     async def update(self, cxt):
-        self.logger.info("Do update from %s", str(cxt.message.author))
+        self.logger.info("Update from %s", str(cxt.message.author))
 
         josextra = self.modules['josextra']['inst']
         shutdown_msg = (":wave: My best showdown was %d msgs/minute, %d msgs/hour, recv %d messages" % \
@@ -398,7 +384,7 @@ class JoseBot(jcommon.Extension):
         await self.sec_auth(self.turnoff, cxt)
 
     async def c_update(self, message, args, cxt):
-        '''`j!update` - Updates josé to latest from github'''
+        '''`j!update` - Pulls from github and shutsdown'''
         await self.sec_auth(self.update, cxt)
 
     async def c_shell(self, message, args, cxt):
@@ -417,10 +403,10 @@ class JoseBot(jcommon.Extension):
         '''`j!ping` - pong'''
         t_init = time.time()
         t_cmdprocess = (time.time() - cxt.t_creation) * 1000
-        pong = await cxt.say("pong! took **%.2fms** to process the command", (t_cmdprocess,))
+        pong = await cxt.say("Pong! `cmd_process`: **%.2fms**", (t_cmdprocess,))
         t_end = time.time()
         delta = t_end - t_init
-        await self.client.edit_message(pong, pong.content + ", **%.2fms** to send it" % (delta * 1000))
+        await self.client.edit_message(pong, pong.content + ", `send_message`: **%.2fms**" % (delta * 1000))
 
     async def c_rand(self, message, args, cxt):
         '''`j!rand min max` - gera um número aleatório no intervalo [min, max]'''
