@@ -29,7 +29,7 @@ class JoseWatch(jaux.Auxiliar):
             pkgname, pkgversion = r[0], r[1]
             self.requirements[pkgname] = pkgversion
 
-        self.cbk_new('jwatch.updates', self.checkupdates, 3600)
+        self.cbk_new('jwatch.updates', self.checkupdates, 21600)
 
     async def ext_load(self):
         return True, ''
