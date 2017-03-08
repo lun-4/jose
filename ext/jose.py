@@ -15,8 +15,6 @@ sys.path.append("..")
 import josecommon as jcommon
 import joseerror as je
 
-jose_debug = jcommon.jose_debug
-
 class JoseBot(jcommon.Extension):
     def __init__(self, _client):
         jcommon.Extension.__init__(self, _client)
@@ -529,35 +527,7 @@ use `j!lnick` for local nickname")
         await self.client.change_nickname(m, nick)
         await cxt.say("Nickname changed to `%r`", (nick,))
 
-    async def c_distatus(self, message, args, cxt):
-        '''`j!distatus` - mostra alguns dados para mostrar se o Discord está funcionando corretamente'''
-        await self.is_admin(message.author.id)
-
-        host = "discordapp.com"
-
-        ping = subprocess.Popen(
-            ["ping", "-c", "6", host],
-            stdout = subprocess.PIPE,
-            stderr = subprocess.PIPE
-        )
-
-        out, error = ping.communicate()
-        matcher = re.compile("rtt min/avg/max/mdev = (\d+.\d+)/(\d+.\d+)/(\d+.\d+)/(\d+.\d+)")
-        rtt = matcher.search(out.decode('utf-8')).groups()
-
-        fmt = 'resultados de ping para `%s` min `%sms` avg `%sms` max `%sms` mdev `%sms`\n%s'
-        looks_like = ''
-        if float(rtt[1]) > 100:
-            looks_like = 'Parece que algo tá rodando ruim nos servidores, cheque http://status.discordapp.com'
-        elif float(rtt[2]) > 150:
-            looks_like = 'Alguma coisa deve ter ocorrido no meio dos pings, tente denovo'
-        else:
-            looks_like = 'Tudo bem... eu acho'
-
-        await cxt.say(fmt % (host, rtt[0], rtt[1], rtt[2], rtt[3], looks_like))
-
     async def c_version(self, message, args, cxt):
-        '''`j!version` - mostra a versão do jose'''
         pyver = '%d.%d.%d' % (sys.version_info[:3])
         head_id = subprocess.check_output("git rev-parse --short HEAD", \
             shell=True).decode('utf-8')
@@ -566,7 +536,7 @@ use `j!lnick` for local nickname")
             head_id, pyver, discord.__version__))
 
     async def c_jose_add(self, message, args, cxt):
-        await cxt.say("José pode ser adicionado para outro servidor usando este link:\n```%s```", (jcommon.OAUTH_URL,))
+        await cxt.say("José Add URL:\n```%s```", (jcommon.OAUTH_URL,))
 
     async def c_clist(self, message, args, cxt):
         '''`j!clist module` - mostra todos os comandos de tal módulo'''
@@ -636,7 +606,7 @@ use `j!lnick` for local nickname")
 
         jcommon.ADMIN_IDS.append(userid)
         if userid in jcommon.ADMIN_IDS:
-            await cxt.say("Added `%r` as temporary admin!", (userid,))
+            await cxt.say(":cop: Added `%r` as temporary admin!", (userid,))
         else:
             await cxt.say(":poop: Error adding user as temporary admin")
 
@@ -668,7 +638,7 @@ sure about that, pretty admin? (y/n)", (announcement,))
                         await self.client.send_message(channel, announcement)
                         chcount += 1
                 svcount += 1
-            await cxt.say("Sent announcement to \
+            await cxt.say(":cop: Sent announcement to \
 %d servers, %d channels", (svcount, chcount))
         else:
             await cxt.say("jk I'm not gonna do what you \
@@ -677,7 +647,7 @@ don't want (unless I'm skynet)")
     async def c_gcollect(self, message, args, cxt):
         await self.is_admin(message.author.id)
         obj = gc.collect()
-        await cxt.say("Collected %d objects!", (obj,))
+        await cxt.say(":cop: Collected %d objects!", (obj,))
 
     async def c_listev(self, message, args, cxt):
         res = []
