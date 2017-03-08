@@ -73,12 +73,12 @@ class JoseWatch(jaux.Auxiliar):
         if len(res) <= 0:
             return
 
-        res.insert(0, 'josebox Python packages needing updates:')
-
         jose_dev_server = [server for server in self.client.servers \
             if server.id == jcommon.JOSE_DEV_SERVER_ID][0]
 
         channel = discord.utils.get(jose_dev_server.channels, name='chat')
+
+        res.insert(0, ':alarm_clock: Luna, you have package updates :alarm_clock:')
 
         await self.client.send_message(channel, '\n'.join(res))
 
@@ -88,7 +88,7 @@ class JoseWatch(jaux.Auxiliar):
 
         res = await self.checkupdates()
 
-        if len(res) < 0:
+        if len(res) <= 0:
             await cxt.say("`No updates found.`")
 
         return
