@@ -27,7 +27,7 @@ def main(args):
 
     msgs = 0
     with open(resfile, 'w') as sqlfile:
-        messages = server_messages(serverid, 10000)
+        messages = server_messages(serverid)
 
         for message in messages:
             sqlfile.write("INSERT INTO markovdb (serverid, message) VALUES (%s, %s);\n" % \
