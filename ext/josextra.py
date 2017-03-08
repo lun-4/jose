@@ -73,6 +73,7 @@ class joseXtra(jaux.Auxiliar):
 
     async def ext_unload(self):
         self.cbk_remove('jxtra.msgcount')
+        self.cbk_remove('jxtra.msgcount_hour')
         return True, ''
 
     async def msg_count_minute(self):
