@@ -6,7 +6,6 @@ random = SystemRandom()
 import sys
 import base64
 import subprocess
-import re
 import importlib
 import copy
 import gc
