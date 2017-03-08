@@ -360,9 +360,13 @@ class Extension:
         '''
         self.client = _client
         self.loop = client.loop
-        self.logger = logger
+        self.logger = jcommon.logger.getChild('Extension')
+
         self._callbacks = {}
+        self._databases = {}
         self.dbapi = DatabaseAPI(self.client)
+
+        self.cbk_new('jsondb:save_all', self.jsondb_save_all, 1200)
 
     async def rolecheck(self, cxt, correct_role):
         roles = [role.name == correct_role for role in cxt.message.author.roles]
@@ -422,6 +426,13 @@ class Extension:
         del self._callbacks[callback_id]
         logger.info("Callback %s removed", callback_id)
 
+    async def jsondb_save_all(self):
+        if len(self._databases) <= 0:
+            return
+
+        for database_id in self._databases:
+            self.jsondb_save(database_id)
+
     def jsondb(database_id, **kwargs):
         if database_id in self._databases:
             return None
@@ -429,6 +440,7 @@ class Extension:
         database_path = kwargs.get('path')
         attribute = kwargs.get('watch', database_id)
         default_file = kwargs.get('default', '{}')
+        cooldown_sec = kwargs.get('cooldown', None)
 
         self._databases[database_id] = {
             'attr': attribute,
@@ -444,7 +456,7 @@ class Extension:
 
         setattr(self, attribute, json.load(open(database_path, 'r')))
 
-    def jsondb_save(database_id):
+    def jsondb_save(self, database_id):
         if database_id not in self._databases:
             return None
 
