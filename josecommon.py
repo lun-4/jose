@@ -519,6 +519,7 @@ def get_defaultcdb():
         # TODO: use them????
         'imgchannel': None,
         'prefix': JOSE_PREFIX,
+        'speak_prob': 0,
     }
 
 async def configdb_set(sid, key, value):
@@ -562,6 +563,12 @@ async def save_configdb():
 
     return True, ''
 
+def cdb_ensure(serverid, entry, default):
+    cdb = configdb[serverid]
+
+    if entry not in cdb:
+        cdb[entry] = default
+
 async def load_configdb():
     global configdb
     if not os.path.isfile(CONFIGDB_PATH):
@@ -574,13 +581,10 @@ async def load_configdb():
     logger.info("load:config")
     try:
         configdb = json.load(open(CONFIGDB_PATH, 'r'))
-        # check sanity
+
+        # ensure new configdb features
         for serverid in configdb:
-            protocdb = configdb[serverid]
-            if isinstance(protocdb, str): # old langdb
-                configdb[serverid] = get_defaultcdb()
-                configdb[serverid]['language'] = protocdb
-                sanity_save = True
+            cdb_ensure(serverid, 'speak_prob', 0)
 
         if sanity_save:
             await save_configdb()

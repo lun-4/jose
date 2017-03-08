@@ -66,6 +66,31 @@ class JoseLanguage(jaux.Auxiliar):
         else:
             await cxt.say("No changes to botblock")
 
+    async def c_jsprob(self, message, args, cxt):
+        '''`j!jsprob prob` - Set JoseSpeak probability of responding to random messages, default 0, maximum 3'''
+
+        if len(args) < 2:
+            await cxt.say(self.c_setprob.__doc__)
+            return
+
+        try:
+            prob = decimal.Decimal(args[1])
+        except:
+            await cxt.say("Error parsing `prob`")
+            return
+
+        if prob < 0:
+            await cxt.say("`prob` can't be less than 0%")
+
+        if prob > 3:
+            await cxt.say("`prob` can't be higher than 3%")
+
+        done = await jcommon.configdb_set(sid, 'speak_prob', prob / 100)
+        if not done:
+            await cxt.say("Error changing `prob`.")
+        else:
+            await cxt.say("`josespeak` probability is now %.2f%%", (prob,))
+
     async def c_language(self, message, args, cxt):
         '''`j!language lang` - sets language for a server(use `!listlang` for available languages)'''
         if message.server is None:
