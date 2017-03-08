@@ -76,22 +76,18 @@ class joseXtra(jaux.Auxiliar):
         return True, ''
 
     async def msg_count_minute(self):
-        msgcount_min = self.msgcount_min
-
-        if msgcount_min > 0:
-            if msgcount_min > self.best_msg_minute:
-                self.best_msg_minute = msgcount_min
-            self.logger.info("Received %d messages/minute", msgcount_min)
+        if self.msgcount_min > 0:
+            if self.msgcount_min > self.best_msg_minute:
+                self.best_msg_minute = self.msgcount_min
+            self.logger.info("Received %d messages/minute", self.msgcount_min)
 
         self.msgcount_min = 0
 
     async def msg_count_hour(self):
-        msgcount_hour = self.msgcount_hour
-
-        if msgcount_hour > 0:
-            if msgcount_hour > self.best_msg_hour:
-                self.best_msg_hour = msgcount_hour
-            self.logger.info("Received %d messages/hour", msgcount_hour)
+        if self.msgcount_hour > 0:
+            if self.msgcount_hour > self.best_msg_hour:
+                self.best_msg_hour = self.msgcount_hour
+            self.logger.info("Received %d messages/hour", self.msgcount_hour)
 
         self.msgcount_hour = 0
 
