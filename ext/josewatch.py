@@ -74,22 +74,18 @@ class JoseWatch(jaux.Auxiliar):
         if len(res) <= 0:
             return
 
-        em = discord.Embed(title='NEW UPDATES')
-        for string in res:
-            em.add_field(name='', value='{}'.format(string))
-
-        em.set_footer(text="Total of {} updates".format(len(res)))
-
         jose_dev_server = [server for server in self.client.servers \
             if server.id == jcommon.JOSE_DEV_SERVER_ID][0]
 
         channel = discord.utils.get(jose_dev_server.channels, name='chat')
 
-        await self.client.send_message(channel, embed=em)
+        await self.client.send_message(channel, '\n'.join(res))
 
     async def c_checkpkgs(self, message, args, cxt):
         await self.is_admin(cxt.message.author.id)
         res = await self.checkupdates()
+
+        await cxt.send_typing()
 
         if len(res) < 0:
             await cxt.say("`No updates found.`")
