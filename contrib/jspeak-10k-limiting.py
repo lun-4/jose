@@ -37,7 +37,7 @@ def main():
             messages = server_messages(serverid, 10000)
 
             for message in messages:
-                sqlfile.write("INSERT INTO markovdb (serverid, message) VALUES (%s, %s)" % \
+                sqlfile.write("INSERT INTO markovdb (serverid, message) VALUES (%s, %s);\n" % \
                     (serverid, json.dumps(message)))
                 msgs += 1
 
