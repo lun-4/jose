@@ -74,10 +74,8 @@ class JoseWatch(jaux.Auxiliar):
         if len(res) <= 0:
             return
 
-        res_str = '\n'.join(res)
-
         em = discord.Embed(title='NEW UPDATES')
-        for string in res_str:
+        for string in res:
             em.add_field(name='', value='{}'.format(string))
 
         em.set_footer(text="Total of {} updates".format(len(res)))
