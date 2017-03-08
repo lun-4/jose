@@ -104,8 +104,8 @@ class JoseSpeak(jcommon.Extension):
         self.messages = {}
         self.text_lengths = {}
         self.msgcount = {}
-        self.txcleaned = -1
 
+        self.txcleaned = -1
         self.last_texter_mcount = -1
         self.last_texter_time = -1
 
@@ -127,16 +127,14 @@ class JoseSpeak(jcommon.Extension):
 
     async def ext_load(self):
         try:
-            self.text_generators = {}
-            self.text_lengths = {}
 
             # make generators
             self.cult_generator = await make_texter('db/jose-data.txt', 1)
             self.global_generator = await make_texter('db/zelao.txt', 1)
 
             # load things in files
-            self.wlengths = json.load(open(self.db_length_path, 'r'))
-            self.messages = json.load(open(self.db_msg_path, 'r'))
+            self.jsondb('jspk_wlengths', path=self.db_length_path, attribute='wlengths')
+            self.jsondb('jspk_messages', path=self.db_msg_path, attribute='messages')
 
             return True, ''
         except Exception as e:
@@ -222,8 +220,7 @@ class JoseSpeak(jcommon.Extension):
 
     async def save_databases(self):
         self.logger.info("savedb:speak")
-        json.dump(self.wlengths, open(self.db_length_path, 'w'))
-        json.dump(self.messages, open(self.db_msg_path, 'w'))
+        await self.jsondb_save_all()
 
     async def c_savedb(self, message, args, cxt):
         """`j!savedb` - saves all available databases(autosaves every 3 minutes)"""
