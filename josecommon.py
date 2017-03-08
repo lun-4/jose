@@ -422,6 +422,41 @@ class Extension:
         del self._callbacks[callback_id]
         logger.info("Callback %s removed", callback_id)
 
+    def jsondb(database_id, **kwargs):
+        if database_id in self._databases:
+            return None
+
+        database_path = kwargs.get('path')
+        attribute = kwargs.get('watch', database_id)
+        default_file = kwargs.get('default', '{}')
+
+        self._databases[database_id] = {
+            'attr': attribute,
+            'path': database_path,
+            'default': default_file,
+        }
+
+        setattr(self, attribute, {})
+
+        if not os.path.isfile(database_path):
+            with open(database_path, 'w') as dbfile:
+                dbfile.write(default_file)
+
+        setattr(self, attribute, json.load(open(database_path, 'r')))
+
+    def jsondb_save(database_id):
+        if database_id not in self._databases:
+            return None
+
+        database = self._databases[database_id]
+        attribute = database['attr']
+        database_path = database['path']
+
+        try:
+            json.dump(getattr(self, attribute), open(database_path, 'w'))
+        except:
+            return False
+
 def parse_command(message):
     if not isinstance(message, str):
         message = message.content
