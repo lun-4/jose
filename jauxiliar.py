@@ -93,3 +93,9 @@ class Auxiliar(jcommon.Extension):
         content = await self.http_get(url, **kwargs)
         data = await self.json_load(content)
         return data
+
+    def server_from_name(self, name):
+        return [s for s in self.client.servers if s.name == name]
+
+    def member_from_name(self, name):
+        return [m for m in self.client.get_all_members() if m.name == name]
