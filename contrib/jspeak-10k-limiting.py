@@ -25,7 +25,7 @@ def get_all_serverids():
     server_ids = do_stmt('SELECT serverid FROM markovdb')
     return set(server_ids)
 
-def main(args):
+def main():
     serverids = get_all_serverids()
     amnt = do_stmt("SELECT COUNT(*) FROM markovdb")
 
@@ -37,10 +37,11 @@ def main(args):
             messages = server_messages(serverid, 10000)
 
             for message in messages:
-                sqlfile.write("INSERT INTO markovdb (serverid, message) VALUES (%s, %s)" % (serverid, json.dumps(message)))
+                sqlfile.write("INSERT INTO markovdb (serverid, message) VALUES (%s, %s)" % \
+                    (serverid, json.dumps(message)))
                 msgs += 1
 
     print("Done! from %d to %d messages." % (amnt, msgs))
 
 if __name__ == '__main__':
-    sys.exit(main(sys.argv))
+    sys.exit(main())
