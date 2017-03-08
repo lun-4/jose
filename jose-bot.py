@@ -51,6 +51,7 @@ def load_all_modules():
     load_module('josespeak', 'JoseSpeak')
     load_module('josestats', 'JoseStats')
     load_module('josemagicword', 'JoseMagicWord')
+    load_module('josewatch', 'JoseWatch')
 
     # fun stuff
     load_module('josememes', 'JoseMemes')

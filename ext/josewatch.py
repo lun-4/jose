@@ -8,9 +8,8 @@ import josecommon as jcommon
 import joseerror as je
 
 def pip_freeze():
-    p = subprocess.Popen(['pip', 'freeze'])
-    out, err = p.communicate()
-    return out, err
+    out = subprocess.check_output('pip freeze', shell=True)
+    return out
 
 class JoseWatch(jaux.Auxiliar):
     def __init__(self, cl):
@@ -23,7 +22,10 @@ class JoseWatch(jaux.Auxiliar):
             reqlist = (reqfile.read()).split('\n')
 
         for pkg in reqlist:
-            pkgname, pkgversion = pkg.split('==')
+            r = pkg.split('==')
+            if len(r) != 2:
+                continue
+            pkgname, pkgversion = r[0], r[1]
             self.requirements[pkgname] = pkgversion
 
         self.cbk_new('jwatch.updates', self.checkupdates, 3600)
@@ -36,7 +38,8 @@ class JoseWatch(jaux.Auxiliar):
 
     async def checkupdates(self):
         future_pip = self.loop.run_in_executor(None, pip_freeze)
-        out, err = await future_pip
+        out = await future_pip
+        out = out.decode('utf-8')
         packages = out.split('\n')
 
         res = []
@@ -45,8 +48,17 @@ class JoseWatch(jaux.Auxiliar):
             pkgname, pkgversion = pkgline.split('==')
 
             if pkgname in self.requirements:
-                curversion = self.requirements[pkgname]
-                if pkgversion != curversion:
+                cur_version = self.requirements[pkgname]
+
+                # :^)
+                if pkgname == 'discord.py[voice]':
+                    pḱgname = 'discord.py'
+
+                pkgdata = await self.json_from_url('http://pypi.python.org/pypi/{}/json'.format\
+                    (pkgname))
+
+                new_version = pkgdata['info']['version']
+                if new_version != cur_version:
                     # !!!!!
                     res.append(" * `%r` needs update from %s to %s" % \
                         (pkgname, curversion, pkgversion))
