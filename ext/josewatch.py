@@ -74,6 +74,8 @@ class JoseWatch(jaux.Auxiliar):
         if len(res) <= 0:
             return
 
+        res.insert(0, 'josebox Python packages needing updates:')
+
         jose_dev_server = [server for server in self.client.servers \
             if server.id == jcommon.JOSE_DEV_SERVER_ID][0]
 
@@ -83,9 +85,9 @@ class JoseWatch(jaux.Auxiliar):
 
     async def c_checkpkgs(self, message, args, cxt):
         await self.is_admin(cxt.message.author.id)
-        res = await self.checkupdates()
-
         await cxt.send_typing()
+
+        res = await self.checkupdates()
 
         if len(res) < 0:
             await cxt.say("`No updates found.`")
