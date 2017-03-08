@@ -47,17 +47,13 @@ class JoseStats(jaux.Auxiliar):
 
     async def savedb(self):
         self.logger.info("savedb:stats")
+        await self.jsondb_save_all()
         json.dump(self.statistics, open(jcommon.STAT_DATABASE_PATH, 'w'))
 
     async def ext_load(self):
         try:
-            self.statistics = {}
-            if not os.path.isfile(jcommon.STAT_DATABASE_PATH):
-                # recreate
-                with open(jcommon.STAT_DATABASE_PATH, 'w') as statsfile:
-                    statsfile.write(DEFAULT_STATS_FILE)
-
-            self.statistics = json.load(open(jcommon.STAT_DATABASE_PATH, 'r'))
+            self.jsondb('statistics', path=jcommon.STAT_DATABASE_PATH, \
+                default=DEFAULT_STATS_FILE)
 
             # make sure i'm making sane things
             # also make the checks in ext_load (instead of any_message)
