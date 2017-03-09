@@ -268,18 +268,18 @@ class JoseGambling(jaux.Auxiliar):
         }
 
         countdown = 3
-        countdown_msg = await cxt.say("First to say `\"bang\"` wins! %d...", (countdown,))
-        await asyncio.sleep(1500)
+        countdown_msg = await cxt.say("First to send a message wins! %d...", (countdown,))
+        await asyncio.sleep(1.5)
 
         for i in reversed(range(1, 3)):
             if i == 0:
                 break
 
             await self.client.edit_message(countdown_msg, "%d..." % (countdown,))
-            await asyncio.sleep(1000)
+            await asyncio.sleep(1)
             countdown -= 1
 
-        await asyncio.sleep(random.randint(2 * 1000, 7 * 1000))
+        await asyncio.sleep(random.randint(2, 7))
         await cxt.say("**GO!**")
 
         def duel_check(msg):
