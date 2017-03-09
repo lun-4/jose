@@ -27,6 +27,7 @@ class JoseGambling(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
         self.sessions = {}
+        self.duels = {}
 
     async def ext_load(self):
         return True, ''
@@ -205,3 +206,94 @@ class JoseGambling(jaux.Auxiliar):
 
     async def c_jcrhelp(self, message, args, cxt):
         await cxt.say(JCROULETTE_HELP_TEXT)
+
+    async def c_duel(self, message, args, cxt):
+        '''`j!duel @someone amount` - Duel'''
+
+        if len(args) < 3:
+            await cxt.say(self.c_duel.__doc__)
+            return
+
+        if message.author.id not in self.jcoin.data:
+            await cxt.say("You don't have a JoséCoin Account")
+            return
+
+        if challenger in self.duels:
+            await cxt.say("You are already in a duel.")
+            return
+
+        challenger = message.author.id
+
+        try:
+            challenged = await jcommon.parse_id(args[1])
+        except:
+            await cxt.say("Error parsing `duelist`")
+            return
+
+        try:
+            amount = decimal.Decimal(args[2])
+        except:
+            await cxt.say("Error parsing `amount`")
+            return
+
+        if challenged not in self.jcoin.data:
+            await cxt.say("Challenged person doesn't have a JoséCoin Account")
+            return
+
+        await cxt.say("<@%s> you got challenged for a duel :gun: by <@%s> total of %.2fJC, accept it? (y/n)", \
+            (challenged, challenger, amount))
+
+        msg = await self.client.wait_for_message(timeout=5, author=challenged, \
+            channel=message.channel)
+
+        if msg is None or ("n" in msg.content):
+            await cxt.say("lel")
+            return
+
+        # make transfer
+        res = self.jcoin.transfer(challenger, self.jcoin.jose_id, amount)
+        if not res[0]:
+            await cxt.say("jc->err: `%r`", (res[1],))
+            return
+
+        await self.jcoin.raw_save()
+
+        self.duels[challenger] = {
+            'other': challenged,
+            'amount': amount
+        }
+
+        countdown = 3
+        countdown_msg = await cxt.say("First to say `\"bang\"` wins! %d...", (countdown,))
+
+        for i in reversed(range(0)):
+            if i == 0:
+                break
+            await self.client.edit_message(countdown_msg, "%d..." % (countdown,))
+            await asyncio.sleep(1000)
+
+        await asyncio.sleep(random.randint(2 * 1000, 7 * 1000))
+        await cxt.say("**GO!**")
+
+        def duel_check(msg):
+            # ugly, but works.
+            return (msg.channel.id == message.channel.id) and \
+                (msg.author.id in [message.author.id, challenged])
+
+        duelmsg = await self.client.wait_for_message(timeout=5, check=duel_check)
+
+        if duelmsg is None:
+            await cxt.say("You guys suck.")
+            del self.duels[challenger]
+            return
+
+        winner = duelmsg.author.id
+        res = await self.jcoin.transfer(self.jcoin.jose_id, winne, amount)
+        if not res[0]:
+            await cxt.say(":warning: Something went wrong. `%s`", (res[1],))
+            del self.duels[challenger]
+            return
+
+        await cxt.say("<@%s> won %.2fJC\n`%s`")
+        del self.duels[challenger]
+        return
