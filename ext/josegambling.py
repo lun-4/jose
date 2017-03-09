@@ -238,7 +238,7 @@ class JoseGambling(jaux.Auxiliar):
             await cxt.say("Error parsing `amount`")
             return
 
-        if amount >= 3:
+        if amount > 3:
             await cxt.say("Can't duel with more than 3 JoséCoins.")
             return
 
