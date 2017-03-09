@@ -242,13 +242,15 @@ class JoseGambling(jaux.Auxiliar):
             await cxt.say("Challenged person doesn't have a JoséCoin Account")
             return
 
+        challenged_user = await self.client.get_user_info(challenged)
+
         await cxt.say("<@%s> you got challenged for a duel :gun: by <@%s> total of %.2fJC, accept it? (y/n)", \
             (challenged, challenger, amount))
 
-        msg = await self.client.wait_for_message(timeout=5, author=challenged, \
+        msg = await self.client.wait_for_message(timeout=6, author=challenged_user, \
             channel=message.channel)
 
-        if msg is None or ("n" in msg.content):
+        if msg is None or (msg.content != "y"):
             await cxt.say("lel")
             return
 
