@@ -75,7 +75,7 @@ class JoseLanguage(jaux.Auxiliar):
             return
 
         try:
-            prob = decimal.Decimal(args[1])
+            prob = float(args[1])
         except:
             await cxt.say("Error parsing `prob`")
             return
