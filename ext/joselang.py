@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+import decimal
 
 sys.path.append("..")
 import jauxiliar as jaux
@@ -70,7 +71,7 @@ class JoseLanguage(jaux.Auxiliar):
         '''`j!jsprob prob` - Set JoseSpeak probability of responding to random messages, default 0, maximum 3'''
 
         if len(args) < 2:
-            await cxt.say(self.c_setprob.__doc__)
+            await cxt.say(self.c_jsprob.__doc__)
             return
 
         try:
