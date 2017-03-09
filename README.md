@@ -38,7 +38,12 @@ OWM_APIKEY = 'OpenWeatherMap API Key'
 MAGICWORD_PATH = 'db/magicwords.json'
 ```
 
-Using:
+Run Redis somewhere:
+```
+redis-server jose/redis.conf
+```
+
+Starting:
 ```
 python3 jose-bot.py
 ```

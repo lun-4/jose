@@ -41,6 +41,11 @@ MAGICWORD_PATH = 'db/magicwords.json'
 
 Recomendável ter um `jose-data.txt` com sentenças do jeito que você quiser, o josé irá falar elas com o comando `!falar`
 
+Inicie o servidor Redis:
+```
+redis-server jose/redis.conf
+```
+
 Rodando:
 ```
 python3 jose-bot.py
