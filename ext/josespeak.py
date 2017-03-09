@@ -323,7 +323,19 @@ class JoseSpeak(jcommon.Extension):
                 await self.dbapi.do("INSERT INTO markovdb (serverid, message) \
                     VALUES (?, ?)", (sid, filtered_line))
 
-        if random.random() < 0.03 or cxt.env.get('flag', False):
+
+        probability = await jcommon.configdb_get(sid, 'speak_prob')
+        if probability is None:
+            self.logger.error("[WTF] probability = None for server %s", sid)
+            return
+
+        random_chance = False
+        if probability > 0:
+            # don't spend random calls when probability is 0
+            if random.random() < probability:
+                random_chance = True
+
+        if random_chance or cxt.env.get('flag', False):
             await cxt.send_typing()
 
             # ensure the server already has its texter loaded up
