@@ -66,7 +66,7 @@ async def parse(text):
         insts.append(inst)
     return insts
 
-async def is_numeric(lit):
+def is_numeric(lit):
     'Return value of numeric literal string or ValueError exception'
 
     # Handle '0'
