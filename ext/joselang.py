@@ -86,7 +86,7 @@ class JoseLanguage(jaux.Auxiliar):
         if prob > 3:
             await cxt.say("`prob` can't be higher than 3%")
 
-        done = await jcommon.configdb_set(sid, 'speak_prob', prob / 100)
+        done = await jcommon.configdb_set(message.server.id, 'speak_prob', prob / 100)
         if not done:
             await cxt.say("Error changing `prob`.")
         else:
