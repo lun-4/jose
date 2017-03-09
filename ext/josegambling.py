@@ -238,6 +238,10 @@ class JoseGambling(jaux.Auxiliar):
             await cxt.say("Error parsing `amount`")
             return
 
+        if amount >= 3:
+            await cxt.say("Can't duel with more than 3 JoséCoins.")
+            return
+
         if challenged not in self.jcoin.data:
             await cxt.say("Challenged person doesn't have a JoséCoin Account")
             return
@@ -247,15 +251,11 @@ class JoseGambling(jaux.Auxiliar):
         await cxt.say("<@%s> you got challenged for a duel :gun: by <@%s> total of %.2fJC, accept it? (y/n)", \
             (challenged, challenger, amount))
 
-        msg = await self.client.wait_for_message(timeout=6, author=challenged_user, \
+        msg = await self.client.wait_for_message(timeout=10, author=challenged_user, \
             channel=message.channel)
 
         if msg is None or (msg.content != "y"):
-            await cxt.say("lel")
-            return
-
-        if amount >= 3:
-            await cxt.say("Can't duel with more than 3 JoséCoins.")
+            await cxt.say("Timeout reached or the challenged person didn't say lowercase y.")
             return
 
         await self.jcoin.raw_save()
