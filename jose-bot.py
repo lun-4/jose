@@ -346,7 +346,6 @@ async def main_task():
     global client
     startupdelta = time.time() - jose.start_time
     jcommon.logger.info("--- STARTUP TOOK %.2f SECONDS ---", startupdelta)
-    jcommon.logger.info("Starting Client")
     if jose.off_mode:
         msgid = random.getrandbits(80)
         userid = str(random.getrandbits(80))
@@ -378,7 +377,14 @@ async def main_task():
             msgid += 1
             await on_message(message)
     else:
-        await client.start(jconfig.discord_token)
+        try:
+            jcommon.logger.info("[start] discord client")
+            await client.start(jconfig.discord_token)
+            jcommon.logger.info("[exit] discord client")
+        except discord.GatewayNotFound:
+            jcommon.logger.error("Received GatewayNotFound from discord.")
+        except Exception as err:
+            jcommon.logger.error("Received %r from client.start", err, exc_info=True)
 
 def main(args):
     try:
@@ -402,27 +408,31 @@ def main(args):
 
     loop = asyncio.get_event_loop()
     try:
+        jcommon.logger.info("[start] main_task")
         loop.run_until_complete(main_task())
+        jcommon.logger.info("[exit] main_task")
     except KeyboardInterrupt:
         jcommon.logger.info("received KeyboardInterrupt, exiting")
 
         # unload normally
         loop.run_until_complete(jose.unload_all())
         loop.run_until_complete(client.logout())
-    except Exception as e:
-        jcommon.logger.error("Received Exception from main function, exiting")
+    except Exception as err:
+        jcommon.logger.error("Received %r from main function, exiting", err)
         jcommon.logger.error("This is the error: %s", traceback.format_exc())
 
         # unload as always
         loop.run_until_complete(jose.unload_all())
         loop.run_until_complete(client.logout())
     finally:
+        jcommon.logger.info("Closing event loop")
         loop.close()
 
     tr.print_diff()
 
-    jcommon.logger.info("Exiting main function")
+    jcommon.logger.info("[exit] main")
     logging.shutdown()
+    return 0
 
 if __name__ == '__main__':
     main(sys.argv)
