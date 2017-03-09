@@ -141,7 +141,8 @@ async def do_command(method, message, args, cxt, t_start, st):
 
     delta = time.time() - st
     if delta > 10:
-        jcommon.logger.warning("HIGH DELTA OF COMMAND PROCESSING: %.4fs", delta)
+        jcommon.logger.warning("HIGH DELTA %r from %s[%s]: %.4fs", \
+            message.content, message.author, message.author.id, delta)
 
     # signal python to clean this shit
     del delta, st, jose_method
