@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 
 import decimal
+import asyncio
 from random import SystemRandom
 random = SystemRandom()
 
 import sys
 sys.path.append("..")
 import jauxiliar as jaux
+import josecommon as jcommon
 
 BETTING_FEE = 3
 JCR_MIN_AMNT = decimal.Decimal(0.1)
@@ -214,6 +216,8 @@ class JoseGambling(jaux.Auxiliar):
             await cxt.say(self.c_duel.__doc__)
             return
 
+        challenger = message.author.id
+
         if message.author.id not in self.jcoin.data:
             await cxt.say("You don't have a JoséCoin Account")
             return
@@ -221,8 +225,6 @@ class JoseGambling(jaux.Auxiliar):
         if challenger in self.duels:
             await cxt.say("You are already in a duel.")
             return
-
-        challenger = message.author.id
 
         try:
             challenged = await jcommon.parse_id(args[1])
@@ -294,6 +296,6 @@ class JoseGambling(jaux.Auxiliar):
             del self.duels[challenger]
             return
 
-        await cxt.say("<@%s> won %.2fJC\n`%s`")
+        await cxt.say("<@%s> won %.2fJC\n`%s`", (winner, amnt, res[1]))
         del self.duels[challenger]
         return
