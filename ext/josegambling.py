@@ -290,12 +290,12 @@ class JoseGambling(jaux.Auxiliar):
             return
 
         winner = duelmsg.author.id
-        res = await self.jcoin.transfer(self.jcoin.jose_id, winne, amount)
+        res = await self.jcoin.transfer(self.jcoin.jose_id, winner, amount)
         if not res[0]:
             await cxt.say(":warning: Something went wrong. `%s`", (res[1],))
             del self.duels[challenger]
             return
 
-        await cxt.say("<@%s> won %.2fJC\n`%s`", (winner, amnt, res[1]))
+        await cxt.say("<@%s> won %.2fJC\n`%s`", (winner, amount, res[1]))
         del self.duels[challenger]
         return
