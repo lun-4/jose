@@ -8,7 +8,7 @@ José
 José is a general-purpose bot for Discord written in Python.
 The bot talks in portuguese and only that, no translation module is available for now, nor is planned.
 
-**Python 3.5+ is needed**
+**Redis and Python 3.5+ is needed**
 
 Instructions for Linuxes:
 ```bash

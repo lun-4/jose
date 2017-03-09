@@ -9,7 +9,7 @@ José é o melhor bot para a galerinha do mal dentro do Discord!
 Atualmente o bot está somente em português brasileiro e não é recomendado usar em outros servidores,
 você terá que configurar manualmente(`git clone`) e rodar ele separadamente
 
-**Python 3.5+ é necessário**
+**Redis e Python 3.5+ são necessários**
 
 Instruções para Linux:
 ```bash
