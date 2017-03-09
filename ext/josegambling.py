@@ -291,7 +291,7 @@ class JoseGambling(jaux.Auxiliar):
             return
 
         winner = duelmsg.author.id
-        duelists.pop(winner)
+        duelists.pop(duelists.index(winner))
         loser = duelists[0]
 
         res = self.jcoin.transfer(loser, winner, amount)
