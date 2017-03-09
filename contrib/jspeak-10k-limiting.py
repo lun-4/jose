@@ -7,7 +7,10 @@ conn = sqlite3.connect('jose.db')
 def do_stmt(stmt, params=None):
     global conn
     cur = conn.cursor()
-    cur.execute(stmt, params)
+    if params is None:
+        cur.execute(stmt)
+    else:
+        cur.execute(stmt, params)
     conn.commit()
     return cur
 
@@ -22,15 +25,16 @@ def server_messages(serverid, limit=None):
     return rows
 
 def get_all_serverids():
-    server_ids = do_stmt('SELECT serverid FROM markovdb')
+    cur = do_stmt('SELECT serverid FROM markovdb')
+    server_ids = [row[0] for row in cur.fetchall()]
     return set(server_ids)
 
 def main(args):
     resfile = args[1]
+    amnt = do_stmt("SELECT COUNT(*) FROM markovdb").fetchall()[0]
     serverids = get_all_serverids()
-    amnt = do_stmt("SELECT COUNT(*) FROM markovdb")
 
-    print("%d servers")
+    print("%d messages" % amnt[0])
 
     msgs = 0
     with open(resfile, 'w') as sqlfile:
@@ -42,7 +46,7 @@ def main(args):
                     (serverid, json.dumps(message)))
                 msgs += 1
 
-    print("Done! from %d to %d messages." % (amnt, msgs))
+    print("Done! from %d to %d messages." % (amnt[0], msgs))
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv))
