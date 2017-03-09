@@ -269,12 +269,15 @@ class JoseGambling(jaux.Auxiliar):
 
         countdown = 3
         countdown_msg = await cxt.say("First to say `\"bang\"` wins! %d...", (countdown,))
+        await asyncio.sleep(1500)
 
-        for i in reversed(range(0)):
+        for i in reversed(range(1, 3)):
             if i == 0:
                 break
+
             await self.client.edit_message(countdown_msg, "%d..." % (countdown,))
             await asyncio.sleep(1000)
+            countdown -= 1
 
         await asyncio.sleep(random.randint(2 * 1000, 7 * 1000))
         await cxt.say("**GO!**")
@@ -282,7 +285,7 @@ class JoseGambling(jaux.Auxiliar):
         def duel_check(msg):
             # ugly, but works.
             return (msg.channel.id == message.channel.id) and \
-                (msg.author.id in [message.author.id, challenged])
+                (msg.author.id in [challenger, challenged])
 
         duelmsg = await self.client.wait_for_message(timeout=5, check=duel_check)
 
@@ -292,6 +295,7 @@ class JoseGambling(jaux.Auxiliar):
             return
 
         winner = duelmsg.author.id
+
         res = await self.jcoin.transfer(self.jcoin.jose_id, winner, amount)
         if not res[0]:
             await cxt.say(":warning: Something went wrong. `%s`", (res[1],))
