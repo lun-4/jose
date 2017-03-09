@@ -347,8 +347,12 @@ class JoseBot(jcommon.Extension):
         jcoin = self.modules['jcoin']['inst']
         josextra = self.modules['josextra']['inst']
 
-        await jcoin.josecoin_save(cxt.message)
-        self.logger.info("%d messages in that sesison", josextra.total_msg)
+        if cxt is not None:
+            await jcoin.josecoin_save(cxt.message)
+        else:
+            await jcoin.josecoin_save(None)
+
+        self.logger.info("%d messages in this session sesison", josextra.total_msg)
 
         # unload all shit and shutdown.
         await self.unload_all()

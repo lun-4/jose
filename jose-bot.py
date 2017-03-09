@@ -413,18 +413,13 @@ def main(args):
         jcommon.logger.info("[exit] main_task")
     except KeyboardInterrupt:
         jcommon.logger.info("received KeyboardInterrupt, exiting")
-
-        # unload normally
-        loop.run_until_complete(jose.unload_all())
-        loop.run_until_complete(client.logout())
     except Exception as err:
         jcommon.logger.error("Received %r from main function, exiting", err)
         jcommon.logger.error("This is the error: %s", traceback.format_exc())
-
-        # unload as always
-        loop.run_until_complete(jose.unload_all())
-        loop.run_until_complete(client.logout())
     finally:
+        jcommon.logger.info("[general_shutdown]")
+        loop.run_until_complete(jose.general_shutdown())
+
         jcommon.logger.info("Closing event loop")
         loop.close()
 
