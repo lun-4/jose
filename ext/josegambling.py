@@ -254,10 +254,8 @@ class JoseGambling(jaux.Auxiliar):
             await cxt.say("lel")
             return
 
-        # make transfer
-        res = self.jcoin.transfer(challenger, self.jcoin.jose_id, amount)
-        if not res[0]:
-            await cxt.say("jc->err: `%r`", (res[1],))
+        if amount >= 3:
+            await cxt.say("Can't duel with more than 3 JoséCoins.")
             return
 
         await self.jcoin.raw_save()
@@ -278,10 +276,12 @@ class JoseGambling(jaux.Auxiliar):
         await asyncio.sleep(random.randint(2, 7))
         await cxt.say("**GO!**")
 
+        duelists = [challenger, challenged]
+
         def duel_check(msg):
             # ugly, but works.
             return (msg.channel.id == message.channel.id) and \
-                (msg.author.id in [challenger, challenged])
+                (msg.author.id in duelists)
 
         duelmsg = await self.client.wait_for_message(timeout=5, check=duel_check)
 
@@ -291,8 +291,10 @@ class JoseGambling(jaux.Auxiliar):
             return
 
         winner = duelmsg.author.id
+        duelists.pop(winner)
+        loser = duelists[0]
 
-        res = self.jcoin.transfer(self.jcoin.jose_id, winner, amount)
+        res = self.jcoin.transfer(loser, winner, amount)
         if not res[0]:
             await cxt.say(":warning: Something went wrong. `%s`", (res[1],))
             del self.duels[challenger]
