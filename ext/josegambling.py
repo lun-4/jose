@@ -246,6 +246,10 @@ class JoseGambling(jaux.Auxiliar):
             await cxt.say("Challenged person doesn't have a JoséCoin Account")
             return
 
+        if amount > self.jcoin.data[challenger]['amount'] or \
+            amount > self.jcoin.data[challenged]['amount']:
+            await cxt.say("One of you don't have enough funds to make this duel.")
+
         challenged_user = await self.client.get_user_info(challenged)
 
         await cxt.say("<@%s> you got challenged for a duel :gun: by <@%s> total of %.2fJC, accept it? (y/n)", \
