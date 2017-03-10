@@ -310,7 +310,12 @@ class JoseMath(jaux.Auxiliar):
             from_currency, to_currency)
 
         await self.jcoin_pricing(cxt, jcommon.API_TAX_PRICE)
-        data = dict(self.btc_cache)
+        try:
+            data = dict(self.btc_cache)
+        except TypeError as err:
+            await cxt.say(":warning: Cache error, probably API having issues `%r`", err)
+            return
+
         nocache = False
         rate = None
 
