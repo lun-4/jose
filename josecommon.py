@@ -6,6 +6,7 @@ import os
 import sqlite3
 import aioredis
 import logging
+import subprocess
 from random import SystemRandom
 random = SystemRandom()
 
@@ -532,6 +533,10 @@ async def r_configdb_raw_load():
     global redis
     loop = asyncio.get_event_loop()
     redis = await aioredis.create_redis(('localhost', 6379), loop=loop)
+    status = redis.ping().decode('utf-8')
+    if status == 'PONG':
+        return True
+    return False
 
 async def r_configdb_ensure(server_id):
     rediskey = make_rkey(server_id)
@@ -574,16 +579,23 @@ async def r_configdb_get(server_id, key):
     return res
 
 async def r_save_configdb():
-    logger.info("savedb:config")
+    logger.info("savedb:r_config")
     try:
-        redis.save()
+        # don't use aioredis, use subprocess
+        out = subprocess.check_output('redis-cli save', shell=True)
+        if not out.startswith('OK'):
+            logger.warning("[r_save_configdb] error saving")
+
         return True, ''
     except Exception as err:
         return False, repr(err)
 
 async def r_load_configdb():
+    logger.info("load_db:r_config")
     try:
-        await r_configdb_raw_load()
+        res = await r_configdb_raw_load()
+        if not res:
+            return False, 'raw_load sent false'
 
         # ensure new configdb features
         for rediskey in redis.keys('*'):
@@ -631,13 +643,16 @@ async def langdb_get(sid):
 async def save_configdb():
     global configdb
     logger.info("savedb:config")
+
     try:
-        await r_save_configdb()
+        res = await r_save_configdb()
+        if not res[0]:
+            return False, res[1]
+
         json.dump(configdb, open(CONFIGDB_PATH, 'w'))
+        return True, ''
     except Exception as err:
         return False, repr(err)
-
-    return True, ''
 
 def cdb_ensure(serverid, entry, default):
     cdb = configdb[serverid]
@@ -656,7 +671,10 @@ async def load_configdb():
     sanity_save = False
     logger.info("load:config")
     try:
-        await r_load_configdb()
+        res = await r_load_configdb()
+        if not res[0]:
+            return False, res[1]
+
         configdb = json.load(open(CONFIGDB_PATH, 'r'))
 
         # ensure new configdb features
@@ -665,10 +683,10 @@ async def load_configdb():
 
         if sanity_save:
             await save_configdb()
+
+        return True, ''
     except Exception as err:
         return False, repr(err)
-
-    return True, ''
 
 
 async def get_translated(langid, string):
