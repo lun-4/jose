@@ -140,8 +140,11 @@ class JoseCoin(jaux.Auxiliar):
         if author_id not in self.jcoin.data:
             return
 
+        if message.channel.is_private:
+            return
+
         now = time.time()
-        cooldown = self.reward_env.get(author_id, now + 100)
+        last_cooldown = self.reward_env.get(author_id, now - 100)
         if now <= cooldown:
             return
 
@@ -166,9 +169,6 @@ class JoseCoin(jaux.Auxiliar):
 
         if decimal.Decimal(random.random()) > probability or \
             cxt.env.get('jcflag', False):
-            return
-
-        if message.channel.is_private:
             return
 
         amount = random.choice(jcommon.JC_REWARDS)
