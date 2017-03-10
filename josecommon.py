@@ -82,9 +82,6 @@ def set_client(_client):
     global client
     client = _client
 
-# Language database
-configdb = None
-
 # Phrases that will be shown randomly when jose starts
 JOSE_PLAYING_PHRASES = playing_phrases.JOSE_PLAYING_PHRASES
 
@@ -712,7 +709,7 @@ serverid %s servername %s chname #%s", server.id, server.name, channel.name)
             await self.client.send_message(channel, \
                 ":elephant: Mensagem muito grande :elephant:")
         else:
-            if configdb is None:
+            if redis is None:
                 logger.info("Loading configuration database @ cxt.say")
                 await load_configdb()
 
