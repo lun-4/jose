@@ -514,7 +514,7 @@ LANGUAGE_OBJECTS = {
 
 def get_defaultcdb():
     return {
-        'botblock': ,
+        'botblock': True,
         'language': 'en',
 
         # TODO: use them????
