@@ -58,12 +58,12 @@ class JoseLanguage(jaux.Auxiliar):
         # sanity check
         n_botblock = await jcommon.configdb_get(sid, 'botblock')
         if n_botblock is None:
-            self.logger.warning("Botblock is None... again")
+            self.logger.warning("`botblock` is None... again")
 
         if n_botblock == (not botblock):
-            await cxt.say("Botblock from %s to %s", (botblock, not botblock))
+            await cxt.say("`botblock` set from %s to %s", (botblock, not botblock))
         else:
-            await cxt.say("No changes to botblock")
+            await cxt.say("No changes to `botblock`")
 
     async def c_jsprob(self, message, args, cxt):
         '''`j!jsprob prob` - Set JoseSpeak probability of responding to random messages, default 0, maximum 3'''

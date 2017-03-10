@@ -601,6 +601,9 @@ async def configdb_set(server_id, key, value):
 
         if after != value:
             logger.warning("[cdb] configdb_set(%s, %s) = %s != %s", server_id, key, value, after)
+            return False
+
+        return True
     except Exception as err:
         logger.error('configdb_set(%s, %s)', server_id, key, exc_info=True)
         return False
