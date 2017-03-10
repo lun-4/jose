@@ -553,6 +553,7 @@ async def r_configdb_ensure(server_id):
 async def r_configdb_ensure_key(server_id, key, default):
     await r_configdb_ensure(server_id)
 
+    rediskey = make_rkey(server_id)
     exists = await redis.hexists(rediskey)
     if not exists:
         res = await redis.hmset(rediskey, key, default)
