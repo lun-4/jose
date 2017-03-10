@@ -339,7 +339,6 @@ class JoseBot(jcommon.Extension):
         if auth:
             self.command_lock = True
             await f(cxt)
-            self.command_lock = False
         else:
             raise je.PermissionError()
 
@@ -358,7 +357,6 @@ class JoseBot(jcommon.Extension):
         await self.unload_all()
         await self.client.logout()
         self.logger.info("Logged out")
-        sys.exit(0)
 
     async def turnoff(self, cxt):
         self.logger.info("Turning Off from %s", str(cxt.message.author))
