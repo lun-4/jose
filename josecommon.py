@@ -533,7 +533,8 @@ async def r_configdb_raw_load():
     global redis
     loop = asyncio.get_event_loop()
     redis = await aioredis.create_redis(('localhost', 6379), loop=loop)
-    status = redis.ping().decode('utf-8')
+    status = await redis.ping()
+    status = status.decode('utf-8')
     if status == 'PONG':
         return True
     return False
