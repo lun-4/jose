@@ -27,6 +27,7 @@ class JoseBot(jcommon.Extension):
         self.command_lock = False
         self.dev_mode = False
         self.off_mode = False
+        self.made_gshutdown = False
         self.ev_empty()
 
     async def do_dev_mode(self):
@@ -343,6 +344,7 @@ class JoseBot(jcommon.Extension):
             raise je.PermissionError()
 
     async def general_shutdown(self, cxt):
+        self.made_gshutdown = True
         jcoin = self.modules['jcoin']['inst']
         josextra = self.modules['josextra']['inst']
 

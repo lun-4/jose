@@ -418,10 +418,13 @@ def main(args):
         jcommon.logger.error("Received %r from main function, exiting", err)
         jcommon.logger.error("This is the error: %s", traceback.format_exc())
     finally:
-        jcommon.logger.info("[general_shutdown]")
-        loop.run_until_complete(jose.general_shutdown(None))
+        if not jose.made_gshutdown:
+            jcommon.logger.info("[general_shutdown]")
+            loop.run_until_complete(jose.general_shutdown(None))
+        else:
+            jcommon.logger.info("[general_shutdown] already done")
 
-        jcommon.logger.info("Closing event loop")
+        jcommon.logger.info("[asyncio] Closing event loop")
         loop.close()
 
     tr.print_diff()
