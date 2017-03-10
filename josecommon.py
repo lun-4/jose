@@ -531,7 +531,7 @@ def make_rkey(server_id):
 async def r_configdb_raw_load():
     global redis
     loop = asyncio.get_event_loop()
-    redis = await aioredis.create_connection(('localhost', 6379), loop=loop)
+    redis = await aioredis.create_redis(('localhost', 6379), loop=loop)
 
 async def r_configdb_ensure(server_id):
     rediskey = make_rkey(server_id)
