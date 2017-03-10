@@ -4,6 +4,7 @@ import re
 import json
 import os
 import sqlite3
+import aioredis
 import logging
 from random import SystemRandom
 random = SystemRandom()
@@ -513,14 +514,85 @@ LANGUAGE_OBJECTS = {
 
 def get_defaultcdb():
     return {
-        'botblock': True,
+        'botblock': ,
         'language': 'en',
 
         # TODO: use them????
-        'imgchannel': None,
+        'imgchannel': 'None',
         'prefix': JOSE_PREFIX,
         'speak_prob': 0,
     }
+
+redis = None
+
+def make_rkey(sid):
+    return 'config:{0}'.format(server_id)
+
+async def r_configdb_load(loop):
+    global redis
+    redis = await aioredis.create_connection(('localhost', 6379), loop=loop)
+
+async def r_configdb_ensure(server_id):
+    rediskey = make_rkey(server_id)
+    exists = await redis.exists(rediskey)
+
+    if not exists:
+        default_cdb = get_defaultcdb()
+
+        res = await redis.hmset_dict(rediskey, default_cdb)
+        if not res:
+            logger.error("Error creating configdb for server %s", rediskey)
+
+async def r_configdb_ensure_key(server_id, key, default):
+    await r_configdb_ensure(server_id)
+
+    exists = await redis.hexists(rediskey)
+    if not exists:
+        res = await redis.hmset(rediskey, key, default)
+        if not res:
+            logger.error("Error creating configdb for server %s", rediskey)
+
+
+async def r_configdb_set(server_id, key, value):
+    await r_configdb_ensure(server_id)
+    rediskey = make_rkey(server_id)
+
+    try:
+        await redis.hmset(rediskey, key, value)
+        after = await redis.hmget(rediskey, key)
+        if after != value:
+            logger.warning("[r_cdb] configdb_set(%s, %s) = %s != %s", sid, key, value, after)
+    except Exception as err:
+        logger.error('configdb_set(%s, %s)', sid, key, exc_info=True)
+        return False
+
+async def r_configdb_get(server_id, key):
+    await r_configdb_ensure(server_id)
+    rediskey = 'config:{0}'.format(server_id)
+    res = await redis.hmget(rediskey, key)
+    return res
+
+async def r_save_configdb():
+    logger.info("savedb:config")
+    try:
+        redis.save()
+        return True, ''
+    except Exception as err:
+        return False, repr(err)
+
+async def r_load_configdb():
+    try:
+        # ensure new configdb features
+        for rediskey in redis.keys('*'):
+            if rediskey.startswith('config:'):
+                server_id = rediskey.split(':')[1]
+                r_configdb_ensure_key(server_id, 'speak_prob', 0)
+
+        await r_save_configdb()
+
+        return True, ''
+    except Exception as err:
+        return False, repr(err)
 
 async def configdb_set(sid, key, value):
     global configdb
