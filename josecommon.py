@@ -593,7 +593,7 @@ async def configdb_get(server_id, key, default=None):
     res = await redis.hmget(rediskey, key)
 
     # aioredis returns a set... I'm pretty WTF rn but ok.
-    return next(iter(s))
+    return next(iter(res))
 
 async def save_configdb():
     logger.info("savedb:r_config")
