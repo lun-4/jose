@@ -529,15 +529,21 @@ redis = None
 def make_rkey(server_id):
     return 'config:{0}'.format(server_id)
 
-async def configdb_raw_load():
-    global redis
-    loop = asyncio.get_event_loop()
-    redis = await aioredis.create_redis(('localhost', 6379), loop=loop)
-    status = await redis.ping()
-    status = status.decode('utf-8')
-    if status == 'PONG':
-        return True
-    return False
+def from_redis(element):
+    if element == 'None':
+        element = None
+
+    try:
+        element = int(element)
+    except:
+        pass
+
+    try:
+        element = float(element)
+    except:
+        pass
+
+    return element
 
 def redis_value(value):
     if value is None:
@@ -547,6 +553,16 @@ def redis_value(value):
     elif value is False:
         value = 0
     return value
+
+async def configdb_raw_load():
+    global redis
+    loop = asyncio.get_event_loop()
+    redis = await aioredis.create_redis(('localhost', 6379), loop=loop)
+    status = await redis.ping()
+    status = status.decode('utf-8')
+    if status == 'PONG':
+        return True
+    return False
 
 async def configdb_ensure(server_id):
     rediskey = make_rkey(server_id)
@@ -579,8 +595,10 @@ async def configdb_set(server_id, key, value):
 
     try:
         await redis.hmset(rediskey, key, value)
-        after = await redis.hmget(rediskey, key)
-        after = next(iter(after))
+        res = await redis.hmget(rediskey, key)
+        after = next(iter(res)).decode('utf-8')
+        after = from_redis(after)
+
         if after != value:
             logger.warning("[cdb] configdb_set(%s, %s) = %s != %s", server_id, key, value, after)
     except Exception as err:
@@ -595,20 +613,7 @@ async def configdb_get(server_id, key, default=None):
 
     element = next(iter(res)).decode('utf-8')
     # try to understand it
-
-    if element == 'None':
-        element = None
-
-    try:
-        element = int(element)
-    except:
-        pass
-
-    try:
-        element = float(element)
-    except:
-        pass
-
+    element = from_redis(element)
     return element
 
 async def save_configdb():
