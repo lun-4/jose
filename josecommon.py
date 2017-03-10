@@ -539,6 +539,15 @@ async def r_configdb_raw_load():
         return True
     return False
 
+def redis_value(value):
+    if value is None:
+        value = 'None'
+    elif value is True:
+        value = 1
+    elif value is False:
+        value = 0
+    return value
+
 async def r_configdb_ensure(server_id):
     rediskey = make_rkey(server_id)
     exists = await redis.exists(rediskey)
@@ -556,6 +565,7 @@ async def r_configdb_ensure_key(server_id, key, default):
     rediskey = make_rkey(server_id)
     exists = await redis.hexists(rediskey, key)
     if not exists:
+        default = redis_value(default)
         res = await redis.hmset(rediskey, key, default)
         if not res:
             logger.error("Error creating configdb for server %s", rediskey)
@@ -564,6 +574,8 @@ async def r_configdb_ensure_key(server_id, key, default):
 async def r_configdb_set(server_id, key, value):
     await r_configdb_ensure(server_id)
     rediskey = make_rkey(server_id)
+
+    value = redis_value(value)
 
     try:
         await redis.hmset(rediskey, key, value)
