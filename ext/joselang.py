@@ -28,11 +28,13 @@ class JoseLanguage(jaux.Auxiliar):
 
     async def ext_unload(self):
         status = await jcommon.save_configdb()
+        await jcommon.r_save_configdb()
         return status
 
     async def c_reloadcdb(self, message, args, cxt):
         await self.savedb()
         await jcommon.load_configdb()
+        await jcommon.r_load_configdb()
         await cxt.say(":speech_left: configdb reloaded")
 
     async def c_confighelp(self, message, args, cxt):
