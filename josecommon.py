@@ -568,7 +568,7 @@ async def configdb_ensure_key(server_id, key, default):
         default = redis_value(default)
         res = await redis.hmset(rediskey, key, default)
         if not res:
-            logger.error("Error creating configdb for server %s", rediskey)
+            logger.error("Error ensuring key %s = %s for key %s", key, default, rediskey)
 
 
 async def configdb_set(server_id, key, value):
@@ -586,7 +586,7 @@ async def configdb_set(server_id, key, value):
         logger.error('configdb_set(%s, %s)', server_id, key, exc_info=True)
         return False
 
-async def configdb_get(server_id, key, default):
+async def configdb_get(server_id, key, default=None):
     await configdb_ensure(server_id)
     rediskey = 'config:{0}'.format(server_id)
     res = await redis.hmget(rediskey, key)
