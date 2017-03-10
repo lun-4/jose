@@ -22,6 +22,7 @@ Command | Description | Example | Alias
 `j!language lang` | Sets a language for a server | `j!language en` |
 `j!listlang` | Shows all available languages for josé | |
 `j!botblock` | Toggles botblock | |
+`j!jcprob probability` | Changes your server's probability of josé saying text, default is 0 | `j!jcprob 3` |
 
 ### `josemagicword`
 
@@ -108,3 +109,4 @@ Command | Description | Example | Alias
 `j!jreport` | JCR :tm: report, shows what amount each one paid in the session | |
 `j!jrcheck` | Shows if a JCR :tm: session is on/off | |
 `j!flip` | Flips a coin. | |
+`j!duel @someone amount` | Makes a duel with someone | `j!duel @aaa 1` |
