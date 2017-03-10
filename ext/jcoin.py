@@ -30,6 +30,8 @@ HOUR = 60 * 60
 LOAN_TAX = 25 / PERCENT
 TAX_CONSTANT = decimal.Decimal(0.1)
 
+DEC_PROBABILITY = decimal.Decimal(jcommon.JC_PROBABILITY)
+
 # 40 minutes of cooldown between rewards
 REWARD_COOLDOWN = 1800
 
@@ -144,12 +146,12 @@ class JoseCoin(jaux.Auxiliar):
             return
 
         now = time.time()
-        last_cooldown = self.reward_env.get(author_id, now - 100)
-        if now <= last_cooldown:
+        last_cooldown = self.reward_env.get(author_id, 0)
+        if now < last_cooldown:
             return
 
         # ugly solution, use all decimal
-        probability = decimal.Decimal(jcommon.JC_PROBABILITY)
+        probability = DEC_PROBABILITY
 
         account = self.jcoin.data[author_id]
         taxpaid = account['taxpaid']
