@@ -71,8 +71,10 @@ class JoseHelp(jaux.Auxiliar):
                 res.append(":green_book: %s, works on %s" % (admin, ', '.join(topics)))
             elif admin.status == discord.Status.idle:
                 res.append(":white_circle: %s, works on %s" % (admin, ', '.join(topics)))
+            elif admin.status == discord.Status.dnd:
+                res.append(":red_circle: %s, works on %s" % (admin, ', '.join(topics)))
             else:
-                # admin is Do Not Disturb or Offline, don't show them lol
+                # admin is Offline, don't show them lol
                 pass
 
         if len(res) == 0:
