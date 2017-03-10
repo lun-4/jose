@@ -580,6 +580,7 @@ async def configdb_set(server_id, key, value):
     try:
         await redis.hmset(rediskey, key, value)
         after = await redis.hmget(rediskey, key)
+        after = next(iter(after))
         if after != value:
             logger.warning("[cdb] configdb_set(%s, %s) = %s != %s", server_id, key, value, after)
     except Exception as err:
@@ -590,7 +591,9 @@ async def configdb_get(server_id, key, default=None):
     await configdb_ensure(server_id)
     rediskey = 'config:{0}'.format(server_id)
     res = await redis.hmget(rediskey, key)
-    return res
+
+    # aioredis returns a set... I'm pretty WTF rn but ok.
+    return next(iter(s))
 
 async def save_configdb():
     logger.info("savedb:r_config")
