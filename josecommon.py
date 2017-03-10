@@ -690,6 +690,11 @@ async def load_configdb():
             if not exists:
                 cdb = configdb[server_id]
 
+                for key in cdb:
+                    val = cdb[key]
+                    if val is None:
+                        cdb[key] = 'None'
+
                 res = await redis.hmset_dict(rediskey, cdb)
                 if not res:
                     logger.error("json->redis_configdb err for server id %s", rediskey)
