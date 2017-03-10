@@ -516,7 +516,7 @@ LANGUAGE_OBJECTS = {
 def get_defaultcdb():
     return {
         'botblock': 1,
-        'language': 'en',
+        'language': 'default',
 
         # TODO: use them????
         'imgchannel': 'None',
@@ -586,7 +586,7 @@ async def configdb_set(server_id, key, value):
         logger.error('configdb_set(%s, %s)', server_id, key, exc_info=True)
         return False
 
-async def configdb_get(server_id, key):
+async def configdb_get(server_id, key, default):
     await configdb_ensure(server_id)
     rediskey = 'config:{0}'.format(server_id)
     res = await redis.hmget(rediskey, key)
