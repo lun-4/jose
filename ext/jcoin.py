@@ -145,7 +145,7 @@ class JoseCoin(jaux.Auxiliar):
 
         now = time.time()
         last_cooldown = self.reward_env.get(author_id, now - 100)
-        if now <= cooldown:
+        if now <= last_cooldown:
             return
 
         # ugly solution, use all decimal
