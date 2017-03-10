@@ -525,7 +525,7 @@ def get_defaultcdb():
 
 redis = None
 
-def make_rkey(sid):
+def make_rkey(server_id):
     return 'config:{0}'.format(server_id)
 
 async def r_configdb_load(loop):
