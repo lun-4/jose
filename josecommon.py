@@ -529,7 +529,7 @@ redis = None
 def make_rkey(server_id):
     return 'config:{0}'.format(server_id)
 
-async def r_configdb_raw_load():
+async def configdb_raw_load():
     global redis
     loop = asyncio.get_event_loop()
     redis = await aioredis.create_redis(('localhost', 6379), loop=loop)
@@ -548,7 +548,7 @@ def redis_value(value):
         value = 0
     return value
 
-async def r_configdb_ensure(server_id):
+async def configdb_ensure(server_id):
     rediskey = make_rkey(server_id)
     exists = await redis.exists(rediskey)
 
@@ -559,8 +559,8 @@ async def r_configdb_ensure(server_id):
         if not res:
             logger.error("Error creating configdb for server %s", rediskey)
 
-async def r_configdb_ensure_key(server_id, key, default):
-    await r_configdb_ensure(server_id)
+async def configdb_ensure_key(server_id, key, default):
+    await configdb_ensure(server_id)
 
     rediskey = make_rkey(server_id)
     exists = await redis.hexists(rediskey, key)
@@ -571,8 +571,8 @@ async def r_configdb_ensure_key(server_id, key, default):
             logger.error("Error creating configdb for server %s", rediskey)
 
 
-async def r_configdb_set(server_id, key, value):
-    await r_configdb_ensure(server_id)
+async def configdb_set(server_id, key, value):
+    await configdb_ensure(server_id)
     rediskey = make_rkey(server_id)
 
     value = redis_value(value)
@@ -581,34 +581,34 @@ async def r_configdb_set(server_id, key, value):
         await redis.hmset(rediskey, key, value)
         after = await redis.hmget(rediskey, key)
         if after != value:
-            logger.warning("[r_cdb] configdb_set(%s, %s) = %s != %s", server_id, key, value, after)
+            logger.warning("[cdb] configdb_set(%s, %s) = %s != %s", server_id, key, value, after)
     except Exception as err:
         logger.error('configdb_set(%s, %s)', server_id, key, exc_info=True)
         return False
 
-async def r_configdb_get(server_id, key):
-    await r_configdb_ensure(server_id)
+async def configdb_get(server_id, key):
+    await configdb_ensure(server_id)
     rediskey = 'config:{0}'.format(server_id)
     res = await redis.hmget(rediskey, key)
     return res
 
-async def r_save_configdb():
+async def save_configdb():
     logger.info("savedb:r_config")
     try:
         # don't use aioredis, use subprocess
         out = subprocess.check_output('redis-cli save', shell=True)
         out = out.decode('utf-8')
         if not out.startswith('OK'):
-            logger.warning("[r_save_configdb] error saving")
+            logger.warning("[save_configdb] error saving")
 
         return True, ''
     except Exception as err:
         return False, repr(err)
 
-async def r_load_configdb():
+async def load_configdb():
     logger.info("load_db:r_config")
     try:
-        res = await r_configdb_raw_load()
+        res = await configdb_raw_load()
         if not res:
             return False, 'raw_load sent false'
 
@@ -618,36 +618,13 @@ async def r_load_configdb():
             rediskey = rediskey.decode('utf-8')
             if rediskey.startswith('config:'):
                 server_id = rediskey.split(':')[1]
-                await r_configdb_ensure_key(server_id, 'speak_prob', 0)
+                await configdb_ensure_key(server_id, 'speak_prob', 0)
 
-        await r_save_configdb()
+        await save_configdb()
 
         return True, ''
     except Exception as err:
         return False, repr(err)
-
-async def configdb_set(sid, key, value):
-    global configdb
-    if sid not in configdb:
-        configdb[sid] = get_defaultcdb()
-
-    try:
-        configdb[sid][key] = value
-        res = configdb[sid][key]
-        if res != value:
-            logger.warning("configdb_set(%s, %s) = %s didn't went through", sid, key, value)
-            return False
-
-        return True
-    except Exception as err:
-        logger.error('configdb_set(%s, %s)', sid, key, exc_info=True)
-        return False
-
-async def configdb_get(sid, key, defaultval=None):
-    global configdb
-    if sid not in configdb:
-        configdb[sid] = get_defaultcdb()
-    return configdb[sid].get(key)
 
 # langdb stuff
 async def langdb_set(sid, lang):
@@ -656,72 +633,6 @@ async def langdb_set(sid, lang):
 async def langdb_get(sid):
     res = await configdb_get(sid, 'language', 'default')
     return res
-
-async def save_configdb():
-    global configdb
-    logger.info("savedb:config")
-
-    try:
-        res = await r_save_configdb()
-        if not res[0]:
-            return False, res[1]
-
-        json.dump(configdb, open(CONFIGDB_PATH, 'w'))
-        return True, ''
-    except Exception as err:
-        return False, repr(err)
-
-def cdb_ensure(serverid, entry, default):
-    cdb = configdb[serverid]
-
-    if entry not in cdb:
-        cdb[entry] = default
-
-async def load_configdb():
-    global configdb
-    if not os.path.isfile(CONFIGDB_PATH):
-        # recreate
-        logger.info("Recreating config database")
-        with open(CONFIGDB_PATH, 'w') as rawconfig_db:
-            rawconfig_db.write('{}')
-
-    sanity_save = False
-    logger.info("load:config")
-    try:
-        res = await r_load_configdb()
-        if not res[0]:
-            return False, res[1]
-
-        configdb = json.load(open(CONFIGDB_PATH, 'r'))
-
-        # ensure new configdb features
-        # from JSON to Redis.
-        for server_id in configdb:
-            rediskey = make_rkey(server_id)
-            exists = await redis.exists(rediskey)
-            if not exists:
-                cdb = configdb[server_id]
-
-                for key in cdb:
-                    val = cdb[key]
-                    if val is None:
-                        cdb[key] = 'None'
-                    elif val is True:
-                        cdb[key] = 1
-                    elif val is False:
-                        cdb[key] = 0
-
-                res = await redis.hmset_dict(rediskey, cdb)
-                if not res:
-                    logger.error("json->redis_configdb err for server id %s", rediskey)
-
-        if sanity_save:
-            await save_configdb()
-
-        return True, ''
-    except Exception as err:
-        return False, repr(err)
-
 
 async def get_translated(langid, string):
     lang = LANGUAGE_OBJECTS.get(langid, None)
