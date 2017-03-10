@@ -44,8 +44,13 @@ class JoseMath(jaux.Auxiliar):
         currencystr = ','.join(COMMON_WORLD)
         url = CRYPTOAPI_MULTIPRICE % (cryptostr, currencystr)
 
-        priceinfo = await self.json_from_url(url)
-        self.btc_cache = priceinfo
+        try:
+            priceinfo = await self.json_from_url(url)
+            self.btc_cache = priceinfo
+        except asyncio.TimeoutError as err:
+            self.logger.warning("[crypto_cache]: TimeoutError: %r", err)
+        except Exception as err:
+            self.logger.error("[crypto_cache]: %r", err)
 
     async def ext_load(self):
         # try to get from coindesk supported currencies
