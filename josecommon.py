@@ -694,6 +694,10 @@ async def load_configdb():
                     val = cdb[key]
                     if val is None:
                         cdb[key] = 'None'
+                    elif val is True:
+                        cdb[key] = 1
+                    elif val is False:
+                        cdb[key] = 0
 
                 res = await redis.hmset_dict(rediskey, cdb)
                 if not res:
