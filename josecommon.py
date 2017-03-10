@@ -584,6 +584,7 @@ async def r_save_configdb():
     try:
         # don't use aioredis, use subprocess
         out = subprocess.check_output('redis-cli save', shell=True)
+        out = out.decode('utf-8')
         if not out.startswith('OK'):
             logger.warning("[r_save_configdb] error saving")
 
@@ -601,6 +602,7 @@ async def r_load_configdb():
         # ensure new configdb features
         keys = await redis.keys('*')
         for rediskey in keys:
+            rediskey = rediskey.decode('utf-8')
             if rediskey.startswith('config:'):
                 server_id = rediskey.split(':')[1]
                 r_configdb_ensure_key(server_id, 'speak_prob', 0)
