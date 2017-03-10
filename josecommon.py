@@ -599,7 +599,8 @@ async def r_load_configdb():
             return False, 'raw_load sent false'
 
         # ensure new configdb features
-        for rediskey in redis.keys('*'):
+        keys = await redis.keys('*')
+        for rediskey in keys:
             if rediskey.startswith('config:'):
                 server_id = rediskey.split(':')[1]
                 r_configdb_ensure_key(server_id, 'speak_prob', 0)
