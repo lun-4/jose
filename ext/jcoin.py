@@ -164,7 +164,8 @@ class JoseCoin(jaux.Auxiliar):
         if probability > 0.0420:
             probability = decimal.Decimal(0.0420)
 
-        if decimal.Decimal(random.random()) > probability:
+        if decimal.Decimal(random.random()) > probability or \
+            cxt.env.get('jcflag', False):
             return
 
         if message.channel.is_private:
@@ -180,6 +181,11 @@ class JoseCoin(jaux.Auxiliar):
             else:
                 jcommon.logger.error("do_josecoin->jc->err: %s", res[1])
                 await cxt.say("jc->err: %s", (res[1],))
+
+    async def c_jcoin_test(self, message, args, cxt):
+        await self.is_admin(message.author.id)
+        cxt.env['jcflag'] = True
+        await self.e_on_message(message, cxt)
 
     async def c_jcprob(self, message, args, cxt):
         '''`j!jcprob` - show your JoséCoin probabilities'''
