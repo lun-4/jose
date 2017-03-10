@@ -249,6 +249,7 @@ class JoseGambling(jaux.Auxiliar):
         if amount > self.jcoin.data[challenger]['amount'] or \
             amount > self.jcoin.data[challenged]['amount']:
             await cxt.say("One of you don't have enough funds to make this duel.")
+            return
 
         challenged_user = await self.client.get_user_info(challenged)
 

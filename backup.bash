@@ -7,6 +7,6 @@ DATE=$(date +%d-%m-%y-%H-%M)
 BACKUPFILE="jose-backup-$DATE.tar.gz"
 
 cd ~/jose
-tar cvzf $BACKUPFILE db/* jose.db db/zelao.txt ext/*.db jcoin/*.db jcoin/*.journal
+tar cvzf $BACKUPFILE db/* jose.db db/zelao.txt ext/*.db jcoin/*.db jcoin/*.journal /var/lib/redis/dump.rdb
 
 gdrive upload --parent $JOSE_BACKUP_DIR $BACKUPFILE
