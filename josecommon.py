@@ -682,8 +682,16 @@ async def load_configdb():
         configdb = json.load(open(CONFIGDB_PATH, 'r'))
 
         # ensure new configdb features
-        for serverid in configdb:
-            cdb_ensure(serverid, 'speak_prob', 0)
+        # from JSON to Redis.
+        for server_id in configdb:
+            rediskey = make_rkey(server_id)
+            exists = await redis.exists(rediskey)
+            if not exists:
+                cdg = configdb[server_id]
+
+                res = await redis.hmset_dict(rediskey, cdb)
+                if not res:
+                    logger.error("json->redis_configdb err for server id %s", rediskey)
 
         if sanity_save:
             await save_configdb()
