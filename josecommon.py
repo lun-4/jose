@@ -632,6 +632,7 @@ async def save_configdb():
     global configdb
     logger.info("savedb:config")
     try:
+        await r_save_configdb()
         json.dump(configdb, open(CONFIGDB_PATH, 'w'))
     except Exception as err:
         return False, repr(err)
@@ -655,6 +656,7 @@ async def load_configdb():
     sanity_save = False
     logger.info("load:config")
     try:
+        await r_save_configdb()
         configdb = json.load(open(CONFIGDB_PATH, 'r'))
 
         # ensure new configdb features
