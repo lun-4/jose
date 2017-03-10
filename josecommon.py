@@ -605,7 +605,7 @@ async def r_load_configdb():
             rediskey = rediskey.decode('utf-8')
             if rediskey.startswith('config:'):
                 server_id = rediskey.split(':')[1]
-                r_configdb_ensure_key(server_id, 'speak_prob', 0)
+                await r_configdb_ensure_key(server_id, 'speak_prob', 0)
 
         await r_save_configdb()
 
