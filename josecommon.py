@@ -569,9 +569,9 @@ async def r_configdb_set(server_id, key, value):
         await redis.hmset(rediskey, key, value)
         after = await redis.hmget(rediskey, key)
         if after != value:
-            logger.warning("[r_cdb] configdb_set(%s, %s) = %s != %s", sid, key, value, after)
+            logger.warning("[r_cdb] configdb_set(%s, %s) = %s != %s", server_id, key, value, after)
     except Exception as err:
-        logger.error('configdb_set(%s, %s)', sid, key, exc_info=True)
+        logger.error('configdb_set(%s, %s)', server_id, key, exc_info=True)
         return False
 
 async def r_configdb_get(server_id, key):
@@ -688,7 +688,7 @@ async def load_configdb():
             rediskey = make_rkey(server_id)
             exists = await redis.exists(rediskey)
             if not exists:
-                cdg = configdb[server_id]
+                cdb = configdb[server_id]
 
                 res = await redis.hmset_dict(rediskey, cdb)
                 if not res:
