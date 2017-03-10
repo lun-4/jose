@@ -528,8 +528,9 @@ redis = None
 def make_rkey(server_id):
     return 'config:{0}'.format(server_id)
 
-async def r_configdb_load(loop):
+async def r_configdb_load():
     global redis
+    loop = asyncio.get_event_loop()
     redis = await aioredis.create_connection(('localhost', 6379), loop=loop)
 
 async def r_configdb_ensure(server_id):
@@ -582,6 +583,8 @@ async def r_save_configdb():
 
 async def r_load_configdb():
     try:
+        await r_configdb_load()
+
         # ensure new configdb features
         for rediskey in redis.keys('*'):
             if rediskey.startswith('config:'):
