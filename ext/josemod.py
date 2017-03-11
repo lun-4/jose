@@ -20,8 +20,6 @@ class JoseMod(jaux.Auxiliar):
             'users': {}
         }
 
-        # TODO: commands for josemod
-
     async def ext_load(self):
         return True, ''
 
@@ -111,8 +109,8 @@ class JoseMod(jaux.Auxiliar):
     async def mod_log(self, logtype, *data):
         server = data[0]
 
-        log_channel = await self.get_from_data(server.id, 'log_channel')
-        if log_channel is None:
+        mod_channel = await self.get_from_data(server.id, 'mod_channel')
+        if mod_channel is None:
             return
 
         log_id = self.new_log_id(server.id)
@@ -151,12 +149,12 @@ class JoseMod(jaux.Auxiliar):
             # overwrite reason
             log['data'][4] = data[1]
 
-            logmsg = await self.client.get_message(log_channel, log['msg_id'])
+            logmsg = await self.client.get_message(mod_channel, log['msg_id'])
             new_report = await self.make_log_report(**log['data'])
             await self.client.edit_message(logmsg, new_report)
 
         if logtype != 'reason':
-            log_message = await cxt.say('\n'.join(log_report), log_channel)
+            log_message = await cxt.say('\n'.join(log_report), mod_channel)
 
         self.moddb[server.id]['logs'][log_id] = {
             'type': logtype,
@@ -290,9 +288,23 @@ class JoseMod(jaux.Auxiliar):
 
     async def c_reason(self, message, args, cxt):
         '''`j!reason id reason` - Sets a reason for a kick/ban/etc'''
-        await self.is_admin(message.author.id)
+        await self.can_do('reason', message.author)
+        await self.has_mod_system(message.server)
 
         if len(args) < 2:
             await cxt.say(self.c_reason.__doc__)
+
+        try:
+            log_id = args[1]
+        except:
+            await cxt.say("Error parsing `id`")
+            return
+
+        try:
+            reason = ' '.join(args[2:])
+        except:
+            await cxt.say("Error parsing `reason`")
+
+        await mod_log(self, 'reason', log_id, reason)
 
         return
