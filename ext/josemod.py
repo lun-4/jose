@@ -45,18 +45,19 @@ class JoseMod(jaux.Auxiliar):
 
         return channel
 
-    async def get_from_data(self, server_id, field):
+    def get_from_data(self, server_id, field):
         data = self.moddb.get(server_id)
         if data is None:
             return
 
         if 'channel' in field:
+            self.logger.info("[get_from_data] field %r channel %r", field, data[field])
             return self.channel_cache(data[field])
         else:
             return data.get(field)
 
     async def e_member_join(self, member):
-        log_channel = await self.get_from_data(member.server.id, 'log_channel')
+        log_channel = self.get_from_data(member.server.id, 'log_channel')
         if log_channel is None:
             return
 
@@ -113,7 +114,8 @@ class JoseMod(jaux.Auxiliar):
 
         self.logger.info("[mod_log:%s] %r", logtype, data)
 
-        mod_channel = await self.get_from_data(server.id, 'mod_channel')
+        mod_channel = self.get_from_data(server.id, 'mod_channel')
+        self.logger.info("mod_channel is %r", mod_channel)
         if mod_channel is None:
             self.logger.warning("[mod_log:%s] mod channel not found", logtype)
             return False
