@@ -1,15 +1,16 @@
-# JoséCoin
+JoséCoin
+====
 
 JoséCoins(Abbreviated as JC) are the currency of José, used usually for paying taxes to use other commands.
 JC Wallets aren't created automatically, this is a design & performance choice. To create, use `j!account`.
 
-## JoséCoin Generation
+### JoséCoin Generation
 
 Each message you send (to a server where José is, obviously), has a 1% random chance of receiving a reward.
 That reward can be 0.2, 0.6, 1, 1.2 or 1.5 JC. José reacts with :moneybag: when you receive a reward.
 The more tax you pay increases your probability of getting JoséCoins, with the maximum amount being 4.20%.
 
-## Command list
+### Command list
 
 Command | Description | Example | Alias
 ------------- | ------------- | ------------- | -------------
@@ -22,7 +23,7 @@ Command | Description | Example | Alias
 `j!ltop10 amount` | Shows the 10 people (or a different amount if a variable is put in as `amount`) that have the most JoséCoins in your server | `j!ltop10 13` |
 `j!jcprob` | Shows your probability of getting JoséCoins per message | |
 
-## Stealing System
+### Stealing System
 
 Stealing System works by using `j!steal`, where you can steal an arbritary amount
 of JC from someone's wallet. That comes with a cost though: You have a chance of getting
@@ -49,7 +50,7 @@ Command | Description | Example | Alias
 `j!stealstat` | Your status in the stealing business | |
 `j!stealreset userid` | Resets an user's status in stealdb **[ONLY ADMINS]** | |
 
-## Bank System
+### Bank System
 
 The banking system has two main parts, the Taxbank and Storagebank.
 
@@ -71,7 +72,7 @@ Command | Description | Example | Alias
 `j!withdraw amount` | Withdraws the amount of JoséCoins you specify from the StorageBank | `j!withdraw 22` |
 `j!loan amount|"pay"|"see"` | Requests a loan from the TaxBank according to amount, you can also see how much is being lent to you, and pay back your loan | `j!loan 10`, `j!loan see`, or `j!loan pay` |
 
-## Coming Soon™
+### Coming Soon™
 
-`j!heist`
-`j!donate`
+ * `j!heist`
+ * `j!donate`
