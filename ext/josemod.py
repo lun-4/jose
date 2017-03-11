@@ -40,12 +40,21 @@ class JoseMod(jaux.Auxiliar):
 
         return channel
 
-    async def e_member_join(self, member):
-        data = self.moddb(member.server.id)
+    async def get_from_data(self, server_id, field):
+        data = self.moddb.get(server_id)
         if data is None:
             return
 
-        log_channel = await self.get_channel(data['log_channel'])
+        if 'channel' in field:
+            value = await self.get_channel(data[field])
+            if value is None:
+                return
+            return value
+        else:
+            return data.get(field)
+
+    async def e_member_join(self, member):
+        log_channel = await self.get_from_data(member.server.id, 'log_channel')
         if log_channel is None:
             return
 
@@ -57,6 +66,74 @@ class JoseMod(jaux.Auxiliar):
         em.add_field(name='Joined', value=member.joined_at)
 
         await cxt.say_embed(em, log_channel)
+
+    def make_ban_report(self, log_title, log_id, member, moderator, reason=None):
+        ban_report = []
+        ban_report.append("**%s**, log number %d" % (log_title, log_id))
+        ban_report.append("**User**: %s [%s]" % (str(member), member.id))
+        if reason is None:
+            ban_report.append("**Reason**: **insert reason `j!reason %d`**" % log_id)
+        else:
+            ban_report.append("**Reason**: %s" % reason)
+        ban_report.append("**Moderator**: %s [%s]" % (str(moderator), moderator.id))
+        return ban_report
+
+    async def mod_log(self, logtype, *data):
+        server = data[0]
+
+        log_channel = await self.get_from_data(server.id, 'log_channel')
+        if log_channel is None:
+            return
+
+        log_id = self.new_log_id(server.id)
+        log_report = None
+        log_data = None
+
+        if logtype == 'ban':
+            member = data[1]
+            moderator = data[2]
+            log_data = ['Ban', log_id, member.id, moderator.id, reason]
+            log_report = self.make_log_report(**log_data)
+
+        elif logtype == 'unban':
+            moderator = data[1]
+            user = await self.client.get_user_info(data[2])
+            log_data = ['Unban', log_id, member.id, moderator.id, reason]
+            log_report = self.make_log_report(**log_data)
+
+        elif logtype == 'softban':
+            member = data[1]
+            moderator = data[2]
+
+            log_data = ['Softban', log_id, member.id, moderator.id, reason]
+            log_report = self.make_log_report(**log_data)
+
+        elif logtype == 'kick':
+            member = data[1]
+            moderator = data[2]
+            log_data = ['Kick', log_id, member.id, moderator.id, reason]
+            log_report = self.make_log_report(**log_data)
+
+        elif logtype == 'reason':
+            log_id = data[0]
+            log = self.moddb[server.id]['logs'][log_id]
+
+            # overwrite reason
+            log['data'][4] = data[1]
+
+            logmsg = await self.client.get_message(log_channel, log['msg_id'])
+            new_report = self.make_log_report(**log['data'])
+            await self.client.edit_message(logmsg, new_report)
+
+        if logtype != 'reason':
+            log_message = await cxt.say('\n'.join(log_report), log_channel)
+
+        self.moddb[server.id]['logs'][log_id] = {
+            'type': logtype,
+            'data': log_data,
+            'timestamp': time.time(),
+            'msg_id': log_message.id,
+        }
 
     async def c_initmod(self, message, args, cxt):
         '''`j!initmod modchannel logchannel` - Initialize Moderator extension in this server'''
@@ -99,8 +176,7 @@ class JoseMod(jaux.Auxiliar):
         self.moddb[server_id] = {
             'mod_channel': mod_channel.id,
             'log_channel': log_channel.id,
-            'bans': {},
-            'kicks': {},
+            'logs': {},
         }
 
         return
@@ -124,10 +200,41 @@ class JoseMod(jaux.Auxiliar):
             await self.client.kick(member)
         except discord.Forbidden:
             await cxt.say('Not enough permissions to kick.')
+            return
         except discord.HTTPException:
             await cxt.say('Error kicking.')
+            return
         else:
-            await cxt.say(':boxing_glove: kicked')
+            await cxt.say(':boxing_glove: **%s kicked**', (str(member),))
+
+        await self.mod_log('kick', member, message.author)
+
+    async def c_ban(self, message, args, cxt):
+        '''`j!ban @mention [reason]` - bans a user'''
+
+        if len(args) < 2:
+            await cxt.say(self.c_kick.__doc__)
+
+        try:
+            userid = await jcommon.parse_id(args[1])
+        except:
+            await cxt.say("Error parsing `@mention`")
+            return
+
+        member = message.server.get_member(userid)
+
+        try:
+            await self.client.ban(member)
+        except discord.Forbidden:
+            await cxt.say('Not enough permissions to ban.')
+            return
+        except discord.HTTPException:
+            await cxt.say('Error banning.')
+            return
+        else:
+            await cxt.say(':hammer: **%s was banned**', (str(member),))
+
+        await self.mod_log('ban', member, message.author)
 
     async def c_reason(self, message, args, cxt):
         '''`j!reason id reason` - Sets a reason for a kick/ban/etc'''
