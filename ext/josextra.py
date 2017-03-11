@@ -410,6 +410,11 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             return
 
         new_description = ' '.join(args[1:])
+
+        if len(new_description) > 140:
+            await cxt.say("Your description has more than 140 characters.")
+            return
+
         self.descdb[message.author.id] = new_description
         self.jsondb_save('descdb')
         await cxt.say("description set to `%r`!", (new_description,))
