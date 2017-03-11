@@ -23,6 +23,7 @@ class JoseBot(jcommon.Extension):
             'cooldowns': {},
             'stcmd': {},
         }
+        self.blocked_servers = []
         self.start_time = time.time()
         self.command_lock = False
         self.dev_mode = False
@@ -709,3 +710,17 @@ don't want (unless I'm skynet)")
             await self.do_dev_mode()
 
         await cxt.say("mode changed to `%r`", (mode,))
+
+    async def c_tempblksv(self, message, args, cxt):
+        '''`j!tempblksv serverid` - blocks a server until jose reboots'''
+        await self.is_admin(message.author.id)
+
+        if len(args) < 1:
+            await cxt.say(self.c_tempblksv.__doc__)
+            return
+
+        server_id = args[1]
+        self.blocked_servers.append(server_id)
+        self.logger.info("Blocked %s", server_id)
+        await cxt.say("Added `%r` to blocked server list.")
+        return
