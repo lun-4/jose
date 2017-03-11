@@ -150,13 +150,15 @@ class JoseHelp(jaux.Auxiliar):
     async def c_feedback(self, message, args, cxt):
         '''`j!feedback stuff` - Sends feedback'''
 
+        author = message.author
+        channel = message.channel
+        server = message.server
+
         em = discord.Embed(title='', colour=discord.Colour.magenta())
         em.timestamp = datetime.datetime.now()
         em.set_footer(text='Feedback Report')
-        em.set_author(name=str(member), icon_url=member.avatar_url or member.default_avatar_url)
-
-        channel = message.channel
-        server = message.server
+        em.set_author(name=str(author), icon_url=author.avatar_url or \
+            author.default_avatar_url)
 
         em.add_field(name="Feedback: ", value=feedback)
         em.add_field(name="Server", value="{} [{}]".format(server.name, server.id))
