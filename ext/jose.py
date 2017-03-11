@@ -258,12 +258,14 @@ class JoseBot(jcommon.Extension):
                 await cxt.say(":ok_hand:")
             except:
                 pass
+            return True
         else:
             self.logger.info("Error loading %s", name)
             try:
                 await cxt.say(":poop:")
             except:
                 sys.exit(0)
+            return False
 
     async def c_reload(self, message, args, cxt):
         '''`j!reload module` - recarrega um módulo do josé'''
