@@ -359,7 +359,8 @@ class JoseMod(jaux.Auxiliar):
             await cxt.say("?????? `%r`", (log,))
             return
 
-        user = await self.client.get_user_info(log_data[1])
+        # log_data[2] has user ID
+        user = await self.client.get_user_info(log_data[2])
 
         try:
             await self.client.unban(server, user)
