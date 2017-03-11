@@ -22,7 +22,7 @@ def main(args):
     stmts = 0
     with open(sql_file, 'r') as sqlfile:
         for line in sqlfile.readlines():
-            if stmts % 1000:
+            if not stmts % 1000:
                 print("%d statements..." % stmts)
             do_stmt(line)
             stmts += 1
