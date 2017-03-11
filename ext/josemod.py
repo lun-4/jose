@@ -13,6 +13,7 @@ class JoseMod(jaux.Auxiliar):
         jaux.Auxiliar.__init__(self, cl)
         # TODO: Implement database
         self.moddb = {}
+        self.cache = {}
 
         # TODO: commands for josemod
 
@@ -21,6 +22,41 @@ class JoseMod(jaux.Auxiliar):
 
     async def ext_unload(self):
         return True, ''
+
+    async def get_channel(self, server_id, channel_id):
+        servers = [server for server in self.client.servers if server.id == server_id]
+
+        if len(servers) == 0 or len(servers) > 1:
+            return None
+
+        server = servers[0]
+        channel = server.get_channel(channel_id)
+
+        if channel is not None:
+            if server_id not in self.cache:
+                self.cache[server_id] = {}
+
+            self.cache[server_id][channel_id] = channel
+
+        return channel
+
+    async def e_member_join(self, member):
+        data = self.moddb(member.server.id)
+        if data is None:
+            return
+
+        log_channel = await self.get_channel(data['log_channel'])
+        if log_channel is None:
+            return
+
+        em = discord.Embed(title='Member Join', colour=discord.Colour.green())
+        em.timestamp = member.created_at
+        em.set_footer(text='Created')
+        em.set_author(name=str(member), icon_url=member.avatar_url or member.default_avatar_url)
+        em.add_field(name='ID', value=member.id)
+        em.add_field(name='Joined', value=member.joined_at)
+
+        await cxt.say_embed(em, log_channel)
 
     async def c_initmod(self, message, args, cxt):
         '''`j!initmod modchannel logchannel` - Initialize Moderator extension in this server'''
@@ -45,7 +81,7 @@ class JoseMod(jaux.Auxiliar):
             return
 
         # everyone can read, only jose can write
-        everyone_perms = discord.PermissionOverwrite(read_messages=True)
+        everyone_perms = discord.PermissionOverwrite(read_messages=True, write_messages=False)
         my_perms = discord.PermissionOverwrite(read_messages=True, write_messages=True)
 
         everyone = discord.ChannelPermissions(target=server.default_role, overwrite=everyone_perms)
@@ -70,15 +106,28 @@ class JoseMod(jaux.Auxiliar):
         return
 
     async def c_kick(self, message, args, cxt):
-        '''`j!kick userid|@mention` - kicks a user'''
+        '''`j!kick @mention` - kicks a user'''
         await self.is_admin(message.author.id)
 
         if len(args) < 2:
             await cxt.say(self.c_kick.__doc__)
 
-        # make its ID for reason, etc
+        try:
+            userid = await jcommon.parse_id(args[1])
+        except:
+            await cxt.say("Error parsing `@mention`")
+            return
 
-        return
+        member = message.server.get_member(userid)
+
+        try:
+            await self.client.kick(member)
+        except discord.Forbidden:
+            await cxt.say('Not enough permissions to kick.')
+        except discord.HTTPException:
+            await cxt.say('Error kicking.')
+        else:
+            await cxt.say(':boxing_glove: kicked')
 
     async def c_reason(self, message, args, cxt):
         '''`j!reason id reason` - Sets a reason for a kick/ban/etc'''

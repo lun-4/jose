@@ -310,6 +310,14 @@ async def on_error(event, *args, **kwargs):
         jcommon.logger.error("Message error happened at ServerID %s name %r" % \
             (message.server.id, message.server.name))
 
+@client.event
+async def on_member_join(member):
+    await do_event('member_join', [member])
+
+@client.event
+async def on_member_remove(member):
+    await do_event('member_remove', [member])
+
 OFF_JOSE_USERDICT = {'name': 'José', 'id': '0', \
     'discriminator': '666', 'avatar': None, 'bot': True}
 OFF_JOSE_USER = discord.User(**OFF_JOSE_USERDICT)
