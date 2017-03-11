@@ -373,7 +373,7 @@ class JoseMod(jaux.Auxiliar):
         else:
             await cxt.say(':angel: **%s was unbanned**', (str(user),))
 
-        await self.mod_log('unban', message.server, member, message.author, reason)
+        await self.mod_log('unban', message.server, user, message.author, reason)
 
     async def c_reason(self, message, args, cxt):
         '''`j!reason caseid reason` - Sets a reason for a kick/ban/etc'''
