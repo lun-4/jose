@@ -19,7 +19,8 @@ class JoseMod(jaux.Auxiliar):
         # TODO: Implement database
         self.moddb = {}
         self.cache = {
-            'users': {}
+            'users': {},
+            'ch': {}
         }
 
     async def ext_load(self):
@@ -36,20 +37,11 @@ class JoseMod(jaux.Auxiliar):
         except Exception as err:
             return False, repr(err)
 
-    async def get_channel(self, server_id, channel_id):
-        servers = [server for server in self.client.servers if server.id == server_id]
-
-        if len(servers) == 0 or len(servers) > 1:
-            return None
-
-        server = servers[0]
-        channel = server.get_channel(channel_id)
+    def channel_cache(self, channel_id):
+        channel = self.client.get_channel(channel_id)
 
         if channel is not None:
-            if server_id not in self.cache:
-                self.cache[server_id] = {}
-
-            self.cache[server_id][channel_id] = channel
+            self.cache['ch'][channel_id] = channel
 
         return channel
 
@@ -59,10 +51,7 @@ class JoseMod(jaux.Auxiliar):
             return
 
         if 'channel' in field:
-            value = await self.get_channel(server_id, data[field])
-            if value is None:
-                return
-            return value
+            return self.channel_cache(data[field])
         else:
             return data.get(field)
 
@@ -126,7 +115,7 @@ class JoseMod(jaux.Auxiliar):
 
         mod_channel = await self.get_from_data(server.id, 'mod_channel')
         if mod_channel is None:
-            self.logger.warning("[mod_log:%s] mod channel not found")
+            self.logger.warning("[mod_log:%s] mod channel not found", logtype)
             return False
 
         log_id = self.new_log_id(server.id)
