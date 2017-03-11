@@ -261,7 +261,7 @@ class JoseMod(jaux.Auxiliar):
 
         try:
             await self.client.kick(member)
-            done = await self.mod_log('kick', member, message.author)
+            done = await self.mod_log('kick', message.server.id, member, message.author)
             if done:
                 await cxt.say(':boxing_glove: **%s kicked**', (str(member),))
             else:
@@ -308,7 +308,7 @@ class JoseMod(jaux.Auxiliar):
         else:
             await cxt.say(':hammer: **%s was banned**', (str(member),))
 
-        await self.mod_log('ban', member, message.author)
+        await self.mod_log('ban', message.server.id, member, message.author)
 
     async def c_reason(self, message, args, cxt):
         '''`j!reason id reason` - Sets a reason for a kick/ban/etc'''
@@ -330,6 +330,6 @@ class JoseMod(jaux.Auxiliar):
         except:
             await cxt.say("Error parsing `reason`")
 
-        await self.mod_log(self, 'reason', log_id, reason)
+        await self.mod_log(self, 'reason', message.server.id, log_id, reason)
 
         return
