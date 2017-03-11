@@ -14,11 +14,11 @@ pip3 install install -U -r requirements.txt
 
 `joseconfig.py` looks like this:
 ```python
-# paths for databases
+# Paths for Databases
 jcoin_path = 'jcoin/josecoin.db'
 MAGICWORD_PATH = 'db/magicwords.json'
 
-# tokens 'n' stuff
+# Tokens 'n' Stuff
 discord_token = 'DISCORD OAUTH2 BOT TOKEN'
 soundcloud_id = 'SOUNDCLOUD API ID'
 WOLFRAMALPHA_APP_ID = 'WOLFRAM|ALPHA APP ID' # https://developer.wolframalpha.com/portal/signin.html
@@ -32,4 +32,4 @@ in a shell(probably on tmux so it doesn't exits when you exit the shell):
 python3 jose-bot.py
 ```
 
-CTRL-C unloads and stops everything(use that AFTER josé logs on, you can use if errors happen in startup)
+CTRL-C unloads and stops everything (use that AFTER josé logs on, you can use if errors happen in startup)
