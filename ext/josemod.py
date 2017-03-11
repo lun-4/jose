@@ -9,6 +9,7 @@ import josecommon as jcommon
 import uuid
 import time
 
+MODERATION_DATABASE = 'db/moderation.json'
 MODERATOR_ROLE_NAME = 'Moderator'
 
 class JoseMod(jaux.Auxiliar):
