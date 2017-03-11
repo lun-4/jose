@@ -157,7 +157,9 @@ class JoseSpeak(jcommon.Extension):
 
     async def server_messages(self, serverid, limit=None):
         cur = await self.dbapi.do('SELECT message FROM markovdb WHERE serverid=?', (serverid,))
-        rows = [row[0] for row in cur.fetchall()]
+
+        # don't trust nobody, not even yourself.
+        rows = [str(row[0]) for row in cur.fetchall()]
         if limit is not None:
             pos = len(rows) - limit
             rows = rows[pos:]
