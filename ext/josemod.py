@@ -59,7 +59,7 @@ class JoseMod(jaux.Auxiliar):
             return
 
         if 'channel' in field:
-            value = await self.get_channel(data[field])
+            value = await self.get_channel(server_id, data[field])
             if value is None:
                 return
             return value
