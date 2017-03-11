@@ -78,7 +78,7 @@ class JoseMod(jaux.Auxiliar):
         em.add_field(name='ID', value=member.id)
         em.add_field(name='Joined', value=member.joined_at)
 
-        await self.client.send_message(embed=em, channel=log_channel)
+        await self.client.send_message(log_channel, embed=em)
 
     def new_log_id(self, server_id):
         data = self.moddb.get(server_id)
@@ -168,8 +168,7 @@ class JoseMod(jaux.Auxiliar):
             await self.client.edit_message(logmsg, new_report)
 
         if logtype != 'reason':
-            log_message = await self.client.send_message('\n'.join(log_report), \
-                channel=mod_channel)
+            log_message = await self.client.send_message(mod_channel, '\n'.join(log_report))
 
         self.moddb[server.id]['logs'][log_id] = {
             'type': logtype,
