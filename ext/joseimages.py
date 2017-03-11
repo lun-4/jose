@@ -16,9 +16,26 @@ random = SystemRandom()
 
 IMAGE_LIMIT = 14
 
+PUDDING_MOE = 'http://pudding.moe'
+
+async def test_generator():
+    img_number = 1
+    img_extension = '.png'
+    if random.randint(0, 26) == 1:
+        img_number += random.randint(0, 38)
+        img_extension = '.gif'
+    else:
+        img_number += random.randint(0, 519)
+
+    return "{}/homepage/random/{}.{}".format(PUDDING_MOE, img_number, img_extension)
+
+
 class JoseImages(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
+        self.image_directories = {
+            'test': test_generator,
+        }
 
     async def ext_load(self):
         return True, ''
@@ -193,3 +210,24 @@ class JoseImages(jaux.Auxiliar):
         except Exception as e:
             await self.debug('```%s```'%traceback.format_exc())
         return
+
+    async def c_random(self, message, args, cxt):
+        '''`j!random directory|"list"` - Random images from some sources here and there'''
+
+        if len(args) < 2:
+            await cxt.say(self.c_random.__doc__)
+            return
+
+        try:
+            directory = args[1]
+        except:
+            await cxt.say("Error parsing `directory`")
+            pass
+
+        generator = self.image_directories.get(directory)
+        if generator is None:
+            await cxt.say("Directory `%r` not found.", (directory,))
+            return
+
+        url = await generator()
+        await cxt.say(url)
