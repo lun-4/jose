@@ -22,10 +22,18 @@ class JoseMod(jaux.Auxiliar):
         }
 
     async def ext_load(self):
-        return True, ''
+        try:
+            self.jsondb('moddb', path=MODERATION_DATABASE)
+            return True, ''
+        except:
+            return False, ''
 
     async def ext_unload(self):
-        return True, ''
+        try:
+            self.jsondb_save('moddb')
+            return True, ''
+        except:
+            return False
 
     async def get_channel(self, server_id, channel_id):
         servers = [server for server in self.client.servers if server.id == server_id]

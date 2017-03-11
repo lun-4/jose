@@ -439,7 +439,7 @@ class Extension:
             return None
 
         database_path = kwargs.get('path')
-        attribute = kwargs.get('watch', database_id)
+        attribute = kwargs.get('attribute', database_id)
         default_file = kwargs.get('default', '{}')
 
         self._databases[database_id] = {
