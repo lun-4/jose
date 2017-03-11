@@ -8,6 +8,8 @@ import joseerror as je
 import josecommon as jcommon
 import uuid
 
+MODERATOR_ROLE_NAME = 'Moderator'
+
 class JoseMod(jaux.Auxiliar):
     def __init__(self, cl):
         '''josemod - Moderator Extension'''
@@ -163,6 +165,23 @@ class JoseMod(jaux.Auxiliar):
             'msg_id': log_message.id,
         }
 
+    async def can_do(self, action, user):
+        # TODO: specific actions to certain roles
+        if user.id in jcommon.ADMIN_IDS:
+            return True
+
+        for role in user.roles:
+            if role.name == MODERATOR_ROLE_NAME:
+                return True
+
+        raise je.PermissionError()
+
+    async def has_mod_system(self, server):
+        if server.id in self.moddb:
+            return True
+        else:
+            raise je.CommonError("Moderation System is not enabled in this server.")
+
     async def c_initmod(self, message, args, cxt):
         '''`j!initmod modchannel logchannel` - Initialize Moderator extension in this server'''
         await self.is_admin(message.author.id)
@@ -213,7 +232,8 @@ class JoseMod(jaux.Auxiliar):
 
     async def c_kick(self, message, args, cxt):
         '''`j!kick @mention` - kicks a user'''
-        await self.is_admin(message.author.id)
+        await self.can_do('kick', message.author)
+        await self.has_mod_system(message.server)
 
         if len(args) < 2:
             await cxt.say(self.c_kick.__doc__)
@@ -241,6 +261,8 @@ class JoseMod(jaux.Auxiliar):
 
     async def c_ban(self, message, args, cxt):
         '''`j!ban @mention [reason]` - bans a user'''
+        await self.can_do('ban', message.author)
+        await self.has_mod_system(message.server)
 
         if len(args) < 2:
             await cxt.say(self.c_kick.__doc__)
