@@ -127,8 +127,8 @@ class JoseMod(jaux.Auxiliar):
 
         elif logtype == 'unban':
             moderator = data[1]
-            user = await self.client.get_user_info(data[2])
-            log_data = ['Unban', log_id, member.id, moderator.id, reason]
+            user_id = data[2]
+            log_data = ['Unban', log_id, user_id, moderator.id, reason]
             log_report = await self.make_log_report(**log_data)
 
         elif logtype == 'softban':
