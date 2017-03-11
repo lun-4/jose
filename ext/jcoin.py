@@ -841,3 +841,20 @@ class JoseCoin(jaux.Auxiliar):
 
         await cxt.say("Removed <@%s> loan record of %.2fJC to pay", \
             (userid, need_to_pay,))
+
+    async def c_donate(self, message, args, cxt):
+        '''`j!donate amount` - donate to your server\'s Taxbank'''
+
+        if len(args) < 2:
+            await cxt.say(self.c_donate.__doc__)
+            return
+
+        try:
+            amount = decimal.Decimal(args[1])
+        except:
+            await cxt.say("Error parsing `amount`")
+            return
+
+        c = await self.jcoin_pricing(cxt, amount)
+        if c:
+            await cxt.say("Donated %.2fJC in taxes.", (amount,))
