@@ -18,9 +18,13 @@ There are 2 extra `Texter`s after the server ones, one is the "cult" generator, 
 
 Command | Description | Example | Alias
 ------------- | ------------- | ------------- | -------------
-`j!speaktrigger` | Triggers your server's `Texter` to generate text | | `j!spt`
+`j!speaktrigger ["fw"]` | Triggers your server's `Texter` to generate text, if fw is listed as in argument, then the `Texter` will generate in Ｆｕｌｌ　Ｗｉｄｔｈ | `j!spt fw` | `j!spt`
 `j!falar` | Triggers the "cult" generator to generate text | |
 `j!sfalar` | Triggers your server's `Texter` to generate text | |
 `j!gfalar` | Triggers the global `Texter` to generate text | |
 `j!jwormhole` | Uses your server's `Texter` to send messages through Septapus Wormhole | | `j!jw`
 `j!tatsu` | Prefixes output from `j!speaktrigger` with `"^"` | |
+
+### Coming Soon™
+
+Removal of `j!sfalar` and `j!gfalar`
