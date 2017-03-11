@@ -153,7 +153,7 @@ class JoseMod(jaux.Auxiliar):
 
         elif logtype == 'reason':
             log_id = data[1]
-            data = self.moddb.get(server_id)
+            data = self.moddb.get(server.id)
             if data is None:
                 return False
 
@@ -335,6 +335,10 @@ class JoseMod(jaux.Auxiliar):
         except:
             await cxt.say("Error parsing `reason`")
 
-        await self.mod_log('reason', message.server, log_id, reason)
+        done = await self.mod_log('reason', message.server, log_id, reason)
+        if done:
+            await cxt.say(":ok_hand: Reason processed")
+        else:
+            await cxt.say(":thinking:")
 
         return
