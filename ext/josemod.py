@@ -172,10 +172,12 @@ class JoseMod(jaux.Auxiliar):
 
             logmsg = await self.client.get_message(mod_channel, log['msg_id'])
             new_report = await self.make_log_report(*log['data'])
-            log_message = await self.client.edit_message(logmsg, new_report)
+            log_message = await self.client.edit_message(logmsg, \
+                '\n'.join(new_report))
 
         if logtype != 'reason':
-            log_message = await self.client.send_message(mod_channel, '\n'.join(log_report))
+            log_message = await self.client.send_message(mod_channel, \
+                '\n'.join(log_report))
 
         self.moddb[server.id]['logs'][log_id] = {
             'type': logtype,
