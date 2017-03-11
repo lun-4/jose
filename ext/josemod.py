@@ -140,10 +140,10 @@ class JoseMod(jaux.Auxiliar):
 
         elif logtype == 'unban':
             moderator = data[1]
-            user_id = data[2]
+            user = data[2]
             reason = data[3]
 
-            log_data = ['Unban', log_id, user_id, moderator.id, reason]
+            log_data = ['Unban', log_id, user.id, moderator.id, reason]
             log_report = await self.make_log_report(*log_data)
 
         elif logtype == 'softban':
@@ -365,6 +365,7 @@ class JoseMod(jaux.Auxiliar):
 
         # log_data[2] has user ID
         user = await self.client.get_user_info(log_data[2])
+        self.add_user_cache(log_data[2], user)
 
         try:
             await self.client.unban(server, user)
