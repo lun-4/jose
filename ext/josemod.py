@@ -131,26 +131,26 @@ class JoseMod(jaux.Auxiliar):
             member = data[1]
             moderator = data[2]
             log_data = ['Ban', log_id, member.id, moderator.id, reason]
-            log_report = await self.make_log_report(**log_data)
+            log_report = await self.make_log_report(*log_data)
 
         elif logtype == 'unban':
             moderator = data[1]
             user_id = data[2]
             log_data = ['Unban', log_id, user_id, moderator.id, reason]
-            log_report = await self.make_log_report(**log_data)
+            log_report = await self.make_log_report(*log_data)
 
         elif logtype == 'softban':
             member = data[1]
             moderator = data[2]
 
             log_data = ['Softban', log_id, member.id, moderator.id, reason]
-            log_report = await self.make_log_report(**log_data)
+            log_report = await self.make_log_report(*log_data)
 
         elif logtype == 'kick':
             member = data[1]
             moderator = data[2]
             log_data = ['Kick', log_id, member.id, moderator.id, reason]
-            log_report = await self.make_log_report(**log_data)
+            log_report = await self.make_log_report(*log_data)
 
         elif logtype == 'reason':
             log_id = data[0]
@@ -160,7 +160,7 @@ class JoseMod(jaux.Auxiliar):
             log['data'][4] = data[1]
 
             logmsg = await self.client.get_message(mod_channel, log['msg_id'])
-            new_report = await self.make_log_report(**log['data'])
+            new_report = await self.make_log_report(*log['data'])
             await self.client.edit_message(logmsg, new_report)
 
         if logtype != 'reason':
