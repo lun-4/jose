@@ -84,6 +84,9 @@ class JoseMod(jaux.Auxiliar):
 
         return new_id
 
+    def add_user_cache(self, userid, user):
+        self.cache['users'][userid] = user
+
     async def get_user(self, userid):
         # get from cache if possible
         if userid in self.cache['users']:
@@ -246,6 +249,8 @@ class JoseMod(jaux.Auxiliar):
             return
 
         member = message.server.get_member(userid)
+        self.add_user_cache(userid, member)
+        self.add_user_cache(message.author.id, message.author)
 
         try:
             await self.client.kick(member)
@@ -275,6 +280,9 @@ class JoseMod(jaux.Auxiliar):
             return
 
         member = message.server.get_member(userid)
+
+        self.add_user_cache(userid, member)
+        self.add_user_cache(message.author.id, message.author)
 
         try:
             await self.client.ban(member)
