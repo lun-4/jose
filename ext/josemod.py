@@ -34,18 +34,29 @@ class JoseMod(jaux.Auxiliar):
             await cxt.say("Moderator is already on in this server")
             return
 
+        server = message.server
         server_id = message.server.id
 
         try:
-            mod_channel_id = args[1]
-            log_channel_id = args[2]
+            mod_channel_name = args[1]
+            log_channel_name = args[2]
         except:
             await cxt.say("???")
             return
 
+        # everyone can read, only jose can write
+        everyone_perms = discord.PermissionOverwrite(read_messages=True)
+        my_perms = discord.PermissionOverwrite(read_messages=True, write_messages=True)
+
+        everyone = discord.ChannelPermissions(target=server.default_role, overwrite=everyone_perms)
+        jose = discord.ChannelPermissions(target=server.me, overwrite=my_perms)
+
+        mod_channel = await self.client.create_channel(server, mod_channel_name, everyone, jose)
+        log_channel = await self.client.create_channel(server, log_channel_name, everyone, jose)
+
         self.moddb[server_id] = {
-            'mod_channel': mod_channel_id,
-            'log_channel': log_channel_id,
+            'mod_channel': mod_channel.id,
+            'log_channel': log_channel.id,
             'bans': {},
             'kicks': {},
         }
