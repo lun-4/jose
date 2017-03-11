@@ -19,6 +19,7 @@ import joseconfig as jconfig
 from random import SystemRandom
 random = SystemRandom()
 
+DESCRIPTION_DATABASE = 'db/descriptions.json'
 JOSE_URL = 'https://github.com/lkmnds/jose/blob/master'
 
 docsdict = {
@@ -69,12 +70,19 @@ class joseXtra(jaux.Auxiliar):
         self.cbk_new("jxtra.msgcount_hour", self.msg_count_hour, 3600)
 
     async def ext_load(self):
-        return True, ''
+        try:
+            self.jsondb('descdb', path=DESCRIPTION_DATABASE)
+            return True, ''
+        except Exception as err:
+            return False, ''
 
     async def ext_unload(self):
-        self.cbk_remove('jxtra.msgcount')
-        self.cbk_remove('jxtra.msgcount_hour')
-        return True, ''
+        try:
+            self.cbk_remove('jxtra.msgcount')
+            self.cbk_remove('jxtra.msgcount_hour')
+            return True, ''
+        except Exception as err:
+            return False, ''
 
     async def msg_count_minute(self):
         if self.msgcount_min > 0:
@@ -361,6 +369,10 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
         else:
             em.add_field(name='Name', value='{}'.format(user.name))
 
+        description = self.descdb.get(user)
+        if description is not None:
+            em.add_field(name='Description', value=description)
+
         if acc_id in self.jcoin.data:
             account = self.jcoin.data.get(acc_id)
 
@@ -389,6 +401,17 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
                 account['times_stolen'], account['success_steal']))
 
         await cxt.say_embed(em)
+
+    async def c_setdesc(self, message, args, cxt):
+        '''`j!setdesc stuff` - set your description(max 140 chars)'''
+
+        if len(args) < 2:
+            await cxt.say(self.c_setdesc.__doc__)
+            return
+
+        new_description = ' '.join(args[1:])
+        self.descdb[message.author.id] = new_description
+        await cxt.say("description set to `%r`!", (new_description,))
 
     async def c_color(self, message, args, cxt):
         '''`j!color "rand"|#aabbcc|red,green,blue` - show colors'''
