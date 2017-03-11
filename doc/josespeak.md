@@ -1,4 +1,4 @@
-The `josespeak` module
+JoséSpeak
 ====
 
 :ok_hand: **THIS IS HIGHLY RECOMMENDED TOP NOTCH READING FOR PEOPLE ADDING JOSÉ TO NEW SERVERS** :ok_hand:
@@ -27,4 +27,4 @@ Command | Description | Example | Alias
 
 ### Coming Soon™
 
-Removal of `j!sfalar` and `j!gfalar`
+ * Removal of `j!sfalar` and `j!gfalar`
