@@ -51,8 +51,14 @@ class JoseMod(jaux.Auxiliar):
         everyone = discord.ChannelPermissions(target=server.default_role, overwrite=everyone_perms)
         jose = discord.ChannelPermissions(target=server.me, overwrite=my_perms)
 
-        mod_channel = await self.client.create_channel(server, mod_channel_name, everyone, jose)
-        log_channel = await self.client.create_channel(server, log_channel_name, everyone, jose)
+        try:
+            mod_channel = await self.client.create_channel(server, \
+                mod_channel_name, everyone, jose)
+            log_channel = await self.client.create_channel(server, \
+                log_channel_name, everyone, jose)
+        except discord.Forbidden:
+            await cxt.say("hey I can't create channels give me permissions")
+            return
 
         self.moddb[server_id] = {
             'mod_channel': mod_channel.id,
