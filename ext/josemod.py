@@ -136,6 +136,8 @@ class JoseMod(jaux.Auxiliar):
         elif logtype == 'unban':
             moderator = data[1]
             user_id = data[2]
+            reason = data[3]
+
             log_data = ['Unban', log_id, user_id, moderator.id, reason]
             log_report = await self.make_log_report(*log_data)
 
@@ -323,8 +325,49 @@ class JoseMod(jaux.Auxiliar):
 
         await self.mod_log('ban', message.server, member, message.author)
 
+    async def c_unban(self, message, args, cxt):
+        '''`j!unban caseid reason` - unbans a user'''
+
+        try:
+            log_id = args[1]
+        except:
+            await cxt.say("Error parsing `caseid`")
+            return
+
+        try:
+            reason = ' '.join(args[2:])
+        except:
+            await cxt.say("Error parsing `reason`")
+
+        self.add_user_cache(message.author.id, message.author)
+        server = message.server
+
+        data = self.moddb.get(server.id)
+        if data is None:
+            return False
+
+        log = data['logs'].get(log_id, None)
+        if log is None:
+            return False
+
+        data = log['data']
+        user = await self.client.get_user_info(data[1])
+
+        try:
+            await self.client.unban(server, user)
+        except discord.Forbidden:
+            await cxt.say('Not enough permissions to unban.')
+            return
+        except discord.HTTPException:
+            await cxt.say('Error unbanning.')
+            return
+        else:
+            await cxt.say(':angel: **%s was unbanned**', (str(user),))
+
+        await self.mod_log('unban', message.server, member, message.author, reason)
+
     async def c_reason(self, message, args, cxt):
-        '''`j!reason id reason` - Sets a reason for a kick/ban/etc'''
+        '''`j!reason caseid reason` - Sets a reason for a kick/ban/etc'''
         await self.can_do('reason', message.author)
         await self.has_mod_system(message.server)
 
@@ -335,7 +378,7 @@ class JoseMod(jaux.Auxiliar):
         try:
             log_id = args[1]
         except:
-            await cxt.say("Error parsing `id`")
+            await cxt.say("Error parsing `caseid`")
             return
 
         try:
