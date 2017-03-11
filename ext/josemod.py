@@ -75,11 +75,9 @@ class JoseMod(jaux.Auxiliar):
         if data is None:
             return
 
-        new_id = '0'
-        took = 1
-        while new_id in data:
+        new_id = str(uuid.uuid4().fields[-1])[:5]
+        while new_id not in data:
             new_id = str(uuid.uuid4().fields[-1])[:5]
-            took += 1
 
         return new_id
 
