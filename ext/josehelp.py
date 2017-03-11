@@ -150,9 +150,15 @@ class JoseHelp(jaux.Auxiliar):
     async def c_feedback(self, message, args, cxt):
         '''`j!feedback stuff` - Sends feedback'''
 
+        if len(args) < 2:
+            await cxt.say(self.c_feedback.__doc__)
+            return
+
         author = message.author
         channel = message.channel
         server = message.server
+
+        feedback = ' '.join(args[1:])
 
         em = discord.Embed(title='', colour=discord.Colour.magenta())
         em.timestamp = datetime.datetime.now()
