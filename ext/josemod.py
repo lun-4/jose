@@ -342,16 +342,20 @@ class JoseMod(jaux.Auxiliar):
         self.add_user_cache(message.author.id, message.author)
         server = message.server
 
-        data = self.moddb.get(server.id)
-        if data is None:
+        mod_data = self.moddb.get(server.id)
+        if mod_data is None:
             return False
 
-        log = data['logs'].get(log_id, None)
+        log = mod_data['logs'].get(log_id, None)
         if log is None:
             return False
 
-        data = log['data']
-        user = await self.client.get_user_info(data[1])
+        log_data = log['data']
+        if log_data is None:
+            await cxt.say("?????? `%r`", (log_data,))
+            return
+
+        user = await self.client.get_user_info(log_data[1])
 
         try:
             await self.client.unban(server, user)
