@@ -224,6 +224,11 @@ class JoseImages(jaux.Auxiliar):
             await cxt.say("Error parsing `directory`")
             pass
 
+        if directory == 'list':
+            await cxt.say(self.codeblock('', ', '.join(\
+                self.image_directories.keys())))
+            return
+
         generator = self.image_directories.get(directory)
         if generator is None:
             await cxt.say("Directory `%r` not found.", (directory,))
