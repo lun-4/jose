@@ -722,5 +722,5 @@ don't want (unless I'm skynet)")
         server_id = args[1]
         self.blocked_servers.append(server_id)
         self.logger.info("Blocked %s", server_id)
-        await cxt.say("Added `%r` to blocked server list.")
+        await cxt.say("Added `%r` to blocked server list.", (server_id,))
         return
