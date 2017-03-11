@@ -715,7 +715,7 @@ don't want (unless I'm skynet)")
         '''`j!tempblksv serverid` - blocks a server until jose reboots'''
         await self.is_admin(message.author.id)
 
-        if len(args) < 1:
+        if len(args) < 2:
             await cxt.say(self.c_tempblksv.__doc__)
             return
 
