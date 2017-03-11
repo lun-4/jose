@@ -90,9 +90,13 @@ class JoseMod(jaux.Auxiliar):
         if userid in self.cache['users']:
             return self.cache['users'][userid]
 
+        self.logger.info("[get_user] %r", userid)
         user = await self.client.get_user_info(userid)
+
         # cache it
         self.cache['users'][userid] = user
+
+        return user
 
     async def make_log_report(self, log_title, log_id, member_id, moderator_id, reason=None):
         ban_report = []
