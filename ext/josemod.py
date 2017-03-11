@@ -152,7 +152,13 @@ class JoseMod(jaux.Auxiliar):
             log_report = await self.make_log_report(*log_data)
 
         elif logtype == 'reason':
+            print(data)
             log_id = data[1]
+            reason = data[2]
+
+            if reason is None:
+                return False
+
             data = self.moddb.get(server.id)
             if data is None:
                 return False
@@ -162,7 +168,7 @@ class JoseMod(jaux.Auxiliar):
                 return False
 
             # overwrite reason
-            log['data'][4] = data[2]
+            log['data'][4] = reason
 
             logmsg = await self.client.get_message(mod_channel, log['msg_id'])
             new_report = await self.make_log_report(*log['data'])
