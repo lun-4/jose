@@ -172,3 +172,4 @@ class JoseHelp(jaux.Auxiliar):
 
         feedback_channel = self.client.get_channel(FEEDBACK_CHANNEL_ID)
         await cxt.say_embed(em, feedback_channel)
+        await cxt.say(":ok_hand: Thanks for the feedback")
