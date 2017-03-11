@@ -100,13 +100,14 @@ class JoseMod(jaux.Auxiliar):
         member = await self.get_user(member_id)
         moderator = await self.get_user(moderator_id)
 
-        ban_report.append("**%s**, log number %d" % (log_title, log_id))
+        ban_report.append("**%s**, log id %s" % (log_title, log_id))
         ban_report.append("**User**: %s [%s]" % (str(member), member.id))
         if reason is None:
             ban_report.append("**Reason**: **insert reason `j!reason %d`**" % log_id)
         else:
             ban_report.append("**Reason**: %s" % reason)
         ban_report.append("**Moderator**: %s [%s]" % (str(moderator), moderator.id))
+
         return ban_report
 
     async def mod_log(self, logtype, *data):
