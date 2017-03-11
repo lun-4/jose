@@ -7,6 +7,7 @@ import jauxiliar as jaux
 import joseerror as je
 import josecommon as jcommon
 import uuid
+import time
 
 MODERATOR_ROLE_NAME = 'Moderator'
 
@@ -68,7 +69,7 @@ class JoseMod(jaux.Auxiliar):
         em.add_field(name='ID', value=member.id)
         em.add_field(name='Joined', value=member.joined_at)
 
-        await cxt.say_embed(em, log_channel)
+        await self.client.send_message(embed=em, channel=log_channel)
 
     def new_log_id(self, server_id):
         data = self.moddb.get(server_id)
@@ -116,6 +117,7 @@ class JoseMod(jaux.Auxiliar):
         log_id = self.new_log_id(server.id)
         log_report = None
         log_data = None
+        reason = None
 
         if logtype == 'ban':
             member = data[1]
@@ -154,7 +156,8 @@ class JoseMod(jaux.Auxiliar):
             await self.client.edit_message(logmsg, new_report)
 
         if logtype != 'reason':
-            log_message = await cxt.say('\n'.join(log_report), mod_channel)
+            log_message = await self.client.send_message('\n'.join(log_report), \
+                channel=mod_channel)
 
         self.moddb[server.id]['logs'][log_id] = {
             'type': logtype,
@@ -305,6 +308,6 @@ class JoseMod(jaux.Auxiliar):
         except:
             await cxt.say("Error parsing `reason`")
 
-        await mod_log(self, 'reason', log_id, reason)
+        await self.mod_log(self, 'reason', log_id, reason)
 
         return
