@@ -5,6 +5,7 @@ sys.path.append("..")
 import jauxiliar as jaux
 import josecommon as jcommon
 import discord
+import datetime
 
 MARKDOWN_HELP_FILES = [
     'doc/cmd/listcmd.md',
@@ -15,6 +16,7 @@ MARKDOWN_HELP_FILES = [
 
 JOSE_INVITE = 'https://discord.gg/5ASwg4C'
 JOSE_LISTCMD_URL = 'https://github.com/lkmnds/jose/blob/master/doc/cmd/listcmd.md'
+FEEDBACK_CHANNEL_ID = '290244095820038144'
 
 class JoseHelp(jaux.Auxiliar):
     def __init__(self, _client):
@@ -144,3 +146,21 @@ class JoseHelp(jaux.Auxiliar):
                 await cxt.say(docstring)
         except Exception as e:
             await cxt.say("Error getting docstring for %s: %r" % (cmd_ht, repr(e)))
+
+    async def c_feedback(self, message, args, cxt):
+        '''`j!feedback stuff` - Sends feedback'''
+
+        em = discord.Embed(title='', colour=discord.Colour.magenta())
+        em.timestamp = datetime.datetime.now()
+        em.set_footer(text='Feedback Report')
+        em.set_author(name=str(member), icon_url=member.avatar_url or member.default_avatar_url)
+
+        channel = message.channel
+        server = message.server
+
+        em.add_field(name="Feedback: ", value=feedback)
+        em.add_field(name="Server", value="{} [{}]".format(server.name, server.id))
+        em.add_field(name="Channel", value="{} [{}]".format(channel.name, channel.id))
+
+        feedback_channel = self.client.get_channel(FEEDBACK_CHANNEL_ID)
+        await cxt.say_embed(em, feedback_channel)
