@@ -94,6 +94,8 @@ When he's ready, you can use `j!speaktrigger` or `j!spt` to hear what he has to 
 
 Use `j!botblock` if you want to block/unblock bot messages coming into José.
 Use `j!language en` to set your language to English or `j!language pt` to set your language to Portuguese.
+
+Use José\'s Discord server for support/help/feedback/etc https://discord.gg/5ASwg4C
 '''.format(JOSE_VERSION)
 
 JOSE_GENERAL_HTEXT = '''
