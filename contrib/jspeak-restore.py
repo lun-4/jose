@@ -7,7 +7,10 @@ conn = sqlite3.connect('jose.db')
 def do_stmt(stmt, params=None):
     global conn
     cur = conn.cursor()
-    cur.execute(stmt, params)
+    if params is None:
+        cur.execute(stmt)
+    else:
+        cur.execute(stmt, params)
     conn.commit()
     return cur
 
