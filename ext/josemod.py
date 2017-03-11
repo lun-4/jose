@@ -122,14 +122,19 @@ class JoseMod(jaux.Auxiliar):
     async def mod_log(self, logtype, *data):
         server = data[0]
 
+        self.logger.info("[mod_log:%s] %r", logtype, data)
+
         mod_channel = await self.get_from_data(server.id, 'mod_channel')
         if mod_channel is None:
-            return
+            self.logger.warning("[mod_log:%s] mod channel not found")
+            return False
 
         log_id = self.new_log_id(server.id)
         log_report = None
         log_data = None
         reason = None
+
+        self.logger.info("[mod_log:%s] making mod log", logtype)
 
         if logtype == 'ban':
             member = data[1]
