@@ -86,7 +86,7 @@ async def check_message(message):
     if message.server is None:
         return False
 
-    if message.server in jose.blocked_servers:
+    if message.server.id in jose.blocked_servers:
         return False
 
     if jose.dev_mode:
