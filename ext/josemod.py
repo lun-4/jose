@@ -8,6 +8,7 @@ import joseerror as je
 import josecommon as jcommon
 import uuid
 import time
+import copy
 
 MODERATION_DATABASE = 'db/moderation.json'
 MODERATOR_ROLE_NAME = 'Moderator'
@@ -176,6 +177,9 @@ class JoseMod(jaux.Auxiliar):
             new_report = await self.make_log_report(*log['data'])
             log_message = await self.client.edit_message(logmsg, \
                 '\n'.join(new_report))
+
+            # copy
+            log_data = copy.copy(log['data'])
 
         if logtype != 'reason':
             log_message = await self.client.send_message(mod_channel, \
@@ -352,7 +356,7 @@ class JoseMod(jaux.Auxiliar):
 
         log_data = log['data']
         if log_data is None:
-            await cxt.say("?????? `%r`", (log_data,))
+            await cxt.say("?????? `%r`", (log,))
             return
 
         user = await self.client.get_user_info(log_data[1])
