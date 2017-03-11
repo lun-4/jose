@@ -42,6 +42,10 @@ class JoseBot(jcommon.Extension):
             'any_message': [],
             'server_join': [],
             'client_ready': [],
+
+            # member stuff
+            'member_join': [],
+            'member_remove': [],
         }
 
     def ev_load(self, dflag=False):

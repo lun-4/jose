@@ -16,3 +16,11 @@
  * Called the same way as `discord.Client.on_ready`
  * **Can be called more than one time**
  * Receives a `discord.Client` object
+
+### `member_join`
+ * Called the same way as `discord.Client.on_member_join`
+ * Receives `discord.Member` object
+
+### `member_remove`
+ * Called the same way as `discord.Client.on_member_remove`
+ * Receives `discord.Member` object
