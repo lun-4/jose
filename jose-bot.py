@@ -76,7 +76,7 @@ async def do_event(event_name, args):
             cxt = jcommon.Context(client, args[0], time.time(), jose)
             await handler(cxt.message, cxt)
         else:
-            await handler(**args)
+            await handler(*args)
 
 async def check_message(message):
     # we do not want the bot to reply to itself
