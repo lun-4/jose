@@ -103,7 +103,7 @@ class JoseMod(jaux.Auxiliar):
         ban_report.append("**%s**, log id %s" % (log_title, log_id))
         ban_report.append("**User**: %s [%s]" % (str(member), member.id))
         if reason is None:
-            ban_report.append("**Reason**: **insert reason `j!reason %d`**" % log_id)
+            ban_report.append("**Reason**: **insert reason `j!reason %s`**" % log_id)
         else:
             ban_report.append("**Reason**: %s" % reason)
         ban_report.append("**Moderator**: %s [%s]" % (str(moderator), moderator.id))
