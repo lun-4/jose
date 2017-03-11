@@ -14,7 +14,9 @@ class JoseMod(jaux.Auxiliar):
         jaux.Auxiliar.__init__(self, cl)
         # TODO: Implement database
         self.moddb = {}
-        self.cache = {}
+        self.cache = {
+            'users': {}
+        }
 
         # TODO: commands for josemod
 
@@ -68,17 +70,6 @@ class JoseMod(jaux.Auxiliar):
 
         await cxt.say_embed(em, log_channel)
 
-    def make_ban_report(self, log_title, log_id, member, moderator, reason=None):
-        ban_report = []
-        ban_report.append("**%s**, log number %d" % (log_title, log_id))
-        ban_report.append("**User**: %s [%s]" % (str(member), member.id))
-        if reason is None:
-            ban_report.append("**Reason**: **insert reason `j!reason %d`**" % log_id)
-        else:
-            ban_report.append("**Reason**: %s" % reason)
-        ban_report.append("**Moderator**: %s [%s]" % (str(moderator), moderator.id))
-        return ban_report
-
     def new_log_id(self, server_id):
         data = self.moddb.get(server_id)
         if data is None:
@@ -91,6 +82,29 @@ class JoseMod(jaux.Auxiliar):
             took += 1
 
         return new_id
+
+    async def get_user(self, userid):
+        # get from cache if possible
+        if userid in self.cache['users']:
+            return self.cache['users'][userid]
+
+        user = await self.client.get_user_info(userid)
+        # cache it
+        self.cache['users'][userid] = user
+
+    async def make_log_report(self, log_title, log_id, member_id, moderator_id, reason=None):
+        ban_report = []
+        member = await self.get_user(member_id)
+        moderator = await self.get_user(moderator_id)
+
+        ban_report.append("**%s**, log number %d" % (log_title, log_id))
+        ban_report.append("**User**: %s [%s]" % (str(member), member.id))
+        if reason is None:
+            ban_report.append("**Reason**: **insert reason `j!reason %d`**" % log_id)
+        else:
+            ban_report.append("**Reason**: %s" % reason)
+        ban_report.append("**Moderator**: %s [%s]" % (str(moderator), moderator.id))
+        return ban_report
 
     async def mod_log(self, logtype, *data):
         server = data[0]
@@ -107,26 +121,26 @@ class JoseMod(jaux.Auxiliar):
             member = data[1]
             moderator = data[2]
             log_data = ['Ban', log_id, member.id, moderator.id, reason]
-            log_report = self.make_log_report(**log_data)
+            log_report = await self.make_log_report(**log_data)
 
         elif logtype == 'unban':
             moderator = data[1]
             user = await self.client.get_user_info(data[2])
             log_data = ['Unban', log_id, member.id, moderator.id, reason]
-            log_report = self.make_log_report(**log_data)
+            log_report = await self.make_log_report(**log_data)
 
         elif logtype == 'softban':
             member = data[1]
             moderator = data[2]
 
             log_data = ['Softban', log_id, member.id, moderator.id, reason]
-            log_report = self.make_log_report(**log_data)
+            log_report = await self.make_log_report(**log_data)
 
         elif logtype == 'kick':
             member = data[1]
             moderator = data[2]
             log_data = ['Kick', log_id, member.id, moderator.id, reason]
-            log_report = self.make_log_report(**log_data)
+            log_report = await self.make_log_report(**log_data)
 
         elif logtype == 'reason':
             log_id = data[0]
@@ -136,7 +150,7 @@ class JoseMod(jaux.Auxiliar):
             log['data'][4] = data[1]
 
             logmsg = await self.client.get_message(log_channel, log['msg_id'])
-            new_report = self.make_log_report(**log['data'])
+            new_report = await self.make_log_report(**log['data'])
             await self.client.edit_message(logmsg, new_report)
 
         if logtype != 'reason':
