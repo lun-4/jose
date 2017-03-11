@@ -30,12 +30,12 @@ class JoseMod(jaux.Auxiliar):
             await cxt.say(self.c_initmod.__doc__)
             return
 
-        if server_id in self.moddb:
-            await cxt.say("Moderator is already on in this server")
-            return
-
         server = message.server
         server_id = message.server.id
+
+        if server_id in self.moddb:
+            await cxt.say("Moderator is already running on in this server")
+            return
 
         try:
             mod_channel_name = args[1]
