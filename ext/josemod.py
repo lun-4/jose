@@ -177,6 +177,8 @@ class JoseMod(jaux.Auxiliar):
             'msg_id': log_message.id,
         }
 
+        return True
+
     async def can_do(self, action, user):
         # TODO: specific actions to certain roles
         if user.id in jcommon.ADMIN_IDS:
@@ -249,6 +251,7 @@ class JoseMod(jaux.Auxiliar):
 
         if len(args) < 2:
             await cxt.say(self.c_kick.__doc__)
+            return
 
         try:
             userid = await jcommon.parse_id(args[1])
@@ -262,16 +265,21 @@ class JoseMod(jaux.Auxiliar):
 
         try:
             await self.client.kick(member)
+            done = await self.mod_log('kick', member, message.author)
+            if done:
+                await cxt.say(':boxing_glove: **%s kicked**', (str(member),))
+            else:
+                await cxt.say(':thinking:')
+
         except discord.Forbidden:
             await cxt.say('Not enough permissions to kick.')
             return
         except discord.HTTPException:
             await cxt.say('Error kicking.')
             return
-        else:
-            await cxt.say(':boxing_glove: **%s kicked**', (str(member),))
-
-        await self.mod_log('kick', member, message.author)
+        except Exception as err:
+            await cxt.say(':thinking: `%r`', (err,))
+            return
 
     async def c_ban(self, message, args, cxt):
         '''`j!ban @mention [reason]` - bans a user'''
@@ -280,6 +288,7 @@ class JoseMod(jaux.Auxiliar):
 
         if len(args) < 2:
             await cxt.say(self.c_kick.__doc__)
+            return
 
         try:
             userid = await jcommon.parse_id(args[1])
@@ -312,6 +321,7 @@ class JoseMod(jaux.Auxiliar):
 
         if len(args) < 2:
             await cxt.say(self.c_reason.__doc__)
+            return
 
         try:
             log_id = args[1]
