@@ -411,6 +411,7 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
 
         new_description = ' '.join(args[1:])
         self.descdb[message.author.id] = new_description
+        self.jsondb_save('descdb')
         await cxt.say("description set to `%r`!", (new_description,))
 
     async def c_color(self, message, args, cxt):
