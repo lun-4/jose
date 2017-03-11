@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
 import discord
-import asyncio
 import sys
 sys.path.append("..")
 import jauxiliar as jaux
 import joseerror as je
+import josecommon as jcommon
+import uuid
 
 class JoseMod(jaux.Auxiliar):
     def __init__(self, cl):
@@ -77,6 +78,19 @@ class JoseMod(jaux.Auxiliar):
             ban_report.append("**Reason**: %s" % reason)
         ban_report.append("**Moderator**: %s [%s]" % (str(moderator), moderator.id))
         return ban_report
+
+    def new_log_id(self, server_id):
+        data = self.moddb.get(server_id)
+        if data is None:
+            return
+
+        new_id = '0'
+        took = 1
+        while new_id in data:
+            new_id = str(uuid.uuid4().fields[-1])[:5]
+            took += 1
+
+        return new_id
 
     async def mod_log(self, logtype, *data):
         server = data[0]
@@ -176,7 +190,9 @@ class JoseMod(jaux.Auxiliar):
         self.moddb[server_id] = {
             'mod_channel': mod_channel.id,
             'log_channel': log_channel.id,
-            'logs': {},
+            'logs': {
+                '0': 'Genesis log'
+            },
         }
 
         return
