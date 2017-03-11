@@ -76,7 +76,7 @@ class JoseMod(jaux.Auxiliar):
             return
 
         new_id = str(uuid.uuid4().fields[-1])[:5]
-        while new_id not in data:
+        while new_id in data:
             new_id = str(uuid.uuid4().fields[-1])[:5]
 
         return new_id
