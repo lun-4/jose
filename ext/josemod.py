@@ -329,6 +329,6 @@ class JoseMod(jaux.Auxiliar):
         except:
             await cxt.say("Error parsing `reason`")
 
-        await self.mod_log(self, 'reason', message.server, log_id, reason)
+        await self.mod_log('reason', message.server, log_id, reason)
 
         return
