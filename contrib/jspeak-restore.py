@@ -13,8 +13,7 @@ def do_stmt(stmt, params=None, stmt_num=-1):
         else:
             cur.execute(stmt, params)
     except Exception as err:
-        print("%r at statment %d: %r", err, stmt_num, stmt)
-    conn.commit()
+        print("%r at statment %d: %r" % (err, stmt_num, stmt))
     return cur
 
 def main(args):
@@ -30,7 +29,10 @@ def main(args):
             do_stmt(line, None, stmts)
             stmts += 1
 
-    print("%d statements executed" % stmts)
+    print("Commiting to file...")
+    conn.commit()
+
+    print("%d statements executed and commited with success!" % stmts)
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv))
