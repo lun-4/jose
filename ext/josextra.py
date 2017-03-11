@@ -369,7 +369,7 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
         else:
             em.add_field(name='Name', value='{}'.format(user.name))
 
-        description = self.descdb.get(user)
+        description = self.descdb.get(user.id)
         if description is not None:
             em.add_field(name='Description', value=description)
 
