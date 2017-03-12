@@ -282,7 +282,7 @@ async def run_callback(callback_id, callback):
     await callback.do()
     return True
 
-async def cbk_call(callback_id):
+async def callback_call(callback_id):
     if callback_id not in callbacks:
         return None
 
@@ -290,7 +290,7 @@ async def cbk_call(callback_id):
     res = await callback.func()
     return res
 
-async def cbk_remove(callback_id):
+def callback_remove(callback_id):
     if callback_id not in callbacks:
         return None
 
@@ -320,6 +320,8 @@ async def do_stmt(stmt, params=None):
     global conn
     cur = conn.cursor()
     cur.execute(stmt, params)
+
+    # TODO: don't commit in every statement
     conn.commit()
     return cur
 
@@ -409,7 +411,7 @@ class Extension:
         logger.info("called callback %s", callback_id)
 
     def cbk_remove(self, callback_id):
-        status = self.noasync(cbk_remove, [callback_id])
+        status = callback_remove(callback_id)
         if status is None:
             logger.error("Error removing callback %s", callback_id)
             return
