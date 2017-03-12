@@ -60,9 +60,6 @@ def load_all_modules():
     load_module('josedatamosh', 'JoseDatamosh')
     load_module('josextra', 'joseXtra')
     load_module('josegambling', 'JoseGambling')
-
-    # etc
-    load_module('joseibc', 'JoseIBC')
     load_module('josemath', 'JoseMath')
 
     # load events
