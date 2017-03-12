@@ -211,16 +211,13 @@ class JoseGambling(jaux.Auxiliar):
 
     async def c_duel(self, message, args, cxt):
         '''`j!duel @someone amount` - Duel'''
+        self.sane_jcoin(cxt)
 
         if len(args) < 3:
             await cxt.say(self.c_duel.__doc__)
             return
 
         challenger = message.author.id
-
-        if message.author.id not in self.jcoin.data:
-            await cxt.say("You don't have a JoséCoin Account")
-            return
 
         if challenger in self.duels:
             await cxt.say("You are already in a duel.")
