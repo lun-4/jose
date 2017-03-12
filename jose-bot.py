@@ -62,7 +62,6 @@ def load_all_modules():
     load_module('josegambling', 'JoseGambling')
 
     # etc
-    load_module('joseassembly', 'JoseAssembly')
     load_module('joseibc', 'JoseIBC')
     load_module('josemath', 'JoseMath')
 
