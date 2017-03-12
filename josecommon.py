@@ -56,7 +56,6 @@ ADMIN_TOPICS = {
 ADMIN_IDS = list(ADMIN_TOPICS.keys())
 
 COOLDOWN_SECONDS = 4
-PIRU_ACTIVITY = .0000069
 
 # 1 percent
 JC_PROBABILITY = .015
@@ -176,11 +175,6 @@ LETTER_TO_PITCH = {
     "9": 95,
 }
 
-async def jose_debug(message, dbg_msg):
-    message_banner = '%s[%s]: %r' % (message.author, message.channel, message.content)
-    dbg_msg = '%s -> %s' % (message_banner, str(dbg_msg))
-    logger.info(dbg_msg)
-
 AVIAOS = [
     'https://www.aboutcar.com/car-advice/wp-content/uploads/2011/02/Spoiler.jpg',
     'http://i.imgur.com/eL2hUyd.jpg',
@@ -211,10 +205,6 @@ ATIVIDADE = [
     'http://imgur.com/a/KKwId',
     'http://imgur.com/a/ekrmK'
 ]
-
-async def gorila_routine(channel):
-    if random.random() < PIRU_ACTIVITY:
-        await client.send_message(channel, random.choice(ATIVIDADE))
 
 async def str_xor(string, other):
     return "".join(chr(ord(a) ^ ord(b)) for a, b in zip(string, other))

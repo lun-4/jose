@@ -247,8 +247,6 @@ async def on_message(message):
     # handle e_on_message
     await do_event('on_message', [message])
 
-    await jcommon.gorila_routine(message.channel)
-
 t_allowed = True
 
 async def _timer_playing():
