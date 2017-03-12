@@ -231,6 +231,10 @@ def speak_filter(message):
     # remove discord mentions
     message = re.sub(r'<@(\!)?\d+>', '', message)
 
+    # remove @everyone and @here, of course
+    message = re.sub(r'@everyone', '', message)
+    message = re.sub(r'@here', '', message)
+
     # remove discord channels
     message = re.sub(r'<#(\!)?\d+>', '', message)
 
