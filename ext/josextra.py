@@ -517,7 +517,7 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             _messages = [(str(m.author), m.content) for m in sorted([m for m in self.client.messages \
                 if m.channel.id == channel_id], key=lambda m: m.timestamp, reverse=True)][:amount]
         else:
-            _messages = [(str(m.author), '#%s: %s' % (str(m.channel) m.content)) for m in \
+            _messages = [(str(m.author), '#%s: %s' % (str(m.channel), m.content)) for m in \
                 sorted([m for m in self.client.messages], key=lambda m: m.timestamp, reverse=True)][:amount]
 
         messages = '\n'.join(('%s: %s' % tup for tup in reversed(_messages)))
