@@ -593,14 +593,14 @@ use `j!lnick` for local nickname")
             await self.client.edit_profile(username=name)
             await cxt.say("done!!!!1!!1 i am now %s", (name,))
         except Exception as e:
-            await cxt.say("err hapnnd!!!!!!!! %r", (e,))
+            await cxt.say(":thinking: %r", (e,))
 
     async def c_announce(self, message, args, cxt):
         '''`j!announce` - announce stuff'''
         await self.is_admin(message.author.id)
 
         announcement = ' '.join(args[1:])
-        await cxt.say("I'm gonna say `%r` to all servers I'm in, are you \
+        await cxt.say("I'm gonna say `\n%r\n` to all servers I'm in, are you \
 sure about that, pretty admin? (y/n)", (announcement,))
         yesno = await self.client.wait_for_message(author=message.author)
 

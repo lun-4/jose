@@ -272,6 +272,7 @@ async def on_ready():
     print("="*25)
     jcommon.logger.info("josé ready, name = %s, id = %s", client.user.name, client.user.id)
     print('='*25)
+    jose.command_lock = False
 
     await do_event('client_ready', [client])
 
