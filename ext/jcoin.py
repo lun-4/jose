@@ -191,6 +191,7 @@ class JoseCoin(jaux.Auxiliar):
 
     async def c_jcprob(self, message, args, cxt):
         '''`j!jcprob` - show your JoséCoin probabilities'''
+        self.sane_jcoin(cxt)
         author_id = message.author.id
 
         probability = decimal.Decimal(jcommon.JC_PROBABILITY)
@@ -272,7 +273,7 @@ class JoseCoin(jaux.Auxiliar):
             id_from = await jcommon.parse_id(args[1], message)
             new_amount = decimal.Decimal(args[2])
         except Exception as e:
-            await cxt.say("huh, exception thingy... `%r`", (e,))
+            await cxt.say(":thinking: `%r`", (e,))
             return
 
         self.jcoin.data[id_from]['amount'] = new_amount
@@ -284,6 +285,7 @@ class JoseCoin(jaux.Auxiliar):
 
     async def c_jcsend(self, message, args, cxt):
         '''`j!jcsend @mention amount` - send JoséCoins to someone'''
+        self.sane_jcoin(cxt)
 
         if len(args) != 3:
             await cxt.say(self.c_jcsend.__doc__)
@@ -404,6 +406,8 @@ class JoseCoin(jaux.Auxiliar):
         await cxt.say("Removed <@%s> from databases `%s`", (userid, ', '.join(res),))
 
     async def c_stealstat(self, message, args, cxt):
+        self.sane_jcoin(cxt)
+
         # get status from person
         personid = message.author.id
 
@@ -476,6 +480,7 @@ class JoseCoin(jaux.Auxiliar):
 
     async def c_steal(self, message, args, cxt):
         '''`j!steal @target amount` - Steal JoséCoins from someone'''
+        self.sane_jcoin(cxt)
 
         if len(args) < 2:
             await cxt.say(self.c_steal.__doc__)
@@ -492,10 +497,6 @@ class JoseCoin(jaux.Auxiliar):
             amount = decimal.Decimal(args[2])
         except:
             await cxt.say("Error parsing `amount`")
-            return
-
-        if message.author.id not in self.jcoin.data:
-            await cxt.say("You don't have a josécoin account.")
             return
 
         if target_id not in self.jcoin.data:
@@ -617,18 +618,15 @@ class JoseCoin(jaux.Auxiliar):
         tbank_id = self.tbank_fmt(cxt)
         self.ensure_tbank(tbank_id)
 
-        tbank = None
-        _tbank = self.jcoin.get(tbank_id)
-        if _tbank[0]:
-            tbank = _tbank[1]
+        tbank = self.jcoin.get(tbank_id)
 
         if tbank is None:
             await cxt.say(":interrobang: tbank not found.")
             return
 
-        await cxt.say("`%.2fJC in taxes`" % tbank['taxes'])
+        await cxt.say("`%.2fJC in taxes`", (tbank['taxes'],))
 
-    async def sw_parse(self, message, args, cxt):
+    async def sw_parse(self, args, cxt):
         try:
             amount = decimal.Decimal(args[1])
         except:
@@ -639,18 +637,17 @@ class JoseCoin(jaux.Auxiliar):
 
     async def c_store(self, message, args, cxt):
         '''`j!store amount` - Store JCs in bank'''
+        self.sane_jcoin(cxt)
 
         if len(args) < 2:
             await cxt.say(self.c_store.__doc__)
             return
 
-        to_store = await self.sw_parse(message, args, cxt)
+        to_store = await self.sw_parse(args, cxt)
         if to_store is None:
             return
 
         account = self.jcoin.data.get(message.author.id, None)
-        if account is None:
-            return
 
         if account['loaning_from'] is not None:
             await cxt.say("You can't store when you have a loan.")
@@ -671,18 +668,17 @@ class JoseCoin(jaux.Auxiliar):
 
     async def c_withdraw(self, message, args, cxt):
         '''`j!withdraw amount` - get JCs from your personal bank'''
+        self.sane_jcoin(cxt)
 
         if len(args) < 2:
             await cxt.say(self.c_withdraw.__doc__)
             return
 
-        to_withdraw = await self.sw_parse(message, args, cxt)
+        to_withdraw = await self.sw_parse(args, cxt)
         if to_withdraw is None:
             return
 
         account = self.jcoin.data.get(message.author.id, None)
-        if account is None:
-            return
 
         if account['loaning_from'] is not None:
             await cxt.say("You can't withdraw when you have a loan.")
@@ -735,13 +731,10 @@ class JoseCoin(jaux.Auxiliar):
         '''`j!loan amount|"pay"|"see"` - loan money from your taxbank'''
         tbank_id = self.tbank_fmt(cxt)
         self.ensure_tbank(tbank_id)
+        self.sane_jcoin(cxt)
 
         if len(args) < 2:
             await cxt.say(self.c_loan.__doc__)
-            return
-
-        if message.author.id not in self.jcoin.data:
-            await cxt.say("You don't have a JC Account.")
             return
 
         pay = False
@@ -802,7 +795,7 @@ class JoseCoin(jaux.Auxiliar):
             await cxt.say("Loan successful. `%r`, you need to pay %.2fJC(loan + 25%% tax) later", \
                 (ok[1], loan))
         else:
-            need_to_pay = tbank['loans'].get(message.author.id, None)
+            need_to_pay = tbank['loans'].get(message.author.id)
             if need_to_pay is None:
                 await cxt.say("You don't need to pay nothing.")
                 return
@@ -844,6 +837,7 @@ class JoseCoin(jaux.Auxiliar):
 
     async def c_donate(self, message, args, cxt):
         '''`j!donate amount` - donate to your server\'s Taxbank'''
+        self.sane_jcoin(cxt)
 
         if len(args) < 2:
             await cxt.say(self.c_donate.__doc__)

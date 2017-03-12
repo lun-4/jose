@@ -99,3 +99,9 @@ class Auxiliar(jcommon.Extension):
 
     def member_from_name(self, name):
         return [m for m in self.client.get_all_members() if m.name == name]
+
+    def sane_jcoin(self, cxt):
+        author_id = cxt.message.author.id
+
+        if author_id not in self.jcoin.data:
+            raise je.JoseCoinError('You don\'t have a JoséCoin account')
