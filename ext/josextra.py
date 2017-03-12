@@ -495,6 +495,7 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
 
     async def c_snoop(self, message, args, cxt):
         '''`j!snoop amount guildid` - snoop on messages'''
+        await self.is_admin(message.author.id)
 
         if len(args) < 3:
             await cxt.say(self.c_snoop.__doc__)
@@ -512,8 +513,12 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             await cxt.say("Error parsing `channelid`")
             return
 
-        _messages = [(str(m.author), m.content) for m in sorted([m for m in self.client.messages \
-            if m.channel.id == channel_id], key=lambda m: m.timestamp, reverse=True)][:amount]
+        if channel_id == 'global':
+            _messages = [(str(m.author), m.content) for m in sorted([m for m in self.client.messages \
+                if m.channel.id == channel_id], key=lambda m: m.timestamp, reverse=True)][:amount]
+        else:
+            _messages = [(str(m.author), '#%s: %s' % (str(m.channel) m.content)) for m in \
+                sorted([m for m in self.client.messages], key=lambda m: m.timestamp, reverse=True)][:amount]
 
         messages = '\n'.join(('%s: %s' % tup for tup in reversed(_messages)))
 
