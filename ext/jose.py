@@ -16,8 +16,8 @@ import josecommon as jcommon
 import joseerror as je
 
 DEFAULT_BLOCKS_JSON = '''{
-    'servers': [],
-    'users': []
+    "servers": [],
+    "users": []
 }'''
 
 class JoseBot(jaux.Auxiliar):
