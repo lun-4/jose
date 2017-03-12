@@ -3,10 +3,8 @@
 ./jauxiliar.py
 ./jcoin/josecoin.py
 ./ext/jose.py
-./ext/joseassembly.py
 ./ext/josedatamosh.py
 ./ext/josegambling.py
-./ext/joseibc.py
 ./ext/joselang.py
 ./ext/josemagicword.py
 ./ext/josemath.py
