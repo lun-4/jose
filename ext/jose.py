@@ -436,35 +436,6 @@ class JoseBot(jcommon.Extension):
         await cxt.say("random number from %d to %d: %d", (n_min, n_max, n_rand))
         return
 
-    async def c_enc(self, message, args, cxt):
-        '''`j!enc text` - encriptar'''
-        if len(args) < 2:
-            await cxt.say(self.c_enc.__doc__)
-            return
-
-        to_encrypt = ' '.join(args[1:])
-        encdata = await jcommon.str_xor(to_encrypt, jcommon.JCRYPT_KEY)
-        a85data = base64.a85encode(bytes(encdata, 'UTF-8'))
-        await cxt.say('resultado(enc): %s', (a85data.decode('UTF-8'),))
-        return
-
-    async def c_dec(self, message, args, cxt):
-        '''`j!dec text` - desencriptar'''
-        if len(args) < 2:
-            await cxt.say(self.c_dec.__doc__)
-            return
-
-        to_decrypt = ' '.join(args[1:])
-        to_decrypt = to_decrypt.encode('UTF-8')
-        try:
-            to_decrypt = base64.a85decode(to_decrypt).decode('UTF-8')
-        except Exception as e:
-            await cxt.say("dec: erro tentando desencodar a mensagem(%r)", (e,))
-            return
-        plaintext = await jcommon.str_xor(to_decrypt, jcommon.JCRYPT_KEY)
-        await cxt.say("resultado(dec): %s", (plaintext,))
-        return
-
     async def c_pstatus(self, message, args, cxt):
         '''`j!pstatus` - muda o status do josé'''
         await self.is_admin(message.author.id)

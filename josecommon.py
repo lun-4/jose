@@ -206,11 +206,6 @@ ATIVIDADE = [
     'http://imgur.com/a/ekrmK'
 ]
 
-async def str_xor(string, other):
-    return "".join(chr(ord(a) ^ ord(b)) for a, b in zip(string, other))
-
-JCRYPT_KEY = 'vcefodaparabensfrozen2meuovomeuovinhoayylmaogordoquaseexploderindo'
-
 async def parse_id(data, message=None):
     if data[0:2] == '<@':
         if data[2] == '!':
