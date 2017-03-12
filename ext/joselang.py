@@ -78,12 +78,8 @@ class JoseLanguage(jaux.Auxiliar):
             await cxt.say("Error parsing `prob`")
             return
 
-        if prob < 0:
-            await cxt.say("`prob` can't be less than 0%")
-            return
-
-        if prob > 3:
-            await cxt.say("`prob` can't be higher than 3%")
+        if prob < 0 or prob > 5:
+            await cxt.say("`prob` is out of the range `[0-5]`")
             return
 
         done = await jcommon.configdb_set(message.server.id, 'speak_prob', prob / 100)
