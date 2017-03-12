@@ -15,6 +15,11 @@ import jauxiliar as jaux
 import josecommon as jcommon
 import joseerror as je
 
+DEFAULT_BLOCKS_JSON = '''{
+    'servers': [],
+    'users': [],
+}'''
+
 class JoseBot(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
@@ -23,12 +28,14 @@ class JoseBot(jaux.Auxiliar):
         self.env = {
             'cooldowns': {},
         }
-        self.blocked_servers = []
+
         self.start_time = time.time()
         self.command_lock = False
         self.dev_mode = False
         self.off_mode = False
         self.made_gshutdown = False
+
+        self.jsondb('blocks', path='db/blocks.json', default=DEFAULT_BLOCKS_JSON)
         self.ev_empty()
 
     async def do_dev_mode(self):
@@ -686,16 +693,31 @@ don't want (unless I'm skynet)")
 
         await cxt.say("mode changed to `%r`", (mode,))
 
-    async def c_tempblksv(self, message, args, cxt):
-        '''`j!tempblksv serverid` - blocks a server until jose reboots'''
+    async def c_blockserver(self, message, args, cxt):
+        '''`j!blockserver serverid` - Blocks/Unblocks a server from message processing.'''
         await self.is_admin(message.author.id)
 
         if len(args) < 2:
-            await cxt.say(self.c_tempblksv.__doc__)
+            await cxt.say(self.c_blockserver.__doc__)
             return
 
-        server_id = args[1]
-        self.blocked_servers.append(server_id)
-        self.logger.info("Blocked %s", server_id)
-        await cxt.say("Added `%r` to blocked server list.", (server_id,))
-        return
+        guild_id = args[1]
+        guild = self.client.get_server(guild_id)
+
+        if guild is None:
+            await cxt.say("Guild not found, are you sure José is in it?")
+            return
+
+        guild_name = guild.name
+
+        if guild_id in self.blocks['guilds']:
+            # remove from blocks
+            self.blocks['guilds'].remove(guild_id)
+            self.logger.info("Unblocked guild %s, %s", guild_name, guild_id)
+            await cxt.say("Unblocked guild `%s[%s]`.", (guild_name, guild_id,))
+        else:
+            self.blocks['guilds'].append(guild_id)
+            self.logger.info("Blocked guild %s, %s", guild_name, guild_id)
+            await cxt.say("Blocked guild `%s[%s]`.", (guild_name, guild_id,))
+
+        await self.jsondb_save('blocks')
