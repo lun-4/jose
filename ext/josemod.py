@@ -12,6 +12,7 @@ import copy
 
 MODERATION_DATABASE = 'db/moderation.json'
 MODERATOR_ROLE_NAME = 'Moderator'
+LOGID_MAX_TRIES = 20
 
 class JoseMod(jaux.Auxiliar):
     def __init__(self, cl):
@@ -76,9 +77,14 @@ class JoseMod(jaux.Auxiliar):
         if data is None:
             return
 
+        tries = 0
         new_id = str(uuid.uuid4().fields[-1])[:5]
         while new_id in data:
+            if tries >= LOGID_MAX_TRIES:
+                return None
+
             new_id = str(uuid.uuid4().fields[-1])[:5]
+            tries += 1
 
         return new_id
 
@@ -125,6 +131,11 @@ class JoseMod(jaux.Auxiliar):
             return False
 
         log_id = self.new_log_id(server.id)
+        if log_id is None:
+            self.logger.warning("[mod_log:%s] error creating log ID, tried %d times", \
+                logtype, LOGID_MAX_TRIES)
+            return False
+
         log_message = None
         log_report = None
         log_data = None
