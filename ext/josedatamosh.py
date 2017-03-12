@@ -98,8 +98,8 @@ Resultados de fotos jogadas ao !datamosh:
         if len(args) > 2:
             try:
                 iterations = int(args[2])
-            except Exception as e:
-                await cxt.say("Erro parseando argumentos(%r).", (e,))
+            except Exception as err:
+                await cxt.say("Erro parseando argumentos(%r).", (err,))
                 return
 
         if iterations > 129:
@@ -113,8 +113,8 @@ Resultados de fotos jogadas ao !datamosh:
         source_image = io.BytesIO(data.getvalue())
         try:
             img = Image.open(data)
-        except Exception as e:
-            await cxt.say("Erro abrindo imagem com o Pillow(%r)", (e,))
+        except Exception as err:
+            await cxt.say("Erro abrindo imagem com o Pillow(%r)", (err,))
             return
 
         if img.format in ['JPEG', 'JPEG 2000']:
@@ -122,7 +122,7 @@ Resultados de fotos jogadas ao !datamosh:
             width, height = img.size
 
             if width > 1280 or height > 720:
-                await cxt.say("Resolução muito grande(largura > 1280 ou altura > 720 pixels)")
+                await cxt.say("High resolution to work on(width > 1280 or height > 720)")
                 return
 
             output_image = await datamosh_jpg(source_image, iterations)
@@ -134,8 +134,8 @@ Resultados de fotos jogadas ao !datamosh:
             # done
             output_image.close()
         elif img.format in ['PNG']:
-            await cxt.say("*não tenho algoritmo pra PNG*\n*espera porra*\n é sério porra")
+            await cxt.say("*no PNG support*")
         elif img.format in ['GIF']:
-            await cxt.say("*o sr esta de brincando comigo NAO VAI TE GIF NO DATAMOSH* é muito caro em relação a processamento NAO")
+            await cxt.say("*no GIF support*")
         else:
             await cxt.say("Formato %s: desconhecido", (img.format,))
