@@ -8,8 +8,8 @@ import jauxiliar as jaux
 import joseerror as je
 
 class JoseExtension(jaux.Auxiliar):
-    def __init__(self, cl):
-        jaux.Auxiliar.__init__(self, cl)
+    def __init__(self, _client):
+        jaux.Auxiliar.__init__(self, _client)
 
     async def ext_load(self):
         try:

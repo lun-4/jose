@@ -11,17 +11,17 @@ import copy
 import gc
 
 sys.path.append("..")
+import jauxiliar as jaux
 import josecommon as jcommon
 import joseerror as je
 
-class JoseBot(jcommon.Extension):
+class JoseBot(jaux.Auxiliar):
     def __init__(self, _client):
-        jcommon.Extension.__init__(self, _client)
+        jaux.Auxiliar.__init__(self, _client)
         self.nick = 'jose-bot'
         self.modules = {}
         self.env = {
             'cooldowns': {},
-            'stcmd': {},
         }
         self.blocked_servers = []
         self.start_time = time.time()

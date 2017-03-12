@@ -9,6 +9,7 @@ CONFIG_HELP = """
 José Configuration:
  * `botblock`, if True, blocks all bot messages, use `j!botblock`
  * `language`, string representing the server's language, use `j!language`
+ * `j!jsprob`, sets probability for JoséSpeak
 """
 
 class JoseLanguage(jaux.Auxiliar):

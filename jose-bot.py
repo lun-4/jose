@@ -79,6 +79,12 @@ async def check_message(message):
     if message.author == client.user:
         return False
 
+    if len(message.content) <= 0:
+        return False
+
+    if jose.command_lock:
+        return False
+
     # Block DMs altogether
     if message.server is None:
         return False
@@ -95,17 +101,10 @@ async def check_message(message):
         if message.author.id not in jcommon.ADMIN_IDS:
             return False
 
-    if jose.command_lock:
-        return False
-
-    if len(message.content) <= 0:
-        return False
-
     # configdb is langdb but with more bits
-    if message.server is not None:
-        botblock = await jcommon.configdb_get(message.server.id, 'botblock')
-        if botblock and message.author.bot:
-            return False
+    botblock = await jcommon.configdb_get(message.server.id, 'botblock')
+    if botblock and message.author.bot:
+        return False
 
     return True
 
@@ -229,9 +228,7 @@ async def on_message(message):
             return
 
         try:
-            # do a barrel roll
             await do_command(method, message, args, cxt, t_start, st)
-            return
         except Exception as e:
             jcommon.logger.error("Exception at %s, made by %s", method, \
                 str(message.author), exc_info=True)
@@ -291,7 +288,7 @@ async def on_server_join(server):
         if channel.is_default:
             await do_event('server_join', [server, channel])
 
-            jcommon.logger.info("New server: %s" % server.id)
+            jcommon.logger.info("New server: %s[%s]", server, server.id)
             await client.send_message(channel, jcommon.WELCOME_MESSAGE)
 
 @client.event

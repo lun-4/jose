@@ -599,6 +599,8 @@ async def configdb_set(server_id, key, value):
         return False
 
 async def configdb_get(server_id, key, default=None):
+    # TODO: make a cache for configdb
+
     await configdb_ensure(server_id)
     rediskey = 'config:{0}'.format(server_id)
     res = await redis.hmget(rediskey, key)
