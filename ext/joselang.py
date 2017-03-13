@@ -19,6 +19,17 @@ class JoseLanguage(jaux.Auxiliar):
             'pt', 'en'
         )
 
+        self.cbk_new('jlang.dbapi_commit', 300)
+
+    async def dbapi_commit(self):
+        t_start = time.time()
+        if self.dbapi.statements > 0:
+            self.dbapi.commit()
+            t_end = time.time()
+
+            delta = (t_end - t_start) * 1000
+            self.logger.info("[dbapi:commit] Took %.2fms", delta)
+
     async def savedb(self):
         await jcommon.save_configdb()
 

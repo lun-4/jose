@@ -302,6 +302,7 @@ def callback_remove(callback_id):
 
 conn = None
 JOSE_DATABASE_PATH = "jose.db"
+statements = 0
 
 async def init_db(client):
     global conn
@@ -319,16 +320,18 @@ async def do_stmt(stmt, params=None):
     global conn
     cur = conn.cursor()
     cur.execute(stmt, params)
-
-    # TODO: don't commit in every statement
-    conn.commit()
+    statements += 1
     return cur
+
+def commit_changes():
+    conn.commit()
 
 class DatabaseAPI:
     def __init__(self, _client):
-        global conn
+        global conn, statements
         self.client = _client
         self.conn = conn
+        self.statements = statements
 
     async def initializedb(self):
         await init_db(self.client)
@@ -343,6 +346,9 @@ class DatabaseAPI:
     async def do(self, stmt, params=None):
         cur = await do_stmt(stmt, params)
         return cur
+
+    def commit(self):
+        commit_changes()
 
 class Extension:
     def __init__(self, _client):
