@@ -772,7 +772,9 @@ class ChannelHandler(logging.Handler):
     def emit(self, record):
         if self.channel is not None:
             _msg = self.format(record)
-            msg = '**[{}]** {}'.format(record.levelname, _msg)
+            msg = '**`[{}] [{}]`** `{}`'.format(record.levelname, \
+                record.name, _msg)
+
             asyncio.ensure_future(client.send_message(self.channel, msg), \
                 loop=client.loop)
 
