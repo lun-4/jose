@@ -39,6 +39,8 @@ class JoseLanguage(jaux.Auxiliar):
         return status
 
     async def ext_unload(self):
+        # save all databases
+        self.dbapi.commit()
         status = await jcommon.save_configdb()
         return status
 

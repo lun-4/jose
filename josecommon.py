@@ -309,7 +309,7 @@ async def register_table(tableid, table_stmt):
     conn.commit()
 
 async def do_stmt(stmt, params=None):
-    global conn
+    global conn, statements
     cur = conn.cursor()
     cur.execute(stmt, params)
     statements += 1
