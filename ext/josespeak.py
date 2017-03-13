@@ -220,8 +220,10 @@ class JoseSpeak(jcommon.Extension):
             del sid_to_clear, t_start, time_taken_ms
 
     async def save_databases(self):
-        self.logger.info("savedb:speak")
-        await self.jsondb_save_all()
+        try:
+            await self.jsondb_save_all()
+        except Exception as err:
+            self.logger.error("[speakdb] error saving: %r", err, exc_info=True)
 
     async def c_savedb(self, message, args, cxt):
         """`j!savedb` - saves all available databases(autosaves every 3 minutes)"""

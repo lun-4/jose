@@ -46,9 +46,10 @@ class JoseStats(jaux.Auxiliar):
         self.cbk_new('jstats.savedb', self.savedb, 180)
 
     async def savedb(self):
-        self.logger.info("savedb:stats")
-        await self.jsondb_save_all()
-        json.dump(self.statistics, open(jcommon.STAT_DATABASE_PATH, 'w'))
+        try:
+            await self.jsondb_save_all()
+        except Exception as err:
+            self.logger.error("[statsdb] error saving: %r", err, exc_info=True)
 
     async def ext_load(self):
         try:
