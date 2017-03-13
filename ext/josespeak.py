@@ -220,6 +220,7 @@ class JoseSpeak(jcommon.Extension):
 
     async def save_databases(self):
         try:
+            self.logger.debug("savedb:speak")
             await self.jsondb_save_all()
         except Exception as err:
             self.logger.error("[speakdb] error saving: %r", err, exc_info=True)

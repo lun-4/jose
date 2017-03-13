@@ -46,8 +46,11 @@ class JoseMagicWord(jaux.Auxiliar):
         self.counter = 0
 
     async def savedb(self):
-        self.logger.info("Saving Magicword database")
-        json.dump(self.magicwords, open(self.db_magicword_path, 'w'))
+        try:
+            self.logger.debug("Saving Magicword database")
+            json.dump(self.magicwords, open(self.db_magicword_path, 'w'))
+        except Exception as err:
+            self.logger.error("Error saving MW database: %r", err, exc_info=True)
 
     async def ext_load(self):
         try:

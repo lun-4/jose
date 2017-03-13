@@ -47,6 +47,7 @@ class JoseStats(jaux.Auxiliar):
 
     async def savedb(self):
         try:
+            self.logger.debug("savedb:stats")
             await self.jsondb_save_all()
         except Exception as err:
             self.logger.error("[statsdb] error saving: %r", err, exc_info=True)
