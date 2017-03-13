@@ -269,16 +269,24 @@ class JoseSpeak(jcommon.Extension):
     async def c_texclean(self, message, args, cxt):
         await self.is_admin(message.author.id)
 
+        try:
+            times = int(args[1])
+        except:
+            times = 1
+
         oldamount = len(self.text_generators)
 
         t_start = time.time()
-        await self.texter_collection()
+
+        for i in range(times):
+            await self.texter_collection()
+
         t_taken = (time.time() - t_start) * 1000
 
         newamount = len(self.text_generators)
 
-        await cxt.say("`Took %.5fms cleaning %d Texters out of %d, now I have %d`", \
-            (t_taken, oldamount - newamount, oldamount, newamount))
+        await cxt.say("`Took %.5fms cleaning %d times, from %d I now have %d, cleaned %d`", \
+            (t_taken, times, oldamount, newamount, oldamount - newamount))
 
     async def c_texstat(self, message, args, cxt):
         '''`j!texstat` - Texter Stats'''
