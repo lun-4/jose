@@ -208,14 +208,13 @@ class JoseSpeak(jcommon.Extension):
         if deadtexters > 0:
             self.txcleaned = deadtexters
             lentg = len(self.text_generators)
-            self.logger.info("%d down to %d Texters", lentg, \
-                (lentg - deadtexters))
 
             for serverid in sid_to_clear:
                 del self.text_generators[serverid]
 
             time_taken_ms = (time.time() - t_start) * 1000
-            self.logger.info("Texter cleaning took %.4fms", time_taken_ms)
+            self.logger.info("%d down to %d Texters in %.3fms", lentg, \
+                (lentg - deadtexters), time_taken_ms)
 
             del sid_to_clear, t_start, time_taken_ms
 
