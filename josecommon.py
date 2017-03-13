@@ -326,7 +326,9 @@ async def do_stmt(stmt, params=None):
 
 class DatabaseAPI:
     def __init__(self, _client):
+        global conn
         self.client = _client
+        self.conn = conn
 
     async def initializedb(self):
         await init_db(self.client)
