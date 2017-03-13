@@ -52,6 +52,7 @@ class JoseBot(jaux.Auxiliar):
             # member stuff
             'member_join': [],
             'member_remove': [],
+            'server_remove': [],
         }
 
     def ev_load(self, dflag=False):

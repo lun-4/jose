@@ -356,6 +356,18 @@ class JoseSpeak(jcommon.Extension):
 
             await self.speak(self.text_generators[sid], cxt)
 
+    async def e_server_remove(self, server):
+        # remove its texter, doesn't matter
+
+        self.logger.info("Removing server %s, %s from speakdb", server.name, server.id)
+        server_id = server.id
+
+        if server_id in self.text_generators:
+            del self.text_generators[serverid]
+
+        # delete messages from database
+        await self.dbapi.do("DELETE FROM markovdb WHERE serverid=?", (server_id))
+
     async def server_sentence(self, serverid, length=None, flag_fw=False):
         if serverid not in self.text_generators:
             await self.new_generator(serverid, MESSAGE_LIMIT)
@@ -363,7 +375,7 @@ class JoseSpeak(jcommon.Extension):
         texter = self.text_generators[serverid]
         res = await texter.gen_sentence(length)
 
-        fw_probability = await jcommon.configdb_get(serverid, 'fw_prob', 0.05)
+        fw_probability = await jcommon.configdb_get(serverid, 'fw_prob', 0.1)
 
         if random.random() < fw_probability or flag_fw:
             res = res.translate(jcommon.WIDE_MAP)
@@ -373,7 +385,7 @@ class JoseSpeak(jcommon.Extension):
     async def speak(self, texter, cxt):
         res = await texter.gen_sentence()
 
-        fw_probability = await jcommon.configdb_get(cxt.message.server.id, 'fw_prob', 0.05)
+        fw_probability = await jcommon.configdb_get(cxt.message.server.id, 'fw_prob', 0.1)
 
         if random.random() < PROB_FULLWIDTH_TEXT or cxt.env.get('flag_fw', False):
             res = res.translate(jcommon.WIDE_MAP)

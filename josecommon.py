@@ -514,7 +514,7 @@ def get_defaultcdb():
         'imgchannel': 'None',
         'prefix': JOSE_PREFIX,
         'speak_prob': 0,
-        'fw_prob': 0.05,
+        'fw_prob': 0.1,
     }
 
 redis = None

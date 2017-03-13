@@ -325,6 +325,10 @@ async def on_member_join(member):
 async def on_member_remove(member):
     await do_event('member_remove', [member])
 
+@client.event
+async def on_server_remove(server):
+    await do_event('server_remove', [server])
+
 OFF_JOSE_USERDICT = {'name': 'José', 'id': '0', \
     'discriminator': '666', 'avatar': None, 'bot': True}
 OFF_JOSE_USER = discord.User(**OFF_JOSE_USERDICT)
