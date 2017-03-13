@@ -256,7 +256,7 @@ async def timer_playing():
     if t_allowed:
         while True:
             game_str = await _timer_playing()
-            g = discord.Game(name=playing_name, url=playing_name)
+            g = discord.Game(name=game_str, url=game_str)
             await client.change_presence(game=g)
 
             t_allowed = False
@@ -388,7 +388,9 @@ async def main_task():
             await on_message(message)
     else:
         try:
-            asyncio.ensure_future(jcommon.setup_logging(), loop=client.loop)
+            jcommon.logger.info("[start] logging")
+            client.loop.create_task(jcommon.setup_logging())
+
             jcommon.logger.info("[start] discord client")
             await client.start(jconfig.discord_token)
             jcommon.logger.info("[exit] discord client")
