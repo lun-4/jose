@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+import time
 sys.path.append("..")
 import jauxiliar as jaux
 import josecommon as jcommon
