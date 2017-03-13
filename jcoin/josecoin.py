@@ -13,22 +13,9 @@ decimal.getcontext().prec = 3
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-handler = logging.FileHandler('José.log')
-handler.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
 
-JOSECOIN_HELP_TEXT = '''JoseCoin(%s) é a melhor moeda que o josé pode te oferecer!
-
-Toda mensagem enviada tem 1%% de chance de conseguir 1, 1.2, 2, 2.5, 5, 5.1 ou 7.4JC$ para o autor da mensagem
-Alguns comandos pedem JC$ em troca da sua funcionalidade(*comandos nsfw incluídos*)
-
-!conta - cria uma nova conta
-!enviar mention quantidade - envia josecoins para alguém
-!saldo [mention] - mostra o quanto que tal conta tem em josecoins
-
-''' % JOSECOIN_VERSION
+logger.addHandler(jcommon.handler)
+logger.addHandler(jcommon.log_channel_handler)
 
 data = {}
 jose_id = jcommon.JOSE_ID
