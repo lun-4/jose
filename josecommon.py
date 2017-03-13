@@ -15,6 +15,7 @@ import jplaying_phrases as playing_phrases
 
 import discord
 
+discord_logger = logging.getLogger('discord')
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
@@ -787,3 +788,4 @@ async def setup_logging():
     await client.wait_until_ready()
     await log_channel_handler.setup()
     logger.addHandler(log_channel_handler)
+    discord_logger.addHandler(log_channel_handler)

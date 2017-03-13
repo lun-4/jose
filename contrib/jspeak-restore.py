@@ -1,5 +1,4 @@
 import sqlite3
-import json
 import sys
 
 conn = sqlite3.connect('jose.db')

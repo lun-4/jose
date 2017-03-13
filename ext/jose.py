@@ -4,7 +4,6 @@ from random import SystemRandom
 random = SystemRandom()
 
 import sys
-import base64
 import subprocess
 import importlib
 import copy
