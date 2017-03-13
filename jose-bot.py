@@ -388,6 +388,7 @@ async def main_task():
             await on_message(message)
     else:
         try:
+            asyncio.ensure_future(jcommon.setup_logging(), loop=client.loop)
             jcommon.logger.info("[start] discord client")
             await client.start(jconfig.discord_token)
             jcommon.logger.info("[exit] discord client")

@@ -41,6 +41,7 @@ CONFIGDB_PATH = 'db/languages.json'
 JOSE_DEV_SERVER_ID = '273863625590964224'
 JOSE_ID = '202587271679967232'
 JOSE_APP_ID = '202586824013643777'
+JOSE_LOG_CHANNEL_ID = '290698227483934721'
 OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=67259457' % JOSE_APP_ID
 
 #configuration things
@@ -752,3 +753,29 @@ class EmptyContext:
 
     async def getall(self):
         return '\n'.join(self.messages)
+
+# logging
+
+class ChannelHandler(logging.NullHandler):
+    def __init__(self, channel_id):
+        '''
+        This is weird.
+        '''
+        logging.NullHandler.__init__()
+        self.channel_id = channel_id
+        self.channel = None
+
+    async def setup(self):
+        await client.wait_until_ready()
+        self.channel = client.get_channel(self.channel_id)
+
+    def emit(self, record):
+        asyncio.ensure_future(client.send_message(self.channel, repr(record)), \
+            loop=client.loop)
+
+log_channel_handler = ChannelHandler(JOSE_LOG_CHANNEL_ID)
+
+async def setup_logging():
+    await client.wait_until_ready()
+    await log_channel_handler.setup()
+    logger.addHandler(log_channel_handler)
