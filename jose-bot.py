@@ -21,7 +21,7 @@ from random import SystemRandom
 random = SystemRandom()
 
 logging.basicConfig(level=logging.INFO, \
-    format='[%(levelname)5s] [%(name)s] %(message)s')
+    format='[%(levelname)7s] [%(name)s] %(message)s')
 
 start_time = time.time()
 
@@ -120,20 +120,30 @@ async def do_command(method, message, args, cxt, t_start, st):
         await jose_method(message, args, cxt)
 
     except je.PermissionError:
-        jcommon.logger.warning("thrown PermissionError at author %s", \
-            str(message.author))
+        jcommon.logger.warning("thrown PermissionError at %r from %s(%r)", \
+            str(message.author), method, args)
 
         await cxt.say("Permission ¯\_(ツ)_/¯ 💠 ¯\_(ツ)_/¯ Error")
+
     except RuntimeError as err:
-        jcommon.logger.error("RuntimeError happened with %s[%s]", \
-            str(message.author), message.author.id, exc_info=True)
+        jcommon.logger.error("RuntimeError happened with %s[%s] from %s(%r)", \
+            str(message.author), message.author.id, method, args, exc_info=True)
         await cxt.say(':interrobang: RuntimeError: %r' % err)
+
     except je.CommonError as err:
+        jcommon.logger.error("CommonError to %r from %s(%r): %r", \
+            str(message.author), method, args, repr(err))
+
         await cxt.say('```\nCommonError: %r```', (err,))
+
     except je.JoseCoinError as err:
         await cxt.say('err: `%r`', (err,))
+
     except asyncio.TimeoutError as err:
+        jcommon.logger.error("TimeoutError to %r from %s(%r): %r", \
+            str(message.author), method, args, repr(err))
         await cxt.say("`[timeout] Timeout Reached`")
+
     except je.LimitError:
         pass
 
