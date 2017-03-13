@@ -50,12 +50,11 @@ class JoseWatch(jaux.Auxiliar):
                 continue
             pkgname = r[0]
 
+            if pkgname == 'discord.py[voice]':
+                pḱgname = 'discord.py'
+
             if pkgname in self.requirements:
                 cur_version = self.requirements[pkgname]
-
-                # :^)
-                if pkgname == 'discord.py[voice]':
-                    pḱgname = 'discord.py'
 
                 pkgdata = await self.json_from_url('http://pypi.python.org/pypi/{}/json'.format\
                     (pkgname))
