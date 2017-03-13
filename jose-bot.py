@@ -248,7 +248,6 @@ async def _timer_playing():
     playing_name = '%s | v%s | %d guilds | %shjose' % (playing_phrase, jcommon.JOSE_VERSION, \
         len(client.servers), jcommon.JOSE_PREFIX)
 
-    jcommon.logger.info("Playing %r", playing_name)
     return playing_name
 
 async def timer_playing():

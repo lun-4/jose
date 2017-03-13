@@ -756,12 +756,12 @@ class EmptyContext:
 
 # logging
 
-class ChannelHandler(logging.NullHandler):
+class ChannelHandler(logging.Handler):
     def __init__(self, channel_id):
         '''
         This is weird.
         '''
-        logging.NullHandler.__init__(self)
+        logging.Handler.__init__(self)
         self.channel_id = channel_id
         self.channel = None
 
@@ -770,6 +770,7 @@ class ChannelHandler(logging.NullHandler):
         self.channel = client.get_channel(self.channel_id)
 
     def emit(self, record):
+        print(record, repr(record))
         asyncio.ensure_future(client.send_message(self.channel, repr(record)), \
             loop=client.loop)
 
