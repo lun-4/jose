@@ -761,7 +761,7 @@ class ChannelHandler(logging.NullHandler):
         '''
         This is weird.
         '''
-        logging.NullHandler.__init__()
+        logging.NullHandler.__init__(self)
         self.channel_id = channel_id
         self.channel = None
 
