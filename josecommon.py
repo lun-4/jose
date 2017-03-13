@@ -12,7 +12,6 @@ random = SystemRandom()
 
 import joseerror as je
 import jplaying_phrases as playing_phrases
-import randemoji as emoji
 
 import discord
 
@@ -192,13 +191,6 @@ async def show_top(message):
     await client.send_message(message.channel, "BALADINHA TOPPER %s %s" % (
         (":joy:" * random.randint(1, 5)),
         (":ok_hand:" * random.randint(1, 6))))
-
-async def check_roles(correct, rolelist):
-    roles = [role.name == correct for role in rolelist]
-    return True in roles
-
-async def random_emoji(maxn):
-    return ''.join((str(emoji.random_emoji()) for i in range(maxn)))
 
 ATIVIDADE = [
     'http://i.imgur.com/lkZVh3K.jpg',

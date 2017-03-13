@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+import re
+import io
+import aiohttp
+import urllib
+import string
 import asyncio
 import sys
 from random import SystemRandom
@@ -12,12 +17,7 @@ sys.path.append("..")
 import josecommon as jcommon
 import jauxiliar as jaux
 import joseerror as je
-
-import re
-import io
-import aiohttp
-import urllib
-import string
+import randemoji as emoji
 
 RI_TABLE = {
     '0': ':zero:',
@@ -66,6 +66,9 @@ BLACK_MIRROR_MESSAGES = [
     'https://pbs.twimg.com/media/Cxlx2sMW8AA37qh.jpg',
     'https://pbs.twimg.com/media/CxkgKCZXgAAlkO2.jpg',
 ]
+
+async def random_emoji(maxn):
+    return ''.join((str(emoji.random_emoji()) for i in range(maxn)))
 
 class JoseMemes(jaux.Auxiliar):
     def __init__(self, _client):
@@ -462,7 +465,7 @@ class JoseMemes(jaux.Auxiliar):
         '''`j!emoji [qt]` - gera de 1 a 5(ou `qt`(máx. 512)) emojis aleatórios'''
         res = ''
         if len(args) < 2:
-            res = await jcommon.random_emoji(random.randint(1,5))
+            res = await random_emoji(random.randint(1, 5))
         else:
             a = int(args[1])
             if a < 1:
@@ -471,7 +474,7 @@ class JoseMemes(jaux.Auxiliar):
             if a >= 512:
                 await cxt.say("*Não tem emoji grátis*")
                 return
-            res = await jcommon.random_emoji(int(args[1]))
+            res = await random_emoji(int(args[1]))
         await cxt.say(res)
 
     async def c_blackmirror(self, message, args, cxt):
