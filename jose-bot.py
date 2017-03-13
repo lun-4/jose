@@ -249,14 +249,16 @@ async def _timer_playing():
         len(client.servers), jcommon.JOSE_PREFIX)
 
     jcommon.logger.info("Playing %r", playing_name)
-    g = discord.Game(name=playing_name, url=playing_name)
-    await client.change_presence(game=g)
+    return playing_name
 
 async def timer_playing():
     global t_allowed
     if t_allowed:
         while True:
-            await _timer_playing()
+            game_str = await _timer_playing()
+            g = discord.Game(name=playing_name, url=playing_name)
+            await client.change_presence(game=g)
+
             t_allowed = False
             sec = random.randint(jcommon.PL_MIN_MINUTES * 60, \
                 jcommon.PL_MAX_MINUTES * 60)
@@ -264,7 +266,9 @@ async def timer_playing():
             minutes = int((sec % (60 * 60)) / 60)
             seconds = int(sec % 60)
 
-            jcommon.logger.info("Playing for %dmin:%dsec", minutes, seconds)
+            jcommon.logger.info("Playing %r for %dmin:%dsec", \
+                game_str, minutes, seconds)
+
             await asyncio.sleep(sec)
 
 @client.event
