@@ -771,8 +771,12 @@ class ChannelHandler(logging.Handler):
 
     def emit(self, record):
         msg = self.format(record)
-        asyncio.ensure_future(client.send_message(self.channel, msg), \
-            loop=client.loop)
+        if self.channel is not None:
+            asyncio.ensure_future(client.send_message(self.channel, msg), \
+                loop=client.loop)
+
+    def in_shutdown(self):
+        self.channel = None
 
 log_channel_handler = ChannelHandler(JOSE_LOG_CHANNEL_ID)
 

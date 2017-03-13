@@ -367,7 +367,9 @@ class JoseBot(jaux.Auxiliar):
         else:
             await jcoin.josecoin_save(None)
 
-        self.logger.info("%d messages in this session sesison", josextra.total_msg)
+        jcommon.log_channel_handler.in_shutdown()
+
+        self.logger.info("%d messages in this session", josextra.total_msg)
 
         # unload all shit and shutdown.
         await self.unload_all()
