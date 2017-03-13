@@ -11,6 +11,7 @@ José Configuration:
  * `botblock`, if True, blocks all bot messages, use `j!botblock`
  * `language`, string representing the server's language, use `j!language`
  * `j!jsprob`, sets probability for JoséSpeak
+ * `j!fwprob`, sets JoséSpeak's probability of sending fullwidth text
 """
 
 class JoseLanguage(jaux.Auxiliar):
@@ -134,3 +135,26 @@ class JoseLanguage(jaux.Auxiliar):
         serverlang = await jcommon.langdb_get(message.server.id)
         await cxt.say("This server's language: `%s`\nAvailable languages: %s", \
             (serverlang, llist))
+
+    async def c_fwprob(self, message, args, cxt):
+        '''`j!fwprob fw_prob` - Set JoseSpeak probability of saying fullwidth text, default 1%, maximum 10%'''
+
+        if len(args) < 2:
+            await cxt.say(self.c_fwprob.__doc__)
+            return
+
+        try:
+            fw_prob = float(args[1])
+        except:
+            await cxt.say("Error parsing `fw_prob`")
+            return
+
+        if fw_prob < 0 or fw_prob > 10:
+            await cxt.say("`fw_prob` is out of the range `[0%-10%]`")
+            return
+
+        done = await jcommon.configdb_set(message.server.id, 'fw_prob', fw_prob / 100)
+        if not done:
+            await cxt.say("Error changing `fw_prob`.")
+        else:
+            await cxt.say("`josespeak.fw` probability is now %.2f%%", (fw_prob,))

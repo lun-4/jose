@@ -514,6 +514,7 @@ def get_defaultcdb():
         'imgchannel': 'None',
         'prefix': JOSE_PREFIX,
         'speak_prob': 0,
+        'fw_prob': 0.05,
     }
 
 redis = None
@@ -634,12 +635,15 @@ async def load_configdb():
             return False, 'raw_load sent false'
 
         # ensure new configdb features
+        default = get_defaultcdb()
         keys = await redis.keys('*')
         for rediskey in keys:
             rediskey = rediskey.decode('utf-8')
             if rediskey.startswith('config:'):
                 server_id = rediskey.split(':')[1]
-                await configdb_ensure_key(server_id, 'speak_prob', 0)
+
+                for key in default:
+                    await configdb_ensure_key(server_id, key, default[key])
 
         await save_configdb()
 

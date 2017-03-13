@@ -363,13 +363,17 @@ class JoseSpeak(jcommon.Extension):
         texter = self.text_generators[serverid]
         res = await texter.gen_sentence(length)
 
-        if random.random() < PROB_FULLWIDTH_TEXT or flag_fw:
+        fw_probability = await jcommon.configdb_get(serverid, 'fw_prob', 0.05)
+
+        if random.random() < fw_probability or flag_fw:
             res = res.translate(jcommon.WIDE_MAP)
 
         return res
 
     async def speak(self, texter, cxt):
         res = await texter.gen_sentence()
+
+        fw_probability = await jcommon.configdb_get(cxt.message.server.id, 'fw_prob', 0.05)
 
         if random.random() < PROB_FULLWIDTH_TEXT or cxt.env.get('flag_fw', False):
             res = res.translate(jcommon.WIDE_MAP)
