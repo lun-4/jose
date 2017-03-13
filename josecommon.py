@@ -770,8 +770,8 @@ class ChannelHandler(logging.Handler):
         self.channel = client.get_channel(self.channel_id)
 
     def emit(self, record):
-        print(record, repr(record))
-        asyncio.ensure_future(client.send_message(self.channel, repr(record)), \
+        msg = self.format(record)
+        asyncio.ensure_future(client.send_message(self.channel, msg), \
             loop=client.loop)
 
 log_channel_handler = ChannelHandler(JOSE_LOG_CHANNEL_ID)
