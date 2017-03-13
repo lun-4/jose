@@ -523,8 +523,12 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             base_messages = sorted([m for m in self.client.messages], \
                 key=lambda m: m.timestamp, reverse=True)
 
-            _messages = [(str(m.author), '#%s: %s' % (str(m.channel), m.content)) for m in base_messages if \
+            _messages = [(str(m.author), '%s' % (m.content)) for m in base_messages if \
                 m.channel.id == channel_id][:amount]
+
+        if len(_messages) < 1:
+            await cxt.say("No messages found")
+            return
 
         messages = '\n'.join(('%s: %s' % tup for tup in reversed(_messages)))
 
