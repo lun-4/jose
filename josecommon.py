@@ -357,8 +357,6 @@ class Extension:
         self._databases = {}
         self.dbapi = DatabaseAPI(self.client)
 
-        self.cbk_new('jsondb:save_all', self.jsondb_save_all, 1200)
-
     async def rolecheck(self, cxt, correct_role):
         roles = [role.name == correct_role for role in cxt.message.author.roles]
         if not True in roles:
@@ -431,6 +429,10 @@ class Extension:
         database_path = kwargs.get('path')
         attribute = kwargs.get('attribute', database_id)
         default_file = kwargs.get('default', '{}')
+
+        # only create callback when actually needed
+        if len(self._databases) < 1:
+            self.cbk_new('jsondb:save_all', self.jsondb_save_all, 1200)
 
         self._databases[database_id] = {
             'attr': attribute,
