@@ -47,8 +47,6 @@ Command | Description | Example | Alias
 `j!meme` | MEMES, use `j!meme` to see possible uses(portuguese text) | | `j!m`
 `j!emoji [n]` | Shows `n` emoji, default is a random number from 1 to 5 | `j!emoji 10` |
 `j!blackmiror` | SHOWS VERY BLACK MIRROR STUFF | |
-`j!wiki search_terms` | Searches Wikipedia | `j!wiki Discord (software)` |
-`j!deswiki search_terms` | Searches desciclopédia | `j!deswiki Pinto` |
 `j!8ball stuff` | Asks 8ball. | `j!8ball Is the universe going to die?` |
 `j!fullwidth text` | Makes a text ｆｕｌｌｗｉｄｔｈ | `j!fw hello world` | `j!fw`
 `j!ri text` | Converts text to *Regional Indicators* | `j!ri hello world` |
