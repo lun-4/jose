@@ -31,7 +31,6 @@ class JoseBot(jaux.Auxiliar):
         self.start_time = time.time()
         self.command_lock = False
         self.dev_mode = False
-        self.off_mode = False
         self.made_gshutdown = False
 
         self.jsondb('blocks', path='db/blocks.json', default=DEFAULT_BLOCKS_JSON)

@@ -208,9 +208,6 @@ async def on_message(message):
     if not is_good:
         return
 
-    if jose.off_mode:
-        print("Recv message: %s" % message.content)
-
     if message.author.id in josecoin.data:
         account = josecoin.data[message.author.id]
         if str(message.author) != account['name']:
@@ -329,88 +326,22 @@ async def on_member_remove(member):
 async def on_server_remove(server):
     await do_event('server_remove', [server])
 
-OFF_JOSE_USERDICT = {'name': 'José', 'id': '0', \
-    'discriminator': '666', 'avatar': None, 'bot': True}
-OFF_JOSE_USER = discord.User(**OFF_JOSE_USERDICT)
-
-async def offline_message(channel, string):
-    jcommon.logger.info("[msg: #%s] %s", channel, string)
-    return discord.Message(content=string, channel=channel, \
-        author=OFF_JOSE_USERDICT, id='0', reactions=[])
-
-async def off_edit_message(msg, new):
-    jcommon.logger.info("[msg.edit] %r became %r => #%s", \
-        msg.content, new, msg.channel)
-
-async def off_del_message(msg):
-    jcommon.logger.info("[msg.del] %r", msg.content)
-
-async def off_add_reaction(msg, reaction):
-    msg.reactions.append(reaction)
-    jcommon.logger.info("[msg.react] %r < %s", msg.content, reaction)
-
-async def off_logout():
-    sys.exit(0)
-
-def overwrite_discord_client():
-    jcommon.MARKOV_LENGTH_PATH = 'db/wordlength.json.other'
-    jcommon.MARKOV_MESSAGES_PATH = 'db/messages.json.other'
-    jcommon.STAT_DATABASE_PATH = 'db/stats.json.other'
-    jcommon.CONFIGDB_PATH = 'db/languages.json.other'
-    jconfig.jcoin_path = 'jcoin/josecoin.db.other'
-    jconfig.MAGICWORD_PATH = 'db/magicwords.json.other'
-    client.send_message = offline_message
-    client.edit_message = off_edit_message
-    client.delete_message = off_del_message
-    client.add_reaction = off_add_reaction
-    client.logout = off_logout
-
 async def main_task():
     global client
     startupdelta = time.time() - jose.start_time
     jcommon.logger.info("--- STARTUP TOOK %.2f SECONDS ---", startupdelta)
-    if jose.off_mode:
-        msgid = random.getrandbits(80)
-        userid = str(random.getrandbits(80))
-        jcommon.ADMIN_IDS.append(userid)
 
-        user_dis = str(random.randint(1111, 9999))
-        channelid = str(random.getrandbits(80))
-        serverid = str(random.getrandbits(80))
+    try:
+        jcommon.logger.info("[start] logging")
+        client.loop.create_task(jcommon.setup_logging())
 
-        # create discord objects
-        _server = discord.Server(name='Offline José Mode', id=serverid)
-
-        userdict = {'name': 'Offline Admin', 'id': userid, \
-            'discriminator': user_dis, 'avatar': None, 'bot': False, \
-            'server': _server}
-
-        _channel = discord.Channel(name='talking', server=_server, \
-            id=channelid, is_private=False, is_defualt=True)
-
-        jcommon.logger.info("You are %s#%s", userdict['name'], \
-            userdict['discriminator'])
-
-        # am I really doing this?
-        overwrite_discord_client()
-        while True:
-            msg = input("José> ")
-            message = discord.Message(content=msg, channel=_channel, \
-                author=userdict, id=str(msgid), reactions=[])
-            msgid += 1
-            await on_message(message)
-    else:
-        try:
-            jcommon.logger.info("[start] logging")
-            client.loop.create_task(jcommon.setup_logging())
-
-            jcommon.logger.info("[start] discord client")
-            await client.start(jconfig.discord_token)
-            jcommon.logger.info("[exit] discord client")
-        except discord.GatewayNotFound:
-            jcommon.logger.error("Received GatewayNotFound from discord.")
-        except Exception as err:
-            jcommon.logger.error("Received %r from client.start", err, exc_info=True)
+        jcommon.logger.info("[start] discord client")
+        await client.start(jconfig.discord_token)
+        jcommon.logger.info("[exit] discord client")
+    except discord.GatewayNotFound:
+        jcommon.logger.error("Received GatewayNotFound from discord.")
+    except Exception as err:
+        jcommon.logger.error("Received %r from client.start", err, exc_info=True)
 
 def main(args):
     try:
@@ -423,10 +354,6 @@ def main(args):
     if mode == 'dev':
         print("===ENTERING DEVELOPER MODE===")
         jose.dev_mode = True
-        logging.basicConfig(level=logging.DEBUG)
-    elif mode == 'offline':
-        print("===OFFLINE/TEST MODE===")
-        jose.off_mode = True
         logging.basicConfig(level=logging.DEBUG)
 
     # load all josé's modules
