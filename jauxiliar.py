@@ -29,7 +29,7 @@ class Auxiliar(jcommon.Extension):
         self.jcoin = jcoin
 
     def tbank_fmt(self, cxt):
-        return 'tbank#%s' % (cxt.message.server.id)
+        return 'tbank#%s' % str(cxt.message.server.id)
 
     def ensure_tbank(self, tbank_id):
         if tbank_id not in self.jcoin.data:
