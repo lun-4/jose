@@ -206,6 +206,8 @@ async def parse_id(data, message=None):
             return data[3:-1]
         else:
             return data[2:-1]
+    elif data[0] == 'u':
+        return data[1:]
     else:
         logger.error("parse_id: %s", data)
         return None
