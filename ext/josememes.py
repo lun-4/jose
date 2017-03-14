@@ -58,6 +58,13 @@ BLACK_MIRROR_MESSAGES = [
 async def random_emoji(maxn):
     return ''.join((str(emoji.random_emoji()) for i in range(maxn)))
 
+def make_meme_entry(author_id, url, uses=0):
+    return {
+        'owner': str(author_id),
+        'data': url,
+        'uses': 0,
+    }
+
 class JoseMemes(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
@@ -177,11 +184,7 @@ class JoseMemes(jaux.Auxiliar):
             url = await self.do_patterns(cxt, meme, url)
 
             # create meme in database
-            self.memes[meme] = {
-                'owner': message.author.id,
-                'data': url,
-                'uses': 0,
-            }
+            self.memes[meme] = make_meme_entry(message.author.id, url)
 
             await cxt.say("%s: meme adicionado!", (meme,))
             return
@@ -276,10 +279,8 @@ class JoseMemes(jaux.Auxiliar):
                 await cxt.say("`%s`: meme já existe", (newname,))
                 return
 
-            self.memes[newname] = {
-                'owner': message.author.id,
-                'data': old_meme['data'],
-            }
+            self.memes[newname] = make_meme_entry(message.author.id, \
+                old_meme['data'], old_meme['uses'])
 
             del self.memes[oldname]
             await cxt.say("`%s` becomes `%s`!", (oldname, newname))
@@ -393,9 +394,9 @@ class JoseMemes(jaux.Auxiliar):
                 await cxt.say("*nao tem owner gratis*")
                 return
 
-            corte = from_owner[page * 50:(page + 1) * 50]
-            res = len(from_owner), len(corte), ', '.join(corte)
-            report = '''Quantidade: %d[%d],\nMemes: %s''' % (res)
+            page_slice = from_owner[page * 50:(page + 1) * 50]
+            res = len(from_owner), len(page_slice), ', '.join(page_slice)
+            report = '''Showing %d[%d in page],\nMemes: %s''' % (res)
             await cxt.say(report)
 
         elif command == 'rand':
