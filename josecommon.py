@@ -189,11 +189,6 @@ AVIAOS = [
     'http://i.imgur.com/AIbjvX7.jpg',
 ]
 
-async def show_top(message):
-    await client.send_message(message.channel, "BALADINHA TOPPER %s %s" % (
-        (":joy:" * random.randint(1, 5)),
-        (":ok_hand:" * random.randint(1, 6))))
-
 ATIVIDADE = [
     'http://i.imgur.com/lkZVh3K.jpg',
     'http://imgur.com/a/KKwId',
