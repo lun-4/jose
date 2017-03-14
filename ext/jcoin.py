@@ -185,11 +185,6 @@ class JoseCoin(jaux.Auxiliar):
                 jcommon.logger.error("do_josecoin->jc->err: %s", res[1])
                 await cxt.say("jc->err: %s", (res[1],))
 
-    async def c_jcoin_test(self, message, args, cxt):
-        await self.is_admin(message.author.id)
-        cxt.env['jcflag'] = True
-        await self.e_on_message(message, cxt)
-
     async def c_jcprob(self, message, args, cxt):
         '''`j!jcprob` - show your JoséCoin probabilities'''
         self.sane_jcoin(cxt)
