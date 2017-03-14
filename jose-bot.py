@@ -160,42 +160,35 @@ async def do_command(method, message, args, cxt, t_start, st):
     # kthxbye
     return
 
+def cooldown_apply(author_id, now):
+    self.env['cooldowns'][author_id] = now + COOLDOWN_SECONDS
+
+def cooldown_remove(author_id):
+    self.env['cooldowns'].pop(author_id, None)
+
 async def do_cooldown(message, cxt):
-    # Check for cooldowns from the author of the command
-    authorid = message.author.id
+    author_id = message.author.id
     now = time.time()
 
-    # timestamp to terminate the cooldown
-    if authorid in env['cooldowns']:
-        cdown_term_time = env['cooldowns'][authorid]
-        if now < cdown_term_time:
-            secleft = cdown_term_time - now
+    # create cooldown
+    if author_id not in self.env['cooldowns']:
+        cooldown_apply(author_id, now)
+        return False
 
-            if secleft > 0.5:
-                # say to the user they're being a shit person
-                m = await cxt.say("Please cool down!(**%.1f** seconds left)", \
-                    (secleft,))
-                # wait secleft before deleting and removing cooldown from user
-                await asyncio.sleep(secleft)
-                await client.delete_message(m)
+    # check if cooldown is alredy gone
+    cooldown_end = self.env['cooldowns'][author_id]
+    if now >= cooldown_end:
+        cooldown_remove(author_id)
+        return False
 
-                # that code repetiton was needed, sorry
-                try:
-                    del env['cooldowns'][authorid]
-                    return True
-                except Exception as e:
-                    jcommon.logger.error("do_cooldown: error removing cooldown for %d: %r", \
-                        authorid, e)
-            else:
-                try:
-                    del env['cooldowns'][authorid]
-                except Exception as e:
-                    jcommon.logger.error("do_cooldown: error removing cooldown for %d: %r", \
-                        authorid, e)
+    time_left = cooldown_end - now
+    cooldown_msg = await cxt.say("Wait **%.2f** seconds", (time_left,))
 
-    # always update user's cooldown
-    env['cooldowns'][authorid] = now + jcommon.COOLDOWN_SECONDS
-    return False
+    await asyncio.sleep(time_left)
+    await client.delete_message(cooldown_msg)
+    cooldown_remove(author_id)
+
+    return True
 
 @client.event
 async def on_message(message):
