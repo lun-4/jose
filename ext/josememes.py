@@ -87,13 +87,8 @@ class JoseMemes(jaux.Auxiliar):
             self.memes = pickle.load(open('ext/josememes.db', 'rb'))
             return True, ''
         except Exception as e:
-            if self.current is not None:
-                await self.debug("load_memes: erro carregando josememes.db(%s)" % e)
-                return False, 'error loading josememes.db(%s)' % e
-            else:
-                self.logger.error("load_memes: %s", e)
-                return False, e
-            self.memes = {}
+            self.logger.error("load_memes: %s", e)
+            return False, 'error loading josememes.db(%s)' % e
 
     async def save_sentinel(self):
         await self.save_memes()
