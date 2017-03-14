@@ -38,6 +38,7 @@ MARKOV_LENGTH_PATH = 'db/wordlength.json'
 MARKOV_MESSAGES_PATH = 'db/messages.json'
 STAT_DATABASE_PATH = 'db/stats.json'
 CONFIGDB_PATH = 'db/languages.json'
+CONFIGDB_PREFIX = 'config'
 
 JOSE_DEV_SERVER_ID = '273863625590964224'
 JOSE_ID = '202587271679967232'
@@ -517,9 +518,10 @@ def get_defaultcdb():
     }
 
 redis = None
+cdb_cache = {}
 
 def make_rkey(server_id):
-    return 'config:{0}'.format(server_id)
+    return '{0}:{1}'.format(CONFIGDB_PREFIX, server_id)
 
 def from_redis(element):
     if element == 'None':
@@ -580,6 +582,7 @@ async def configdb_ensure_key(server_id, key, default):
 
 
 async def configdb_set(server_id, key, value):
+    global cdb_cache
     await configdb_ensure(server_id)
     rediskey = make_rkey(server_id)
 
@@ -595,22 +598,28 @@ async def configdb_set(server_id, key, value):
             logger.warning("[cdb] configdb_set(%s, %s) = %s != %s", server_id, key, value, after)
             return False
 
+        cdb_cache[server_id][key] = value
+
         return True
     except Exception as err:
         logger.error('configdb_set(%s, %s)', server_id, key, exc_info=True)
         return False
 
 async def configdb_get(server_id, key, default=None):
-    # TODO: make a cache for configdb
+    global cdb_cache
+    if server_id in cdb_cache:
+        return cdb_cache[server_id][key]
 
     await configdb_ensure(server_id)
-    rediskey = 'config:{0}'.format(server_id)
+    rediskey = make_rkey(server_id)
     res = await redis.hmget(rediskey, key)
-    # aioredis returns a set... I'm pretty WTF rn but ok.
 
-    element = next(iter(res)).decode('utf-8')
-    # try to understand it
-    element = from_redis(element)
+    # aioredis returns a set... I'm pretty WTF rn but ok.
+    element = from_redis(next(iter(res)).decode('utf-8'))
+
+    # insert in cache
+    cdb_cache[server_id][key] = element
+
     return element
 
 async def save_configdb():
@@ -633,13 +642,18 @@ async def load_configdb():
         if not res:
             return False, 'raw_load sent false'
 
-        # ensure new configdb features
+        # ensure new configdb features are already there
         default = get_defaultcdb()
+
+        # get all keys (yes its inneficient)
         keys = await redis.keys('*')
         for rediskey in keys:
             rediskey = rediskey.decode('utf-8')
-            if rediskey.startswith('config:'):
+            if rediskey.startswith('{}:'.format(CONFIGDB_PREFIX)):
                 server_id = rediskey.split(':')[1]
+
+                # create serverid entry in cache
+                cdb_cache[server_id] = {}
 
                 for key in default:
                     await configdb_ensure_key(server_id, key, default[key])
