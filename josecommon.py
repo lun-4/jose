@@ -598,16 +598,17 @@ async def configdb_set(server_id, key, value):
             logger.warning("[cdb] configdb_set(%s, %s) = %s != %s", server_id, key, value, after)
             return False
 
+        # overwrite cache
         cdb_cache[server_id][key] = value
-
         return True
+
     except Exception as err:
         logger.error('configdb_set(%s, %s)', server_id, key, exc_info=True)
         return False
 
 async def configdb_get(server_id, key, default=None):
     global cdb_cache
-    if server_id in cdb_cache:
+    if key in cdb_cache[server_id]:
         return cdb_cache[server_id][key]
 
     await configdb_ensure(server_id)
