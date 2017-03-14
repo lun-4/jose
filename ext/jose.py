@@ -722,3 +722,30 @@ don't want (unless I'm skynet)")
             await cxt.say("Blocked guild `%s[%s]`.", (guild_name, guild_id,))
 
         await self.jsondb_save('blocks')
+
+    async def c_blockuser(self, message, args, cxt):
+        '''`j!blockuser userid` - Blocks/Unblocks an User from message processing.'''
+        await self.is_admin(message.author.id)
+
+        if len(args) < 2:
+            await cxt.say(self.c_blockuser.__doc__)
+            return
+
+        user_id = args[1]
+        user = discord.utils.get(self.client.get_all_members(), id = user_id)
+
+        if user is None:
+            await cxt.say("User not found")
+            return
+
+        if user_id in self.blocks['users']:
+            # remove from blocks
+            self.blocks['users'].remove(user_id)
+            self.logger.info("Unblocked user %s, %s", user, user_id)
+            await cxt.say("Unblocked user `%s[%s]`.", (user, user_id,))
+        else:
+            self.blocks['users'].append(user_id)
+            self.logger.info("Blocked user %s, %s", user, user_id)
+            await cxt.say("Blocked user `%s[%s]`.", (user, user_id,))
+
+        await self.jsondb_save('blocks')

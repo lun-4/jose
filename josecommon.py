@@ -31,7 +31,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 JOSE_VERSION = '1.5.1'
-JOSE_PREFIX = "j!"
+JOSE_PREFIX = 'j!'
 LEN_PREFIX = len(JOSE_PREFIX)
 
 MARKOV_LENGTH_PATH = 'db/wordlength.json'
@@ -351,7 +351,7 @@ class Extension:
         all modules inherit from this class.
         '''
         self.client = _client
-        self.loop = client.loop
+        self.loop = _client.loop
         self.logger = logger.getChild('Extension')
 
         self._callbacks = {}
