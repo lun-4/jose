@@ -468,6 +468,44 @@ class JoseSpeak(jcommon.Extension):
 
         await cxt.say(' '.join(res))
 
+    async def make_midi(self, tempo_to_use, string):
+        midi_file = MIDIFile(1)
+        track = 0
+        st_time = 0
+        midi_file.addTrackName(track, st_time, "Jose")
+        midi_file.addTempo(track, st_time, tempo_to_use)
+
+        # add some notes
+        channel = 0
+        volume = 100
+        duration = 1
+        st_time = 0
+
+        self.logger.info("Making MIDI out of %r", string)
+
+        # do the magic
+        for index, letter in enumerate(string):
+            if letter in LETTER_TO_PITCH:
+                # get letter after the letter
+                try:
+                    modifier = string[index + 1]
+                    if modifier == " ": duration = 2
+                    elif modifier == ",": duration = 3
+                    elif modifier == ".": duration = 4
+                    else: duration = 1
+                except IndexError:
+                    duration = 1
+
+                st_time += duration
+                pitch = LETTER_TO_PITCH[letter]
+
+                # run that in a thread
+                future = self.loop.run_in_executor(None, midi_file.addNote, \
+                    track, channel, pitch, st_time, duration, volume)
+                await future
+
+        return midi_file
+
     async def c_midi(self, message, args, cxt):
         '''`j!midi [stuff]` - Make MIDI files made out of josé's generated sentences
         `j!midi bpm<bpm> [stuff]` - set tempo'''
@@ -505,40 +543,7 @@ class JoseSpeak(jcommon.Extension):
         else:
             res = generated_str
 
-        midi_file = MIDIFile(1)
-        track = 0
-        st_time = 0
-        midi_file.addTrackName(track, st_time, "Jose")
-        midi_file.addTempo(track, st_time, tempo_to_use)
-
-        # add some notes
-        channel = 0
-        volume = 100
-        duration = 1
-        st_time = 0
-
-        self.logger.info("Making MIDI out of %r", res)
-
-        # do the magic
-        for index, letter in enumerate(res):
-            if letter in LETTER_TO_PITCH:
-                # get letter after the letter
-                try:
-                    modifier = res[index + 1]
-                    if modifier == " ": duration = 2
-                    elif modifier == ",": duration = 3
-                    elif modifier == ".": duration = 4
-                    else: duration = 1
-                except IndexError:
-                    duration = 1
-
-                st_time += duration
-                pitch = LETTER_TO_PITCH[letter]
-
-                # run that in a thread
-                future = self.loop.run_in_executor(None, midi_file.addNote, \
-                    track, channel, pitch, st_time, duration, volume)
-                await future
+        midi_file = await self.make_midi(tempo_to_use, res)
 
         t_taken_ms = (time.time() - t_start) * 1000
         self.logger.info("Took %.2fms to make MIDI file", t_taken_ms)
