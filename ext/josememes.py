@@ -189,15 +189,13 @@ class JoseMemes(jaux.Auxiliar):
             meme_owner = self.memes[meme]['owner']
             is_admin = await self.b_isowner(cxt)
 
-            if (message.author.id == meme_owner) or is_admin:
-                del self.memes[meme]
 
-                # meme removal saves
-                await self.save_memes()
-                await cxt.say("%s: meme removido", (meme,))
-            else:
+            if (message.author.id != meme_owner) or not is_admin:
                 raise je.PermissionError()
-            return
+
+            del self.memes[meme]
+            await self.save_memes()
+            await cxt.say("%s: meme removido", (meme,))
         elif command == 'save':
             done = await self.save_memes()
             if done:
@@ -291,28 +289,26 @@ class JoseMemes(jaux.Auxiliar):
             await cxt.say("quantidade de memes: %d", (len(self.memes),))
 
         elif command == 'stat':
-            stat = ''
-
-            copy = dict(self.memes)
-
             inconsistency = False
-            for k in copy:
-                inconsistency_report = ''
+            for k in self.memes:
+                inconsistency_report = []
                 if 'uses' not in copy[k]:
-                    inconsistency_report += "%s, " % k
+                    inconsistency_report.append("%s, " % k)
                     inconsistency = True
 
             if inconsistency:
-                await cxt.say("INCONSISTENCY: `%s`", (inconsistency_report,))
+                await cxt.say("INCONSISTENCY: `%s`", (''.join(inconsistency_report),))
                 return
 
-            i = 1
-            for key in sorted(copy, key=lambda key: -copy[key]['uses'])[:10]:
-                stat += '%d. %s used %d times\n' % (i, \
-                    key, copy[key]['uses'])
+            stat = []
+            ordered = sorted(self.memes, key=lambda key: self.memes[key]['uses'], reverse=True)
+            for (i, key) in enumerate(ordered[:12]):
+
+                stat.append('[%2d] %s used %d times\n' % \
+                    (i, key, self.memes[key]['uses']))
                 i += 1
 
-            await cxt.say(self.codeblock('', stat))
+            await cxt.say(self.codeblock('', '\n'.join(stat)))
 
         elif command == 'istat':
             meme = ' '.join(args[2:])
