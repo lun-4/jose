@@ -438,7 +438,6 @@ class Extension:
         self._databases[database_id] = {
             'attr': attribute,
             'path': database_path,
-            'default': default_file,
         }
 
         setattr(self, attribute, {})
