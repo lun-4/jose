@@ -44,18 +44,6 @@ RI_STR = '🇦🇧🇨🇩🇪🇫🇬🇭🇮🇯🇰🇱🇲🇳🇴🇵🇶�
 RI_TABLE.update({letter:RI_STR[string.ascii_lowercase.find(letter)] for \
     letter in string.ascii_lowercase})
 
-MEMES_TECH_HELP = '''
-Então você teve problemas usando `j!m stat` ou `j!m get` ou alguma merda assim?
-Siga esses passos:
-    1) Rode um `j!m check` no josé
-        O `j!m check` irá checar meme por meme e ver se ele faz sentido, tipo ter um
-        número de usos, se não, ele irá corrigir automaticamente
-
-        Outra coisa que o `j!m check` faz é procurar por duplicatas, ou seja, 2 memes que
-        vão pro mesmo resultado, ele te mostra quem tem duplicata e você remove manualmente
-    2) Se o problema persiste, fale com lunão.
-'''
-
 BLACK_MIRROR_MESSAGES = [
     'http://s2.glbimg.com/beSMsXdBIPHqeQxdWi-nM31wNXs=/s.glbimg.com/jo/eg/f/original/2016/11/18/fdsaff.jpg',
     'http://s2.glbimg.com/N8LLtE22ZW2pFjlhzQWBdzvfn9E=/s.glbimg.com/jo/eg/f/original/2016/11/18/fsdfdsf.jpg',
@@ -76,6 +64,8 @@ class JoseMemes(jaux.Auxiliar):
         self.memes = {}
         self.WIDE_MAP = jcommon.WIDE_MAP
         self.patterns = ['fbcdn.net', 'akamaihd.net']
+
+        self.cbk_new('save_memes', self.save_sentinel, 120)
 
     async def ext_load(self):
         r = await self.load_memes()
@@ -98,6 +88,9 @@ class JoseMemes(jaux.Auxiliar):
                 return False, e
             self.memes = {}
 
+    async def save_sentinel(self):
+        await self.save_memes()
+
     async def save_memes(self):
         try:
             pickle.dump(self.memes, open("ext/josememes.db", 'wb'))
@@ -109,9 +102,6 @@ class JoseMemes(jaux.Auxiliar):
     async def c_aprovado(self, message, args, cxt):
         '''`j!aprovado` - O Melhor Sean Anthony®'''
         await cxt.say('http://gaveta.com.br/images/Aprovacao-Sean-Anthony.png')
-
-    async def c_htmpr(self, message, args, cxt):
-        await cxt.say(MEMES_TECH_HELP)
 
     async def do_patterns(self, cxt, meme, url):
         for pat in self.patterns:
@@ -137,28 +127,22 @@ class JoseMemes(jaux.Auxiliar):
         return url
 
     async def c_meme(self, message, args, cxt):
-        '''
-        j!meme: Adicione e mostre memes com o josé!
-        **RECOMENDADO**: use `!htmpr` para descobrir problemas técnicos.
-        *alias*: j!m
+        '''`j!meme add <meme>;<meme_content>` - `j!meme get <meme>`, jose says `<meme_content>`
+        `j!meme get <meme>` - get a `<meme>`
+        `j!meme search <terms>` - search for specific terms
+        `j!meme rm <meme>` - remove meme
+        `j!meme rename <old meme key>;<new meme key>` - remove meme name
+        `j!meme owner <meme>` - who's the father of the meme
+        `j!meme count` - amount of stuff
+        `j!meme stat` - statistics
+        `j!meme istat <meme>` - individual stats about a meme
+        `j!meme page <page>` - all memes(`<page>` starts from 1)
+        `j!meme see @user <page>` - shows all memes that @user made(`<page>` starts from 0)
+        `j!meme check` - checks meme database for inconsistencies
+        `j!meme rand` - random meme
+        `j!meme searchc <terms>` - search in the database every meme that its `<meme_content>` contains `<terms>`
 
-        Subcomandos:
-        `j!meme add <trigger>;<meme>` - toda vez que alguém mandar um `!meme get <trigger>`, josé falará `<meme>`(limite de <trigger> é 96 chars)
-        `j!meme get <trigger>` - josé falará o que estiver programado para falar de acordo com `<trigger>`
-        `j!meme search <termo>` - procura o banco de dados de memes por um meme específico
-        `j!meme rm <meme>` - remove um meme
-        `j!meme rename <nome antigo>;<nome novo>` - altera o `<trigger>` de um meme
-        `j!meme owner <meme>` - mostra quem "criou" o `<meme>`
-        `j!meme count` - mostra a quantidade de memes
-        `j!meme stat` - estatísticas sobre o uso dos memes
-        `j!meme istat <meme>` - estatísticas individuais sobre um meme
-        `j!meme page <página>` - mostra a página tal de todos os memes disponíveis(inicia de 1, não do 0)
-        `j!meme see @user <página>` - mostra todos os memes que a @pessoa fez(`página` inicia de 0, não de 1)
-        `j!meme check` - checa o banco de dados de memes
-        `j!meme rand` - meme aleatório
-        `j!meme searchc <termos>` - procura o DB de meme qual o valor do meme que bate com os termos
-
-        Tenha cuidado ao adicionar coisas NSFW.
+        **No NSFW.**
         '''
 
         if len(args) < 2:
@@ -172,16 +156,16 @@ class JoseMemes(jaux.Auxiliar):
             try:
                 meme = args_sp[0]
                 url = args_sp[1]
-            except IndexError:
+            except:
                 await cxt.say("Error parsing arguments")
                 return
 
             if len(meme) > 96:
-                await cxt.say("*não tem meme grátis*")
+                await cxt.say("*meme name is too long*")
                 return
 
             if meme in self.memes:
-                await cxt.say("%s: meme já existe", (meme,))
+                await cxt.say("%s: meme already exists", (meme,))
                 return
 
             url = await self.do_patterns(cxt, meme, url)
@@ -193,8 +177,6 @@ class JoseMemes(jaux.Auxiliar):
                 'uses': 0,
             }
 
-            # save it because of my sanity
-            await self.save_memes()
             await cxt.say("%s: meme adicionado!", (meme,))
             return
         elif command == 'rm':
@@ -205,16 +187,15 @@ class JoseMemes(jaux.Auxiliar):
 
                 if (message.author.id == meme_owner) or is_admin:
                     del self.memes[meme]
+
+                    # meme removal saves
                     await self.save_memes()
                     await cxt.say("%s: meme removido", (meme,))
-                    return
                 else:
                     raise je.PermissionError()
-
-                return
             else:
                 await cxt.say("%s: meme não encontrado", (meme,))
-                return
+            return
         elif command == 'save':
             done = await self.save_memes()
             if done:
@@ -244,7 +225,6 @@ class JoseMemes(jaux.Auxiliar):
             if meme in self.memes:
                 self.memes[meme]['uses'] += 1
                 await cxt.say(self.memes[meme]['data'])
-                await self.save_memes()
             else:
                 # find other memes that are like the not found one
                 probables = [key for key in self.memes if meme in key.lower()]
@@ -257,28 +237,27 @@ class JoseMemes(jaux.Auxiliar):
             term = ' '.join(args[2:])
             term = term.lower()
             if term.strip() == '':
-                await cxt.say("Pesquisas vazias não são permitidas")
+                await cxt.say("Empty searches? lol")
                 return
 
             # better than google
             probables = [key for key in self.memes if term in key.lower()]
             if len(probables) > 0:
                 to_send = ', '.join(probables)
-                # check length of message
-                if len(to_send) > 1995: # 1 9 9 5
-                    await cxt.say(":elephant: Resultados muito grandes :elephant:")
-                else:
-                    await cxt.say(self.codeblock("", to_send))
+                await cxt.say(self.codeblock("", to_send))
             else:
                 await cxt.say("%r: Nenhum resultado encontrado", (term,))
+
+            return
         elif command == 'rename':
             args_s = ' '.join(args[2:])
             args_sp = args_s.split(';')
             try:
                 oldname = args_sp[0]
                 newname = args_sp[1]
-            except Exception as e:
-                await cxt.say("Error parsing arguments: %r", (e,))
+            except:
+                await cxt.say("Error parsing arguments: ")
+                return
 
             if oldname not in self.memes:
                 await cxt.say("%s: meme não encontrado", (oldname,))
@@ -300,8 +279,7 @@ class JoseMemes(jaux.Auxiliar):
             }
 
             del self.memes[oldname]
-            await cxt.say("`%s` foi renomeado para `%s`!", (oldname, newname))
-            await self.save_memes()
+            await cxt.say("`%s` becomes `%s`!", (oldname, newname))
             return
 
         elif command == 'owner':
@@ -415,7 +393,7 @@ class JoseMemes(jaux.Auxiliar):
                 await cxt.say("*nao tem owner gratis*")
                 return
 
-            corte = from_owner[page*50:(page+1)*50]
+            corte = from_owner[page * 50:(page + 1) * 50]
             res = len(from_owner), len(corte), ', '.join(corte)
             report = '''Quantidade: %d[%d],\nMemes: %s''' % (res)
             await cxt.say(report)
@@ -449,8 +427,7 @@ class JoseMemes(jaux.Auxiliar):
         await self.c_meme(message, args, cxt)
 
     async def c_fullwidth(self, message, args, cxt):
-        '''`j!fullwidth texto` - converte texto para fullwidth'''
-        # looks like discord made fullwidth suppoert available again :D
+        '''`j!fullwidth text` - converts text to full width'''
         text = ' '.join(args[1:])
         if len(text.strip()) <= 0:
             return

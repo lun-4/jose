@@ -120,7 +120,7 @@ JOSE_PLAYING_PHRASES = [
     'terminal seven',
     'Cortana',
     'Custom Prefixes',
-    'Natual Language Processing',
+    'Natural Language Processing',
     'nltk',
     'RSS Feeds',
     '/r/linuxmasterrace',
@@ -146,5 +146,6 @@ JOSE_PLAYING_PHRASES = [
     'Virtual Reality',
     'Other Virtual Reality ( ͡° ͜ʖ ͡°)',
     'Thinking',
-    'dunno ¯\_(ツ)_/¯'
+    'dunno ¯\_(ツ)_/¯',
+    'capture the flag with 4chan'
 ]
