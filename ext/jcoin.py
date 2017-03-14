@@ -7,6 +7,7 @@ import josecommon as jcommon
 import decimal
 import json
 import os
+import discord
 import time
 
 from random import SystemRandom
@@ -539,7 +540,10 @@ class JoseCoin(jaux.Auxiliar):
             self.stealdb['points'][thief_id] = stealuses = 3
 
         thief_user = message.author
-        target_user = await self.client.get_user_info(target_id)
+        target_user = discord.utils.get(self.client.get_all_members(), id = target_id)
+
+        if target_user is None:
+            target_user = await self.client.get_user_info(target_id)
 
         grace_period = (self.stealdb['period'].get(target_id, 0) - time.time())
         if grace_period > 0:
