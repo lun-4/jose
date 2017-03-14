@@ -252,6 +252,8 @@ async def _timer_playing():
 
 async def timer_playing():
     global t_allowed
+    await client.wait_until_ready()
+
     if t_allowed:
         while True:
             game_str = await _timer_playing()
