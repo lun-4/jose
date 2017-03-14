@@ -363,7 +363,7 @@ class JoseSpeak(jcommon.Extension):
         server_id = server.id
 
         if server_id in self.text_generators:
-            del self.text_generators[serverid]
+            del self.text_generators[server_id]
 
         # delete messages from database
         await self.dbapi.do("DELETE FROM markovdb WHERE serverid=?", (server_id))
@@ -387,7 +387,7 @@ class JoseSpeak(jcommon.Extension):
 
         fw_probability = await jcommon.configdb_get(cxt.message.server.id, 'fw_prob', 0.1)
 
-        if random.random() < PROB_FULLWIDTH_TEXT or cxt.env.get('flag_fw', False):
+        if random.random() < fw_probability or cxt.env.get('flag_fw', False):
             res = res.translate(jcommon.WIDE_MAP)
 
         await cxt.say(res)

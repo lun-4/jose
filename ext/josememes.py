@@ -3,7 +3,6 @@
 import re
 import io
 import aiohttp
-import urllib
 import string
 import asyncio
 import sys
@@ -132,7 +131,7 @@ class JoseMemes(jaux.Auxiliar):
         if meme_key in self.memes:
             return True
         else:
-            raise je.CommonError("%s: meme not found" % (meme))
+            raise je.CommonError("%s: meme not found" % (meme_key))
 
     async def c_meme(self, message, args, cxt):
         '''`j!meme add <meme>;<meme_content>` - `j!meme get <meme>`, jose says `<meme_content>`
