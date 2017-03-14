@@ -54,6 +54,8 @@ BLACK_MIRROR_MESSAGES = [
     'https://pbs.twimg.com/media/CxkgKCZXgAAlkO2.jpg',
 ]
 
+MAX_MEME_NAME = 96
+
 async def random_emoji(maxn):
     return ''.join((str(emoji.random_emoji()) for i in range(maxn)))
 
@@ -157,8 +159,9 @@ class JoseMemes(jaux.Auxiliar):
             return
 
         command = args[1]
+        args_s = ' '.join(args[2:])
+
         if command == 'add':
-            args_s = ' '.join(args[2:])
             args_sp = args_s.split(';')
             try:
                 meme = args_sp[0]
@@ -167,7 +170,7 @@ class JoseMemes(jaux.Auxiliar):
                 await cxt.say("Error parsing arguments")
                 return
 
-            if len(meme) > 96:
+            if len(meme) > MAX_MEME_NAME:
                 await cxt.say("*meme name is too long*")
                 return
 
@@ -206,20 +209,18 @@ class JoseMemes(jaux.Auxiliar):
             return
 
         elif command == 'saveload':
-            self.logger.info("saveloading meme database")
+            self.logger.info("saveloading memedb")
+
             done = await self.save_memes()
-            if done:
-                await cxt.say("jmemes: banco de dados salvo")
-            else:
+            if not done:
                 raise IOError("banco de dados não salvo corretamente")
 
             done = await self.load_memes()
-            if done:
-                await cxt.say("jmemes: banco de dados carregado")
-            else:
+            if not done:
                 raise IOError("banco de dados não carregado corretamente")
 
-            return
+            await cxt.say("done")
+
         elif command == 'get':
             meme = ' '.join(args[2:])
             if meme in self.memes:
@@ -250,7 +251,6 @@ class JoseMemes(jaux.Auxiliar):
 
             return
         elif command == 'rename':
-            args_s = ' '.join(args[2:])
             args_sp = args_s.split(';')
             try:
                 oldname = args_sp[0]
@@ -260,8 +260,6 @@ class JoseMemes(jaux.Auxiliar):
                 return
 
             self.meme_exists(oldname)
-
-            # swapping
             old_meme = self.memes[oldname]
 
             if old_meme['owner'] != message.author.id:
@@ -271,11 +269,12 @@ class JoseMemes(jaux.Auxiliar):
                 await cxt.say("`%s`: meme já existe", (newname,))
                 return
 
+            # swapping
             self.memes[newname] = make_meme_entry(message.author.id, \
                 old_meme['data'], old_meme['uses'])
-
             del self.memes[oldname]
-            await cxt.say("`%s` becomes `%s`!", (oldname, newname))
+
+            await cxt.say("`%s` is now `%s`!", (oldname, newname))
 
         elif command == 'owner':
             meme = ' '.join(args[2:])
@@ -289,17 +288,6 @@ class JoseMemes(jaux.Auxiliar):
             await cxt.say("quantidade de memes: %d", (len(self.memes),))
 
         elif command == 'stat':
-            inconsistency = False
-            for k in self.memes:
-                inconsistency_report = []
-                if 'uses' not in copy[k]:
-                    inconsistency_report.append("%s, " % k)
-                    inconsistency = True
-
-            if inconsistency:
-                await cxt.say("INCONSISTENCY: `%s`", (''.join(inconsistency_report),))
-                return
-
             stat = []
             ordered = sorted(self.memes, key=lambda key: self.memes[key]['uses'], reverse=True)
             for (i, key) in enumerate(ordered[:12]):
