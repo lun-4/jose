@@ -161,22 +161,22 @@ async def do_command(method, message, args, cxt, t_start, st):
     return
 
 def cooldown_apply(author_id, now):
-    self.env['cooldowns'][author_id] = now + COOLDOWN_SECONDS
+    env['cooldowns'][author_id] = now + jcommon.COOLDOWN_SECONDS
 
 def cooldown_remove(author_id):
-    self.env['cooldowns'].pop(author_id, None)
+    env['cooldowns'].pop(author_id, None)
 
 async def do_cooldown(message, cxt):
     author_id = message.author.id
     now = time.time()
 
     # create cooldown
-    if author_id not in self.env['cooldowns']:
+    if author_id not in env['cooldowns']:
         cooldown_apply(author_id, now)
         return False
 
     # check if cooldown is alredy gone
-    cooldown_end = self.env['cooldowns'][author_id]
+    cooldown_end = env['cooldowns'][author_id]
     if now >= cooldown_end:
         cooldown_remove(author_id)
         return False
