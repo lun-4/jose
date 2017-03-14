@@ -49,13 +49,13 @@ def load_all_modules():
     load_module('joselang', 'JoseLanguage')
     load_module('josehelp', 'JoseHelp')
     load_module('jcoin', 'JoseCoin')
-    load_module('josespeak', 'JoseSpeak')
     load_module('josestats', 'JoseStats')
     load_module('josemagicword', 'JoseMagicWord')
     load_module('josewatch', 'JoseWatch')
     load_module('josemod', 'JoseMod')
+    load_module('josespeak', 'JoseSpeak')
 
-    # fun stuff
+    # the other stuff
     load_module('josememes', 'JoseMemes')
     load_module('joseimages', 'JoseImages')
     load_module('josedatamosh', 'JoseDatamosh')

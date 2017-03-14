@@ -618,7 +618,7 @@ class JoseCoin(jaux.Auxiliar):
         tbank_id = self.tbank_fmt(cxt)
         self.ensure_tbank(tbank_id)
 
-        tbank = self.jcoin.get(tbank_id)
+        tbank = self.jcoin.get(tbank_id)[1]
 
         if tbank is None:
             await cxt.say(":interrobang: tbank not found.")
