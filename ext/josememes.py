@@ -126,6 +126,12 @@ class JoseMemes(jaux.Auxiliar):
                     break
         return url
 
+    def meme_exists(self, meme_key):
+        if meme_key in self.memes:
+            return True
+        else:
+            raise je.CommonError("%s: meme not found" % (meme))
+
     async def c_meme(self, message, args, cxt):
         '''`j!meme add <meme>;<meme_content>` - `j!meme get <meme>`, jose says `<meme_content>`
         `j!meme get <meme>` - get a `<meme>`
@@ -181,20 +187,19 @@ class JoseMemes(jaux.Auxiliar):
             return
         elif command == 'rm':
             meme = ' '.join(args[2:])
-            if meme in self.memes:
-                meme_owner = self.memes[meme]['owner']
-                is_admin = await self.b_isowner(cxt)
+            self.meme_exists(meme)
 
-                if (message.author.id == meme_owner) or is_admin:
-                    del self.memes[meme]
+            meme_owner = self.memes[meme]['owner']
+            is_admin = await self.b_isowner(cxt)
 
-                    # meme removal saves
-                    await self.save_memes()
-                    await cxt.say("%s: meme removido", (meme,))
-                else:
-                    raise je.PermissionError()
+            if (message.author.id == meme_owner) or is_admin:
+                del self.memes[meme]
+
+                # meme removal saves
+                await self.save_memes()
+                await cxt.say("%s: meme removido", (meme,))
             else:
-                await cxt.say("%s: meme não encontrado", (meme,))
+                raise je.PermissionError()
             return
         elif command == 'save':
             done = await self.save_memes()
@@ -256,12 +261,10 @@ class JoseMemes(jaux.Auxiliar):
                 oldname = args_sp[0]
                 newname = args_sp[1]
             except:
-                await cxt.say("Error parsing arguments: ")
+                await cxt.say("Error parsing arguments")
                 return
 
-            if oldname not in self.memes:
-                await cxt.say("%s: meme não encontrado", (oldname,))
-                return
+            self.meme_exists(oldname)
 
             # swapping
             old_meme = self.memes[oldname]
@@ -280,17 +283,14 @@ class JoseMemes(jaux.Auxiliar):
 
             del self.memes[oldname]
             await cxt.say("`%s` becomes `%s`!", (oldname, newname))
-            return
 
         elif command == 'owner':
             meme = ' '.join(args[2:])
-            if meme in self.memes:
-                u = discord.utils.get(self.client.get_all_members(), \
-                    id = self.memes[meme]['owner'])
-                await cxt.say("%s foi criado por %s", (meme, u))
-            else:
-                await cxt.say("%s: meme não encontrado", (meme,))
-            return
+            self.meme_exists(meme)
+
+            u = discord.utils.get(self.client.get_all_members(), \
+                id = self.memes[meme]['owner'])
+            await cxt.say("%s foi criado por %s", (meme, u))
 
         elif command == 'count':
             await cxt.say("quantidade de memes: %d", (len(self.memes),))
@@ -318,10 +318,10 @@ class JoseMemes(jaux.Auxiliar):
                 i += 1
 
             await cxt.say(self.codeblock('', stat))
-            return
 
         elif command == 'istat':
             meme = ' '.join(args[2:])
+            self.meme_exists(meme)
             if meme in self.memes:
                 await cxt.say(self.codeblock('', 'uses: %d'), (self.memes[meme]['uses'],))
             else:
