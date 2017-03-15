@@ -328,6 +328,10 @@ async def on_member_remove(member):
 async def on_server_remove(server):
     await do_event('server_remove', [server])
 
+@client.event
+async def on_socket_raw_receive(data):
+    await do_event('socket_raw_receive', [data])
+
 async def main_task():
     global client
     startupdelta = time.time() - jose.start_time

@@ -105,6 +105,10 @@ class joseXtra(jaux.Auxiliar):
         self.msgcount_hour += 1
         self.total_msg += 1
 
+    async def e_socket_raw_receive(self, data):
+        # TODO: count websocket events
+        print(data)
+
     async def c_msgstats(self, message, args, cxt):
         '''`j!msgstats` - Show message rate statistics'''
         res = []
