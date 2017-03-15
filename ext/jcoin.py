@@ -327,7 +327,7 @@ class JoseCoin(jaux.Auxiliar):
         res = []
         for (index, account_id) in enumerate(lst[:finish]):
             account = self.jcoin.data[account_id]
-            res.append('%2d. %25s -> %.2f' % \
+            res.append('%2d. %30s -> %.2f' % \
                 (index, account['name'], account[entry]))
         return res
 
