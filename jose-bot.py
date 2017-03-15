@@ -263,21 +263,24 @@ async def timer_playing():
 
     if t_allowed:
         while True:
-            game_str = await _timer_playing()
-            g = discord.Game(name=game_str, url=game_str)
-            await client.change_presence(game=g)
+            if not jose.dev_mode:
+                game_str = await _timer_playing()
+                g = discord.Game(name=game_str, url=game_str)
+                await client.change_presence(game=g)
 
-            t_allowed = False
-            sec = random.randint(jcommon.PL_MIN_MINUTES * 60, \
-                jcommon.PL_MAX_MINUTES * 60)
+                t_allowed = False
+                sec = random.randint(jcommon.PL_MIN_MINUTES * 60, \
+                    jcommon.PL_MAX_MINUTES * 60)
 
-            minutes = int((sec % (60 * 60)) / 60)
-            seconds = int(sec % 60)
+                minutes = int((sec % (60 * 60)) / 60)
+                seconds = int(sec % 60)
 
-            jcommon.logger.info("Playing %r for %dmin:%dsec", \
-                game_str, minutes, seconds)
+                jcommon.logger.info("Playing %r for %dmin:%dsec", \
+                    game_str, minutes, seconds)
 
-            await asyncio.sleep(sec)
+                await asyncio.sleep(sec)
+            else:
+                await asyncio.sleep(10)
 
 @client.event
 async def on_ready():
