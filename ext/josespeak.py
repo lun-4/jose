@@ -143,8 +143,6 @@ class JoseSpeak(jcommon.Extension):
         try:
             # save DB
             await self.save_databases()
-
-            # clear the dict full of shit (it rhymes)
             self.text_generators.clear()
 
             # Remove the callbacks
@@ -245,8 +243,13 @@ class JoseSpeak(jcommon.Extension):
         await self.is_admin(message.author.id)
 
         await cxt.send_typing()
-        logs = await self.client.logs_from(message.channel, limit=1000)
-        texter = await make_texter(None, 1, '\n'.join(logs))
+
+        logs = self.client.logs_from(message.channel, limit=1000)
+        res = []
+        async for message in logs:
+            res.append(message.content)
+
+        texter = await make_texter(None, 1, '\n'.join(res))
         await cxt.say(texter.gen_sentence())
         del texter
 
