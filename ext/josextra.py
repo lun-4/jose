@@ -373,6 +373,11 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
         if description is not None:
             em.add_field(name='Description', value=description)
 
+        # check if admin
+        if user.id in ADMIN_TOPICS:
+            topic = ADMIN_TOPICS[user.id]
+            em.add_field(name='José Admin! Works on', value=topic)
+
         if acc_id in self.jcoin.data:
             account = self.jcoin.data.get(acc_id)
 
