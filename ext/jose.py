@@ -332,18 +332,8 @@ class JoseBot(jaux.Auxiliar):
             await cxt.say(":warning: Error loading `%s` :warning:", (modname,))
 
     async def c_modlist(self, message, args, cxt):
-        '''`j!modlist` - Módulos do josé'''
-        mod_list = []
-        for key in self.modules:
-            if 'module' in self.modules[key]:
-                # normally loaded ext, can use !reload on it
-                mod_list.append(key)
-            else:
-                # externally loaded ext, can't reload
-                mod_list.append('gext:%s' % key)
-
-        # show everyone in a nice codeblock
-        await cxt.say(self.codeblock("", " ".join(mod_list)))
+        '''`j!modlist` - List loaded modules'''
+        await cxt.say(self.codeblock("", " ".join(self.modules.keys())))
 
     async def c_hjose(self, message, args, cxt):
         await cxt.say(jcommon.JOSE_GENERAL_HTEXT, message.author)
