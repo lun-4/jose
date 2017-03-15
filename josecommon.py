@@ -788,12 +788,18 @@ class ChannelHandler(logging.Handler):
         await client.wait_until_ready()
         self.channel = client.get_channel(self.channel_id)
 
+    def dump_queue(self):
+        if len(self._queue) > 0:
+            res = '\n'.join(self._queue)
+            asyncio.ensure_future(client.send_message(self.channel, res), \
+                loop=client.loop)
+
+            self._queue = []
+
     async def watcher(self):
         await client.wait_until_ready()
         while True:
-            if len(self._queue) > 0:
-                await client.send_message(self.channel, '\n'.join(self._queue))
-                self._queue = []
+            self.dump_queue()
             await asyncio.sleep(10)
 
     def queue_message(self, string):
@@ -802,7 +808,7 @@ class ChannelHandler(logging.Handler):
     def emit(self, record):
         if self.channel is not None:
             _msg = self.format(record)
-            msg = '**`[{}] [{}]`** `{}`'.format(record.levelname, \
+            msg = '\n**`[{}] [{}]`** `{}`'.format(record.levelname, \
                 record.name, _msg)
 
             if self.use_queue:
@@ -812,6 +818,7 @@ class ChannelHandler(logging.Handler):
                     loop=client.loop)
 
     def in_shutdown(self):
+        self.dump_queue()
         self.channel = None
 
 log_channel_handler = ChannelHandler(JOSE_LOG_CHANNEL_ID)
