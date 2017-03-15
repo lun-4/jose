@@ -336,6 +336,7 @@ async def main_task():
     try:
         jcommon.logger.info("[start] logging")
         client.loop.create_task(jcommon.setup_logging())
+        client.loop.create_task(jcommon.log_channel_handler.watcher())
 
         jcommon.logger.info("[start] discord client")
         await client.start(jconfig.discord_token)
