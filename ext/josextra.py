@@ -376,7 +376,7 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
         # check if admin
         if user.id in jcommon.ADMIN_TOPICS:
             topic = jcommon.ADMIN_TOPICS[user.id]
-            em.add_field(name='José Admin! Works on', value=topic)
+            em.add_field(name='José Admin! Works on', value=topic[0])
 
         if acc_id in self.jcoin.data:
             account = self.jcoin.data.get(acc_id)
