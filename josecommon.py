@@ -398,13 +398,12 @@ class Extension:
         if status is None:
             logger.error("Error happened in callback %s", callback_id)
 
-        logger.info("Callback %s finished", callback_id)
-
     async def cbk_call(self, callback_id):
         status = await callback_call(callback_id)
         if status is None:
             logger.error("Error calling callback %s", callback_id)
             return
+
         logger.info("called callback %s", callback_id)
 
     def cbk_remove(self, callback_id):
