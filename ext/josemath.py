@@ -402,3 +402,28 @@ class JoseMath(jaux.Auxiliar):
 
         res = (percentage * amount) / decimal.Decimal(100)
         await cxt.say("%.2f%% out of %.2f = **%.4f**", (percentage, amount, res))
+
+    async def c_mkping(self, message, args, cxt):
+        '''`j!mkping amount` - makes a better ping to discord'''
+        await self.is_admin(message.author.id)
+
+        try:
+            amount = int(args[1])
+        except:
+            await cxt.say(self.c_mkping.__doc__)
+            return
+
+        pings = []
+        for i in range(amount):
+            t_init = time.time()
+            await cxt.send_typing()
+            t_final = time.time()
+
+            delta = (t_final - t_init) * 1000
+            pings.append(delta)
+
+            await asyncio.sleep(0.5)
+
+        average_ms = (sum(pings) / len(pings))
+        await cxt.say("Average over %d pings: %.2fms max/min: %.2fms/%.2fms", \
+            (amount, average_ms, max(pings), min(pings)))
