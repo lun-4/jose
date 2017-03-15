@@ -414,6 +414,10 @@ class JoseMath(jaux.Auxiliar):
             await cxt.say(self.c_mkping.__doc__)
             return
 
+        if 1 < amount < 40:
+            await cxt.say("`amount` out of range `[1-40]`")
+            return
+
         pings = []
         for i in range(amount):
             t_init = time.time()
