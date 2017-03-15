@@ -15,7 +15,7 @@ import josecommon as jcommon
 import joseerror as je
 
 DEFAULT_BLOCKS_JSON = '''{
-    "servers": [],
+    "guilds": [],
     "users": []
 }'''
 
