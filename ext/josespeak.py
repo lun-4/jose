@@ -250,8 +250,11 @@ class JoseSpeak(jcommon.Extension):
             res.append(message.content)
 
         texter = await make_texter(None, 1, '\n'.join(res))
-        await cxt.say(texter.gen_sentence())
-        del texter
+
+        result = await texter.gen_sentence()
+        await cxt.say(result)
+
+        del texter, result, res, logs
 
     async def c_spt(self, message, args, cxt):
         '''`j!spt` - alias para `!speaktrigger`'''
