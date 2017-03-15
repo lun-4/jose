@@ -107,6 +107,9 @@ class joseXtra(jaux.Auxiliar):
 
     async def e_socket_raw_receive(self, data):
         # TODO: count websocket events
+        if isinstance(data, bytes):
+            data = data.decode('utf-8')
+
         print(data)
 
     async def c_msgstats(self, message, args, cxt):
