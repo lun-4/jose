@@ -240,6 +240,15 @@ class JoseSpeak(jcommon.Extension):
             cxt.env['flag_fw'] = True
         await self.e_on_message(message, cxt)
 
+    async def c_experimental(self, message, args, cxt):
+        '''`j!experimental` - **DON'T USE THIS**'''
+        await self.is_admin(message.author.id)
+
+        logs = await self.client.logs_from(channel, limit=1000)
+        texter = await make_texter(None, 1, '\n'.join(logs))
+        await cxt.say(texter.gen_sentence())
+        del texter
+
     async def c_spt(self, message, args, cxt):
         '''`j!spt` - alias para `!speaktrigger`'''
         await self.c_speaktrigger(message, args, cxt)
