@@ -248,7 +248,10 @@ class JoseGambling(jaux.Auxiliar):
             await cxt.say("One of you don't have enough funds to make this duel.")
             return
 
-        challenged_user = await self.client.get_user_info(challenged)
+        challenged_user = discord.utils.get(self.client.get_all_members(), id=challenged)
+
+        if challenged_user is None:
+            challenged_user = await self.client.get_user_info(challenged)
 
         await cxt.say("<@%s> you got challenged for a duel :gun: by <@%s> total of %.2fJC, accept it? (y/n)", \
             (challenged, challenger, amount))
