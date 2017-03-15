@@ -90,6 +90,9 @@ async def check_message(message):
     if message.server is None:
         return False
 
+    if message.author.id in jose.blocks['users']:
+        return False
+
     if message.server.id in jose.blocks['servers']:
         return False
 

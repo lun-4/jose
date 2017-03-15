@@ -711,7 +711,7 @@ don't want (unless I'm skynet)")
             self.logger.info("Blocked guild %s, %s", guild_name, guild_id)
             await cxt.say("Blocked guild `%s[%s]`.", (guild_name, guild_id,))
 
-        await self.jsondb_save('blocks')
+        self.jsondb_save('blocks')
 
     async def c_blockuser(self, message, args, cxt):
         '''`j!blockuser userid` - Blocks/Unblocks an User from message processing.'''
@@ -738,4 +738,4 @@ don't want (unless I'm skynet)")
             self.logger.info("Blocked user %s, %s", user, user_id)
             await cxt.say("Blocked user `%s[%s]`.", (user, user_id,))
 
-        await self.jsondb_save('blocks')
+        self.jsondb_save('blocks')
