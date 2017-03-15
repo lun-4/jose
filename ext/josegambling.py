@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import discord
 import decimal
 import asyncio
 from random import SystemRandom

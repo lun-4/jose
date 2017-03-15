@@ -186,7 +186,7 @@ async def do_cooldown(message, cxt):
 
     time_left = cooldown_end - now
     if time_left < 0.5:
-        cooldown_msg(author_id)
+        cooldown_remove(author_id)
         return False
 
     cooldown_msg = await cxt.say("Wait **%.2f** seconds", (time_left,))
