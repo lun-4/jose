@@ -242,12 +242,22 @@ class JoseSpeak(jcommon.Extension):
         '''`j!experimental` - **DON'T USE THIS**'''
         await self.is_admin(message.author.id)
 
+        try:
+            msglimit = int(args[1])
+        except:
+            msglimit = 1000
+
         await cxt.send_typing()
 
-        logs = self.client.logs_from(message.channel, limit=1000)
+        if msglimit > 10000:
+            await cxt.say("no")
+            return
+
+        logs = self.client.logs_from(message.channel, limit=msglimit)
         res = []
         async for message in logs:
-            res.append(message.content)
+            if message.author != jcommon.JOSE_ID:
+                res.append(message.content)
 
         texter = await make_texter(None, 1, '\n'.join(res))
 
