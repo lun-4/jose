@@ -93,7 +93,7 @@ async def check_message(message):
     if message.author.id in jose.blocks['users']:
         return False
 
-    if message.server.id in jose.blocks['servers']:
+    if message.server.id in jose.blocks['guilds']:
         return False
 
     if jose.dev_mode:
