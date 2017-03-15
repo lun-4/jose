@@ -47,6 +47,7 @@ class JoseBot(jaux.Auxiliar):
             'any_message': [],
             'server_join': [],
             'client_ready': [],
+            'socket_response': [],
 
             # member stuff
             'member_join': [],

@@ -9,6 +9,7 @@ import re
 import psutil
 import os
 import hashlib
+import collections
 
 import sys
 sys.path.append("..")
@@ -57,6 +58,7 @@ class joseXtra(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
         self.docs = docsdict
+        self.socket_stats = collections.Counter()
 
         self.msgcount_min = 0
         self.msgcount_hour = 0
@@ -105,12 +107,9 @@ class joseXtra(jaux.Auxiliar):
         self.msgcount_hour += 1
         self.total_msg += 1
 
-    async def e_socket_raw_receive(self, data):
-        # TODO: count websocket events
-        if isinstance(data, bytes):
-            data = data.decode('utf-8')
-
-        print(data)
+    async def e_socket_response(self, msg):
+        print(msg)
+        self.socket_stats[msg.get('t')] += 1
 
     async def c_msgstats(self, message, args, cxt):
         '''`j!msgstats` - Show message rate statistics'''
