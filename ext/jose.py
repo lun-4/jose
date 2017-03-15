@@ -414,7 +414,7 @@ class JoseBot(jaux.Auxiliar):
 
         t_init = time.time()
         await cxt.send_typing()
-        t_end = time.time
+        t_end = time.time()
         delta_typing = (t_end - t_init) * 1000
 
         t_init = time.time()

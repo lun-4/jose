@@ -185,6 +185,10 @@ async def do_cooldown(message, cxt):
         return False
 
     time_left = cooldown_end - now
+    if time_left < 0.5:
+        cooldown_msg(author_id)
+        return False
+
     cooldown_msg = await cxt.say("Wait **%.2f** seconds", (time_left,))
 
     await asyncio.sleep(time_left)
