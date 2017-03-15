@@ -345,6 +345,10 @@ async def main_task():
         jcommon.logger.error("Received GatewayNotFound from discord.")
     except Exception as err:
         jcommon.logger.error("Received %r from client.start", err, exc_info=True)
+        try:
+            await client.logout()
+        except Exception as err:
+            jcommon.logger.error("Received %r from client.logout", err, exc_info=True)
 
 def main(args):
     try:
