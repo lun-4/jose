@@ -58,6 +58,7 @@ class joseXtra(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
         self.docs = docsdict
+        self.sock_start = time.time()
         self.socket_stats = collections.Counter()
 
         self.msgcount_min = 0
@@ -108,8 +109,17 @@ class joseXtra(jaux.Auxiliar):
         self.total_msg += 1
 
     async def e_socket_response(self, msg):
-        print(msg)
         self.socket_stats[msg.get('t')] += 1
+
+    async def c_sockstats(self, message, args, cxt):
+        '''`j!sockstats` - Socket Stats'''
+        delta = time.time() - self.sock_start
+        minutes = delta / 60
+        total = sum(self.socket_stats.values())
+        events_minute = total / minutes
+
+        await cxt.say("%d socket events, %.2f/minute:\n%s", \
+            (total, events_minute, self.socket_stats))
 
     async def c_msgstats(self, message, args, cxt):
         '''`j!msgstats` - Show message rate statistics'''
