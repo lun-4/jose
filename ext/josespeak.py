@@ -244,7 +244,8 @@ class JoseSpeak(jcommon.Extension):
         '''`j!experimental` - **DON'T USE THIS**'''
         await self.is_admin(message.author.id)
 
-        logs = await self.client.logs_from(channel, limit=1000)
+        await cxt.send_typing()
+        logs = await self.client.logs_from(message.channel, limit=1000)
         texter = await make_texter(None, 1, '\n'.join(logs))
         await cxt.say(texter.gen_sentence())
         del texter
