@@ -374,8 +374,8 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             em.add_field(name='Description', value=description)
 
         # check if admin
-        if user.id in ADMIN_TOPICS:
-            topic = ADMIN_TOPICS[user.id]
+        if user.id in jcommon.ADMIN_TOPICS:
+            topic = jcommon.ADMIN_TOPICS[user.id]
             em.add_field(name='José Admin! Works on', value=topic)
 
         if acc_id in self.jcoin.data:
