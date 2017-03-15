@@ -781,7 +781,7 @@ class ChannelHandler(logging.Handler):
         logging.Handler.__init__(self)
         self.channel_id = channel_id
         self.channel = None
-        self.queue = []
+        self._queue = []
         self.use_queue = True
 
     async def setup(self):
@@ -791,13 +791,13 @@ class ChannelHandler(logging.Handler):
     async def watcher(self):
         await client.wait_until_ready()
         while True:
-            if len(self.queue) > 0:
-                await client.send_message(self.channel, '\n'.join(self.queue))
-                self.queue = []
+            if len(self._queue) > 0:
+                await client.send_message(self.channel, '\n'.join(self._queue))
+                self._queue = []
             await asyncio.sleep(10)
 
-    def queue(self, string):
-        self.queue.append(string)
+    def queue_message(self, string):
+        self._queue.append(string)
 
     def emit(self, record):
         if self.channel is not None:
@@ -806,7 +806,7 @@ class ChannelHandler(logging.Handler):
                 record.name, _msg)
 
             if self.use_queue:
-                self.queue(msg)
+                self.queue_message(msg)
             else:
                 asyncio.ensure_future(client.send_message(self.channel, msg), \
                     loop=client.loop)
