@@ -423,7 +423,8 @@ class JoseBot(jaux.Auxiliar):
         t_end = time.time()
 
         delta_send_message = (t_end - t_init) * 1000
-        await self.client.edit_message(pong, pong.content + ", `send_message`: **%.2fms**" % (delta))
+        await self.client.edit_message(pong, pong.content + \
+            ", `send_message`: **%.2fms**" % (delta_send_message))
 
     async def c_rand(self, message, args, cxt):
         '''`j!rand min max` - gera um número aleatório no intervalo [min, max]'''
