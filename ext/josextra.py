@@ -11,6 +11,7 @@ import os
 import hashlib
 import collections
 import time
+import datetime
 
 import sys
 sys.path.append("..")
@@ -426,6 +427,9 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
         if user.id in jcommon.ADMIN_TOPICS:
             topic = jcommon.ADMIN_TOPICS[user.id]
             em.add_field(name='José Admin! Works on', value=topic[0])
+
+        delta = datetime.datetime.now() - user.created_at
+        em.add_field(name='Account creation time', value='{} ago'.format(str(delta)))
 
         if acc_id in self.jcoin.data:
             account = self.jcoin.data.get(acc_id)
