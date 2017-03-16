@@ -134,6 +134,11 @@ class joseXtra(jaux.Auxiliar):
         bots, humans, ratio = self.bot_human_ratio(server)
         self.logger.info("ratio %dbots / %dhumans = %.2f", len(bots), len(humans), ratio)
 
+        if ratio > 2:
+            self.logger.warning("BOT RATIO > 2, BLOCKING %s[%s]", \
+                server.name, server.id)
+            self.client.jose.blocks['guilds'].append(server.id)
+
     async def c_bhratio(self, message, args, cxt):
         bots, humans, ratio = self.bot_human_ratio(message.server)
         await cxt.say("%d bots / %d humans = `%.2fb/h`, global is `%.2fb/h`", \
