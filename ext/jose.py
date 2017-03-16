@@ -61,31 +61,32 @@ class JoseBot(jaux.Auxiliar):
     def ev_load(self, dflag=False):
         # register events
         count = 0
+
         for modname in self.modules:
             module = self.modules[modname]
             modinst = self.modules[modname]['inst']
             for method in module['handlers']:
-                if method.startswith("e_"):
-                    evname = method[method.find("_")+1:]
+                evname = method[method.find("_")+1:]
 
-                    if dflag:
-                        self.logger.info("Event handler %s@%s:%s", \
-                            method, modname, evname)
+                if dflag:
+                    self.logger.info("Event handler %s@%s:%s", \
+                        method, modname, evname)
 
-                    # check if event exists
-                    if evname in self.event_tbl:
-                        handler = getattr(modinst, method, None)
-                        if handler is None:
-                            # ????
-                            self.logger.error("Event handler %s@%s:%s doesn't... exist????", \
-                                method, modname, evname)
-                            sys.exit(0)
+                # check if event exists
+                if evname not in self.event_tbl:
+                    self.logger.warning("Event %s@%s:%s doesn't exist in Event Table, creating", \
+                        method, modname, evname)
 
-                        self.event_tbl[evname].append(handler)
-                        count += 1
-                    else:
-                        self.logger.warning("Event %s@%s:%s doesn't exist in Event Table", \
-                            method, modname, evname)
+                    self.event_tbl[evname] = []
+
+                try:
+                    handler = getattr(modinst, method)
+                except Exception as err:
+                    self.logger.error("fuck", exc_info=True)
+                    sys.exit(0)
+
+                self.event_tbl[evname].append(handler)
+                count += 1
 
         self.logger.info("[ev_load] Loaded %d handlers" % count)
 
