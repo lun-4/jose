@@ -254,7 +254,7 @@ class JoseBot(jaux.Auxiliar):
             elif stw(method, 'e_'):
                 setattr(instance, method.replace('e_', 'on_'), method)
 
-        self.client.load_cog(instance)
+        self.client.add_cog(instance)
         return True
 
     async def _load_ext(self, name, class_name, cxt):
