@@ -139,11 +139,8 @@ class JoseImages(jaux.Auxiliar):
         return
 
     async def img_routine(self, cxt):
-        res = await jcoin.jcoin_control(cxt.message.author.id, jcommon.IMG_PRICE)
-        if not res[0]:
-            await cxt.say("PermError: %s", (res[1],))
-            return False
-        return True
+        res = await self.jcoin_pricing(cxt, jcommon.IMG_PRICE)
+        return res
 
     async def c_hypno(self, message, args, cxt):
         access = await self.img_routine(cxt)
