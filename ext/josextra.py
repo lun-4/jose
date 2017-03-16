@@ -119,7 +119,7 @@ class joseXtra(jaux.Auxiliar):
         return bots, humans, (len(bots) / len(humans))
 
     def bhratio_global(self):
-        all_members = self.client.get_all_members()
+        all_members = self.client.get_all_members
 
         bots = [member for member in all_members() if member.bot]
         humans = [member for member in all_members() if not member.bot]
