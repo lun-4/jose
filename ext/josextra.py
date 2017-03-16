@@ -555,3 +555,9 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
         messages = '\n'.join(('%s: %s' % tup for tup in reversed(_messages)))
 
         await cxt.say(self.codeblock("", messages))
+
+    async def c_testembed(self, message, args, cxt):
+        emojoj = '<:www:285909085524590593>'
+        em = discord.Embed(colour=discord.Colour.purple())
+        em.add_field(title=emojoj, value="fuck")
+        await cxt.say_embed(em)
