@@ -50,7 +50,10 @@ LOWERCASE, UPPERCASE = 'x', 'X'
 
 def hex_to_rgb(triplet):
     triplet = triplet.lstrip('#')
-    return _HEXDEC[triplet[0:2]], _HEXDEC[triplet[2:4]], _HEXDEC[triplet[4:6]]
+    try:
+        return _HEXDEC[triplet[0:2]], _HEXDEC[triplet[2:4]], _HEXDEC[triplet[4:6]]
+    except:
+        return None
 
 def rgb_to_hex(triplet):
     return '%02x%02x%02x' % triplet
@@ -484,6 +487,9 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
                 await cxt.say("`#aabbcc` format not recognized")
                 return
             color = hex_to_rgb(args[1])
+            if color is None:
+                await cxt.say("Error recognizing hex data")
+                return
 
         elif args[1].find(','):
             # parse rgb int,int,int
