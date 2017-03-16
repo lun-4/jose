@@ -240,13 +240,15 @@ class JoseBot(jaux.Auxiliar):
         stw = str.startswith
         for method in instance_methods:
             if stw(method, 'c_'):
-                @commands.group(pass_context=True)
-                @self.client.command
+
                 async def cmd(self, ctx):
                     t = time.time()
                     jcxt = jcommon.Context(self.client, ctx.message, t, self)
                     await method(instance, ctx.message, \
                         ctx.message.content.split(' '), jcxt)
+
+                cmd = commands.group(pass_context=True)(cmd)
+                cmd = self.client.command(cmd)
 
                 setattr(instance, method.replace('c_', ''), cmd)
             elif stw(method, 'e_'):
