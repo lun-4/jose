@@ -232,7 +232,7 @@ class JoseBot(jaux.Auxiliar):
         module = importlib.import_module(module_name)
         importlib.reload(module)
 
-        instance = mod_class.setup(self.client)
+        instance = module.setup(self.client)
         instance_methods = (method for method in dir(instance) \
             if callable(getattr(instance, method)))
 
