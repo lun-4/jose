@@ -24,11 +24,11 @@ logging.basicConfig(level=logging.INFO, \
     format='[%(levelname)7s] [%(name)s] %(message)s')
 
 start_time = time.time()
-client = commands.Bot(command_prefix=jcommon.JOSE_PREFIX)
-jcommon.set_client(client) # to jcommon
+bot = commands.Bot(command_prefix=jcommon.JOSE_PREFIX)
+jcommon.set_client(bot) # to jcommon
 
 # initialize jose instance
-jose = jose_bot.JoseBot(client)
+jose = jose_bot.JoseBot(bot)
 env = jose.env
 
 counter = 0
@@ -68,7 +68,7 @@ def load_all_modules():
 async def do_event(event_name, args):
     for handler in jose.event_tbl[event_name]:
         if isinstance(args[0], discord.Message):
-            cxt = jcommon.Context(client, args[0], time.time(), jose)
+            cxt = jcommon.Context(bot, args[0], time.time(), jose)
             await handler(cxt.message, cxt)
         else:
             await handler(*args)
@@ -223,7 +223,7 @@ async def on_message(message):
         if len(command.strip()) == '':
             return
 
-        cxt = jcommon.Context(client, message, t_start, jose)
+        cxt = jcommon.Context(bot, message, t_start, jose)
 
         try:
             getattr(jose, method)
@@ -288,7 +288,7 @@ async def on_ready():
     print('='*25)
     jose.command_lock = False
 
-    await do_event('client_ready', [client])
+    await do_event('client_ready', [bot])
 
     if not jose.dev_mode:
         await timer_playing()
@@ -334,7 +334,6 @@ async def on_socket_response(data):
     await do_event('socket_response', [data])
 
 async def main_task():
-    global client
     startupdelta = time.time() - jose.start_time
     jcommon.logger.info("--- STARTUP TOOK %.2f SECONDS ---", startupdelta)
 
@@ -343,9 +342,9 @@ async def main_task():
         bot.loop.create_task(jcommon.setup_logging())
         bot.loop.create_task(jcommon.log_channel_handler.watcher())
 
-        jcommon.logger.info("[start] discord client")
+        jcommon.logger.info("[start] discord bot")
         await bot.start(jconfig.discord_token)
-        jcommon.logger.info("[exit] discord client")
+        jcommon.logger.info("[exit] discord bot")
     except discord.GatewayNotFound:
         jcommon.logger.error("Received GatewayNotFound from discord.")
     except Exception as err:
