@@ -94,38 +94,39 @@ class JoseBot(jaux.Auxiliar):
 
     async def unload_mod(self, modname):
         module = self.modules[modname]
-        # if ext_unload exists
-        if getattr(module['inst'], 'ext_unload', False):
-            try:
-                instance = module['inst']
-                ok = await instance.ext_unload()
+        instance = module['inst']
 
-                # first, we should, at least, remove the commands the module has
-                # it will help a LOT on memory usage.
-                instance_methods = (method for method in dir(instance)
-                    if callable(getattr(instance, method)))
-
-                for method in instance_methods:
-                    if method.startswith('c_'):
-                        # command, remove it
-                        delattr(self, method)
-
-                # delete stuff from the module table
-                del instance_methods, self.modules[modname]
-
-                # remove its events from the evt. table, if any
-                if len(module['handlers']) > 0:
-                    self.ev_empty()
-                    self.ev_load()
-
-                self.logger.info("[unload_mod] Unloaded %s", modname)
-                return ok
-            except Exception as e:
-                self.logger.error("[ERR][unload_mod]%s: %s", (modname, repr(e)))
-                return False, repr(e)
-        else:
-            self.logger.info("%s doesn't have ext_unload", modname)
+        if not hasattr(instance, 'ext_unload'):
+            self.logger.error("%s doesn't have ext_unload", modname)
             return False, "ext_unload isn't available in %s" % (modname)
+
+        try:
+            ok = await instance.ext_unload()
+
+            # first, we should, at least, remove the commands the module has
+            # it will help a LOT on memory usage.
+            instance_methods = (method for method in dir(instance)
+                if callable(getattr(instance, method)))
+
+            for method in instance_methods:
+                if method.startswith('c_'):
+                    # command, remove it
+                    delattr(self, method)
+
+            # delete stuff from the module table
+            del instance_methods, self.modules[modname]
+
+            # remove its events from the evt. table, if any
+            if len(module['handlers']) > 0:
+                self.ev_empty()
+                self.ev_load()
+
+            self.logger.info("[unload_mod] Unloaded %s", modname)
+            return ok
+        except Exception as e:
+            self.logger.error("[ERR][unload_mod]%s: %s", (modname, repr(e)))
+            return False, repr(e)
+
 
     async def unload_all(self):
         # unload all modules

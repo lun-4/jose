@@ -4,7 +4,6 @@ import sys
 sys.path.append("..")
 import josecommon as jcommon
 import jauxiliar as jaux
-import jcoin.josecoin as jcoin
 
 import aiohttp
 import json
