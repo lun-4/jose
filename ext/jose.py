@@ -175,24 +175,21 @@ class JoseBot(jaux.Auxiliar):
         # set its logger
         instance.logger = jcommon.logger.getChild(name)
 
-        # check if it has ext_load method
-        mod_ext_load = getattr(instance, 'ext_load', False)
-        if not mod_ext_load:
-            # module not compatible with Extension API
+        if not hasattr(instance, 'ext_load'):
             self.logger.error("Module not compatible with EAPI")
             return False
-        else:
-            # hey thats p good
-            try:
-                ok = await instance.ext_load()
-                if not ok[0]:
-                    self.logger.error("Error happened on ext_load(%s): %s", name, ok[1])
-                    return False
-                else:
-                    return instance
-            except Exception as e:
-                self.logger.warn("Almost loaded %s", name, exc_info=True)
+
+        # hey thats p good
+        try:
+            ok = await instance.ext_load()
+            if not ok[0]:
+                self.logger.error("Error happened on ext_load(%s): %s", name, ok[1])
                 return False
+            else:
+                return instance
+        except Exception as e:
+            self.logger.warn("Almost loaded %s", name, exc_info=True)
+            return False
 
     async def register_mod(self, name, class_name, module, instance):
         instance_methods = (method for method in dir(instance)
@@ -264,46 +261,47 @@ class JoseBot(jaux.Auxiliar):
     async def _load_ext(self, name, class_name, cxt):
         self.logger.info("load_ext: %s@%s", class_name, name)
 
-        if name not in NEW_BACKEND:
-            # find/reload the module
-            module = await self.get_module(name)
-            if not module:
-                self.logger.error("module not found/error loading module")
-                return False
+        if name in NEW_BACKEND:
+            return self.load_new_backend(name)
 
-            # get the class that represents the module
-            module_class = getattr(module, class_name, None)
-            if not module_class:
-                if cxt is not None:
-                    await cxt.say(":train:")
-                self.logger.error("class instance is None")
-                return False
 
-            # instantiate and ext_load it
-            instance = await self.mod_instance(name, module_class)
-            if not instance: # catches False and None
-                self.logger.error("instance isn't good")
-                return False
+        # find/reload the module
+        module = await self.get_module(name)
+        if not module:
+            self.logger.error("module not found/error loading module")
+            return False
 
-            if name in self.modules:
-                # delete old one
-                del self.modules[name]
+        # get the class that represents the module
+        module_class = getattr(module, class_name, None)
+        if not module_class:
+            if cxt is not None:
+                await cxt.say(":train:")
+            self.logger.error("class instance is None")
+            return False
+
+        # instantiate and ext_load it
+        instance = await self.mod_instance(name, module_class)
+        if not instance: # catches False and None
+            self.logger.error("instance isn't good")
+            return False
+
+        if name in self.modules:
+            # delete old one
+            del self.modules[name]
 
             # instiated with success, register all shit this module has
-            ok = await self.register_mod(name, class_name, module, instance)
-            if not ok:
-                self.logger.error("Error registering module")
-                return False
+        ok = await self.register_mod(name, class_name, module, instance)
+        if not ok:
+            self.logger.error("Error registering module")
+            return False
 
-            # redo the event handler shit
-            self.ev_empty()
-            self.ev_load()
+        # redo the event handler shit
+        self.ev_empty()
+        self.ev_load()
 
-            # finally
-            return True
-        else:
-            # module in new backend
-            return self.load_new_backend(name)
+        # finally
+        return True
+
 
     async def load_ext(self, name, class_name, cxt):
         # try
