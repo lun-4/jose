@@ -122,8 +122,8 @@ class joseXtra(jaux.Auxiliar):
         bots, humans, ratio = self.bot_human_ratio(server)
         self.logger.info("ratio %dbots / %dhumans = %.2f", bots, humans, ratio)
 
-    async def c_bhratio(self, server):
-        bots, humans, ratio = self.bot_human_ratio(server)
+    async def c_bhratio(self, message, args, cxt):
+        bots, humans, ratio = self.bot_human_ratio(message.server)
         await cxt.say("%d bots / %d humans = `%.2fb/h`", \
             (bots, humans, ratio))
 
