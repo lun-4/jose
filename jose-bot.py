@@ -6,8 +6,8 @@ import uvloop
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 import traceback
 import logging
-import readline
 import discord
+from discord.ext import commands
 
 import josecommon as jcommon
 import ext.jose as jose_bot
@@ -24,9 +24,7 @@ logging.basicConfig(level=logging.INFO, \
     format='[%(levelname)7s] [%(name)s] %(message)s')
 
 start_time = time.time()
-
-#default stuff
-client = discord.Client()
+client = commands.Bot(command_prefix=jcommon.JOSE_PREFIX)
 jcommon.set_client(client) # to jcommon
 
 # initialize jose instance
@@ -77,7 +75,7 @@ async def do_event(event_name, args):
 
 async def check_message(message):
     # we do not want the bot to reply to itself
-    if message.author == client.user:
+    if message.author == bot.user:
         return False
 
     if len(message.content) <= 0:
@@ -192,12 +190,12 @@ async def do_cooldown(message, cxt):
     cooldown_msg = await cxt.say("Wait **%.2f** seconds", (time_left,))
 
     await asyncio.sleep(time_left)
-    await client.delete_message(cooldown_msg)
+    await bot.delete_message(cooldown_msg)
     cooldown_remove(author_id)
 
     return True
 
-@client.event
+@bot.event
 async def on_message(message):
     global jose
     global counter
@@ -253,20 +251,20 @@ t_allowed = True
 async def _timer_playing():
     playing_phrase = random.choice(jcommon.JOSE_PLAYING_PHRASES)
     playing_name = '%s | v%s | %d guilds | %shjose' % (playing_phrase, jcommon.JOSE_VERSION, \
-        len(client.servers), jcommon.JOSE_PREFIX)
+        len(bot.servers), jcommon.JOSE_PREFIX)
 
     return playing_name
 
 async def timer_playing():
     global t_allowed
-    await client.wait_until_ready()
+    await bot.wait_until_ready()
 
     if t_allowed:
         while True:
             if not jose.dev_mode:
                 game_str = await _timer_playing()
                 g = discord.Game(name=game_str, url=game_str)
-                await client.change_presence(game=g)
+                await bot.change_presence(game=g)
 
                 t_allowed = False
                 sec = random.randint(jcommon.PL_MIN_MINUTES * 60, \
@@ -282,11 +280,11 @@ async def timer_playing():
             else:
                 await asyncio.sleep(10)
 
-@client.event
+@bot.event
 async def on_ready():
     global t_allowed
     print("="*25)
-    jcommon.logger.info("josé ready, name = %s, id = %s", client.user.name, client.user.id)
+    jcommon.logger.info("josé ready, name = %s, id = %s", bot.user.name, bot.user.id)
     print('='*25)
     jose.command_lock = False
 
@@ -299,16 +297,16 @@ async def on_ready():
 
     t_allowed = False
 
-@client.event
+@bot.event
 async def on_server_join(server):
     for channel in server.channels:
         if channel.is_default:
             await do_event('server_join', [server, channel])
 
             jcommon.logger.info("New server: %s[%s]", server, server.id)
-            await client.send_message(channel, jcommon.WELCOME_MESSAGE)
+            await bot.send_message(channel, jcommon.WELCOME_MESSAGE)
 
-@client.event
+@bot.event
 async def on_error(event, *args, **kwargs):
     err = traceback.format_exc()
     jcommon.logger.error("Error at %s(%s, %s), %s" % \
@@ -319,19 +317,19 @@ async def on_error(event, *args, **kwargs):
         jcommon.logger.error("Message error happened at ServerID %s name %r" % \
             (message.server.id, message.server.name))
 
-@client.event
+@bot.event
 async def on_member_join(member):
     await do_event('member_join', [member])
 
-@client.event
+@bot.event
 async def on_member_remove(member):
     await do_event('member_remove', [member])
 
-@client.event
+@bot.event
 async def on_server_remove(server):
     await do_event('server_remove', [server])
 
-@client.event
+@bot.event
 async def on_socket_response(data):
     await do_event('socket_response', [data])
 
@@ -342,20 +340,20 @@ async def main_task():
 
     try:
         jcommon.logger.info("[start] logging")
-        client.loop.create_task(jcommon.setup_logging())
-        client.loop.create_task(jcommon.log_channel_handler.watcher())
+        bot.loop.create_task(jcommon.setup_logging())
+        bot.loop.create_task(jcommon.log_channel_handler.watcher())
 
         jcommon.logger.info("[start] discord client")
-        await client.start(jconfig.discord_token)
+        await bot.start(jconfig.discord_token)
         jcommon.logger.info("[exit] discord client")
     except discord.GatewayNotFound:
         jcommon.logger.error("Received GatewayNotFound from discord.")
     except Exception as err:
-        jcommon.logger.error("Received %r from client.start", err, exc_info=True)
+        jcommon.logger.error("Received %r from bot.start", err, exc_info=True)
         try:
-            await client.logout()
+            await bot.logout()
         except Exception as err:
-            jcommon.logger.error("Received %r from client.logout", err, exc_info=True)
+            jcommon.logger.error("Received %r from bot.logout", err, exc_info=True)
 
 def main(args):
     try:
