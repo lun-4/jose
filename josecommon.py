@@ -568,7 +568,7 @@ async def configdb_ensure(server_id):
             logger.error("Error creating configdb for server %s", rediskey)
 
         # set empty cache
-        cdb_cache[serverid] = {}
+        cdb_cache[server_id] = {}
 
 async def configdb_ensure_key(server_id, key, default):
     await configdb_ensure(server_id)
