@@ -118,6 +118,14 @@ class joseXtra(jaux.Auxiliar):
 
         return bots, humans, (len(bots) / len(humans))
 
+    def bhratio_global(self):
+        all_members = self.client.get_all_members()
+
+        bots = [member for member in all_members() if member.bot]
+        humans = [member for member in all_members() if not member.bot]
+
+        return bots, humans, (len(bots) / len(humans))
+
     async def e_server_join(self, server):
         # bots-to-members ratio
         bots, humans, ratio = self.bot_human_ratio(server)
@@ -125,8 +133,8 @@ class joseXtra(jaux.Auxiliar):
 
     async def c_bhratio(self, message, args, cxt):
         bots, humans, ratio = self.bot_human_ratio(message.server)
-        await cxt.say("%d bots / %d humans = `%.2fb/h`", \
-            (len(bots), len(humans), ratio))
+        await cxt.say("%d bots / %d humans = `%.2fb/h`, global is `%.2fb/h`", \
+            ( len(bots), len(humans), ratio, self.bhratio_global()[2] ))
 
     async def c_sockstats(self, message, args, cxt):
         '''`j!sockstats` - Socket Stats'''
