@@ -290,9 +290,9 @@ class JoseMemes(jaux.Auxiliar):
         elif command == 'stat':
             stat = []
             ordered = sorted(self.memes, key=lambda key: self.memes[key]['uses'], reverse=True)
-            for (i, key) in enumerate(ordered[:12]):
+            for (i, key) in enumerate(ordered[:15]):
 
-                stat.append('[%2d] %s used %d times\n' % \
+                stat.append('[%2d] %s used %d times' % \
                     (i, key, self.memes[key]['uses']))
                 i += 1
 
