@@ -243,20 +243,24 @@ class Callback:
         self.run = False
         self.cid = cid
         self.last_run = None
+        self.task = None
 
     async def do(self):
-        logger.info("%s: Running Callback", self.cid)
-        while self.run:
-            logger.debug("%s: called", self.cid)
+        try:
+            logger.info("[callback:%s] running", self.cid)
+            while self.run:
+                logger.debug("%s: called", self.cid)
 
-            try:
-                self.last_run = time.time()
-                await self.func()
-            except:
-                logger.error('Error at cbk %s.do', self.cid, exc_info=True)
+                try:
+                    self.last_run = time.time()
+                    await self.func()
+                except:
+                    logger.error('Error at cbk %s.do', self.cid, exc_info=True)
 
-            await asyncio.sleep(self.sec)
-        logger.debug("%s: ended", self.cid)
+                await asyncio.sleep(self.sec)
+            logger.debug("[callback:%s] finished", self.cid)
+        except concurrent.futures.CancelledError as err:
+            logger.info("[callback:%s] Cancelled", self.cid)
 
     def stop(self):
         self.run = False
@@ -270,7 +274,8 @@ async def run_callback(callback_id, callback):
 
     callbacks[callback_id] = callback
     callback.start()
-    await callback.do()
+    callback.task = client.loop.create_task(callback.do())
+
     return True
 
 async def callback_call(callback_id):
@@ -286,8 +291,10 @@ def callback_remove(callback_id):
         return None
 
     callback = callbacks[callback_id]
+    callback.task.cancel()
     callback.stop()
     del callbacks[callback_id]
+
     return True
 
 # === DATABASE API ===
