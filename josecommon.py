@@ -567,6 +567,9 @@ async def configdb_ensure(server_id):
         if not res:
             logger.error("Error creating configdb for server %s", rediskey)
 
+        # set empty cache
+        cdb_cache[serverid] = {}
+
 async def configdb_ensure_key(server_id, key, default):
     await configdb_ensure(server_id)
 
@@ -606,10 +609,13 @@ async def configdb_set(server_id, key, value):
 
 async def configdb_get(server_id, key, default=None):
     global cdb_cache
+
+    # ensure first, get cache LATER
+    await configdb_ensure(server_id)
+
     if key in cdb_cache[server_id]:
         return cdb_cache[server_id][key]
 
-    await configdb_ensure(server_id)
     rediskey = make_rkey(server_id)
     res = await redis.hmget(rediskey, key)
 
