@@ -241,7 +241,7 @@ class JoseBot(jaux.Auxiliar):
         for method in instance_methods:
             if stw(method, 'c_'):
                 @commands.group(pass_context=True)
-                @bot.command
+                @self.client.command
                 async def cmd(self, ctx):
                     t = time.time()
                     jcxt = jcommon.Context(self.client, ctx.message, t, self)
