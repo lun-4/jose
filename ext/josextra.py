@@ -558,6 +558,6 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
 
     async def c_testembed(self, message, args, cxt):
         emojoj = '<:www:285909085524590593>'
-        em = discord.Embed(colour=discord.Colour.purple())
-        em.add_field(title=emojoj, value="fuck")
+        em = discord.Embed(colour=discord.Colour.purple(), title='test')
+        em.add_field(name=emojoj, value="fuck")
         await cxt.say_embed(em)
