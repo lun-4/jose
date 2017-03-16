@@ -700,10 +700,8 @@ class Context:
         try:
             await self.client.send_typing(self.message.channel)
         except discord.Forbidden:
-            server = self.message.server
-            channel = self.message.channel
-            logger.info("Context.send_typing: got err Forbidden from\
-serverid %s servername %s chname #%s", server.id, server.name, channel.name)
+            # I really don't care anymore
+            pass
         except Exception as err:
             logger.error('send_typing', exc_info=True)
 
@@ -749,8 +747,8 @@ serverid %s servername %s chname #%s", server.id, server.name, channel.name)
                     ret = await self.client.send_message(channel, translated)
                     return ret
             except discord.Forbidden:
-                logger.info("discord.Forbidden: %r %r %r", channel, \
-                    channel.server.id, channel.server.name)
+                # I don't care anymore
+                pass
 
 class EmptyContext:
     def __init__(self, _client, message):
