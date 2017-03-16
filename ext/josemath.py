@@ -414,7 +414,7 @@ class JoseMath(jaux.Auxiliar):
             await cxt.say(self.c_mkping.__doc__)
             return
 
-        if 1 < amount < 40:
+        if amount < 1 or amount > 40:
             await cxt.say("`amount` out of range `[1-40]`")
             return
 
