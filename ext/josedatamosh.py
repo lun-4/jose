@@ -139,3 +139,6 @@ Resultados de fotos jogadas ao !datamosh:
             await cxt.say("*no GIF support*")
         else:
             await cxt.say("Formato %s: desconhecido", (img.format,))
+
+def setup(bot):
+    return JoseDatamosh(bot)
