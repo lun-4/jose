@@ -27,6 +27,8 @@ class JoseBot(jaux.Auxiliar):
         jaux.Auxiliar.__init__(self, _client)
         self.nick = 'jose-bot'
         self.modules = {}
+        self._client.modules = self.modules
+
         self.env = {
             'cooldowns': {},
         }
