@@ -118,7 +118,7 @@ async def do_command(method, message, args, cxt, t_start, st):
         return
 
     try:
-        await bot.process_commands(message)
+        await jose_method(message, args, cxt)
 
     except je.PermissionError:
         jcommon.logger.warning("thrown PermissionError at %r from %s(%r)", \
