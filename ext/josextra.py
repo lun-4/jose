@@ -113,8 +113,9 @@ class joseXtra(jaux.Auxiliar):
         self.socket_stats[msg.get('t')] += 1
 
     def bot_human_ratio(self, server):
-        bots = [member for member in sever.members if member.bot]
-        humans = [member for member in sever.members if not member.bot]
+        bots = [member for member in server.members if member.bot]
+        humans = [member for member in server.members if not member.bot]
+
         return bots, humans, (len(bots) / len(humans))
 
     async def e_server_join(self, server):
