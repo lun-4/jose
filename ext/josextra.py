@@ -112,6 +112,21 @@ class joseXtra(jaux.Auxiliar):
     async def e_socket_response(self, msg):
         self.socket_stats[msg.get('t')] += 1
 
+    def bot_human_ratio(self, server):
+        bots = [member for member in sever.members if member.bot]
+        humans = [member for member in sever.members if not member.bot]
+        return bots, humans, (len(bots) / len(humans))
+
+    async def e_server_join(self, server):
+        # bots-to-members ratio
+        bots, humans, ratio = self.bot_human_ratio(server)
+        self.logger.info("ratio %dbots / %dhumans = %.2f", bots, humans, ratio)
+
+    async def c_bhratio(self, server):
+        bots, humans, ratio = self.bot_human_ratio(server)
+        await cxt.say("%d bots / %d humans = `%.2fb/h`", \
+            (bots, humans, ratio))
+
     async def c_sockstats(self, message, args, cxt):
         '''`j!sockstats` - Socket Stats'''
         delta = time.time() - self.sock_start
