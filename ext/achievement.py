@@ -62,6 +62,8 @@ class JoseAchievement(jaux.Auxiliar):
             user_id = member.id
             await self.achv_check(user_id, 'admin', admin_check)
 
+        self.jsondb_save('achievements')
+
     def mk_achievment(self, achievement_id):
         achv_description = ACHIEVEMENTS[achievement_id]
         achv_emoji = ACHIEVEMENT_EMOJI[achievement_id]
