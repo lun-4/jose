@@ -82,13 +82,13 @@ class JoseAchievment(jaux.Auxiliar):
         return True
 
     async def c_achievments(self, message, args, cxt):
-        achievments = self.achv_get(user_id)
+        achievments = self.achv_get(str(message.author.id))
         emoji = [ACHIEVMENT_EMOJI[a] for a in achievments]
         await cxt.say("%s", (' '.join(emoji),))
 
     async def c_listachv(self, message, args, cxt):
         await self.is_admin(message.author.id)
-        res = ['`%s - %s`'.format(k, ACHIEVMENT_NAMES[k]) for (k) in ACHIEVMENT_NAMES]
+        res = ['`{} - {}`'.format(k, ACHIEVMENT_NAMES[k]) for (k) in ACHIEVMENT_NAMES]
         await cxt.say("%s", ('\n'.join(res),))
 
     async def c_addachv(self, message, args, cxt):
