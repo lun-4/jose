@@ -52,7 +52,7 @@ def load_all_modules():
     load_module('josewatch', 'JoseWatch')
     load_module('josemod', 'JoseMod')
     load_module('josespeak', 'JoseSpeak')
-    load_module('achievement', 'JoseAchievment')
+    load_module('achievement', 'JoseAchievement')
 
     # the other stuff
     load_module('josememes', 'JoseMemes')

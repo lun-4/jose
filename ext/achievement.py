@@ -22,7 +22,7 @@ ACHIEVEMENT_OVERWRITES = {
     '10-meme': ('5-meme',),
 }
 
-class JoseAchievment(jaux.Auxiliar):
+class JoseAchievement(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
 
@@ -88,7 +88,10 @@ class JoseAchievment(jaux.Auxiliar):
         emojis = [ACHIEVEMENT_EMOJI[a] for a in achievements]
 
         em = discord.Embed(title='Your achievements', colour=discord.Colour.dark_teal())
-        em.add_field(name='stuff', value=' '.join(emojis))
+        if len(emojis) > 0:
+            em.add_field(name='stuff', value=' '.join(emojis))
+        else:
+            em.add_field(name='No achievments', value='rip')
 
         await cxt.say_embed(em)
 
@@ -109,7 +112,7 @@ class JoseAchievment(jaux.Auxiliar):
         try:
             achievement_id = args[2]
         except:
-            await cxt.say("error parsing `achieevment_id`")
+            await cxt.say("error parsing `achievement_id`")
             return
 
         if user_id is None:
