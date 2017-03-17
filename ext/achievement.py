@@ -80,7 +80,7 @@ class JoseAchievement(jaux.Auxiliar):
 
         # add the shit
         achievements.append(achievement_id)
-        self.logger.info("Add achievement %r to %s", achievEment_id, user_id)
+        self.logger.info("Add achievement %r to %s", achievement_id, user_id)
         return True
 
     async def c_achievements(self, message, args, cxt):
@@ -91,7 +91,7 @@ class JoseAchievement(jaux.Auxiliar):
         if len(emojis) > 0:
             em.add_field(name='stuff', value=' '.join(emojis))
         else:
-            em.add_field(name='No achievments', value='rip')
+            em.add_field(name='No achievements', value='rip')
 
         await cxt.say_embed(em)
 
