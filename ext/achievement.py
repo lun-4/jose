@@ -14,19 +14,25 @@ ACHIEVEMENT_NAMES = {
 }
 
 ACHIEVEMENT_EMOJI = {
-    '5-meme':   '<:thunking:286955648472711168>',
-    '10-meme':  '<:thonking:260597447858978816>',
+    'admin':        '<:jose:286955536274948096>',
+    'tester':       ':gun:',
+    '5-meme':       '<:thunking:286955648472711168>',
+    '10-meme':      '<:thonking:260597447858978816>',
 }
 
 ACHIEVEMENT_OVERWRITES = {
     '10-meme': ('5-meme',),
 }
 
+def admin_check(user_id):
+    return user_id in jcommon.ADMIN_IDS
+
 class JoseAchievement(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
 
         self.jsondb('achievements', path='db/achievements.json')
+        self.cbk_new('achv', self.check_achievements, 600)
 
     async def ext_load(self):
         try:
@@ -40,6 +46,21 @@ class JoseAchievement(jaux.Auxiliar):
             return True, ''
         except Exception as err:
             return False, repr(err)
+
+    async def achv_check(self, user_id, achievement_id, check_function)
+        achievements = self.achv_get(user_id)
+        if achievement_id in achievements:
+            return
+
+        res = check_function(user_id)
+        if res:
+            self.achv_add(user_id, achievement_id)
+
+    async def check_achievements(self):
+        await self.client.wait_until_ready()
+        for member in self.client.get_all_members():
+            user_id = member.id
+            await self.achv_check(user_id, 'admin', admin_check)
 
     def mk_achievment(self, achievement_id):
         achv_description = ACHIEVEMENTS[achievement_id]
