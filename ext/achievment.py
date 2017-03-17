@@ -85,8 +85,12 @@ class JoseAchievment(jaux.Auxiliar):
 
     async def c_achievments(self, message, args, cxt):
         achievments = self.achv_get(str(message.author.id))
-        emoji = [ACHIEVMENT_EMOJI[a] for a in achievments]
-        await cxt.say(' '.join(emoji))
+        emojis = [ACHIEVMENT_EMOJI[a] for a in achievments]
+
+        em = discord.Embed(title='Your achievments', colour=discord.Colour.dark_teal())
+        em.add_field(name='', value=' '.join(emoji))
+
+        await cxt.say_embed(em)
 
     async def c_listachv(self, message, args, cxt):
         await self.is_admin(message.author.id)
@@ -113,11 +117,12 @@ class JoseAchievment(jaux.Auxiliar):
             return
 
         result = self.achv_add(user_id, achievment_id)
+
         if not result:
             await cxt.say("Error adding achievment `%s` to userid %s", \
                 (achievment_id, user_id))
         else:
-            await cxt.say("Now %s has `%s`", \
+            await cxt.say("Now <@%s> has `%s`", \
                 (user_id, self.achv_get(user_id)))
 
-        await self.json_save('achievments')
+        await self.jsondb_save('achievments')
