@@ -79,7 +79,7 @@ class JoseAchievment(jaux.Auxiliar):
             achievments.remove(conflict)
 
         # add the shit
-        achievments.append(overwrites)
+        achievments.append(achievment_id)
         self.logger.info("Add achievment %r to %s", achievment_id, user)
         return True
 
