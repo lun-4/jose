@@ -80,7 +80,7 @@ class JoseAchievment(jaux.Auxiliar):
 
         # add the shit
         achievments.append(achievment_id)
-        self.logger.info("Add achievment %r to %s", achievment_id, user)
+        self.logger.info("Add achievment %r to %s", achievment_id, user_id)
         return True
 
     async def c_achievments(self, message, args, cxt):
