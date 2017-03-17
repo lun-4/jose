@@ -88,7 +88,7 @@ class JoseAchievment(jaux.Auxiliar):
         emojis = [ACHIEVMENT_EMOJI[a] for a in achievments]
 
         em = discord.Embed(title='Your achievments', colour=discord.Colour.dark_teal())
-        em.add_field(name='', value=' '.join(emojis))
+        em.add_field(name='stuff', value=' '.join(emojis))
 
         await cxt.say_embed(em)
 
