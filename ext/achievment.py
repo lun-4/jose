@@ -96,13 +96,18 @@ class JoseAchievment(jaux.Auxiliar):
 
         try:
             user_id = await jcommon.parse_id(args[1])
+        except:
+            await cxt.say("error parsing `user_id`")
+            return
+
+        try:
             achievment_id = args[2]
         except:
-            await cxt.say("error parsing shit")
+            await cxt.say("error parsing `achievment_id`")
             return
 
         if user_id is None:
-            await cxt.say("error parsing shit")
+            await cxt.say("error parsing shit(user_id)")
             return
 
         result = self.achv_add(user_id, achievment_id)
