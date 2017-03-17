@@ -8,17 +8,17 @@ import jauxiliar as jaux
 import joseerror as je
 import josecommon as jcommon
 
-ACHIEVMENT_NAMES = {
+ACHIEVEMENT_NAMES = {
     '5-meme': 'Made 5 memes in `j!meme`',
     '10-meme': 'Made 10 memes in `j!meme`',
 }
 
-ACHIEVMENT_EMOJI = {
+ACHIEVEMENT_EMOJI = {
     '5-meme':   '<:thunking:286955648472711168>',
     '10-meme':  '<:thonking:260597447858978816>',
 }
 
-ACHIEVMENT_OVERWRITES = {
+ACHIEVEMENT_OVERWRITES = {
     '10-meme': ('5-meme',),
 }
 
@@ -26,7 +26,7 @@ class JoseAchievment(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
 
-        self.jsondb('achievments', path='db/achievments.json')
+        self.jsondb('achievements', path='db/achievements.json')
 
     async def ext_load(self):
         try:
@@ -41,60 +41,60 @@ class JoseAchievment(jaux.Auxiliar):
         except Exception as err:
             return False, repr(err)
 
-    def mk_achievment(self, achievment_id):
-        achv_description = ACHIEVMENTS[achievment_id]
-        achv_emoji = ACHIEVMENT_EMOJI[achievment_id]
+    def mk_achievment(self, achievement_id):
+        achv_description = ACHIEVEMENTS[achievement_id]
+        achv_emoji = ACHIEVEMENT_EMOJI[achievement_id]
 
         return {
-            'id': achievment_id,
+            'id': achievEment_id,
             'description': achv_description,
             'emoji': achv_emoji,
         }
 
     def achv_ensure(self, userid):
-        user = self.achievments.get(userid, None)
+        user = self.achievements.get(userid, None)
         # create shit
         if user is None:
-            self.achievments[userid] = []
+            self.achievements[userid] = []
 
     def achv_get(self, userid):
         userid = str(userid)
 
         self.achv_ensure(userid)
-        return self.achievments.get(userid)
+        return self.achievements.get(userid)
 
-    def achv_add(self, user_id, achievment_id):
-        if achievment_id not in ACHIEVMENT_NAMES:
+    def achv_add(self, user_id, achievement_id):
+        if achievement_id not in ACHIEVEMENT_NAMES:
             return False
 
         user_id = str(user_id)
 
-        achievments = self.achv_get(user_id)
+        achievements = self.achv_get(user_id)
 
-        if achievment_id in achievments:
+        if achievement_id in achievements:
             return True
 
-        overwrites = ACHIEVMENT_OVERWRITES.get(achievment_id, {})
+        overwrites = ACHIEVEMENT_OVERWRITES.get(achievement_id, {})
         for conflict in overwrites:
-            achievments.remove(conflict)
+            achievements.remove(conflict)
 
         # add the shit
-        achievments.append(achievment_id)
-        self.logger.info("Add achievment %r to %s", achievment_id, user_id)
+        achievements.append(achievement_id)
+        self.logger.info("Add achievement %r to %s", achievEment_id, user_id)
         return True
 
-    async def c_achievments(self, message, args, cxt):
-        achievments = self.achv_get(str(message.author.id))
-        emojis = [ACHIEVMENT_EMOJI[a] for a in achievments]
+    async def c_achievements(self, message, args, cxt):
+        achievements = self.achv_get(str(message.author.id))
+        emojis = [ACHIEVEMENT_EMOJI[a] for a in achievements]
 
-        em = discord.Embed(title='Your achievments', colour=discord.Colour.dark_teal())
+        em = discord.Embed(title='Your achievements', colour=discord.Colour.dark_teal())
         em.add_field(name='stuff', value=' '.join(emojis))
 
         await cxt.say_embed(em)
 
     async def c_listachv(self, message, args, cxt):
         await self.is_admin(message.author.id)
-        res = ['`{}` - {}\n'.format(k, ACHIEVMENT_NAMES[k]) for (k) in ACHIEVMENT_NAMES]
+        res = ['`{}` - {}\n'.format(k, ACHIEVEMENT_NAMES[k]) for (k) in ACHIEVEMENT_NAMES]
         await cxt.say("%s", ('\n'.join(res),))
 
     async def c_addachv(self, message, args, cxt):
@@ -107,22 +107,22 @@ class JoseAchievment(jaux.Auxiliar):
             return
 
         try:
-            achievment_id = args[2]
+            achievement_id = args[2]
         except:
-            await cxt.say("error parsing `achievment_id`")
+            await cxt.say("error parsing `achieevment_id`")
             return
 
         if user_id is None:
             await cxt.say("error parsing shit(user_id)")
             return
 
-        result = self.achv_add(user_id, achievment_id)
+        result = self.achv_add(user_id, achievement_id)
 
         if not result:
-            await cxt.say("Error adding achievment `%s` to userid %s", \
-                (achievment_id, user_id))
+            await cxt.say("Error adding achievement `%s` to userid %s", \
+                (achievement_id, user_id))
         else:
             await cxt.say("Now <@%s> has `%s`", \
                 (user_id, self.achv_get(user_id)))
 
-        await self.jsondb_save('achievments')
+        self.jsondb_save('achievements')
