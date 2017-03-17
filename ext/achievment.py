@@ -96,8 +96,8 @@ class JoseAchievment(jaux.Auxiliar):
 
         try:
             user_id = await jcommon.parse_id(args[1])
-        except:
-            await cxt.say("error parsing `user_id`")
+        except Exception as err:
+            await cxt.say("error parsing `user_id` %r", (err,))
             return
 
         try:
