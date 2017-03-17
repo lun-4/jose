@@ -600,3 +600,13 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
         em = discord.Embed(colour=discord.Colour.purple(), title='test')
         em.add_field(name=emojoj, value="fuck")
         await cxt.say_embed(em)
+
+    async def c_pinch(self, message, args, cxt):
+        try:
+            p1 = args[1]
+        except:
+            await cxt.say("Error parsing p1")
+            return
+
+        await cxt.say("{} got pinched by {} for not wearing green!\n{}".format\
+            (p1, message.author, 'http://theotakuspot.animeblogger.net/wp-content/uploads/2007/10/shana2-3.png'))
