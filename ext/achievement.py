@@ -47,7 +47,7 @@ class JoseAchievement(jaux.Auxiliar):
         except Exception as err:
             return False, repr(err)
 
-    async def achv_check(self, user_id, achievement_id, check_function)
+    async def achv_check(self, user_id, achievement_id, check_function):
         achievements = self.achv_get(user_id)
         if achievement_id in achievements:
             return
