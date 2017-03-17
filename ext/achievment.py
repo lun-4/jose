@@ -6,6 +6,7 @@ import sys
 sys.path.append("..")
 import jauxiliar as jaux
 import joseerror as je
+import josecommon as jcommon
 
 ACHIEVMENT_NAMES = {
     '5-meme': 'Made 5 memes in `j!meme`',
