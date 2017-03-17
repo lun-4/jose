@@ -36,6 +36,7 @@ class JoseAchievment(jaux.Auxiliar):
 
     async def ext_unload(self):
         try:
+            await self.jsondb_save_all()
             return True, ''
         except Exception as err:
             return False, repr(err)
@@ -54,7 +55,7 @@ class JoseAchievment(jaux.Auxiliar):
         user = self.achievments.get(userid, None)
         # create shit
         if user is None:
-            self.achievments[userid] = {}
+            self.achievments[userid] = []
 
     def achv_get(self, userid):
         userid = str(userid)
