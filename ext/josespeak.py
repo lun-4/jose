@@ -99,10 +99,6 @@ class JoseSpeak(jcommon.Extension):
         self.flag = False
 
         self.text_generators = {}
-        self.wlengths = {}
-        self.messages = {}
-        self.text_lengths = {}
-        self.msgcount = {}
 
         self.txcleaned = -1
         self.last_texter_mcount = -1
@@ -130,10 +126,6 @@ class JoseSpeak(jcommon.Extension):
             # make generators
             self.cult_generator = await make_texter('db/jose-data.txt', 1)
             self.global_generator = await make_texter('db/zelao.txt', 1)
-
-            # load things in files
-            self.jsondb('jspk_wlengths', path=self.db_length_path, attribute='wlengths')
-            self.jsondb('jspk_messages', path=self.db_msg_path, attribute='messages')
 
             return True, ''
         except Exception as e:
@@ -173,7 +165,6 @@ class JoseSpeak(jcommon.Extension):
         t_start = time.time()
 
         messages = await self.server_messages(serverid, limit)
-        self.msgcount[serverid] = len(messages)
 
         if serverid in self.text_generators:
             # delet this
@@ -182,7 +173,7 @@ class JoseSpeak(jcommon.Extension):
         # create it
         self.text_generators[serverid] = await make_texter(None, 1, '\n'.join(messages))
 
-        self.last_texter_mcount = self.msgcount[serverid]
+        self.last_texter_mcount = len(messages)
         self.last_texter_time = (time.time() - t_start)
 
         return True
@@ -335,22 +326,6 @@ class JoseSpeak(jcommon.Extension):
         # filter message before adding
         filtered_msg = jcommon.speak_filter(message.content)
         sid = message.server.id
-
-        if message.server.id not in self.wlengths:
-            # average wordlength
-            self.wlengths[sid] = 5
-
-        if message.server.id not in self.messages:
-            # the message being received now
-            self.messages[sid] = 1
-
-        # get word count
-        self.wlengths[sid] += len(filtered_msg.split())
-        self.messages[sid] += 1
-
-        # recalc
-        self.text_lengths[sid] = \
-            self.wlengths[sid] / self.messages[sid]
 
         for line in filtered_msg.split('\n'):
             # append every line to the database
