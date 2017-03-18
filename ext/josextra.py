@@ -552,7 +552,8 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
         if acc_id != message.author.id:
             user = await self.client.get_user_info(acc_id)
 
-        await cxt.say("This is what discord gave me: %s", (user.avatar_url,))
+        await cxt.say("This is what discord gave me: %s", \
+            (user.avatar_url.replace('webp', 'png'),))
 
     async def c_snoop(self, message, args, cxt):
         '''`j!snoop amount guildid` - snoop on messages'''
