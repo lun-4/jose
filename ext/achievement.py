@@ -38,14 +38,14 @@ def rich_check(self, user_id):
     return False
 
 def meme5_check(self, user_id):
-    jmemes = self.modules['josememes']['inst']
+    jmemes = self.client.modules['josememes']['inst']
     memedb = jmemes.memes
     from_user = [x for x in memedb if memedb[x]['owner'] == user_id]
 
     return len(from_user) >= 5
 
 def meme10_check(self, user_id):
-    jmemes = self.modules['josememes']['inst']
+    jmemes = self.client.modules['josememes']['inst']
     memedb = jmemes.memes
     from_user = [x for x in memedb if memedb[x]['owner'] == user_id]
 
