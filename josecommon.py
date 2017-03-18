@@ -259,7 +259,7 @@ class Callback:
 
                 await asyncio.sleep(self.sec)
             logger.debug("[callback:%s] finished", self.cid)
-        except concurrent.futures.CancelledError as err:
+        except asyncio.CancelledError as err:
             logger.info("[callback:%s] Cancelled", self.cid)
 
     def stop(self):

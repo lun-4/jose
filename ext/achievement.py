@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 
 import discord
-import asyncio
 import sys
 sys.path.append("..")
 import jauxiliar as jaux
-import joseerror as je
 import josecommon as jcommon
 
 ACHIEVEMENT_NAMES = {
@@ -101,11 +99,11 @@ class JoseAchievement(jaux.Auxiliar):
         await cxt.say("done executing `check_achievements`")
 
     def mk_achievment(self, achievement_id):
-        achv_description = ACHIEVEMENTS[achievement_id]
+        achv_description = ACHIEVEMENT_NAMES[achievement_id]
         achv_emoji = ACHIEVEMENT_EMOJI[achievement_id]
 
         return {
-            'id': achievEment_id,
+            'id': achievement_id,
             'description': achv_description,
             'emoji': achv_emoji,
         }
