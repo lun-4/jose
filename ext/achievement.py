@@ -13,11 +13,13 @@ ACHIEVEMENT_NAMES = {
     'tester':       'Tested José in its early stages',
     '5-meme':       'Made 5 memes in `j!meme`',
     '10-meme':      'Made 10 memes in `j!meme`',
+    'rich':         'Has more than 30JC',
 }
 
 ACHIEVEMENT_EMOJI = {
     'admin':        '<:jose:286955536274948096>',
     'tester':       ':gun:',
+    'rich':         ':money_mouth:',
     '5-meme':       '<:thunking:286955648472711168>',
     '10-meme':      '<:thonking:260597447858978816>',
 }
@@ -26,8 +28,16 @@ ACHIEVEMENT_OVERWRITES = {
     '10-meme': ('5-meme',),
 }
 
-def admin_check(user_id):
+def admin_check(self, user_id):
     return user_id in jcommon.ADMIN_IDS
+
+def rich_check(self, user_id):
+    account = self.jcoin.data.get(user_id)
+    if account is not None:
+        if account['amount'] > 30:
+            return True
+
+    return False
 
 class JoseAchievement(jaux.Auxiliar):
     def __init__(self, _client):
@@ -54,7 +64,7 @@ class JoseAchievement(jaux.Auxiliar):
         if achievement_id in achievements:
             return
 
-        res = check_function(user_id)
+        res = check_function(self, user_id)
         if res:
             self.achv_add(user_id, achievement_id)
 
@@ -63,6 +73,7 @@ class JoseAchievement(jaux.Auxiliar):
         for member in self.client.get_all_members():
             user_id = member.id
             await self.achv_check(user_id, 'admin', admin_check)
+            await self.achv_check(user_id, 'rich', rich_check)
 
         self.jsondb_save('achievements')
 

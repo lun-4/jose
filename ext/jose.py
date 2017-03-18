@@ -266,7 +266,6 @@ class JoseBot(jaux.Auxiliar):
         if name in NEW_BACKEND:
             return self.load_new_backend(name)
 
-
         # find/reload the module
         module = await self.get_module(name)
         if not module:
