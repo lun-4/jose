@@ -112,11 +112,6 @@ class JoseSpeak(jcommon.Extension):
             message nvarchar(2050)
         );""")
 
-        # load timers
-
-        # every 3 minutes
-        self.cbk_new('jspeak.savedb', self.save_databases, 180)
-
         # every minute
         self.cbk_new('jspeak.texter_collection', self.texter_collection, 60)
 
@@ -133,13 +128,10 @@ class JoseSpeak(jcommon.Extension):
 
     async def ext_unload(self):
         try:
-            # save DB
-            await self.save_databases()
             self.text_generators.clear()
 
             # Remove the callbacks
             self.cbk_remove('jspeak.texter_collection')
-            self.cbk_remove('jspeak.savedb')
 
             return True, ''
         except Exception as e:
@@ -206,20 +198,6 @@ class JoseSpeak(jcommon.Extension):
                 (lentg - deadtexters), time_taken_ms)
 
             del sid_to_clear, t_start, time_taken_ms
-
-    async def save_databases(self):
-        try:
-            self.logger.debug("savedb:speak")
-            await self.jsondb_save_all()
-        except Exception as err:
-            self.logger.error("[speakdb] error saving: %r", err, exc_info=True)
-
-    async def c_savedb(self, message, args, cxt):
-        """`j!savedb` - saves all available databases(autosaves every 3 minutes)"""
-        await self.is_admin(message.author.id)
-
-        await self.save_databases()
-        await cxt.say(":floppy_disk: saved messages database :floppy_disk:")
 
     async def c_speaktrigger(self, message, args, cxt):
         """`j!speaktrigger` - trigger jose's speaking code"""
