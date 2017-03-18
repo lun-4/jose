@@ -39,6 +39,20 @@ def rich_check(self, user_id):
 
     return False
 
+def meme5_check(self, user_id):
+    jmemes = self.modules['josememes']['inst']
+    memedb = jmemes.memes
+    from_user = [x for x in memedb if memedb[x]['owner'] == user_id]
+
+    return len(from_user) >= 5
+
+def meme10_check(self, user_id):
+    jmemes = self.modules['josememes']['inst']
+    memedb = jmemes.memes
+    from_user = [x for x in memedb if memedb[x]['owner'] == user_id]
+
+    return len(from_user) >= 10
+
 class JoseAchievement(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
@@ -74,6 +88,10 @@ class JoseAchievement(jaux.Auxiliar):
             user_id = member.id
             await self.achv_check(user_id, 'admin', admin_check)
             await self.achv_check(user_id, 'rich', rich_check)
+
+            # meme checks
+            await self.achv_check(user_id, '5-meme', meme5_check)
+            await self.achv_check(user_id, '10-meme', meme10_check)
 
         self.jsondb_save('achievements')
 
@@ -138,7 +156,7 @@ class JoseAchievement(jaux.Auxiliar):
 
     async def c_listachv(self, message, args, cxt):
         await self.is_admin(message.author.id)
-        res = ['`{}` - {}\n'.format(k, ACHIEVEMENT_NAMES[k]) for (k) in ACHIEVEMENT_NAMES]
+        res = ['`{} - {}`'.format(k, ACHIEVEMENT_NAMES[k]) for (k) in ACHIEVEMENT_NAMES]
         await cxt.say("%s", ('\n'.join(res),))
 
     async def c_addachv(self, message, args, cxt):
