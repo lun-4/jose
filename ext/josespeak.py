@@ -257,7 +257,7 @@ class JoseSpeak(jcommon.Extension):
         res = []
         async for message in logs:
             if message.author != jcommon.JOSE_ID:
-                res.append(message.content)
+                res.append(jcommon.speak_filter(message.content))
 
         texter = await make_texter(None, 1, '\n'.join(res))
 

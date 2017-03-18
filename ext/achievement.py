@@ -11,8 +11,8 @@ import josecommon as jcommon
 ACHIEVEMENT_NAMES = {
     'admin':        'Is a José Administrator',
     'tester':       'Tested José in its early stages',
-    '5-meme': 'Made 5 memes in `j!meme`',
-    '10-meme': 'Made 10 memes in `j!meme`',
+    '5-meme':       'Made 5 memes in `j!meme`',
+    '10-meme':      'Made 10 memes in `j!meme`',
 }
 
 ACHIEVEMENT_EMOJI = {
