@@ -390,8 +390,17 @@ def main(args):
         else:
             jcommon.logger.info("[general_shutdown] already done")
 
-        jcommon.logger.info("[asyncio] Closing event loop")
-        loop.close()
+    try:
+        pending = asyncio.Task.all_tasks(loop=loop)
+        gathered = asyncio.gather(*pending, loop=loop)
+        gathered.cancel()
+        loop.run_until_complete(gathered)
+        gathered.exception()
+    except Exception as err:
+        print(traceback.format_exc())
+
+    jcommon.logger.info("[asyncio] Closing event loop")
+    loop.close()
 
     tr.print_diff()
 
