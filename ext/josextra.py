@@ -383,6 +383,15 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
         colorval = int(hashlib.md5(name.encode("utf-8")).hexdigest()[:6], 16)
         return discord.Colour(colorval)
 
+    def delta_str(self, delta):
+        sec = delta.total_seconds()
+        years = seconds / 60 / 60 / 24 / 365.25
+        days = seconds / 60 / 60 / 24
+        if years >= 1:
+            return f'{years} years, {days} days'
+        else:
+            return f'{days} days'
+
     async def c_profile(self, message, args, cxt):
         '''`j!profile [@mention]` - profile card stuff'''
         await cxt.send_typing()
@@ -429,7 +438,7 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             em.add_field(name='José Admin! Works on', value=topic[0])
 
         delta = datetime.datetime.now() - user.created_at
-        em.add_field(name='Account creation time', value='{} ago'.format(str(delta)))
+        em.add_field(name='Discord account age', value='{}'.format(self.delta_str(delta)))
 
         if acc_id in self.jcoin.data:
             account = self.jcoin.data.get(acc_id)
