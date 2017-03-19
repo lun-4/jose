@@ -386,7 +386,7 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
     def delta_str(self, delta):
         seconds = delta.total_seconds()
         years = seconds / 60 / 60 / 24 / 365.25
-        days = (seconds / 60 / 60 / 24) - (years * 365.25)
+        days = seconds / 60 / 60 / 24
         if years >= 1:
             return f'{years:.2f} years'
         else:
