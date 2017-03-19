@@ -386,11 +386,11 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
     def delta_str(self, delta):
         seconds = delta.total_seconds()
         years = seconds / 60 / 60 / 24 / 365.25
-        days = seconds / 60 / 60 / 24
+        days = (seconds / 60 / 60 / 24) - (year * 365.25)
         if years >= 1:
-            return f'{years} years, {days} days'
+            return f'{years:.2f} years, {days:.2f} days'
         else:
-            return f'{days} days'
+            return f'{days:.2f} days'
 
     async def c_profile(self, message, args, cxt):
         '''`j!profile [@mention]` - profile card stuff'''
