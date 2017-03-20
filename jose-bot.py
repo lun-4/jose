@@ -69,6 +69,9 @@ def load_all_modules():
     jose.ev_load(True)
 
 async def do_event(event_name, args):
+    if event_name not in jose.event_tbl:
+        jose.event_tbl[event_name] = []
+
     for handler in jose.event_tbl[event_name]:
         if isinstance(args[0], discord.Message):
             cxt = jcommon.Context(bot, args[0], time.time(), jose)
