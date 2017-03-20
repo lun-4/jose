@@ -405,6 +405,10 @@ def main(args):
         print("===ENTERING DEVELOPER MODE===")
         jose.dev_mode = True
         logging.basicConfig(level=logging.DEBUG)
+    elif mode == 'sw':
+        print("===SUICIDE WATCH MODE===")
+        jose.sw_mode = True
+        logging.basicConfig(level=logging.DEBUG)
 
     # load all josé's modules
     load_all_modules()
