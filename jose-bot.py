@@ -128,7 +128,7 @@ async def do_command(method, message, args, cxt, t_start, st):
         return
 
     try:
-        if jose.sw_mode:
+        if jose.sw_mode and (message.author.id not in jcommon.ADMIN_IDS):
             await cxt.say("I'm on suicide watch mode, Discord is having issues\n\
 https://status.discordapp.com")
 
