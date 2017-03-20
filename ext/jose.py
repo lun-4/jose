@@ -46,6 +46,7 @@ class JoseBot(jaux.Auxiliar):
 
     async def do_dev_mode(self):
         self.logger.info("Developer Mode Enabled")
+        self.playing_task.cancel()
         g = discord.Game(name='JOSÉ IN MAINTENANCE', url='fuck you')
         await self.client.change_presence(game=g)
 
@@ -728,6 +729,12 @@ don't want (unless I'm skynet)")
 
     async def init_sw_mode(self):
         self.logger.error("SUICIDE WATCH MODE IS ACTIVATED, REBOOT TO NORMALIZE")
+        self.playing_task.cancel()
+
+        g = discord.Game(name='DISCORD ON SUICIDE WATCH', \
+            url='status.discordapp.com')
+
+        await self.client.change_presence(game=g)
 
     async def c_mode(self, message, args, cxt):
         '''`j!mode normal|dev` - change jose mode'''

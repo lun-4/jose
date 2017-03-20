@@ -305,11 +305,6 @@ async def on_ready():
 
     await do_event('client_ready', [bot])
 
-    if not jose.dev_mode:
-        await timer_playing()
-    else:
-        await jose.do_dev_mode()
-
     t_allowed = False
 
 @bot.event
@@ -378,6 +373,13 @@ async def main_task():
 
     try:
         jcommon.logger.info("[start] logging")
+
+        jose.playing_task = bot.loop.create_task(timer_playing())
+        if not jose.dev_mode:
+            jose.playing_task = bot.loop.create_task(timer_playing())
+        else:
+            jose.playing_task = bot.loop.create_task(jose.do_dev_mode())
+
         bot.loop.create_task(jcommon.setup_logging())
         bot.loop.create_task(jcommon.log_channel_handler.watcher())
 
