@@ -89,6 +89,9 @@ class JoseMod(jaux.Auxiliar):
     async def e_member_ban(self, member):
         await self.mod_log('ban', member.server, member, None)
 
+    async def e_member_unban(self, server, user):
+        await self.mod_log('unban', server, None, user, None)
+
     def new_log_id(self, server_id):
         data = self.moddb.get(server_id)
         if data is None:
@@ -186,7 +189,11 @@ class JoseMod(jaux.Auxiliar):
             user = data[2]
             reason = data[3]
 
-            log_data = ['Unban', log_id, user.id, moderator.id, reason]
+            if moderator is None:
+                log_data = ['Unban', log_id, user.id, None, reason]
+            else:
+                log_data = ['Unban', log_id, user.id, moderator.id, reason]
+
             log_report = await self.make_log_report(*log_data)
 
         elif logtype == 'softban':
