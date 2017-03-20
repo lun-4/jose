@@ -129,12 +129,13 @@ async def do_command(method, message, args, cxt, t_start, st):
 
     try:
         is_admin = message.author.id in jcommon.ADMIN_IDS
-        if jose.sw_mode and (not is_admin):
-            await cxt.say("I'm on suicide watch mode, Discord is having issues\n\
+        if jose.sw_mode:
+            if not is_admin:
+                await cxt.say("I'm on suicide watch mode, Discord is having issues\n\
 https://status.discordapp.com")
+                return
 
-        else:
-            await jose_method(message, args, cxt)
+        await jose_method(message, args, cxt)
 
     except je.PermissionError:
         jcommon.logger.warning("thrown PermissionError at %r from %s(%r)", \
