@@ -72,6 +72,9 @@ class JoseMod(jaux.Auxiliar):
 
         await self.client.send_message(log_channel, embed=em)
 
+    async def e_member_ban(self, member):
+        await self.mod_log('ban', member.server, member, None)
+
     def new_log_id(self, server_id):
         data = self.moddb.get(server_id)
         if data is None:
@@ -107,7 +110,10 @@ class JoseMod(jaux.Auxiliar):
     async def make_log_report(self, log_title, log_id, member_id, moderator_id, reason=None):
         ban_report = []
         member = await self.get_user(member_id)
-        moderator = await self.get_user(moderator_id)
+        moderator = None
+
+        if moderator_id is not None:
+            moderator = await self.get_user(moderator_id)
 
         ban_report.append("**%s**, log id %s" % (log_title, log_id))
         ban_report.append("**User**: %s [%s]" % (str(member), member.id))
@@ -115,7 +121,11 @@ class JoseMod(jaux.Auxiliar):
             ban_report.append("**Reason**: **insert reason `j!reason %s`**" % log_id)
         else:
             ban_report.append("**Reason**: %s" % reason)
-        ban_report.append("**Moderator**: %s [%s]" % (str(moderator), moderator.id))
+
+        if moderator_id is not None:
+            ban_report.append("**Moderator**: %s [%s]" % (str(moderator), moderator.id))
+        else:
+            ban_report.append("**Moderator**: **No responsible moderator**")
 
         return ban_report
 
@@ -145,8 +155,16 @@ class JoseMod(jaux.Auxiliar):
 
         if logtype == 'ban':
             member = data[1]
-            moderator = data[2]
-            log_data = ['Ban', log_id, member.id, moderator.id, reason]
+            moderator = None
+            log_data = None
+            if data[2] is not None:
+                moderator = data[2]
+
+            if moderator is not None:
+                log_data = ['Ban', log_id, member.id, moderator.id, reason]
+            else:
+                log_data = ['Ban', log_id, member.id, None, reason]
+
             log_report = await self.make_log_report(*log_data)
 
         elif logtype == 'unban':
