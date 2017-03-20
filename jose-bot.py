@@ -332,6 +332,14 @@ async def on_member_remove(member):
     await do_event('member_remove', [member])
 
 @bot.event
+async def on_member_ban(member):
+    await do_event('member_ban', [member])
+
+@bot.event
+async def on_member_unban(server, user):
+    await do_event('member_unban', [server, user])
+
+@bot.event
 async def on_server_remove(server):
     await do_event('server_remove', [server])
 
