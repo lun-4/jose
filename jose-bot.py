@@ -336,6 +336,22 @@ async def on_server_remove(server):
 async def on_socket_response(data):
     await do_event('socket_response', [data])
 
+@bot.event
+async def on_message_edit(before, after):
+    await do_event('message_edit', [before, after])
+
+    if not before.content.startswith(JOSE_PREFIX):
+        return
+
+    delta = after.edited_timestamp - before.timestamp
+
+    if delta.total_seconds() > 10:
+        return
+
+    # redo on_message event
+    # this is bulky but yeah, fast solutions require ugliness
+    await on_message(after)
+
 async def main_task():
     startupdelta = time.time() - jose.start_time
     jcommon.logger.info("--- STARTUP TOOK %.2f SECONDS ---", startupdelta)
