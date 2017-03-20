@@ -60,6 +60,10 @@ class JoseBot(jaux.Auxiliar):
             'member_join': [],
             'member_remove': [],
             'server_remove': [],
+
+            'member_ban': [],
+            'member_unban': [],
+            'message_edit': [],
         }
 
     def ev_load(self, dflag=False):
