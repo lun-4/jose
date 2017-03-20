@@ -130,7 +130,7 @@ class joseXtra(jaux.Auxiliar):
 
         return bots, humans, (len(bots) / len(humans))
 
-    async def e_server_join(self, server):
+    async def e_server_join(self, server, channel):
         # bots-to-members ratio
         bots, humans, ratio = self.bot_human_ratio(server)
         self.logger.info("ratio %dbots / %dhumans = %.2f", len(bots), len(humans), ratio)
