@@ -100,6 +100,10 @@ async def check_message(message):
     if message.server.id in jose.blocks['guilds']:
         return False
 
+    if jose.sw_mode:
+        if message.author.id not in jcommon.ADMIN_IDS:
+            return False
+
     if jose.dev_mode:
         # Ignore messages from other servers
         if message.server.id != jcommon.JOSE_DEV_SERVER_ID:
@@ -124,7 +128,12 @@ async def do_command(method, message, args, cxt, t_start, st):
         return
 
     try:
-        await jose_method(message, args, cxt)
+        if jose.sw_mode:
+            await cxt.say("I'm on suicide watch mode, Discord is having issues\n\
+https://status.discordapp.com")
+
+        else:
+            await jose_method(message, args, cxt)
 
     except je.PermissionError:
         jcommon.logger.warning("thrown PermissionError at %r from %s(%r)", \

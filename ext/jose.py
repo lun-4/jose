@@ -38,6 +38,7 @@ class JoseBot(jaux.Auxiliar):
         self.start_time = time.time()
         self.command_lock = False
         self.dev_mode = False
+        self.sw_mode = False
         self.made_gshutdown = False
 
         self.jsondb('blocks', path='db/blocks.json', default=DEFAULT_BLOCKS_JSON)
@@ -725,6 +726,9 @@ don't want (unless I'm skynet)")
 
         await cxt.say("OUT:%s\nERR:%s", (out, error))
 
+    async def init_sw_mode(self):
+        self.logger.error("SUICIDE WATCH MODE IS ACTIVATED, REBOOT TO NORMALIZE")
+
     async def c_mode(self, message, args, cxt):
         '''`j!mode normal|dev` - change jose mode'''
         await self.is_admin(message.author.id)
@@ -736,10 +740,16 @@ don't want (unless I'm skynet)")
         mode = args[1]
 
         if mode == 'normal':
+            self.sw_mode = False
             self.dev_mode = False
         elif mode == 'dev':
+            self.sw_mode = False
             self.dev_mode = True
             await self.do_dev_mode()
+        elif mode == 'sw':
+            self.dev_mode = False
+            self.sw_mode = True
+            await self.init_sw_mode()
 
         await cxt.say("mode changed to `%r`", (mode,))
 
