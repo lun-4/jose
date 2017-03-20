@@ -343,7 +343,7 @@ async def on_socket_response(data):
 async def on_message_edit(before, after):
     await do_event('message_edit', [before, after])
 
-    if not before.content.startswith(JOSE_PREFIX):
+    if not before.content.startswith(jcommon.JOSE_PREFIX):
         return
 
     delta = after.edited_timestamp - before.timestamp
