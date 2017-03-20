@@ -128,6 +128,15 @@ class JoseAchievement(jaux.Auxiliar):
 
         achievements = self.achv_get(user_id)
 
+        for achv in ACHIEVEMENT_OVERWRITES:
+            overwrites = ACHIEVEMENT_OVERWRITES[achv]
+
+            if achievement_id in overwrites:
+                if achv in achievements:
+                    # don't add achievments to people
+                    # that already have their overwrites on
+                    return False
+
         if achievement_id in achievements:
             return True
 
