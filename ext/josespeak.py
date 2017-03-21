@@ -430,8 +430,8 @@ class JoseSpeak(jcommon.Extension):
 
         await cxt.send_typing()
 
-        res = ' '.join(args[1:])
-        if res.count('---') > 5:
+        strrep = ' '.join(args[1:])
+        if strrep.count('---') > 5:
             await cxt.say("thats a .......... lot")
             return
 
