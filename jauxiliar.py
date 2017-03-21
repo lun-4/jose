@@ -102,6 +102,7 @@ class Auxiliar(jcommon.Extension):
 
     def sane_jcoin(self, cxt):
         author_id = cxt.message.author.id
+        self.ensure_tbank(self.tbank_fmt(cxt.message.server.id))
 
         if author_id not in self.jcoin.data:
             raise je.JoseCoinError('You don\'t have a JoséCoin account')
