@@ -77,7 +77,7 @@ class JoseMod(jaux.Auxiliar):
         if log_channel is None:
             return
 
-        em = discord.Embed(title='Member Remove', colour=discord.Colour.green())
+        em = discord.Embed(title='Member Remove', colour=discord.Colour.red())
         em.timestamp = member.created_at
         em.set_footer(text='Created')
         em.set_author(name=str(member), icon_url=member.avatar_url or member.default_avatar_url)
