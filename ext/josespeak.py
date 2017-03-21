@@ -15,7 +15,7 @@ import markovify
 
 logger = None
 PROB_FULLWIDTH_TEXT = 0.1
-MESSAGE_LIMIT = 10000 # 10k messages
+MESSAGE_LIMIT = 3000
 LETTER_TO_PITCH = jcommon.LETTER_TO_PITCH
 
 async def make_texter(textpath=None, markov_length=2, text=None):
@@ -301,9 +301,6 @@ class JoseSpeak(jcommon.Extension):
         await cxt.say(self.codeblock("", res))
 
     async def e_on_message(self, message, cxt):
-        if message.server is None:
-            # ignore DMs here as well
-            return
 
         # filter message before adding
         filtered_msg = jcommon.speak_filter(message.content)
