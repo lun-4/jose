@@ -8,6 +8,7 @@ import asyncio
 import sys
 sys.path.append("..")
 import josecommon as jcommon
+import joseerror as je
 
 from midiutil.MidiFile import MIDIFile
 import markovify
@@ -201,6 +202,9 @@ class JoseSpeak(jcommon.Extension):
 
     async def c_speaktrigger(self, message, args, cxt):
         """`j!speaktrigger` - trigger jose's speaking code"""
+        if message.server is None:
+            raise je.CommonError("DMs don't have `j!speaktrigger` support")
+
         cxt.env['flag'] = True
         cxt.env['flat_fw'] = False
         if 'fw' in args:
@@ -399,10 +403,6 @@ class JoseSpeak(jcommon.Extension):
 
     async def c_jwormhole(self, message, args, cxt):
         '''`j!jwormhole` - `j!speaktrigger` routed to Septapus Wormhole'''
-        if message.server is None:
-            await cxt.say("Esse comando não está disponível em DMs")
-            return
-
         await cxt.send_typing()
         ecxt = jcommon.EmptyContext(self.client, message)
         await self.c_speaktrigger(message, [], ecxt)
@@ -411,10 +411,6 @@ class JoseSpeak(jcommon.Extension):
 
     async def c_tatsu(self, message, args, cxt):
         '''`j!tatsu` - `j!speaktrigger` rerouted to prefix with `^``'''
-        if message.server is None:
-            await cxt.say("DMs not available")
-            return
-
         await cxt.send_typing()
         ecxt = jcommon.EmptyContext(self.client, message)
         await self.c_speaktrigger(message, [], ecxt)
