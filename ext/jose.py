@@ -21,7 +21,7 @@ DEFAULT_BLOCKS_JSON = '''{
     "users": []
 }'''
 
-NEW_BACKEND = ['']
+NEW_BACKEND = ['josedatamosh']
 
 class JoseBot(jaux.Auxiliar):
     def __init__(self, _client):
