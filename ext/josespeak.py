@@ -437,13 +437,18 @@ class JoseSpeak(jcommon.Extension):
 
         await cxt.send_typing()
 
+        res = ' '.join(args[1:])
+        if res.count('---') > 5:
+            await cxt.say("thats a .......... lot")
+            return
+
         for word in args[1:]:
             if word == '---':
                 res.append(await self.server_sentence(serverid, 12))
             else:
                 res.append(word)
 
-        self.logger.info("madlibs: %s => %s", ' '.join(args[1:]), ' '.join(res))
+        self.logger.info("madlibs: %s => %s", res, ' '.join(res))
 
         await cxt.say(' '.join(res))
 
