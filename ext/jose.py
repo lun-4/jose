@@ -166,10 +166,10 @@ class JoseBot(jaux.Auxiliar):
             try:
                 ok = await mod['inst'].ext_unload()
                 if not ok[0]:
-                    self.logger.error("Error on ext_unload(%s): %s", name, ok[1])
+                    self.logger.error("[ext_unload(%s)] %s", name, ok[1])
                     return False
-            except Exception as e:
-                self.logger.warn("Almost unloaded %s: %s", name, repr(e))
+            except Exception as err:
+                self.logger.warn("[ext_unload(%s):almost] %r", name, err, exc_info=True)
                 return False
 
             # import new code
@@ -185,19 +185,19 @@ class JoseBot(jaux.Auxiliar):
         instance.logger = jcommon.logger.getChild(name)
 
         if not hasattr(instance, 'ext_load'):
-            self.logger.error("Module not compatible with EAPI")
+            self.logger.error("%s not compatible with EAPI", name)
             return False
 
         # hey thats p good
         try:
             ok = await instance.ext_load()
             if not ok[0]:
-                self.logger.error("Error happened on ext_load(%s): %s", name, ok[1])
+                self.logger.error("[ext_load(%s)]: %s", name, ok[1])
                 return False
             else:
                 return instance
-        except Exception as e:
-            self.logger.warn("Almost loaded %s", name, exc_info=True)
+        except Exception as err:
+            self.logger.warn("[ext_load(%s):err]", name, exc_info=True)
             return False
 
     def register_mod(self, name, class_name, module, instance):
@@ -210,7 +210,7 @@ class JoseBot(jaux.Auxiliar):
             'module': module,
         }
 
-        methods = []
+        commands = []
         handlers = []
 
         for method in instance_methods:
@@ -218,16 +218,19 @@ class JoseBot(jaux.Auxiliar):
             if stw(method, 'c_'):
                 # command
                 setattr(self, method, getattr(instance, method))
-                methods.append(method)
+                commands.append(method)
 
             elif stw(method, 'e_'):
                 # Event handler
                 handlers.append(method)
 
         # copy them and kill them
-        ref['methods'] = copy.copy(methods)
+        self.logger.info("%d commands, %d handlers", len(commands), len(handlers))
+
+        # TODO: change ref['methods'] to ref['commands']
+        ref['methods'] = copy.copy(commands)
         ref['handlers'] = copy.copy(handlers)
-        del methods, handlers
+        del commands, handlers
 
         # done
         return True
@@ -266,7 +269,7 @@ class JoseBot(jaux.Auxiliar):
         self.client.add_cog(instance)
         return True
 
-    async def _load_ext(self, name, class_name, cxt):
+    async def _load_ext(self, name, class_name, cxt=None):
         self.logger.info("load_ext: %s@%s", class_name, name)
 
         if name in NEW_BACKEND:
@@ -296,7 +299,7 @@ class JoseBot(jaux.Auxiliar):
             # delete old one
             del self.modules[name]
 
-            # instiated with success, register all shit this module has
+        # instiated with success, register all shit this module has
         ok = self.register_mod(name, class_name, module, instance)
         if not ok:
             self.logger.error("Error registering module")
@@ -310,7 +313,7 @@ class JoseBot(jaux.Auxiliar):
         return True
 
 
-    async def load_ext(self, name, class_name, cxt):
+    async def load_ext(self, name, class_name, cxt=None):
         # try
         ok = await self._load_ext(name, class_name, cxt)
 
