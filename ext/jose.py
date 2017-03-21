@@ -231,8 +231,6 @@ class JoseBot(jaux.Auxiliar):
         ref['methods'] = copy.copy(commands)
         ref['handlers'] = copy.copy(handlers)
         del commands, handlers
-
-        # done
         return True
 
     def load_new_backend(self, name):
@@ -252,6 +250,7 @@ class JoseBot(jaux.Auxiliar):
         stw = str.startswith
         for method in instance_methods:
             if stw(method, 'c_'):
+                cmd_name = method[method.find('_'):]
 
                 async def cmd(self, ctx):
                     t = time.time()
@@ -260,7 +259,7 @@ class JoseBot(jaux.Auxiliar):
                         ctx.message.content.split(' '), jcxt)
 
                 cmd = commands.group(pass_context=True)(cmd)
-                cmd = self.client.command(cmd)
+                cmd = self.client.command(cmd, name=cmd_name)
 
                 setattr(instance, method.replace('c_', ''), cmd)
             elif stw(method, 'e_'):
@@ -357,10 +356,10 @@ class JoseBot(jaux.Auxiliar):
         modname = args[1]
 
         if modname not in self.modules:
-            await cxt.say("%s: module not loaded", (modname,))
+            await cxt.say("%s: module not found", (modname,))
         else:
             # unload it
-            self.logger.info("!unload: %s" % modname)
+            self.logger.info("Unloading from command: %s" % modname)
             res = await self.unload_mod(modname)
             if res[0]:
                 await cxt.say(":skull: `%s` is dead :skull:", (modname,))
@@ -380,7 +379,7 @@ class JoseBot(jaux.Auxiliar):
 
         ok = await self.load_ext(modname, modclass, cxt)
         if ok:
-            self.logger.info("!loadmod: %s" % modname)
+            self.logger.info("Loading from command: %s" % modname)
             await cxt.say(":ok_hand: Success loading `%s`!", (modname,))
         else:
             await cxt.say(":warning: Error loading `%s` :warning:", (modname,))
