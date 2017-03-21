@@ -9,6 +9,7 @@ import subprocess
 import importlib
 import copy
 import gc
+import asyncio
 
 sys.path.append("..")
 import jauxiliar as jaux
@@ -199,11 +200,10 @@ class JoseBot(jaux.Auxiliar):
             self.logger.warn("Almost loaded %s", name, exc_info=True)
             return False
 
-    async def register_mod(self, name, class_name, module, instance):
+    def register_mod(self, name, class_name, module, instance):
         instance_methods = (method for method in dir(instance)
             if callable(getattr(instance, method)))
 
-        # create module in the... module table... yaaaaay...
         self.modules[name] = ref = {
             'inst': instance,
             'class': class_name,
@@ -297,7 +297,7 @@ class JoseBot(jaux.Auxiliar):
             del self.modules[name]
 
             # instiated with success, register all shit this module has
-        ok = await self.register_mod(name, class_name, module, instance)
+        ok = self.register_mod(name, class_name, module, instance)
         if not ok:
             self.logger.error("Error registering module")
             return False
