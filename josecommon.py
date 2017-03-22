@@ -636,7 +636,8 @@ async def configdb_get(server_id, key, default=None):
     await configdb_ensure(server_id)
 
     if key in cdb_cache[server_id]:
-        return cdb_cache[server_id][key]
+        element = from_redis(cdb_cache[server_id][key])
+        return element
 
     rediskey = make_rkey(server_id)
     res = await redis.hmget(rediskey, key)
