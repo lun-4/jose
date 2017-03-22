@@ -310,6 +310,8 @@ class JoseSpeak(jcommon.Extension):
         await cxt.say(self.codeblock("", res))
 
     async def e_on_message(self, message, cxt):
+        sid = message.server.id
+
         probability = await jcommon.configdb_get(sid, 'speak_prob')
         if probability is None:
             self.logger.error("[WTF] probability = None for server %s", sid)
