@@ -149,7 +149,7 @@ def load(fname):
         with open(fname, 'rb') as f:
             data = pickle.load(f)
     except Exception as e:
-        return False, str(e)
+        return False, repr(e)
 
     remove_itbank = False
 
@@ -202,7 +202,7 @@ def save(fname):
         with open(fname, 'wb') as f:
             pickle.dump(data, f)
     except Exception as e:
-        return False, str(e)
+        return False, repr(e)
 
     #ledger_data(fname.replace('db', 'journal'), '%f;SAVE;%r\n' % (time.time(), data))
     return True, "save %s" % fname
