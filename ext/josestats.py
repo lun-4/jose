@@ -136,6 +136,12 @@ class JoseStats(jaux.Auxiliar):
             self.statistics[serverid]['messages'][authorid] += 1
             self.statistics['gl_messages'] += 1
 
+    async def e_server_remove(self, server):
+        server_id = server.id
+        self.logger.info("Removed from server %s[%s]", server.name, server_id)
+
+        # TODO: Removal
+
     async def c_query(self, message, args, cxt):
         '''`j!query data` - Query some statistics
 https://github.com/lkmnds/jose/blob/master/doc/queries-pt.md'''

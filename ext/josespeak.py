@@ -105,14 +105,6 @@ class JoseSpeak(jcommon.Extension):
         self.last_texter_mcount = -1
         self.last_texter_time = -1
 
-        self.db_length_path = jcommon.MARKOV_LENGTH_PATH
-        self.db_msg_path = jcommon.MARKOV_MESSAGES_PATH
-
-        self.dbapi._register("markovdb", """CREATE TABLE IF NOT EXISTS markovdb (
-            serverid nvarchar(90),
-            message nvarchar(2050)
-        );""")
-
         # every minute
         self.cbk_new('jspeak.texter_collection', self.texter_collection, 60)
 
@@ -333,18 +325,6 @@ class JoseSpeak(jcommon.Extension):
                 await self.new_generator(sid, MESSAGE_LIMIT)
 
             await self.speak(self.text_generators[sid], cxt)
-
-    async def e_server_remove(self, server):
-        # remove its texter, doesn't matter
-
-        self.logger.info("Removing server %s, %s from speakdb", server.name, server.id)
-        server_id = server.id
-
-        if server_id in self.text_generators:
-            del self.text_generators[server_id]
-
-        # delete messages from database
-        await self.dbapi.do("DELETE FROM markovdb WHERE serverid=?", (server_id))
 
     async def server_sentence(self, serverid, length=None, flag_fw=False):
         if serverid not in self.text_generators:
