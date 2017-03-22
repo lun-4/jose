@@ -240,14 +240,21 @@ class JoseBot(jaux.Auxiliar):
 
         module_name = "ext.{}".format(name)
         module = importlib.import_module(module_name)
+
+        self.logger.info("module: %r", module)
+
         importlib.reload(module)
 
         instance = module.setup(self.client)
         instance_methods = (method for method in dir(instance) \
             if callable(getattr(instance, method)))
 
+        self.logger.info("Loading %s in new backend, %d methods", \
+            name, len(instance_methods))
+
         # this is a giant hack
         stw = str.startswith
+
         for method in instance_methods:
             if stw(method, 'c_'):
                 cmd_name = method[method.find('_'):]
@@ -260,6 +267,7 @@ class JoseBot(jaux.Auxiliar):
 
                 cmd = commands.group(pass_context=True)(cmd)
                 cmd = self.client.command(cmd, name=cmd_name)
+                self.logger.info("Add %s command: %r", cmd_name, cmd)
 
                 setattr(instance, method.replace('c_', ''), cmd)
             elif stw(method, 'e_'):
