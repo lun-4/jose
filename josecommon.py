@@ -541,11 +541,13 @@ def from_redis(element):
 
     try:
         element = int(element)
+        return element
     except:
         pass
 
     try:
         element = float(element)
+        return element
     except:
         pass
 
@@ -558,6 +560,9 @@ def redis_value(value):
         value = 1
     elif value is False:
         value = 0
+    elif isinstance(value, str):
+        return 's%s' % value
+
     return value
 
 async def configdb_raw_load():
