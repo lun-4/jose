@@ -53,7 +53,7 @@ class JoseTools(jaux.Auxiliar):
         enviroment.update(globals())
 
         debug_input = self.rm_codeblocks(' '.join(args[1:]))
-        code = f'async def debug():{debug_input}'
+        code = f'async def debug():\n{debug_input}'
 
         try:
             exec(code, enviroment)
@@ -62,7 +62,7 @@ class JoseTools(jaux.Auxiliar):
             return
 
         output = io.StringIO()
-        debug = env['debug']
+        debug = enviroment['debug']
         try:
             with contextlib.redirect_stdout(output):
                 retval = await debug()
