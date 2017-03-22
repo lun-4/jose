@@ -128,12 +128,15 @@ async def do_command(method, message, args, cxt, t_start, st):
         return
 
     try:
+        await bot.process_commands(message)
+
         is_admin = message.author.id in jcommon.ADMIN_IDS
         if jose.sw_mode:
             if not is_admin:
                 await cxt.say("I'm on suicide watch mode, Discord is having issues\n\
 https://status.discordapp.com")
                 return
+
 
         await jose_method(message, args, cxt)
 
