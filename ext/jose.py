@@ -269,7 +269,8 @@ class JoseBot(jaux.Auxiliar):
                 cmd = self.client.command(cmd, name=cmd_name)
                 self.logger.info("Add %s command: %r", cmd_name, cmd)
 
-                setattr(instance, method.replace('c_', ''), cmd)
+                #setattr(instance, method.replace('c_', ''), cmd)
+                self.client.add_command(cmd)
             elif stw(method, 'e_'):
 
                 self.logger.info("Add %s handler", method)
