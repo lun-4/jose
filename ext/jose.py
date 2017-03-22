@@ -257,7 +257,7 @@ class JoseBot(jaux.Auxiliar):
 
         for method in instance_methods:
             if stw(method, 'c_'):
-                cmd_name = method[method.find('_'):]
+                cmd_name = method[method.find('_')+1:]
 
                 async def cmd(self, ctx):
                     t = time.time()
@@ -274,11 +274,6 @@ class JoseBot(jaux.Auxiliar):
 
                 self.logger.info("Add %s handler", method)
                 setattr(instance, method.replace('e_', 'on_'), method)
-
-        methods2 = [method for method in dir(instance) \
-            if callable(getattr(instance, method))]
-
-        self.logger.info("methods debug %s: %r", name, methods2)
 
         self.client.add_cog(instance)
         return True
