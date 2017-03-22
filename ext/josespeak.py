@@ -140,8 +140,9 @@ class JoseSpeak(jcommon.Extension):
 
     async def server_messages(self, serverid, limit=MESSAGE_LIMIT):
         server = self.client.get_server(serverid)
+
         logs = self.client.logs_from(server.default_channel, limit=msglimit)
-        botblock = await jcommon.configdb_get(message.server.id, 'botblock')
+        botblock = await jcommon.configdb_get(serverid, 'botblock')
 
         messages = []
         async for message in logs:
