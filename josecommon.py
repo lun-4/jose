@@ -529,13 +529,16 @@ cdb_cache = {}
 def make_rkey(server_id):
     return '{0}:{1}'.format(CONFIGDB_PREFIX, server_id)
 
-def from_redis(element):
+def from_redis(element, flag=False):
     if element == 'None':
         element = None
 
     try:
         if element[0] == 's':
-            return element[1:]
+            if flag:
+                return element
+            else:
+                return element[1:]
     except:
         pass
 
@@ -612,7 +615,7 @@ async def configdb_set(server_id, key, value):
         await redis.hmset(rediskey, key, value)
         res = await redis.hmget(rediskey, key)
         after = next(iter(res)).decode('utf-8')
-        after = from_redis(after)
+        after = from_redis(after, True)
 
         if after != value:
             logger.warning("[cdb] configdb_set(%s, %s) = %r != %r", server_id, key, value, after)
