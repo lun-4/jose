@@ -517,6 +517,7 @@ def get_defaultcdb():
 
         # TODO: use them????
         'imgchannel': 'None',
+        'speak_channel': '',
         'prefix': JOSE_PREFIX,
         'speak_prob': 0,
         'fw_prob': 0.1,

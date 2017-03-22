@@ -112,3 +112,13 @@ class Auxiliar(jcommon.Extension):
 
         if author_id not in self.jcoin.data:
             raise je.JoseCoinError('You don\'t have a JoséCoin account')
+
+    def parse_channel(self, string):
+
+        if
+
+        if data[0:2] == '<@':
+            if data[2] == '!':
+                return data[3:-1]
+            else:
+                return data[2:-1]

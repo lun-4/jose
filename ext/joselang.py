@@ -158,3 +158,23 @@ class JoseLanguage(jaux.Auxiliar):
             await cxt.say("Error changing `fw_prob`.")
         else:
             await cxt.say("`josespeak.fw` probability is now %.2f%%", (fw_prob,))
+
+    async def c_schannel(self, message, args, cxt):
+        '''`j!schannel channel` - sets the channel for `josespeak` to gather source text'''
+
+        try:
+            channel_id = self.channel_parse(args[1])
+        except:
+            await cxt.say("Error parsing `channel`")
+            return
+
+        channel = message.server.get_channel(channel_id)
+        if channel is None:
+            await cxt.say("Channel not found")
+            return
+
+        done = await jcommon.configdb_set(message.server.id, 'speak_channel', channel_id)
+        if done:
+            await cxt.say("channel to gather messages is now <#%s>", (channel_id,))
+        else:
+            await cxt.say("Error changing `speak_channel`.")

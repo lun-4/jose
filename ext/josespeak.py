@@ -132,8 +132,14 @@ class JoseSpeak(jcommon.Extension):
 
     async def server_messages(self, serverid, limit=MESSAGE_LIMIT):
         server = self.client.get_server(serverid)
+        channel_id = await jcommon.configdb_get(serverid, 'speak_channel')
+        channel = None
+        if len(channel_id) < 1:
+            channel = server.default_channel
+        else:
+            channel = server.get_channel(channel_id)
 
-        logs = self.client.logs_from(server.default_channel, limit)
+        logs = self.client.logs_from(channel, limit)
         botblock = await jcommon.configdb_get(serverid, 'botblock')
 
         messages = []
@@ -148,7 +154,7 @@ class JoseSpeak(jcommon.Extension):
             filtered = jcommon.speak_filter(message.content)
             messages.append(filtered)
 
-        del server, logs, botblock
+        del server, logs, botblock, channel
 
         return messages
 
