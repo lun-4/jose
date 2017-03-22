@@ -247,40 +247,6 @@ class joseXtra(jaux.Auxiliar):
 
         await cxt.say(self.codeblock("", '\n'.join(res)))
 
-    async def c_status(self, message, args, cxt):
-        '''`j!status` get josé's status to some servers'''
-        await self.is_admin(message.author.id)
-
-        msg = await self.client.send_message(message.channel, "Status:")
-
-        discordapp_ping = subprocess.Popen(
-            ["ping", "-c", "3", "discordapp.com"],
-            stdout = subprocess.PIPE,
-            stderr = subprocess.PIPE
-        )
-
-        d_out, d_error = discordapp_ping.communicate()
-        matcher = re.compile("rtt min/avg/max/mdev = (\d+.\d+)/(\d+.\d+)/(\d+.\d+)/(\d+.\d+)")
-        d_rtt = matcher.search(d_out.decode('utf-8')).groups()
-
-        edit1 = await self.client.edit_message(msg, msg.content + """
-%s : min %sms avg %sms max %sms
-""" % ("discordapp.com", d_rtt[0], d_rtt[1], d_rtt[2]))
-
-        google_ping = subprocess.Popen(
-            ["ping", "-c", "3", "google.com"],
-            stdout = subprocess.PIPE,
-            stderr = subprocess.PIPE
-        )
-
-        g_out, g_error = google_ping.communicate()
-        matcher = re.compile("rtt min/avg/max/mdev = (\d+.\d+)/(\d+.\d+)/(\d+.\d+)/(\d+.\d+)")
-        g_rtt = matcher.search(g_out.decode('utf-8')).groups()
-
-        await self.client.edit_message(edit1, edit1.content + """
-%s : min %sms avg %sms max %sms
-""" % ("google.com", g_rtt[0], g_rtt[1], g_rtt[2]))
-
     async def c_info(self, message, args, cxt):
         await cxt.say("""
 José v%s
@@ -605,12 +571,6 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
         messages = '\n'.join(('%s: %s' % tup for tup in reversed(_messages)))
 
         await cxt.say(self.codeblock("", messages))
-
-    async def c_testembed(self, message, args, cxt):
-        emojoj = '<:cody1:266337951586189312>'
-        em = discord.Embed(colour=discord.Colour.purple(), title='test')
-        em.add_field(name=emojoj, value="fuck")
-        await cxt.say_embed(em)
 
     async def c_pinch(self, message, args, cxt):
         try:
