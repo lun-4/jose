@@ -163,7 +163,7 @@ class JoseLanguage(jaux.Auxiliar):
         '''`j!schannel channel` - sets the channel for `josespeak` to gather source text'''
 
         try:
-            channel_id = self.channel_parse(args[1])
+            channel_id = self.parse_channel(args[1])
         except:
             await cxt.say("Error parsing `channel`")
             return
