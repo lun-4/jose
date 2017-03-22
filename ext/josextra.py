@@ -633,7 +633,7 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
         res.append("`send_typing`: **%.2fms**" % delta_st)
 
         ping_sm = time.monotonic()
-        pong = await cxt.send("pong")
+        pong = await cxt.say("pong")
         ping_sm_end = time.monotonic()
         delta_sm = (ping_sm_end - ping_sm) * 1000
         res.append("`send_message`: **%.2fms**" % delta_sm)
