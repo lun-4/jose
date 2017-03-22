@@ -17,7 +17,7 @@ import discord
 
 discord_logger = logging.getLogger('discord')
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 # José.log = all logs
 handler = logging.FileHandler('José.log')
