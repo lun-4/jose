@@ -75,4 +75,5 @@ class JoseTools(jaux.Auxiliar):
 
         out_data = output.getvalue()
         self._last_res = retval
-        await cxt.say(self.codeblock('py', f'out:{out_data} \nres:{retval}'))
+        f_retval = repr(retval)
+        await cxt.say(self.codeblock('py', f'out:\n {out_data}\nres:\n {f_retval}'))
