@@ -357,6 +357,10 @@ async def on_socket_response(data):
 async def on_message_edit(before, after):
     await do_event('message_edit', [before, after])
 
+    is_good = await check_message(before)
+    if not is_good:
+        return
+
     if not before.content.startswith(jcommon.JOSE_PREFIX):
         return
 
