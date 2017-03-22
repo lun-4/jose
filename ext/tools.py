@@ -4,6 +4,7 @@ import discord
 import io
 import traceback
 import contextlib
+import textwrap
 import sys
 sys.path.append("..")
 import jauxiliar as jaux
