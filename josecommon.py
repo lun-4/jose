@@ -604,7 +604,7 @@ async def configdb_set(server_id, key, value):
         after = from_redis(after)
 
         if after != value:
-            logger.warning("[cdb] configdb_set(%s, %s) = %s != %s", server_id, key, value, after)
+            logger.warning("[cdb] configdb_set(%s, %s) = %r != %r", server_id, key, value, after)
             return False
 
         # overwrite cache
