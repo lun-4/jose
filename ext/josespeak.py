@@ -73,8 +73,8 @@ class NewTexter:
         return 'Texter(refcount=%s)' % self.refcount
 
     async def gen_sentence(self, char_limit=None):
-        if self.refcount <= 2:
-            # max value refcount can be is 3
+        if self.refcount <= 4:
+            # max value refcount can be is 5
             self.refcount += 1
 
         res = None
