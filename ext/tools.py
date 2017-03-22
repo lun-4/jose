@@ -39,8 +39,8 @@ class JoseTools(jaux.Auxiliar):
         await self.is_admin(cxt.message.author.id)
 
         enviroment = {
-            'modules': self.jose.modules,
-            'jose': self.jose,
+            'modules': self.client.jose.modules,
+            'jose': self.client.jose,
             'cl': self.client,
             'msg': message,
             'author': cxt.author,
