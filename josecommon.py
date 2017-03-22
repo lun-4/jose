@@ -534,6 +534,12 @@ def from_redis(element):
         element = None
 
     try:
+        if element[0] == 's':
+            return element[1:]
+    except:
+        pass
+
+    try:
         element = int(element)
     except:
         pass

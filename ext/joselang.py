@@ -174,9 +174,10 @@ class JoseLanguage(jaux.Auxiliar):
             await cxt.say("Channel not found")
             return
 
+        _channel_id = 's%s' % channel_id
         self.logger.info("Set speak_channel to %r", channel_id)
 
-        done = await jcommon.configdb_set(message.server.id, 'speak_channel', channel_id)
+        done = await jcommon.configdb_set(message.server.id, 'speak_channel', _channel_id)
         if done:
             await cxt.say("channel to gather messages is now <#%s>", (channel_id,))
         else:
