@@ -20,7 +20,7 @@ from pympler import tracker
 from random import SystemRandom
 random = SystemRandom()
 
-logging.basicConfig(level=logging.DEBUG, \
+logging.basicConfig(level=logging.INFO, \
     format='[%(levelname)7s] [%(name)s] %(message)s')
 
 start_time = time.time()

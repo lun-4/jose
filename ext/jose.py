@@ -271,7 +271,14 @@ class JoseBot(jaux.Auxiliar):
 
                 setattr(instance, method.replace('c_', ''), cmd)
             elif stw(method, 'e_'):
+
+                self.logger.info("Add %s handler", method)
                 setattr(instance, method.replace('e_', 'on_'), method)
+
+        methods2 = [method for method in dir(instance) \
+            if callable(getattr(instance, method))]
+
+        self.logger.info("methods debug %s: %r", name, methods2)
 
         self.client.add_cog(instance)
         return True
