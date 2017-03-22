@@ -620,3 +620,38 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
 
         await cxt.say("{} got pinched by {} for not wearing green!\n{}".format\
             (p1, message.author, 'http://theotakuspot.animeblogger.net/wp-content/uploads/2007/10/shana2-3.png'))
+
+    async def c_betterping(self, message, args, cxt):
+        res = []
+        delta_cmd_process = (time.time() - cxt.t_creation) * 1000
+        res.append("`cmd_process`: **%.2fms**" % delta_cmd_process)
+
+        ping_st = time.monotonic()
+        await cxt.send_typing()
+        ping_st_end = time.monotonic()
+        delta_st = (ping_st_end - ping_st) * 1000
+        res.append("`send_typing`: **%.2fms**" % delta_st)
+
+        ping_sm = time.monotonic()
+        pong = await cxt.send("pong")
+        ping_sm_end = time.monotonic()
+        delta_sm = (ping_sm_end - ping_sm) * 1000
+        res.append("`send_message`: **%.2fms**" % delta_sm)
+
+        await asyncio.sleep(0.3)
+
+        ping_em = time.monotonic()
+        await self.client.edit_message(pong, "pong 2")
+        ping_em_end = time.monotonic()
+        delta_em = (ping_em_end - ping_em) * 1000
+        res.append("`edit_message`: **%.2fms**" % delta_em)
+
+        await asyncio.sleep(0.3)
+
+        ping_dm = time.monotonic()
+        await self.client.delete_message(pong)
+        ping_dm_end = time.monotonic()
+        delta_dm = (ping_dm_end - ping_dm) * 1000
+        res.append("`delete_message`: **%.2fms**" % delta_dm)
+
+        await cxt.say('\n'.join(res))
