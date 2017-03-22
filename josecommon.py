@@ -715,8 +715,9 @@ class Context:
 
         self.message = message
         self.server = message.server
-        self.me = message.server.me
         self.channel = message.channel
+        self.author = message.author
+        self.me = message.server.me
 
         self.client = _client
         self.t_creation = t_creation
