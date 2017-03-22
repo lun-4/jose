@@ -117,4 +117,4 @@ class Auxiliar(jcommon.Extension):
         if data[0:2] == '<#':
             return data[2:-1]
 
-        raise je.CommonError("Error parsing channel")
+        raise je.CommonError("Error parsing %r as a channel" % (string))

@@ -12,6 +12,7 @@ José Configuration:
  * `language`, string representing the server's language, use `j!language`
  * `j!jsprob`, sets probability for JoséSpeak
  * `j!fwprob`, sets JoséSpeak's probability of sending fullwidth text
+ * `j!schannel`, setup JoséSpeak's speak channel, the channel where josé will get all his messages from
 """
 
 class JoseLanguage(jaux.Auxiliar):
