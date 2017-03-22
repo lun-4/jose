@@ -156,6 +156,8 @@ class JoseSpeak(jcommon.Extension):
             filtered = jcommon.speak_filter(message.content)
             messages.append(filtered)
 
+        del server, logs, botblock
+
         return messages
 
     async def server_messages_string(self, serverid, limit=None):
@@ -371,14 +373,6 @@ class JoseSpeak(jcommon.Extension):
     async def c_falar(self, message, args, cxt):
         """`j!falar` - josé fala"""
         await self.speak(self.cult_generator, cxt)
-
-    async def c_sfalar(self, message, args, cxt):
-        """`j!sfalar` - falar usando textos do seu servidor atual"""
-        # ensure Texter exists
-        if message.server.id not in self.text_generators:
-            await self.new_generator(message.server.id, MESSAGE_LIMIT)
-
-        await self.speak(self.text_generators[message.server.id], cxt)
 
     async def c_gfalar(self, message, args, cxt):
         """`j!gfalar` - falar usando o texto global"""

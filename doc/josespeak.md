@@ -7,7 +7,7 @@ In José, `josespeak` is the module responsible for Text Generation, or, more ge
 
 José needs source text so he can make its sentences, currently José gets 3000 messages from the server's default channel(usually #general).
 
-In technical terms, `josespeak` has its `on_message` event, that only calculates the probability of receiving an answer from José(default is 1%), when needed, a text generator is born, `Texter`. The `Texter` is *usually* filled with 3000 messages from the server's default channel, the messages go through a filter and messages from José are ignored.
+In technical terms, `josespeak` has its `on_message` event, that only calculates the probability of receiving an answer from José(default is 1%), when needed, a text generator is born, `Texter`. The `Texter` is *usually* filled with 3000 messages from the server's default channel, the messages go through a filter and messages from José are ignored. Botblock rules still apply.
 
 (removed actions: Message storage to SQL, wordlength calculation)
 
