@@ -4,6 +4,7 @@ import time
 from random import SystemRandom
 random = SystemRandom()
 
+import collections
 import sys
 import subprocess
 import importlib
@@ -41,6 +42,15 @@ class JoseBot(jaux.Auxiliar):
         self.dev_mode = False
         self.sw_mode = False
         self.made_gshutdown = False
+
+        # for josextra
+        self.socket_stats = collections.Counter()
+        self.msgcount_min = 0
+        self.msgcount_hour = 0
+        self.total_msg = 0
+
+        self.best_msg_minute = 0
+        self.best_msg_hour = 0
 
         self.jsondb('blocks', path='db/blocks.json', default=DEFAULT_BLOCKS_JSON)
         self.ev_empty()

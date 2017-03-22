@@ -9,7 +9,6 @@ import re
 import psutil
 import os
 import hashlib
-import collections
 import time
 import datetime
 import asyncio
@@ -64,15 +63,18 @@ class joseXtra(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
         self.docs = docsdict
-        self.sock_start = time.time()
-        self.socket_stats = collections.Counter()
+        jose = self.client.jose
 
-        self.msgcount_min = 0
-        self.msgcount_hour = 0
-        self.total_msg = 0
+        # persist data across reloads
+        self.sock_start = jose.start_time
+        self.socket_stats = jose.socket_stats
 
-        self.best_msg_minute = 0
-        self.best_msg_hour = 0
+        self.msgcount_min = jose.msgcount_min
+        self.msgcount_hour = jose.msgcount_hour
+        self.total_msg = jose.total_msg
+
+        self.best_msg_minute = jose.best_msg_minute
+        self.best_msg_hour = jose.best_msg_hour
 
         # every minute, show josé's usage
         self.cbk_new("jxtra.msgcount", self.msg_count_minute, 60)
