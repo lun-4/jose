@@ -35,6 +35,9 @@ class Auxiliar(jcommon.Extension):
             return 'tbank#%s' % str(cxt)
 
     def ensure_tbank(self, tbank_id):
+        if isinstance(tbank_id, jcommon.Context):
+            tbank_id = self.tbank_fmt(tbank_id)
+
         if tbank_id not in self.jcoin.data:
             # type 1 account = taxbank
             self.jcoin.data[tbank_id] = self.jcoin.empty_acc(tbank_id, \
