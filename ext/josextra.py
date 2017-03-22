@@ -4,7 +4,6 @@ import discord
 import aiohttp
 import urllib.parse
 import urllib.request
-import subprocess
 import re
 import psutil
 import os
