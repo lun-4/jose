@@ -698,6 +698,10 @@ class Context:
             t_creation = time.time()
 
         self.message = message
+        self.server = message.server
+        self.me = message.server.me
+        self.channel = message.channel
+
         self.client = _client
         self.t_creation = t_creation
         self.jose = jose
