@@ -139,6 +139,10 @@ class JoseSpeak(jcommon.Extension):
         else:
             channel = server.get_channel(channel_id)
 
+        if channel is None:
+            self.logger.warning("channel %r is None", channel_id)
+            return 'None'
+
         logs = self.client.logs_from(channel, limit)
         botblock = await jcommon.configdb_get(serverid, 'botblock')
 
