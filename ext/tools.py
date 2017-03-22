@@ -32,7 +32,7 @@ class JoseTools(jaux.Auxiliar):
 
         return content.strip('` \n')
 
-    def debug_err(out_data, traceback_err):
+    def debug_err(self, out_data, traceback_err):
         return self.codeblock('py', f'err: {traceback_err}\noutput: {out_data}')
 
     async def c_debug(self, message, args, cxt):
@@ -53,6 +53,7 @@ class JoseTools(jaux.Auxiliar):
         enviroment.update(globals())
 
         debug_input = self.rm_codeblocks(' '.join(args[1:]))
+        debug_input = textwrap.indent(debug_input, '  ')
         code = f'async def debug():\n{debug_input}'
 
         try:
