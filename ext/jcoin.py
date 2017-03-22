@@ -74,9 +74,7 @@ class JoseCoin(jaux.Auxiliar):
         res = self.jcoin.save('jcoin/josecoin.db')
         if not res[0]:
             self.logger.error("jcerr: %r", res)
-            if message is not None:
-                await self.client.send_message(message.channel, \
-                    "jcerr: `%r`" % res)
+
         return res
 
     async def josecoin_load(self, message, dbg_flag=True):
@@ -452,9 +450,6 @@ class JoseCoin(jaux.Auxiliar):
 
     async def do_arrest(self, thief_id, amount, arrest_type=0, tbank_id=None):
         self.stealdb['cdown'][thief_id] = (time.time() + ARREST_TIME, arrest_type)
-        if tbank_id is None:
-            tbank_id = self.jcoin.jose_id
-
         if arrest_type == 0:
             # pay half the amount
             fine = amount / decimal.Decimal(2)
@@ -481,7 +476,7 @@ class JoseCoin(jaux.Auxiliar):
     async def c_steal(self, message, args, cxt):
         '''`j!steal @target amount` - Steal JoséCoins from someone'''
         self.sane_jcoin(cxt)
-        tbank_id = self.tbank_fmt(cxt.message.server.id)
+        tbank_id = self.tbank_fmt(cxt)
 
         if len(args) < 2:
             await cxt.say(self.c_steal.__doc__)
