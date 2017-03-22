@@ -138,16 +138,24 @@ class JoseSpeak(jcommon.Extension):
         except Exception as e:
             return False, repr(e)
 
-    async def server_messages(self, serverid, limit=None):
-        cur = await self.dbapi.do('SELECT message FROM markovdb WHERE serverid=?', (serverid,))
+    async def server_messages(self, serverid, limit=MESSAGE_LIMIT):
+        server = self.client.get_server(serverid)
+        logs = self.client.logs_from(server.default_channel, limit=msglimit)
+        botblock = await jcommon.configdb_get(message.server.id, 'botblock')
 
-        # don't trust nobody, not even yourself.
-        rows = [str(row[0]) for row in cur.fetchall()]
-        if limit is not None:
-            pos = len(rows) - limit
-            rows = rows[pos:]
+        messages = []
+        async for message in logs:
+            author = message.author
+            if author.id == jcommon.JOSE_ID:
+                continue
 
-        return rows
+            if author.bot and botblock:
+                continue
+
+            filtered = jcommon.speak_filter(message.content)
+            messages.append(filtered)
+
+        return messages
 
     async def server_messages_string(self, serverid, limit=None):
         r = await self.server_messages(serverid, limit)
@@ -301,21 +309,6 @@ class JoseSpeak(jcommon.Extension):
         await cxt.say(self.codeblock("", res))
 
     async def e_on_message(self, message, cxt):
-
-        # filter message before adding
-        filtered_msg = jcommon.speak_filter(message.content)
-        sid = message.server.id
-
-        for line in filtered_msg.split('\n'):
-            # append every line to the database
-            # filter lines before adding
-            filtered_line = jcommon.speak_filter(line)
-            if len(filtered_line) > 0:
-                # no issues, add it
-                await self.dbapi.do("INSERT INTO markovdb (serverid, message) \
-                    VALUES (?, ?)", (sid, filtered_line))
-
-
         probability = await jcommon.configdb_get(sid, 'speak_prob')
         if probability is None:
             self.logger.error("[WTF] probability = None for server %s", sid)
