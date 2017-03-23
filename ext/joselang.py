@@ -13,6 +13,7 @@ José Configuration:
  * `j!jsprob`, sets probability for JoséSpeak
  * `j!fwprob`, sets JoséSpeak's probability of sending fullwidth text
  * `j!schannel`, setup JoséSpeak's speak channel, the channel where josé will get all his messages from
+ * `j!imgchannel`, setup JoséImage's image channel, image-related commands will only work in that channel.
 """
 
 class JoseLanguage(jaux.Auxiliar):
