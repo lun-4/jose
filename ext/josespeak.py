@@ -419,7 +419,7 @@ class JoseSpeak(jcommon.Extension):
             if word == '---':
                 res.append(await self.server_sentence(serverid, 12))
             else:
-                res.append(word)
+                res.append(jcommon.speak_filter(word))
 
         self.logger.info("madlibs: %s => %s", res, ' '.join(res))
 
