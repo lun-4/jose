@@ -158,7 +158,7 @@ class Polls(jaux.Auxiliar):
                 return
 
             try:
-                option = int(op-1)
+                option = int(op) - 1
             except:
                 await cxt.say("Your option is not a number")
                 return
