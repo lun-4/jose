@@ -196,7 +196,7 @@ class JoseLanguage(jaux.Auxiliar):
             return
 
         self.logger.info("Set imgchannel in %r to %r", message.server.name, channel_id)
-        done = await jcommon.configdb_set(message.server.id, 'nsfw_channel', channel_id)
+        done = await jcommon.configdb_set(message.server.id, 'imgchannel', channel_id)
         if done:
             await cxt.say("image channel is now <#%s>", (channel_id,))
         else:
