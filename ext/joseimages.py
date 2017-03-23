@@ -141,6 +141,8 @@ class JoseImages(jaux.Auxiliar):
     async def img_routine(self, cxt):
         channel_id = await jcommon.configdb_get(cxt.message.server.id, 'imgchannel')
 
+        self.logger.info("[img_routine] imgchannel: %r", channel_id)
+
         if channel_id is None:
             raise je.CommonError("No channel is set for image commands, use `j!imgchannel`.")
 
