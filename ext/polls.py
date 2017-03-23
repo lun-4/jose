@@ -2,11 +2,9 @@
 
 import time
 import uuid
-import collections
 import sys
 sys.path.append("..")
 import jauxiliar as jaux
-import joseerror as je
 
 POLLID_MAX_TRIES = 10
 POLL_ACTIONS = ['close', 'results']
@@ -65,9 +63,10 @@ class Polls(jaux.Auxiliar):
 
         # create the poll
         self.polls[poll_id] = {
-            'timestamp': time.time()
+            'timestamp': time.time(),
             'closed': False,
             'owner': str(message.author.id),
+            'title': title,
             'options': options,
             'votes': {},
         }
@@ -115,7 +114,7 @@ class Polls(jaux.Auxiliar):
 
             scounts = sorted(counts, key=lambda key: counts[key])
             res = ['%d. %s - %d votes' % (index, poll['options'][option], counts[option]) \
-                for option in scounts]
+                for (index, option) in enumerate(scounts)]
 
             await cxt.say(self.codeblock('', '\n'.join(res)))
 
