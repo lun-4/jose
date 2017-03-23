@@ -138,6 +138,14 @@ class JoseImages(jaux.Auxiliar):
         return
 
     async def img_routine(self, cxt):
+        channel_id = await jcommon.configdb_get(cxt.message.server.id, 'imgchannel')
+
+        if channel_id is None:
+            raise je.CommonError("No channel is set for image commands, use `j!imgchannel`.")
+
+        if cxt.message.channel.id != channel_id:
+            raise je.CommonError("You aren't in a image channel")
+
         res = await self.jcoin_pricing(cxt, jcommon.IMG_PRICE)
         return res
 
