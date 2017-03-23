@@ -163,6 +163,9 @@ class Polls(jaux.Auxiliar):
                 await cxt.say("Your option is not a number")
                 return
 
+            if option < 1:
+                await cxt.say("not allowed :^)")
+
             if author_id in poll['votes']:
                 await cxt.say("You already voted in this poll")
                 return
@@ -174,7 +177,7 @@ class Polls(jaux.Auxiliar):
                 return
 
             poll['votes'][author_id] = option
-            await cxt.say("<@%s> voted on option %d, %s", \
+            await cxt.say("<@%s> voted on option `%d - %r`", \
                 (author_id, option, option_str))
 
             self.jsondb_save('polls')
