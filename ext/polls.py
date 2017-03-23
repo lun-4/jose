@@ -104,7 +104,7 @@ class Polls(jaux.Auxiliar):
         author_id = str(message.author.id)
         poll = self.polls[poll_id]
         if action == 'close':
-            admin = await self.b_isowner(message.author.id)
+            admin = await self.b_isowner(cxt)
             poll_owner = author_id == poll['owner']
             if not (poll_owner or admin):
                 await cxt.say(':lock: Unauthorized :lock:')
