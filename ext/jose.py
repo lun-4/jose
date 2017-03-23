@@ -10,7 +10,6 @@ import subprocess
 import importlib
 import copy
 import gc
-import asyncio
 
 sys.path.append("..")
 import jauxiliar as jaux

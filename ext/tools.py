@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import discord
+import asyncio
 import io
 import traceback
 import contextlib
@@ -42,15 +43,19 @@ class JoseTools(jaux.Auxiliar):
         enviroment = {
             'modules': self.client.jose.modules,
             'jose': self.client.jose,
-            'cl': self.client,
-            'msg': message,
-            'message': message,
+            'client': self.client,
+
             'cxt': cxt,
+            'message': cxt.message,
             'author': cxt.author,
             'server': cxt.server,
             'channel': cxt.channel,
             'me': cxt.me,
-            'res': self._last_res,
+            '_': self._last_res,
+
+            # libraries
+            'asyncio': asyncio,
+            'discord': discord,
         }
 
         enviroment.update(globals())

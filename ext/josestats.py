@@ -3,6 +3,7 @@
 import sys
 import os
 import operator
+import time
 
 sys.path.append("..")
 import jauxiliar as jaux
