@@ -161,7 +161,7 @@ class JoseLanguage(jaux.Auxiliar):
             await cxt.say("`josespeak.fw` probability is now %.2f%%", (fw_prob,))
 
     async def c_schannel(self, message, args, cxt):
-        '''`j!schannel channel` - sets the channel for `josespeak` to gather source text'''
+        '''`j!schannel #channel` - sets the channel for `josespeak` to gather source text'''
 
         try:
             channel_id = self.parse_channel(args[1])
@@ -180,3 +180,24 @@ class JoseLanguage(jaux.Auxiliar):
             await cxt.say("channel to gather messages is now <#%s>", (channel_id,))
         else:
             await cxt.say("Error changing `speak_channel`.")
+
+    async def c_nsfwchannel(self, message, args, cxt):
+        '''`j!nsfwchannel #channel` - sets the channel for `joseimages` to work on'''
+
+        try:
+            channel_id = self.parse_channel(args[1])
+        except:
+            await cxt.say("Error parsing `channel`")
+            return
+
+        channel = message.server.get_channel(channel_id)
+        if channel is None:
+            await cxt.say("Channel not found")
+            return
+
+        self.logger.info("Set nsfw_channel in %r to %r", message.server.name, channel_id)
+        done = await jcommon.configdb_set(message.server.id, 'nsfw_channel', channel_id)
+        if done:
+            await cxt.say("NSFW channel is now <#%s>", (channel_id,))
+        else:
+            await cxt.say("Error changing `nsfw_channel`.")

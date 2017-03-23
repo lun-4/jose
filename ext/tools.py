@@ -44,6 +44,8 @@ class JoseTools(jaux.Auxiliar):
             'jose': self.client.jose,
             'cl': self.client,
             'msg': message,
+            'message': message,
+            'cxt': cxt,
             'author': cxt.author,
             'server': cxt.server,
             'channel': cxt.channel,
