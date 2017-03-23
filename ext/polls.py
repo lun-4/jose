@@ -29,9 +29,9 @@ class Polls(jaux.Auxiliar):
         # parse shit
         try:
             s = ' '.join(args[1:])
-            s.split(';')
-            title = s[0]
-            options = s[1:]
+            sp = s.split(';')
+            title = sp[0]
+            options = sp[1:]
         except:
             await cxt.say("Error parsing your shit!!!!!")
             return
