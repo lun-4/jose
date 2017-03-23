@@ -116,10 +116,10 @@ class Polls(jaux.Auxiliar):
 
             counts = {}
             for userid in votes:
-                vote = votes['userid']
-
+                vote = votes[userid]
                 if vote not in counts:
                     counts[vote] = 0
+
                 counts[vote] += 1
 
             scounts = sorted(counts, key=lambda key: counts[key])
