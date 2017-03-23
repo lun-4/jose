@@ -18,9 +18,15 @@ logger.addHandler(jcommon.handler)
 logger.addHandler(jcommon.log_channel_handler)
 
 data = {}
+lock = False
 jose_id = jcommon.JOSE_ID
 
 LEDGER_PATH = 'jcoin/josecoin-5.journal'
+
+def lockdb():
+    '''Locks JoséCoin database, no transactions can be done'''
+    global lock
+    lock = True
 
 def ledger_data(fpath, data):
     with open(fpath, 'a') as f:
@@ -63,6 +69,9 @@ def empty_acc(name, amnt, acctype=0):
         }
 
 def new_acc(id_acc, name, init_amnt=None, acctype=0):
+    if lock:
+        return False, 'database is locked'
+
     if init_amnt is None and acctype == 0:
         init_amnt = decimal.Decimal('3')
 
@@ -73,6 +82,9 @@ def new_acc(id_acc, name, init_amnt=None, acctype=0):
     return True, 'account made with success'
 
 def get(id_acc):
+    if lock:
+        return False, 'database is locked'
+
     if id_acc not in data:
         return False, 'account doesn\'t exist'
     return True, data[id_acc]
@@ -85,6 +97,9 @@ def gen():
 def transfer(id_from, id_to, amnt, file_name=None):
     if file_name is None:
         file_name = LEDGER_PATH
+
+    if lock:
+        return False, 'database is locked'
 
     amnt = decimal.Decimal(str(amnt))
 

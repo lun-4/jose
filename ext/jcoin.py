@@ -133,7 +133,11 @@ class JoseCoin(jaux.Auxiliar):
     async def e_any_message(self, message, cxt):
         self.counter += 1
         if self.counter >= 20:
-            await self.josecoin_save(message, False)
+            res = await self.josecoin_save(message, False)
+            if not res:
+                self.logger.error("[jcoin:autosave] ERROR SAVING DB: %s", res[1])
+                self.jcoin.lockdb()
+
             self.counter = 0
 
     async def e_on_message(self, message, cxt):
