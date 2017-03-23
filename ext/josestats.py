@@ -43,6 +43,7 @@ class JoseStats(jaux.Auxiliar):
 
         # every 2 minutes, save databases
         self.cbk_new('jstats.savedb', self.savedb, 180)
+        self.cbk_new('jstats.timestamped', self.stats_timestamp, 600)
 
     async def savedb(self):
         try:
@@ -55,6 +56,8 @@ class JoseStats(jaux.Auxiliar):
         try:
             self.jsondb('statistics', path=jcommon.STAT_DATABASE_PATH, \
                 default=DEFAULT_STATS_FILE)
+
+            self.jsondb('timed_stats', path='db/timed_stats.json')
 
             # make sure i'm making sane things
             # also make the checks in ext_load (instead of any_message)
@@ -98,9 +101,44 @@ class JoseStats(jaux.Auxiliar):
         await self.savedb()
         await cxt.say(":floppy_disk: saved query database :floppy_disk:")
 
+    async def stats_timestamp(self):
+        timestamp = time.time()
+
+        g_cmd = self.statistics['gl_commands']
+        sorted_gcmd = sorted(g_cmd.items(), \
+            key=operator.itemgetter(1), reverse=True)
+
+        t1 = time.monotonic()
+        logging_ch = self.client.get_channel(jcommon.JOSE_LOG_CHANNEL_ID)
+        if logging_ch is not None:
+            await self.client.send_typing(logging_ch)
+
+        t2 = time.monotonic()
+
+        if logging_ch is not None:
+            typing_ping = t2 - t1
+        else:
+            # make errors very obvious to the graph
+            typing_ping = -1
+
+        self.timed_stats[timestamp] = [
+            # num of messages received
+            self.statistics['gl_messages'],
+
+            # total commands done
+            sum(self.statistics['gl_commands'].values()),
+
+            # top10 most used commands
+            sorted_gcmd[:10],
+
+            # ping to send a typing status
+            typing_ping,
+        ]
+
+        self.jsondb_save('timed_stats')
+
     async def e_any_message(self, message, cxt):
         if message.server is None:
-            # I'm at a DM, how i'm supposed to make account of that
             return
 
         serverid = message.server.id
