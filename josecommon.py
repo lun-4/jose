@@ -388,8 +388,11 @@ class Extension:
     async def b_isowner(self, cxt):
         return cxt.message.author.id in ADMIN_IDS
 
+    def _mkdown(self, string):
+        return string.replace('`', '\\`')
+
     def codeblock(self, lang, string):
-        return "```%s\n%s```" % (lang, string)
+        return "```%s\n%s```" % (lang, self._mkdown(string))
 
     def noasync(self, func, args):
         return asyncio.ensure_future(func(*args), loop=self.loop)
