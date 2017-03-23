@@ -48,7 +48,15 @@ class Polls(jaux.Auxiliar):
         # parse shit
         try:
             s = ' '.join(args[1:])
+            if len(s.strip()) < 0:
+                await cxt.say("error parsing your shit")
+                return
+
             sp = s.split(';')
+            if len(sp) < 2:
+                await cxt.say("error parsing your shit")
+                return
+
             title = sp[0]
             options = sp[1:]
         except:
@@ -60,6 +68,8 @@ class Polls(jaux.Auxiliar):
             self.logger.warning("[polls] CAN'T GENERATE MORE POLL IDS")
             await cxt.say(":warning: o shit, poll generation is flooded, `j!helpme` :warning:")
             return
+
+        self.logger.info("[polls:%s] Created poll %r", poll_id, title)
 
         # create the poll
         self.polls[poll_id] = {
