@@ -225,9 +225,13 @@ class joseXtra(jaux.Auxiliar):
 
         # get memory usage
         process = psutil.Process(os.getpid())
-        mem_bytes = process.memory_info().rss
+
+        mem_bytes = process.memory_full_info().rss
         mem_mb = mem_bytes / 1024 / 1024
+        cpu_usage = process.cpu_percent() / psutil.cpu_count()
+
         res.append("Memory Usage: %.2f MB" % mem_mb)
+        res.append("CPU: %.2f" % cpu_usage)
 
         # get num of servers
         res.append("Guilds: %d" % len(self.client.servers))
