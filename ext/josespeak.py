@@ -134,10 +134,11 @@ class JoseSpeak(jcommon.Extension):
         server = self.client.get_server(serverid)
         channel_id = await jcommon.configdb_get(serverid, 'speak_channel')
         channel = None
-        if len(channel_id) < 1:
+        try:
+            if len(channel_id) > 0:
+                channel = server.get_channel(channel_id)
+        except:
             channel = server.default_channel
-        else:
-            channel = server.get_channel(channel_id)
 
         if channel is None:
             self.logger.warning("channel %r is None", channel_id)
