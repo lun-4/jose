@@ -137,6 +137,8 @@ class JoseSpeak(jcommon.Extension):
         try:
             if len(channel_id) > 0:
                 channel = server.get_channel(channel_id)
+            else:
+                channel = server.default_channel
         except:
             channel = server.default_channel
 
