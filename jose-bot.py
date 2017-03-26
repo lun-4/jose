@@ -30,15 +30,13 @@ jcommon.set_client(bot) # to jcommon
 # initialize jose instance
 jose = jose_bot.JoseBot(bot)
 env = jose.env
+loop = asyncio.get_event_loop()
 
 counter = 0
 
 def load_module(n, n_cl):
     t_start = time.time()
-
-    loop = asyncio.get_event_loop()
     loop.run_until_complete(jose.load_ext(n, n_cl, None))
-
     time_taken_ms = (time.time() - t_start) * 1000
     jcommon.logger.info("%s took %.3fms to load", n, time_taken_ms)
 
