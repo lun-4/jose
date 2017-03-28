@@ -135,6 +135,10 @@ class Stars(jaux.Auxiliar):
         except discord.NotFound:
             pass
 
+        if stars < 1 and star_msg is not None:
+            await self.client.delete_message(star_msg)
+            return True
+
         m_embed = self.make_embed(message)
         m_str = self.star_str(star, message)
 
