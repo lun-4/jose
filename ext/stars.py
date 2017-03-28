@@ -190,7 +190,7 @@ class Stars(jaux.Auxiliar):
         except IndexError:
             return False
 
-        if message.channel.id == starboard['channel_id']:
+        if message.channel.id == starboard['starboard_id']:
             return False
 
         stars = starboard['stars']
@@ -231,7 +231,7 @@ class Stars(jaux.Auxiliar):
         except IndexError:
             return False
 
-        if message.channel.id == starboard['channel_id']:
+        if message.channel.id == starboard['starboard_id']:
             return False
 
         star = starboard['stars'].get(message_id)
