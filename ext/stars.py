@@ -24,7 +24,7 @@ def _data(message, user):
 class Stars(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
-        self.star_lock = False
+        self.star_global_lock = False
         self.cbk_new('stars.cleaner', self.stars_cleaner, 1200)
 
     async def ext_load(self):
@@ -49,28 +49,29 @@ class Stars(jaux.Auxiliar):
             c_stars = copy.copy(stars)
             for message_id in c_stars:
                 star = stars[message_id]
-                if len(star['starrers']) < 1:
-                    guild = client.get_server(guild_id)
-                    if guild is None:
-                        self.logger.info("autoremoving server %s", guild_id)
-                        del self.stars[guild_id]
-                        return
+                if len(star['starrers']) > 1:
+                    continue
 
-                    channel = guild.get_channel(star['channel_id'])
-                    if channel is None:
-                        continue
+                guild = client.get_server(guild_id)
+                if guild is None:
+                    self.logger.info("autoremoving server %s", guild_id)
+                    del self.stars[guild_id]
+                    return
 
-                    try:
-                        message = await self.client.get_message(channel, message_id)
-                    except discord.NotFound:
-                        del stars[message_id]
-                        continue
+                channel = guild.get_channel(star['channel_id'])
+                if channel is None:
+                    continue
+                try:
+                    message = await self.client.get_message(channel, message_id)
+                except discord.NotFound:
+                    del stars[message_id]
+                    continue
 
-                    await self.remove_all({
-                        'server_id': guild_id,
-                        'channel_id': star['channel_id'],
-                        'message_id': message_id
-                    })
+                await self.remove_all({
+                    'server_id': guild_id,
+                    'channel_id': star['channel_id'],
+                    'message_id': message_id
+                })
 
     async def init_starboard(self, server_id, channel_id):
         server_id = str(server_id)
@@ -180,7 +181,7 @@ class Stars(jaux.Auxiliar):
         return True
 
     async def add_star(self, message, user):
-        if self.star_lock:
+        if self.star_global_lock:
             return False
 
         server_id, channel_id, message_id, user_id = _data(message, user)
@@ -222,7 +223,7 @@ class Stars(jaux.Auxiliar):
         return True
 
     async def remove_star(self, message, user):
-        if self.star_lock:
+        if self.star_global_lock:
             return False
 
         server_id, channel_id, message_id, user_id = _data(message, user)
@@ -337,7 +338,11 @@ class Stars(jaux.Auxiliar):
             await cxt.say("Forbidden to create channels.")
             return
 
-        await self.init_starboard(message.server.id, starboard.id)
+        res = await self.init_starboard(message.server.id, starboard.id)
+        if res:
+            await cxt.say(":ok_hand: Starboard initialized :ok_hand:")
+        else:
+            await cxt.say(":sob: Starboard initialization failed :sob:")
 
     async def c_star(self, message, args, cxt):
         try:
@@ -362,5 +367,14 @@ class Stars(jaux.Auxiliar):
                 await cxt.say(":star: :ok_hand:")
 
     async def c_starlock(self, message, args, cxt):
-        self.star_lock = not self.star_lock
-        await cxt.say("`star_lock` set to %r" % self.star_lock)
+        await self.is_admin(message.author.id)
+
+        try:
+            operation = args[1]
+        except:
+            await cxt.say("Error parsing `operation`")
+            return
+
+        if operation == 'global'
+            self.star_global_lock = not self.star_global_lock
+            await cxt.say("`star_global_lock` set to %r" % self.star_global_lock)
