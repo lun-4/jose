@@ -20,6 +20,7 @@ def _data(message, user):
 class JoseExtension(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
+        self.star_lock = False
         self.cbk_new('stars.cleaner', self.stars_cleaner, 1200)
 
     async def ext_load(self):
@@ -64,6 +65,9 @@ class JoseExtension(jaux.Auxiliar):
         pass
 
     async def add_star(self, message, user):
+        if self.star_lock:
+            return False
+
         server_id, channel_id, message_id, user_id = _data(message, user)
 
         try:
@@ -86,17 +90,52 @@ class JoseExtension(jaux.Auxiliar):
         return True
 
     async def remove_star(self, message, user):
-        server_id, channel_id, message_id, user_id = _data(message, user)
+        if self.star_lock:
+            return False
 
+        server_id, channel_id, message_id, user_id = _data(message, user)
+        try:
+            starboard = self.stars[server_id]
+        except IndexError:
+            return False
+
+        stars = starboard['stars']
+        star = starboard['stars'].get(message_id)
+        star['starrers'].remove(user_id)
+
+        await self.update_star(server_id, channel_id, message_id)
+        return True
 
     async def remove_all(self, message):
         server_id = data['server']
         channel_id = data['channel']
         message_id = data['message']
         user_id = data['user']
-        starboard
+
+        try:
+            starboard = self.stars[server_id]
+        except IndexError:
+            return False
+
+        try:
+            await self.update_star(server_id, channel_id, message_id, delete=True)
+        except:
+            return False
+
+        try:
+            del starboard['stars'][message_id]
+        except IndexError:
+            return False
+
+        return True
 
     async def e_reaction_add(self, reaction, user):
+        if reaction.custom_emoji:
+            return
+
+        if reaction.emoji != '⭐':
+            return
+
         m = reaction.message
         await self.add_star({
             'server': m.server.id,
@@ -106,6 +145,12 @@ class JoseExtension(jaux.Auxiliar):
         })
 
     async def e_reaction_remove(self, reaction, user):
+        if reaction.custom_emoji:
+            return
+
+        if reaction.emoji != '⭐':
+            return
+
         m = reaction.message
         await self.remove_star({
             'server': m.server.id,
@@ -115,6 +160,13 @@ class JoseExtension(jaux.Auxiliar):
         })
 
     async def e_reaction_clear(self, message, reactions):
+        starboard = self.stars.get(str(message.server.id))
+        if starboard is None:
+            return
+
+        if str(message.id) not in starboard['stars']:
+            return
+
         await self.remove_all({
             'server': message.server.id,
             'channel': message.channel.id,
@@ -165,4 +217,12 @@ class JoseExtension(jaux.Auxiliar):
         except discrord.HTTPException:
             await cxt.say("Failed to retreive the message")
         else:
-            await self.add_star(message.id, message.author.id)
+            res = await self.add_star(message.id, message.author.id)
+            if not res:
+                await cxt.say("Error adding star to the message.")
+            else:
+                await cxt.say(":star: :ok_hand:")
+
+    async def c_starlock(self, message, args, cxt):
+        self.star_lock = not self.star_lock
+        await cxt.say("`star_lock` set to %r" % self.star_lock)
