@@ -17,7 +17,7 @@ def _data(message, user):
     user_id = str(user.id)
     return server_id, channel_id, message_id, user_id
 
-class JoseExtension(jaux.Auxiliar):
+class Stars(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
         self.star_lock = False
@@ -226,7 +226,7 @@ class JoseExtension(jaux.Auxiliar):
         await self.add_star({
             'server': m.server.id,
             'channel': m.channel.id,
-            'message' m.id,
+            'message': m.id,
             'user': user.id,
         })
 
