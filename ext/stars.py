@@ -227,12 +227,7 @@ class Stars(jaux.Auxiliar):
             return
 
         m = reaction.message
-        await self.add_star({
-            'server': m.server.id,
-            'channel': m.channel.id,
-            'message': m.id,
-            'user': user.id,
-        })
+        await self.add_star(m, user)
 
     async def e_reaction_remove(self, reaction, user):
         if reaction.custom_emoji:
@@ -242,12 +237,7 @@ class Stars(jaux.Auxiliar):
             return
 
         m = reaction.message
-        await self.remove_star({
-            'server': m.server.id,
-            'channel': m.channel.id,
-            'message': m.id,
-            'user': user.id,
-        })
+        await self.remove_star(m, user)
 
     async def e_reaction_clear(self, message, reactions):
         starboard = self.stars.get(str(message.server.id))
@@ -299,7 +289,7 @@ class Stars(jaux.Auxiliar):
             return
 
         try:
-            message = await self.client.get_message(message.channel, message_id)
+            to_star = await self.client.get_message(message.channel, message_id)
         except discord.NotFound:
             await cxt.say("Message not found in this channel.")
         except discord.Forbidden:
@@ -307,7 +297,7 @@ class Stars(jaux.Auxiliar):
         except discrord.HTTPException:
             await cxt.say("Failed to retreive the message")
         else:
-            res = await self.add_star(message.id, message.author.id)
+            res = await self.add_star(to_star, message.author)
             if not res:
                 await cxt.say("Error adding star to the message.")
             else:
