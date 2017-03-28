@@ -53,16 +53,93 @@ class JoseExtension(jaux.Auxiliar):
 
         # guild_id => starboard object
         self.stars[guild_id] = {
-            'channelid': channel_id,
+            'starboard_id': channel_id,
             # message_id => star object
             'stars': {},
         }
 
         self.jsondb_save('stars')
 
-    async def update_star(self, message_id):
-        # TODO: check different data and edit message accordingly
-        pass
+    def star_str(self, star, message):
+        return '%d stars, ID: %s' % (len(star['starrers']), message.id)
+
+    def make_embed(self, message):
+        content = message.content
+
+        em = discord.Embed(description=content, colour=discord.Colour(0xffff00))
+        em.timestamp = message.timestamp
+        em.set_author(message.author)
+
+        author = message.author
+        avatar = author.avatar_url or author.default_avatar_url
+        em.set_author(name=author.display_name, icon_url=avatar)
+
+        attch = message.attachments
+        if attch:
+            attch_url = attch[0]['url']
+            if attch_url.lower().endswith(('png', 'jpeg', 'jpg', 'gif')):
+                e.set_image(url=attch_url)
+            else:
+                attachments = '[Attachment](%s)' % attch_url
+                if content:
+                    em.description = message.content + '\n' + attachments
+                else:
+                    em.description = attachments
+
+        return em
+
+    async def update_star(self, server_id, channel_id, message_id, delete=False):
+        server = self.client.get_server(server_id)
+        if server is None:
+            self.logger.warning("Server %s not found", server_id)
+            raise Exception('server not found', server_id)
+
+        channel = server.get_channel(channel_id)
+        if channel is None:
+            self.logger.warning('channel %s not found', channel_id)
+            raise Exception('channel not found', server_id)
+
+        try:
+            message = await self.client.get_message(channel, message_id)
+        except discord.NotFound:
+            raise Exception('message not found')
+
+        try:
+            starboard = self.stars[server_id]
+        except:
+            raise Exception('starboard not found')
+
+        try:
+            star = starboard['stars'][message_id]
+        except:
+            raise Exception('star not found')
+
+        starboard_id = starboard['starboard_id']
+        starboard_channel = server.get_channel(starboard_id)
+        if starboard_channel is None:
+            del self.stars[server_id]
+            self.logger.info('Autoremoving %s[%s] from starboard', \
+                server.name, server_id)
+            raise Exception('Autoemoved %s from starboard')
+
+        stars = len(star['starrers'])
+        star_msg_id = star['star_message']
+
+        try:
+            star_msg = await self.client.get_message(starboard_channel, star_msg_id)
+        except discord.NotFound:
+            star_msg = None
+
+        m_embed = self.make_embed(message)
+        m_str = self.star_str(star, message)
+
+        if star_msg:
+            await client.edit_message(star_msg, m_str, embed=m_embed)
+        else:
+            star_msg = await client.send_message(starboard_channel, m_str, embed=m_embed)
+            star['star_message'] = str(star_msg.id)
+
+        self.jsondb_save('stars')
 
     async def add_star(self, message, user):
         if self.star_lock:
@@ -78,6 +155,7 @@ class JoseExtension(jaux.Auxiliar):
         stars = starboard['stars']
         star = starboard['stars'].get(message_id, {
             'channel_id': channel_id,
+            'star_message': None,
             'starrers': [],
         })
 
@@ -86,7 +164,11 @@ class JoseExtension(jaux.Auxiliar):
         except IndexError:
             star['starrers'].append(user_id)
 
-        await self.update_star(self, message_id)
+        try:
+            await self.update_star(server_id, channel_id, message_id)
+        except:
+            return False
+
         return True
 
     async def remove_star(self, message, user):
@@ -103,7 +185,11 @@ class JoseExtension(jaux.Auxiliar):
         star = starboard['stars'].get(message_id)
         star['starrers'].remove(user_id)
 
-        await self.update_star(server_id, channel_id, message_id)
+        try:
+            await self.update_star(server_id, channel_id, message_id)
+        except:
+            return False
+
         return True
 
     async def remove_all(self, message):
