@@ -139,9 +139,11 @@ class Stars(jaux.Auxiliar):
         m_str = self.star_str(star, message)
 
         if star_msg is not None:
-            await client.edit_message(star_msg, m_str, embed=m_embed)
+            await self.client.edit_message(star_msg, \
+                m_str, embed=m_embed)
         else:
-            star_msg = await client.send_message(starboard_channel, m_str, embed=m_embed)
+            star_msg = await self.client.send_message(starboard_channel, \
+                m_str, embed=m_embed)
             star['star_message'] = str(star_msg.id)
 
         self.jsondb_save('stars')
