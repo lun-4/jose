@@ -400,7 +400,7 @@ class Stars(jaux.Auxiliar):
             await cxt.say("Error parsing `operation`")
             return
 
-        if operation == 'global'
+        if operation == 'global':
             self.star_global_lock = not self.star_global_lock
             await cxt.say("`star_global_lock` set to %r" % self.star_global_lock)
         elif operation == 'local':
@@ -412,3 +412,5 @@ class Stars(jaux.Auxiliar):
             except ValueError:
                 self.stars['locks'].append(str(message.server.id))
                 await cxt.say(":lock: Locked starboard for %s[%s]", (message.server.name, server_id))
+        else:
+            await cxt.say("Operation not found")
