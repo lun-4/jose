@@ -52,7 +52,7 @@ class Stars(jaux.Auxiliar):
                 if len(star['starrers']) > 1:
                     continue
 
-                guild = client.get_server(guild_id)
+                guild = self.client.get_server(guild_id)
                 if guild is None:
                     self.logger.info("autoremoving server %s", guild_id)
                     del self.stars[guild_id]
@@ -184,7 +184,19 @@ class Stars(jaux.Auxiliar):
         if self.star_global_lock:
             return False
 
+        try:
+            self.stars['locks'].index(server_id)
+            return
+        except ValueError:
+            pass
+
         server_id, channel_id, message_id, user_id = _data(message, user)
+
+        try:
+            self.stars['locks'].index(server_id)
+            return
+        except ValueError:
+            pass
 
         try:
             starboard = self.stars[server_id]
@@ -227,6 +239,13 @@ class Stars(jaux.Auxiliar):
             return False
 
         server_id, channel_id, message_id, user_id = _data(message, user)
+
+        try:
+            self.stars['locks'].index(server_id)
+            return
+        except ValueError:
+            pass
+
         try:
             starboard = self.stars[server_id]
         except IndexError:
@@ -259,6 +278,12 @@ class Stars(jaux.Auxiliar):
 
     async def remove_all(self, message):
         server_id, channel_id, message_id = _data(message, None)
+
+        try:
+            self.stars['locks'].index(server_id)
+            return
+        except ValueError:
+            pass
 
         try:
             starboard = self.stars[server_id]
@@ -378,3 +403,12 @@ class Stars(jaux.Auxiliar):
         if operation == 'global'
             self.star_global_lock = not self.star_global_lock
             await cxt.say("`star_global_lock` set to %r" % self.star_global_lock)
+        elif operation == 'local':
+            server_id = str(message.server.id)
+            try:
+                self.stars['locks'].index(server_id)
+                self.stars['locks'].remove(server_id)
+                await cxt.say("Removed lock for %s[%s]", (message.server.name, server_id))
+            except ValueError:
+                self.stars['locks'].append(str(message.server.id))
+                await cxt.say(":lock: Locked starboard for %s[%s]", (message.server.name, server_id))
