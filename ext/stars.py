@@ -10,9 +10,17 @@ import joseerror as je
 perm_overwrite = discord.PermissionOverwrite
 channel_perms = discord.ChannelPermissions
 
+def _data(message, user):
+    server_id = str(message.server.id)
+    channel_id = str(message.channel.id)
+    message_id = str(message.id)
+    user_id = str(user.id)
+    return server_id, channel_id, message_id, user_id
+
 class JoseExtension(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
+        self.cbk_new('stars.cleaner', self.stars_cleaner, 1200)
 
     async def ext_load(self):
         try:
@@ -28,6 +36,16 @@ class JoseExtension(jaux.Auxiliar):
         except Exception as err:
             return False, repr(err)
 
+    async def stars_cleaner(self):
+        for guild_id in self.stars:
+            starboard = self.stars[guild_id]
+            stars = starboard['stars']
+
+            for message_id in stars:
+                star = stars[message_id]
+                if len(star['starrers']) < 1:
+                    await self.remove_all(star['message_id'])
+
     async def init_starboard(self, server_id, channel_id):
         server_id = str(server_id)
         channel_id = str(channel_id)
@@ -41,23 +59,67 @@ class JoseExtension(jaux.Auxiliar):
 
         self.jsondb_save('stars')
 
-    async def add_star(self, message_id, user_id):
+    async def update_star(self, message_id):
+        # TODO: check different data and edit message accordingly
         pass
 
-    async def remove_star(self, message_id, user_id):
-        pass
+    async def add_star(self, message, user):
+        server_id, channel_id, message_id, user_id = _data(message, user)
 
-    async def remove_all(self, message_id):
-        pass
+        try:
+            starboard = self.stars[server_id]
+        except IndexError:
+            return False
+
+        stars = starboard['stars']
+        star = starboard['stars'].get(message_id, {
+            'channel_id': channel_id,
+            'starrers': [],
+        })
+
+        try:
+            star['starrers'][user_id]
+        except IndexError:
+            star['starrers'].append(user_id)
+
+        await self.update_star(self, message_id)
+        return True
+
+    async def remove_star(self, message, user):
+        server_id, channel_id, message_id, user_id = _data(message, user)
+
+
+    async def remove_all(self, message):
+        server_id = data['server']
+        channel_id = data['channel']
+        message_id = data['message']
+        user_id = data['user']
+        starboard
 
     async def e_reaction_add(self, reaction, user):
-        await self.add_star(reaction.message.id, user.id)
+        m = reaction.message
+        await self.add_star({
+            'server': m.server.id,
+            'channel': m.channel.id,
+            'message' m.id,
+            'user': user.id,
+        })
 
     async def e_reaction_remove(self, reaction, user):
-        await self.remove_star(reaction.message.id, user.id)
+        m = reaction.message
+        await self.remove_star({
+            'server': m.server.id,
+            'channel': m.channel.id,
+            'message' m.id,
+            'user': user.id,
+        })
 
     async def e_reaction_clear(self, message, reactions):
-        await self.remove_all(message.id)
+        await self.remove_all({
+            'server': message.server.id,
+            'channel': message.channel.id,
+            'message': message.id,
+        })
 
     async def c_starboard(self, message, args, cxt):
         '''`j!starboard channel_name` - initialize Starboard'''
