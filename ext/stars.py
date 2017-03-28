@@ -72,7 +72,6 @@ class Stars(jaux.Auxiliar):
 
         em = discord.Embed(description=content, colour=discord.Colour(0xffff00))
         em.timestamp = message.timestamp
-        em.set_author(message.author)
 
         author = message.author
         avatar = author.avatar_url or author.default_avatar_url
