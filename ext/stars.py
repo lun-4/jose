@@ -52,13 +52,17 @@ class Stars(jaux.Auxiliar):
         channel_id = str(channel_id)
 
         # guild_id => starboard object
-        self.stars[guild_id] = {
+        if server_id in self.stars:
+            return False
+
+        self.stars[server_id] = {
             'starboard_id': channel_id,
             # message_id => star object
             'stars': {},
         }
 
         self.jsondb_save('stars')
+        return True
 
     def star_str(self, star, message):
         return '%d stars, ID: %s' % (len(star['starrers']), message.id)
