@@ -3,6 +3,7 @@
 import discord
 import asyncio
 import sys
+import copy
 sys.path.append("..")
 import jauxiliar as jaux
 import joseerror as je
@@ -11,6 +12,9 @@ perm_overwrite = discord.PermissionOverwrite
 channel_perms = discord.ChannelPermissions
 
 def _data(message, user):
+    if isinstance(message, dict) and user is None:
+        return message['server_id'], message['channel_id'], message['message_id']
+
     server_id = str(message.server.id)
     channel_id = str(message.channel.id)
     message_id = str(message.id)
@@ -42,10 +46,31 @@ class Stars(jaux.Auxiliar):
             starboard = self.stars[guild_id]
             stars = starboard['stars']
 
-            for message_id in stars:
+            c_stars = copy.copy(stars)
+            for message_id in c_stars:
                 star = stars[message_id]
                 if len(star['starrers']) < 1:
-                    await self.remove_all(star['message_id'])
+                    guild = client.get_server(guild_id)
+                    if guild is None:
+                        self.logger.info("autoremoving server %s", guild_id)
+                        del self.stars[guild_id]
+                        return
+
+                    channel = guild.get_channel(star['channel_id'])
+                    if channel is None:
+                        continue
+
+                    try:
+                        message = await self.client.get_message(channel, message_id)
+                    except discord.NotFound:
+                        del stars[message_id]
+                        continue
+
+                    await self.remove_all({
+                        'server_id': guild_id,
+                        'channel_id': star['channel_id'],
+                        'message_id': message_id
+                    })
 
     async def init_starboard(self, server_id, channel_id):
         server_id = str(server_id)
@@ -226,10 +251,7 @@ class Stars(jaux.Auxiliar):
         return True
 
     async def remove_all(self, message):
-        server_id = data['server']
-        channel_id = data['channel']
-        message_id = data['message']
-        user_id = data['user']
+        server_id, channel_id, message_id = _data(message, None)
 
         try:
             starboard = self.stars[server_id]
@@ -237,7 +259,8 @@ class Stars(jaux.Auxiliar):
             return False
 
         try:
-            done = await self.update_star(server_id, channel_id, message_id, delete=True)
+            done = await self.update_star(server_id, channel_id, \
+                message_id, delete=True)
         except:
             return False
 
@@ -280,11 +303,7 @@ class Stars(jaux.Auxiliar):
         if str(message.id) not in starboard['stars']:
             return
 
-        await self.remove_all({
-            'server': message.server.id,
-            'channel': message.channel.id,
-            'message': message.id,
-        })
+        await self.remove_all(message)
 
     async def c_starboard(self, message, args, cxt):
         '''`j!starboard channel_name` - initialize Starboard'''
