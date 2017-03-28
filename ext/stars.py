@@ -172,12 +172,12 @@ class Stars(jaux.Auxiliar):
         try:
             done = await self.update_star(server_id, channel_id, message_id)
         except:
-            logger.error('add_star(%s, %s[%s])', message.id, \
+            self.logger.error('add_star(%s, %s[%s])', message.id, \
                 user.name, user.id, exc_info=True)
             return False
 
         if not done:
-            logger.error('update_star sent False')
+            self.logger.error('update_star sent False')
             return False
 
         return True
@@ -202,12 +202,12 @@ class Stars(jaux.Auxiliar):
         try:
             done = await self.update_star(server_id, channel_id, message_id)
         except:
-            logger.error('remove_star(%s, %s[%s])', message.id, \
+            self.logger.error('remove_star(%s, %s[%s])', message.id, \
                 user.name, user.id, exc_info=True)
             return False
 
         if not done:
-            logger.error('update_star sent False')
+            self.logger.error('update_star sent False')
             return False
 
         return True
@@ -229,7 +229,7 @@ class Stars(jaux.Auxiliar):
             return False
 
         if not done:
-            logger.error('update_star sent False')
+            self.logger.error('update_star sent False')
             return False
 
         try:
