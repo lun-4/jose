@@ -187,12 +187,6 @@ class Stars(jaux.Auxiliar):
         if self.star_global_lock:
             return False
 
-        try:
-            self.stars['locks'].index(server_id)
-            return
-        except ValueError:
-            pass
-
         server_id, channel_id, message_id, user_id = _data(message, user)
 
         try:
