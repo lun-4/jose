@@ -115,7 +115,7 @@ class Stars(jaux.Auxiliar):
 
         try:
             star = starboard['stars'][message_id]
-        except IndexError:
+        except KeyError:
             raise Exception('star not found')
 
         starboard_id = starboard['starboard_id']
@@ -158,11 +158,14 @@ class Stars(jaux.Auxiliar):
             return False
 
         stars = starboard['stars']
-        star = starboard['stars'].get(message_id, {
-            'channel_id': channel_id,
-            'star_message': None,
-            'starrers': [],
-        })
+        if message_id not in stars:
+            starboard['stars'][message_id] = {
+                'channel_id': channel_id,
+                'star_message': None,
+                'starrers': [],
+            }
+
+        star = starboard['stars'][message_id]
 
         try:
             star['starrers'].index(user_id)
@@ -193,6 +196,8 @@ class Stars(jaux.Auxiliar):
             return False
 
         star = starboard['stars'].get(message_id)
+        if star is None:
+            return False
 
         try:
             star['starrers'].remove(user_id)
