@@ -30,6 +30,9 @@ class Stars(jaux.Auxiliar):
     async def ext_load(self):
         try:
             self.jsondb('stars', path='db/stars.json')
+            if 'locks' not in self.stars:
+                self.stars['locks'] = []
+
             return True, ''
         except Exception as err:
             return False, repr(err)
