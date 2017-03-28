@@ -356,6 +356,18 @@ async def on_socket_response(data):
     await do_event('socket_response', [data])
 
 @bot.event
+async def on_reaction_add(reaction, user):
+    await do_event('reaction_add', [reaction, user])
+
+@bot.event
+async def on_reaction_remove(reaction, user):
+    await do_event('reaction_remove', [reaction, user])
+
+@bot.event
+async def on_reaction_clear(message, reactions):
+    await do_event('reaction_clear', [message, reactions])
+
+@bot.event
 async def on_message_edit(before, after):
     await do_event('message_edit', [before, after])
 

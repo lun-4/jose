@@ -76,6 +76,10 @@ class JoseBot(jaux.Auxiliar):
             'member_ban': [],
             'member_unban': [],
             'message_edit': [],
+
+            'reaction_add': [],
+            'reaction_remove': [],
+            'reaction_clear': [],
         }
 
     def ev_load(self, dflag=False):
