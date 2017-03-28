@@ -285,7 +285,7 @@ class Stars(jaux.Auxiliar):
             await cxt.say("Forbidden to create channels.")
             return
 
-        await self.init_starboard(self, message.server.id, starboard.id)
+        await self.init_starboard(message.server.id, starboard.id)
 
     async def c_star(self, message, args, cxt):
         try:
