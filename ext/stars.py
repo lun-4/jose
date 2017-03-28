@@ -50,6 +50,10 @@ class Stars(jaux.Auxiliar):
 
     async def stars_cleaner(self):
         for guild_id in self.stars:
+            # skip locks
+            if guild_id == 'locks':
+                continue
+
             starboard = self.stars[guild_id]
             stars = starboard['stars']
 
