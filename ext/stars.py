@@ -226,7 +226,7 @@ class Stars(jaux.Auxiliar):
         await self.add_star({
             'server': m.server.id,
             'channel': m.channel.id,
-            'message': m.id,
+            'message' m.id,
             'user': user.id,
         })
 
