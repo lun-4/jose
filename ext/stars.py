@@ -241,7 +241,7 @@ class Stars(jaux.Auxiliar):
         await self.remove_star({
             'server': m.server.id,
             'channel': m.channel.id,
-            'message' m.id,
+            'message': m.id,
             'user': user.id,
         })
 
