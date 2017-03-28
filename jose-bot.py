@@ -62,6 +62,7 @@ def load_all_modules():
     # achievment is last
     load_module('achievement', 'JoseAchievement')
     load_module('tools', 'JoseTools')
+    load_module('stars', 'Stars')
 
     # load events
     jose.ev_empty()
