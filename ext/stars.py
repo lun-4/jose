@@ -110,12 +110,12 @@ class Stars(jaux.Auxiliar):
 
         try:
             starboard = self.stars[server_id]
-        except:
+        except IndexError:
             raise Exception('starboard not found')
 
         try:
             star = starboard['stars'][message_id]
-        except:
+        except IndexError:
             raise Exception('star not found')
 
         starboard_id = starboard['starboard_id']
@@ -144,6 +144,7 @@ class Stars(jaux.Auxiliar):
             star['star_message'] = str(star_msg.id)
 
         self.jsondb_save('stars')
+        return True
 
     async def add_star(self, message, user):
         if self.star_lock:
@@ -169,10 +170,14 @@ class Stars(jaux.Auxiliar):
             star['starrers'].append(user_id)
 
         try:
-            await self.update_star(server_id, channel_id, message_id)
+            done = await self.update_star(server_id, channel_id, message_id)
         except:
             logger.error('add_star(%s, %s[%s])', message.id, \
                 user.name, user.id, exc_info=True)
+            return False
+
+        if not done:
+            logger.error('update_star sent False')
             return False
 
         return True
@@ -195,10 +200,14 @@ class Stars(jaux.Auxiliar):
             return False
 
         try:
-            await self.update_star(server_id, channel_id, message_id)
+            done = await self.update_star(server_id, channel_id, message_id)
         except:
             logger.error('remove_star(%s, %s[%s])', message.id, \
                 user.name, user.id, exc_info=True)
+            return False
+
+        if not done:
+            logger.error('update_star sent False')
             return False
 
         return True
@@ -215,8 +224,12 @@ class Stars(jaux.Auxiliar):
             return False
 
         try:
-            await self.update_star(server_id, channel_id, message_id, delete=True)
+            done = await self.update_star(server_id, channel_id, message_id, delete=True)
         except:
+            return False
+
+        if not done:
+            logger.error('update_star sent False')
             return False
 
         try:
