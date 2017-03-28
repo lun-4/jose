@@ -177,6 +177,9 @@ class Stars(jaux.Auxiliar):
             await self.client.delete_message(star_msg)
             return True
 
+        if stars < 1:
+            return True
+
         m_embed = self.make_embed(message)
         m_str = self.star_str(star, message)
 
