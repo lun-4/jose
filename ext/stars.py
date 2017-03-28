@@ -127,12 +127,13 @@ class Stars(jaux.Auxiliar):
 
         stars = len(star['starrers'])
         star_msg_id = star['star_message']
+        star_msg = None
 
         try:
             if star_msg_id is not None:
                 star_msg = await self.client.get_message(starboard_channel, star_msg_id)
         except discord.NotFound:
-            star_msg = None
+            pass
 
         m_embed = self.make_embed(message)
         m_str = self.star_str(star, message)
