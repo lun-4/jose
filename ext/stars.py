@@ -81,7 +81,7 @@ class Stars(jaux.Auxiliar):
         if attch:
             attch_url = attch[0]['url']
             if attch_url.lower().endswith(('png', 'jpeg', 'jpg', 'gif')):
-                e.set_image(url=attch_url)
+                em.set_image(url=attch_url)
             else:
                 attachments = '[Attachment](%s)' % attch_url
                 if content:
