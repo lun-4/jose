@@ -164,8 +164,8 @@ class Stars(jaux.Auxiliar):
         })
 
         try:
-            star['starrers'][user_id]
-        except IndexError:
+            star['starrers'].index(user_id)
+        except ValueError:
             star['starrers'].append(user_id)
 
         try:
@@ -187,7 +187,11 @@ class Stars(jaux.Auxiliar):
 
         stars = starboard['stars']
         star = starboard['stars'].get(message_id)
-        star['starrers'].remove(user_id)
+
+        try:
+            star['starrers'].remove(user_id)
+        except ValueError:
+            return False
 
         try:
             await self.update_star(server_id, channel_id, message_id)
