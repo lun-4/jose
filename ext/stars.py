@@ -8,6 +8,10 @@ sys.path.append("..")
 import jauxiliar as jaux
 import joseerror as je
 
+DEFAULT_STARDB = '''{
+    "locks": []
+}'''
+
 perm_overwrite = discord.PermissionOverwrite
 channel_perms = discord.ChannelPermissions
 
@@ -29,7 +33,7 @@ class Stars(jaux.Auxiliar):
 
     async def ext_load(self):
         try:
-            self.jsondb('stars', path='db/stars.json')
+            self.jsondb('stars', path='db/stars.json', default=DEFAULT_STARDB)
             if 'locks' not in self.stars:
                 self.stars['locks'] = []
 
@@ -197,7 +201,7 @@ class Stars(jaux.Auxiliar):
 
         try:
             starboard = self.stars[server_id]
-        except IndexError:
+        except KeyError:
             return False
 
         if message.channel.id == starboard['starboard_id']:
