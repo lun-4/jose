@@ -65,7 +65,8 @@ class Stars(jaux.Auxiliar):
         return True
 
     def star_str(self, star, message):
-        return '%d stars, ID: %s' % (len(star['starrers']), message.id)
+        return '%d stars, <#%s> ID: %s' % \
+            (len(star['starrers']), message.channel.id, message.id)
 
     def make_embed(self, message):
         content = message.content
