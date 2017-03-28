@@ -322,7 +322,7 @@ class Stars(jaux.Auxiliar):
             await cxt.say("Message not found in this channel.")
         except discord.Forbidden:
             await cxt.say("No permissions to get messages")
-        except discrord.HTTPException:
+        except discord.HTTPException:
             await cxt.say("Failed to retreive the message")
         else:
             res = await self.add_star(to_star, message.author)
