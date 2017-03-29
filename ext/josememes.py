@@ -165,7 +165,7 @@ class JoseMemes(jaux.Auxiliar):
             args_sp = args_s.split(';')
             try:
                 meme = args_sp[0]
-                url = args_sp[1]
+                url = ';'.join(args_sp[1:])
             except:
                 await cxt.say("Error parsing arguments")
                 return
