@@ -100,7 +100,8 @@ class JoseImages(jaux.Auxiliar):
         response = await self.get_json(url)
 
         if not response:
-            await cxt.say("`[img.%s] Error parsing JSON response`", (boardid,))
+            await cxt.say("`[img.%s] Error parsing JSON response, got %d bytes`", \
+                (boardid, len(response)))
             return
 
         if list_key:
