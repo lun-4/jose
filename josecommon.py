@@ -646,7 +646,10 @@ async def configdb_get(server_id, key, default=None):
     res = await redis.hmget(rediskey, key)
 
     # aioredis returns a set... I'm pretty WTF rn but ok.
-    element = from_redis(next(iter(res)).decode('utf-8'))
+    try:
+        element = from_redis(next(iter(res)).decode('utf-8'))
+    except AttributeError:
+        return 'vNothing'
 
     # insert in cache
     cdb_cache[server_id][key] = element

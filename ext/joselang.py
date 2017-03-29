@@ -202,3 +202,19 @@ class JoseLanguage(jaux.Auxiliar):
             await cxt.say("image channel is now <#%s>", (channel_id,))
         else:
             await cxt.say("Error changing `imgchannel`.")
+
+    async def c_cfget(self, message, args, cxt):
+        '''`j!cfget field` - get configuration data for the server'''
+
+        try:
+            field = args[1]
+        except:
+            await cxt.say(self.c_cfget.__doc__)
+            return
+
+        field_data = await jcommon.configdb_get(message.server.id, field)
+        if field_data == 'vNothing':
+            await cxt.say('field `%r` not found', (field,))
+            return
+
+        await cxt.say('`%s, %r = %r`', (message.server.id, field, field_data))
