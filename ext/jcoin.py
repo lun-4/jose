@@ -503,6 +503,10 @@ class JoseCoin(jaux.Auxiliar):
             await cxt.say("The person you're trying to steal from doesn't have a JoséCoin account")
             return
 
+        if self.jcoin.data[target_id]['times_stolen'] < 1:
+            await cxt.say("You can't steal from someone who never used the steal command.")
+            return
+
         if amount <= 0:
             await cxt.say("good one haha :ok_hand: actually no")
             return
