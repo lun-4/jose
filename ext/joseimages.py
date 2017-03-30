@@ -31,22 +31,100 @@ async def test_generator():
 
 
 HYPNOHUB_CONFIG = {
-    'index_url': 'http://hypnohub.net/post/index.json',
-    'post_key': 'file_url',
+    'urls': {
+        'index': 'https://hypnohub.net/post/index.json',
+    },
+    'keys': {
+        'post': 'file_url',
+    },
 }
 
 YANDERE_CONFIG = {
-    'index_url': 'https://yande.re/post.json',
-    'post_key': 'file_url',
+    'urls': {
+        'index': 'https://yande.re/post.json',
+    },
+    'keys': {
+        'post': 'file_url',
+    },
 }
 
 def img_function(board_config):
     board_id = board_config.get('name')
 
-    async def clojure(self, cxt, search_data):
-        pass
+    _cfg = board_config.get
+    _key = board_config.get('keys', {}).get
+    _url = board_config.get('urls', {}).get
 
-    return clojure
+    '''
+        index_url: index page of the image board
+        search_url: get one post based on the tags (default index_url)
+        show_url: get one post based on its ID
+    '''
+
+    index_url =     _url('index')
+    search_url =    _url('search', index_url)
+    show_url =      _url('show')
+
+    '''
+        post_key: where to get the post's URL
+        id_key: where to get the post's ID
+        limit_key: the key to limit posts returned by the API
+        search_key: the key in the URL to send tags to
+        posts_key: the key where the API gives its posts data
+    '''
+
+    post_key =      _key('post', 'file_url')
+    id_key =        _key('id', 'id')
+    limit_key =     _key('limit', 'limit')
+    search_key =    _key('tags', 'tags')
+    posts_key =     _key('posts')
+
+    async def func(self, cxt, search_data):
+        random_flag = False
+        post, url = None, ''
+        lmt_params = f'{limit_key}={IMAGE_LIMIT}'
+        srch_params = f'{search_key}={search_data}'
+
+        if search_term == '-latest':
+            url = f'{index_url}?{lmt_params}'
+        elif search_term == '-random':
+            random_flag = True
+            url = f'{index_url}?{limit_key}=1'
+        else:
+            url = f'{search_url}?{lmt_params}&{srch_params}'
+
+        self.logger.info("[%s]: %r", boardid, search_data)
+        response = await self.json_from_url(url)
+
+        if posts_key: response = response[posts_key]
+
+        if len(response) < 1:
+            await cxt.say("`[%s] No results found.`", (boardid,))
+            return
+
+        if random_flag and not show_url:
+            await cxt.say("`%s` doesn't support individual posts.", (boardid,))
+            return
+
+        if random_flag:
+            most_recent_id = response[0][id_key]
+
+            # Assume posts start counting from 1
+            random_id = random.randint(1, int(most_recent_id))
+            rand_post_url = f'{show_url}?{id_key}={random_id}'
+            post = await self.json_from_url(random_post_url)
+        else:
+            post = random.choice(response)
+
+        post_url = post[post_key]
+        if not post_url.startswith('http'):
+            post_url = post_url.replace('//', '/')
+            post_url = 'http:/%s' % post_url
+
+        await cxt.say('ID: %d, URL: %s', (post['id'], post_url))
+        return
+
+    return func
 
 class JoseImages(jaux.Auxiliar):
     def __init__(self, _client):
@@ -97,7 +175,7 @@ class JoseImages(jaux.Auxiliar):
         search_url = config.get('search_url', index_url)
         show_url = config.get('show_url')
         post_key = config.get('post_key')
-        rspec = config.get('rspec')
+
         limit_key = config.get('limit_key', 'limit')
         search_key = config.get('search_key', 'tags')
         list_key = config.get('list_key', None)

@@ -73,6 +73,9 @@ class Auxiliar(jcommon.Extension):
             raise je.JoseCoinError(res[1])
 
     async def json_load(self, string):
+        if len(string):
+            raise je.JSONError("Can't parse empty string")
+
         future_json = self.loop.run_in_executor(None, json.loads, string)
 
         try:
