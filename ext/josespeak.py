@@ -383,21 +383,30 @@ class JoseSpeak(jcommon.Extension):
         output = subprocess.Popen(['wc', 'db/zelao.txt'], stdout=subprocess.PIPE).communicate()[0]
         await cxt.say(output)
 
-    async def c_jwormhole(self, message, args, cxt):
-        '''`j!jwormhole` - `j!speaktrigger` routed to Septapus Wormhole'''
+    async def say_prefixed(self, cxt, prefix):
         await cxt.send_typing()
-        ecxt = jcommon.EmptyContext(self.client, message)
+        ecxt = jcommon.EmptyContext(self.client, cxt.message)
         await self.c_speaktrigger(message, [], ecxt)
         res = await ecxt.getall()
-        await cxt.say("<@127296623779774464> wormhole send %s", (res,))
+        await cxt.say(f'{prefix}{res}')
+
+    async def c_jwormhole(self, message, args, cxt):
+        '''`j!jwormhole` - `j!speaktrigger` routed to Septapus Wormhole'''
+        await self.say_prefixed(cxt, '<@127296623779774464> wormhole send ')
 
     async def c_tatsu(self, message, args, cxt):
         '''`j!tatsu` - `j!speaktrigger` rerouted to prefix with `^``'''
-        await cxt.send_typing()
-        ecxt = jcommon.EmptyContext(self.client, message)
-        await self.c_speaktrigger(message, [], ecxt)
-        res = await ecxt.getall()
-        await cxt.say("^%s", (res,))
+        await self.say_prefixed(cxt, '^')
+
+    async def c_skprefix(self, message, args, cxt):
+        '''`j!skprefix prefix` - prefix shit jose says'''
+        try:
+            prefix = args[1]
+        except:
+            await cxt.say(self.c_skprefix.__doc__)
+            return
+
+        await self.say_prefixed(cxt, prefix)
 
     async def c_jw(self, message, args, cxt):
         '''`j!jw` - alias para `!jwormhole`'''
