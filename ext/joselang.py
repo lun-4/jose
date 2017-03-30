@@ -83,6 +83,9 @@ class JoseLanguage(jaux.Auxiliar):
         else:
             await cxt.say("No changes to `botblock`")
 
+    async def c_jspeak(self, message, args, cxt):
+        await self.c_jsprob(message, args, cxt)
+
     async def c_jsprob(self, message, args, cxt):
         '''`j!jsprob prob` - Set JoseSpeak probability of responding to random messages, default 0, maximum 3'''
 
