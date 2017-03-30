@@ -228,6 +228,7 @@ class Stars(jaux.Auxiliar):
 
         try:
             star['starrers'].index(user_id)
+            return False
         except ValueError:
             star['starrers'].append(user_id)
 
@@ -399,7 +400,7 @@ class Stars(jaux.Auxiliar):
         else:
             res = await self.add_star(to_star, message.author)
             if not res:
-                await cxt.say("Error adding star to the message.")
+                await cxt.say("Error adding star to the message.(probably starring twice?)")
             else:
                 await cxt.say(":star: :ok_hand:")
 
