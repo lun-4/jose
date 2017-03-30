@@ -190,10 +190,18 @@ class JoseMemes(jaux.Auxiliar):
             self.meme_exists(meme)
 
             meme_owner = self.memes[meme]['owner']
+
             is_admin = await self.b_isowner(cxt)
+            is_owner = (message.author.id == meme_owner)
 
+            raise_err = False
+            if not is_owner:
+                raise_err = True
 
-            if (message.author.id != meme_owner) or not is_admin:
+            if is_admin:
+                raise_err = False
+
+            if raise_err:
                 raise je.PermissionError()
 
             del self.memes[meme]
