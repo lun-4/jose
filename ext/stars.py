@@ -60,12 +60,12 @@ class Stars(jaux.Auxiliar):
             c_stars = copy.copy(stars)
             for message_id in c_stars:
                 star = stars[message_id]
-                if len(star['starrers']) > 1:
+                if len(star['starrers']) > 0:
                     continue
 
                 guild = self.client.get_server(guild_id)
                 if guild is None:
-                    self.logger.info("autoremoving server %s", guild_id)
+                    self.logger.info("[starboard] autoremoving server %s", guild_id)
                     del self.stars[guild_id]
                     return
 
@@ -75,6 +75,8 @@ class Stars(jaux.Auxiliar):
                 try:
                     message = await self.client.get_message(channel, message_id)
                 except discord.NotFound:
+                    self.logger.warning("[cleaner:NotFound] removing message:%s from starboard:%s", \
+                        message_id, server_id)
                     del stars[message_id]
                     continue
 
@@ -309,6 +311,8 @@ class Stars(jaux.Auxiliar):
             return False
 
         try:
+            logger.info("Removing message:%s from starboard:%s:%r", \
+                message_id, server_id, message.server.name)
             del starboard['stars'][message_id]
         except IndexError:
             return False
