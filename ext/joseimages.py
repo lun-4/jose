@@ -30,6 +30,24 @@ async def test_generator():
     return "{}/homepage/random/{}.{}".format(PUDDING_MOE, img_number, img_extension)
 
 
+HYPNOHUB_CONFIG = {
+    'index_url': 'http://hypnohub.net/post/index.json',
+    'post_key': 'file_url',
+}
+
+YANDERE_CONFIG = {
+    'index_url': 'https://yande.re/post.json',
+    'post_key': 'file_url',
+}
+
+def img_function(board_config):
+    board_id = board_config.get('name')
+
+    async def clojure(self, cxt, search_data):
+        pass
+
+    return clojure
+
 class JoseImages(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
@@ -37,7 +55,14 @@ class JoseImages(jaux.Auxiliar):
             'test': test_generator,
         }
 
+        self.boards = {}
+
     async def ext_load(self):
+        self.boards = {
+            'hypnohub': img_function(HYPNOHUB_CONFIG),
+            'yandere': img_function(YANDERE_CONFIG),
+            #'e621': img_function(E621_CONFIG),
+        }
         return True, ''
 
     async def ext_unload(self):
@@ -142,8 +167,6 @@ class JoseImages(jaux.Auxiliar):
     async def img_routine(self, cxt):
         channel_id = await jcommon.configdb_get(cxt.message.server.id, 'imgchannel')
 
-        self.logger.info("[img_routine] imgchannel: %r", channel_id)
-
         if channel_id is None:
             raise je.CommonError("No channel is set for image commands, use `j!imgchannel`.")
 
@@ -153,23 +176,16 @@ class JoseImages(jaux.Auxiliar):
         res = await self.jcoin_pricing(cxt, jcommon.IMG_PRICE)
         return res
 
-    async def c_hypno(self, message, args, cxt):
+    async def do_board(self, cxt, board_id, search_terms):
         access = await self.img_routine(cxt)
         if access:
-            await self.json_api(cxt, 'hypnohub', {
-                'search_term': ' '.join(args[1:]),
-                'index_url': 'http://hypnohub.net/post/index.json',
-                'post_key': 'file_url',
-            })
+            await self.boards[board_id](cxt, search_terms)
+
+    async def c_hypno(self, message, args, cxt):
+        await self.do_board(cxt, 'hypnohub', ' '.join(args[1:]))
 
     async def c_yandere(self, message, args, cxt):
-        access = await self.img_routine(cxt)
-        if access:
-            await self.json_api(cxt, 'yandere', {
-                'search_term': ' '.join(args[1:]),
-                'index_url': 'https://yande.re/post.json',
-                'post_key': 'file_url',
-            })
+        await self.do_board(cxt, 'yandere', ' '.join(args[1:]))
 
     async def c_e621(self, message, args, cxt):
         access = await self.img_routine(cxt)
