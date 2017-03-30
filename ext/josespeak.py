@@ -386,7 +386,7 @@ class JoseSpeak(jcommon.Extension):
     async def say_prefixed(self, cxt, prefix):
         await cxt.send_typing()
         ecxt = jcommon.EmptyContext(self.client, cxt.message)
-        await self.c_speaktrigger(message, [], ecxt)
+        await self.c_speaktrigger(cxt.message, [], ecxt)
         res = await ecxt.getall()
         await cxt.say(f'{prefix}{res}')
 
