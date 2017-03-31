@@ -150,7 +150,8 @@ def img_function(board_config):
             post_url = post_url.replace('//', '/')
             post_url = 'http:/%s' % post_url
 
-        await cxt.say('ID: %d, URL: %s', (post['id'], post_url))
+        post_id = str(post['id'])
+        await cxt.say('ID: %s, URL: %s', (post_id, post_url))
         return
 
     return func
