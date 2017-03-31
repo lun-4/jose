@@ -77,11 +77,11 @@ DERPIBOORU_CONFIG = {
 }
 
 def img_function(board_config):
-    board_id = board_config.get('name')
-
     _cfg = board_config.get
-    _key = board_config.get('keys', {}).get
-    _url = board_config.get('urls', {}).get
+
+    board_id = _cfg('name')
+    _key = _cfg('keys', {}).get
+    _url = _cfg('urls', {}).get
 
     '''
         index_url: index page of the image board
