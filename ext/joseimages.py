@@ -164,6 +164,7 @@ class JoseImages(jaux.Auxiliar):
             'hypnohub': img_function(HYPNOHUB_CONFIG),
             'yandere': img_function(YANDERE_CONFIG),
             'e621': img_function(E621_CONFIG),
+            'derpibooru': img_function(DERPIBOORU_CONFIG),
         }
 
     async def ext_load(self):
