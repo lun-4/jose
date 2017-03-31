@@ -81,6 +81,7 @@ class Auxiliar(jcommon.Extension):
         try:
             res = await future_json
         except Exception as err:
+            self.logger.error('json_load', exc_info=True)
             raise je.JSONError("Error parsing JSON data(%d bytes)" % (len(string)))
 
         return res
