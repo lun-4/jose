@@ -247,7 +247,7 @@ class JoseImages(jaux.Auxiliar):
         access = await self.img_routine(cxt)
         if access:
             try:
-                self.logger.info("[do_board:%s]: %r", boardid, search_terms)
+                self.logger.info("[do_board:%s]: %r", board_id, search_terms)
                 await self.boards[board_id](self.json_from_url, cxt, search_terms)
             except Exception as err:
                 await cxt.say("`ERROR: %r`", (err,))
