@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 
 import discord
-import asyncio
 import sys
 import copy
 sys.path.append("..")
 import jauxiliar as jaux
-import joseerror as je
 
 DEFAULT_STARDB = '''{
     "locks": []
@@ -73,10 +71,10 @@ class Stars(jaux.Auxiliar):
                 if channel is None:
                     continue
                 try:
-                    message = await self.client.get_message(channel, message_id)
+                    await self.client.get_message(channel, message_id)
                 except discord.NotFound:
                     self.logger.warning("[cleaner:NotFound] removing message:%s from starboard:%s", \
-                        message_id, server_id)
+                        message_id, guild_id)
                     del stars[message_id]
                     continue
 
@@ -312,7 +310,7 @@ class Stars(jaux.Auxiliar):
             return False
 
         try:
-            logger.info("Removing message:%s from starboard:%s:%r", \
+            self.logger.info("Removing message:%s from starboard:%s:%r", \
                 message_id, server_id, message.server.name)
             del starboard['stars'][message_id]
         except IndexError:
