@@ -61,6 +61,21 @@ E621_CONFIG = {
     }
 }
 
+DERPIBOORU_CONFIG = {
+    'name': 'derpibooru',
+    'urls': {
+        'index': 'http://derpibooru.org/images.json',
+        'search': 'http://derpibooru.org/search.json',
+    },
+    'keys': {
+        'post': 'image',
+        'limit': 'page',
+        'search': 'q',
+        'list': 'images',
+        'from_search': 'search',
+    }
+}
+
 def img_function(board_config):
     board_id = board_config.get('name')
 
@@ -213,9 +228,7 @@ class JoseImages(jaux.Auxiliar):
             response = response[list_key]
 
         post = None
-        if rspec:
-            post = random.choice(response[rspec])
-        elif random_flag:
+        if random_flag:
             if not show_url:
                 await cxt.say("`[img.%s] API doesn't support individual posts`", (boardid,))
                 return
@@ -276,19 +289,7 @@ class JoseImages(jaux.Auxiliar):
         await self.do_board(cxt, 'e621', args)
 
     async def c_derpibooru(self, message, args, cxt):
-        access = await self.img_routine(cxt)
-        if access:
-            await self.json_api(cxt, 'derpibooru', {
-                'search_term': ' '.join(args[1:]),
-                'search_url': 'http://derpibooru.org/search.json',
-                'index_url': 'http://derpibooru.org/images.json',
-                # 'show_url': 'derpibooru.org/%d.json',
-                'post_key': 'image',
-                'limit_key': 'page',
-                'search_key': 'q',
-                'list_key': 'images',
-                'search_url_key': 'search',
-            })
+        await self.do_board(cxt, 'derpibooru', args)
 
     async def c_derpi(self, message, args, cxt):
         await self.c_derpibooru(message, args, cxt)
