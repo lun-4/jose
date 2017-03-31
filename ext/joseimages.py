@@ -79,7 +79,7 @@ def img_function(board_config):
     search_key =    _key('tags', 'tags')
     posts_key =     _key('posts')
 
-    async def func(self, cxt, search_data):
+    async def func(json_function, cxt, search_data):
         random_flag = False
         post, url = None, ''
         lmt_params = f'{limit_key}={IMAGE_LIMIT}'
@@ -93,8 +93,7 @@ def img_function(board_config):
         else:
             url = f'{search_url}?{lmt_params}&{srch_params}'
 
-        self.logger.info("[%s]: %r", boardid, search_data)
-        response = await self.json_from_url(url)
+        response = await json_function(url)
 
         if posts_key: response = response[posts_key]
 
@@ -112,7 +111,7 @@ def img_function(board_config):
             # Assume posts start counting from 1
             random_id = random.randint(1, int(most_recent_id))
             rand_post_url = f'{show_url}?{id_key}={random_id}'
-            post = await self.json_from_url(random_post_url)
+            post = await json_function(random_post_url)
         else:
             post = random.choice(response)
 
@@ -248,7 +247,8 @@ class JoseImages(jaux.Auxiliar):
         access = await self.img_routine(cxt)
         if access:
             try:
-                await self.boards[board_id](cxt, search_terms)
+                self.logger.info("[do_board:%s]: %r", boardid, search_terms)
+                await self.boards[board_id](self.json_from_url, cxt, search_terms)
             except Exception as err:
                 await cxt.say("`ERROR: %r`", (err,))
 
