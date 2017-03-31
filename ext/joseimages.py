@@ -87,8 +87,8 @@ def img_function(board_config):
 
         if search_data == '-latest':
             url = f'{index_url}?{lmt_params}'
-        elif search_term == '-random':
-            search_data = True
+        elif search_data == '-random':
+            random_flag = True
             url = f'{index_url}?{limit_key}=1'
         else:
             url = f'{search_url}?{lmt_params}&{srch_params}'
