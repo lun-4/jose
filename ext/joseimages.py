@@ -121,7 +121,7 @@ def img_function(board_config):
             url = f'{index_url}?{limit_key}=1'
         else:
             url = f'{search_url}?{lmt_params}&{srch_params}'
-            if from_search_key: list_key = from_search_key
+            if from_search_key: posts_key = from_search_key
 
         response = await json_function(url)
 
