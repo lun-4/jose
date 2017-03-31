@@ -124,7 +124,7 @@ def img_function(board_config):
             # Assume posts start counting from 1
             random_id = random.randint(1, int(most_recent_id))
             rand_post_url = f'{show_url}?{id_key}={random_id}'
-            post = await json_function(random_post_url)
+            post = await json_function(rand_post_url)
         else:
             post = random.choice(response)
 
