@@ -71,7 +71,7 @@ DERPIBOORU_CONFIG = {
         'post': 'image',
         'limit': 'page',
         'search': 'q',
-        'list': 'images',
+        'posts': 'images',
         'from_search': 'search',
     }
 }
@@ -101,11 +101,12 @@ def img_function(board_config):
         posts_key: the key where the API gives its posts data
     '''
 
-    post_key =      _key('post', 'file_url')
-    id_key =        _key('id', 'id')
-    limit_key =     _key('limit', 'limit')
-    search_key =    _key('tags', 'tags')
-    posts_key =     _key('posts')
+    post_key =          _key('post', 'file_url')
+    id_key =            _key('id', 'id')
+    limit_key =         _key('limit', 'limit')
+    search_key =        _key('tags', 'tags')
+    posts_key =         _key('posts')
+    from_search_key =   _key('from_search')
 
     async def func(json_function, cxt, search_data):
         random_flag = False
@@ -120,6 +121,7 @@ def img_function(board_config):
             url = f'{index_url}?{limit_key}=1'
         else:
             url = f'{search_url}?{lmt_params}&{srch_params}'
+            if from_search_key: list_key = from_search_key
 
         response = await json_function(url)
 
