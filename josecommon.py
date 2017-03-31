@@ -660,10 +660,11 @@ async def save_configdb():
     logger.info("savedb:r_config")
     try:
         # don't use aioredis, use subprocess
-        out = subprocess.check_output('redis-cli save', shell=True)
-        out = out.decode('utf-8')
+        _out = subprocess.check_output('redis-cli save', shell=True)
+        out = _out.decode('utf-8')
         if not out.startswith('OK'):
-            logger.warning("[save_configdb] error saving")
+            logger.warning("[save_configdb] error saving: %s", out)
+            return False, out
 
         return True, ''
     except Exception as err:
