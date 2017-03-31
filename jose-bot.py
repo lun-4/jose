@@ -81,7 +81,7 @@ async def do_event(event_name, args):
 
 async def check_message(message):
     # we do not want the bot to reply to itself
-    if message.author == bot.user:
+    if message.author.id == bot.user.id:
         return False
 
     if len(message.content) <= 0:

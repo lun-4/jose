@@ -681,6 +681,7 @@ async def load_configdb():
         default = get_defaultcdb()
 
         # get all keys (yes its inneficient)
+        # TODO: use SCAN?
         keys = await redis.keys('*')
         for rediskey in keys:
             rediskey = rediskey.decode('utf-8')
@@ -708,7 +709,7 @@ async def langdb_get(sid):
     return res
 
 async def get_translated(langid, string):
-    lang = LANGUAGE_OBJECTS.get(langid, None)
+    lang = LANGUAGE_OBJECTS.get(langid)
     if lang is None:
         # fallback, just return the same string
         return string
