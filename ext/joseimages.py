@@ -98,11 +98,11 @@ def img_function(board_config):
         if posts_key: response = response[posts_key]
 
         if len(response) < 1:
-            await cxt.say("`[%s] No results found.`", (boardid,))
+            await cxt.say("`[%s] No results found.`", (board_id,))
             return
 
         if random_flag and not show_url:
-            await cxt.say("`%s` doesn't support individual posts.", (boardid,))
+            await cxt.say("`%s` doesn't support individual posts.", (board_id,))
             return
 
         if random_flag:
