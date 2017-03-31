@@ -201,11 +201,11 @@ class JoseGambling(jaux.Auxiliar):
         '''`j!flip` - joga uma moeda(49%, 49% 2%)'''
         p = random.random()
         if p < 0.49:
-            await cxt.say('http://i.imgur.com/GtTQvaM.jpg') # cara
+            await cxt.say('http://i.imgur.com/oEEkybO.png') # cara
         elif 0.49 < p < 0.98:
-            await cxt.say("http://i.imgur.com/oPc1siM.jpg") # coroa
+            await cxt.say("http://i.imgur.com/c9smEW6.png") # coroa
         else:
-            await cxt.say("http://i.imgur.com/u4Gem8A.png") # empate
+            await cxt.say("http://i.imgur.com/yDPUp3P.png") # empate
 
     async def c_jcrhelp(self, message, args, cxt):
         await cxt.say(JCROULETTE_HELP_TEXT)
