@@ -133,27 +133,17 @@ class JoseImages(jaux.Auxiliar):
             'test': test_generator,
         }
 
-        self.boards = {}
-
-    async def ext_load(self):
         self.boards = {
             'hypnohub': img_function(HYPNOHUB_CONFIG),
             'yandere': img_function(YANDERE_CONFIG),
             #'e621': img_function(E621_CONFIG),
         }
+
+    async def ext_load(self):
         return True, ''
 
     async def ext_unload(self):
         return True, ''
-
-    async def get_json(self, url):
-        r = await aiohttp.request('GET', url)
-        r = await r.text()
-        try:
-            r = json.loads(r)
-        except:
-            return None
-        return r
 
     async def json_api(self, cxt, boardid, config):
         '''
@@ -200,7 +190,7 @@ class JoseImages(jaux.Auxiliar):
                 list_key = search_url_key
 
         self.logger.info("images: json_api->%s: %r", boardid, search_term)
-        response = await self.get_json(url)
+        response = await self.json_from_url(url)
 
         if not response:
             await cxt.say("`[img.%s] Error parsing JSON response, got %d bytes`", \
@@ -227,7 +217,7 @@ class JoseImages(jaux.Auxiliar):
                 return
 
             random_post_url = '%s?id=%s' % (show_url, random_id)
-            post = await self.get_json(random_post_url)
+            post = await self.jsom_from_url(random_post_url)
         else:
             if len(response) < 1:
                 await cxt.say("`[img.%s] No results found.`", (boardid,))
@@ -257,7 +247,10 @@ class JoseImages(jaux.Auxiliar):
     async def do_board(self, cxt, board_id, search_terms):
         access = await self.img_routine(cxt)
         if access:
-            await self.boards[board_id](cxt, search_terms)
+            try:
+                await self.boards[board_id](cxt, search_terms)
+            except Exception as err:
+                await cxt.say("`ERROR: %r`", (err,))
 
     async def c_hypno(self, message, args, cxt):
         await self.do_board(cxt, 'hypnohub', ' '.join(args[1:]))
