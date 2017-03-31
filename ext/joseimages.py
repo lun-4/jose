@@ -31,6 +31,7 @@ async def test_generator():
 
 
 HYPNOHUB_CONFIG = {
+    'name': 'hypnohub'
     'urls': {
         'index': 'https://hypnohub.net/post/index.json',
     },
@@ -40,12 +41,24 @@ HYPNOHUB_CONFIG = {
 }
 
 YANDERE_CONFIG = {
+    'name': 'yandere'
     'urls': {
         'index': 'https://yande.re/post.json',
     },
     'keys': {
         'post': 'file_url',
     },
+}
+
+E621_CONFIG = {
+    'name': 'e621',
+    'urls': {
+        'index': 'https://e621.net/post/index.json',
+        'show': 'https://e621.net/post/show.json',
+    },
+    'keys': {
+        'post': 'file_url',
+    }
 }
 
 def img_function(board_config):
@@ -135,7 +148,7 @@ class JoseImages(jaux.Auxiliar):
         self.boards = {
             'hypnohub': img_function(HYPNOHUB_CONFIG),
             'yandere': img_function(YANDERE_CONFIG),
-            #'e621': img_function(E621_CONFIG),
+            'e621': img_function(E621_CONFIG),
         }
 
     async def ext_load(self):
@@ -243,30 +256,24 @@ class JoseImages(jaux.Auxiliar):
         res = await self.jcoin_pricing(cxt, jcommon.IMG_PRICE)
         return res
 
-    async def do_board(self, cxt, board_id, search_terms):
+    async def do_board(self, cxt, board_id, args):
         access = await self.img_routine(cxt)
         if access:
             try:
+                search_terms = ' '.join(args[1:])
                 self.logger.info("[do_board:%s]: %r", board_id, search_terms)
                 await self.boards[board_id](self.json_from_url, cxt, search_terms)
             except Exception as err:
                 await cxt.say("`ERROR: %r`", (err,))
 
     async def c_hypno(self, message, args, cxt):
-        await self.do_board(cxt, 'hypnohub', ' '.join(args[1:]))
+        await self.do_board(cxt, 'hypnohub', args)
 
     async def c_yandere(self, message, args, cxt):
-        await self.do_board(cxt, 'yandere', ' '.join(args[1:]))
+        await self.do_board(cxt, 'yandere', args)
 
     async def c_e621(self, message, args, cxt):
-        access = await self.img_routine(cxt)
-        if access:
-            await self.json_api(cxt, 'e621', {
-                'search_term': ' '.join(args[1:]),
-                'index_url': 'https://e621.net/post/index.json',
-                'show_url': 'https://e621.net/post/show.json',
-                'post_key': 'file_url',
-            })
+        await self.do_board(cxt, 'e621', args)
 
     async def c_derpibooru(self, message, args, cxt):
         access = await self.img_routine(cxt)
