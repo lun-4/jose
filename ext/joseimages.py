@@ -31,7 +31,7 @@ async def test_generator():
 
 
 HYPNOHUB_CONFIG = {
-    'name': 'hypnohub'
+    'name': 'hypnohub',
     'urls': {
         'index': 'https://hypnohub.net/post/index.json',
     },
@@ -41,7 +41,7 @@ HYPNOHUB_CONFIG = {
 }
 
 YANDERE_CONFIG = {
-    'name': 'yandere'
+    'name': 'yandere',
     'urls': {
         'index': 'https://yande.re/post.json',
     },
