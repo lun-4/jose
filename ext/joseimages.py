@@ -129,7 +129,7 @@ def img_function(board_config):
             await cxt.say("`[%s] JSONError@%r: %r`", (board_id, url, err))
             return
 
-        logger.info('[%s] %s %r', board_id, posts_key, search_data)
+        self.logger.info('[%s] %s %r', board_id, posts_key, search_data)
 
         if posts_key:
             response = response[posts_key]
