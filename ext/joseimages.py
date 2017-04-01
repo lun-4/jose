@@ -112,6 +112,8 @@ def img_function(board_config):
     from_search_key =   _key('from_search')
 
     async def func(json_function, cxt, search_data):
+        nonlocal post_key, id_key, limit_key, posts_key, from_search_key
+
         random_flag = False
         post, url = None, ''
         lmt_params = f'{limit_key}={IMAGE_LIMIT}'
