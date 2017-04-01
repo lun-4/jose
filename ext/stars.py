@@ -311,7 +311,7 @@ class Stars(jaux.Auxiliar):
 
         try:
             self.logger.info("Removing message:%s from starboard:%s:%r", \
-                message_id, server_id, message.server.name)
+                message_id, server_id, client.get_server(server_id))
             del starboard['stars'][message_id]
         except IndexError:
             return False
