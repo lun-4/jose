@@ -123,7 +123,11 @@ def img_function(board_config):
             url = f'{search_url}?{lmt_params}&{srch_params}'
             if from_search_key: posts_key = from_search_key
 
-        response = await json_function(url)
+        try:
+            response = await json_function(url)
+        except je.JSONError as err:
+            await cxt.say("`[%s] JSONError@%r: %r`", url, err)
+            return
 
         if posts_key: response = response[posts_key]
 
