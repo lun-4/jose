@@ -46,6 +46,8 @@ JOSE_APP_ID = '202586824013643777'
 JOSE_LOG_CHANNEL_ID = '290698227483934721'
 OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=67259457' % JOSE_APP_ID
 
+APRIL_FOOLS = True
+
 #configuration things
 ADMIN_TOPICS = {
     # Luna, Corno, Dan and Nat
@@ -780,6 +782,8 @@ class Context:
                     ret = await self.say("Can't send empty message", _channel, tup)
                     return ret
                 else:
+                    if APRIL_FOOLS:
+                        translated = translated[::-1]
                     ret = await self.client.send_message(channel, translated)
                     return ret
             except discord.Forbidden:
