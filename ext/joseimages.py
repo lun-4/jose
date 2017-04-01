@@ -161,7 +161,10 @@ def img_function(board_config):
             rand_post_url = f'{show_url}?{id_key}{random_id}'
             if id_tags:
                 rand_post_url = f'{show_url}?{search_key}={id_in_url}{random_id}'
+
             post = await json_function(rand_post_url)
+            if id_tags:
+                post = post[posts_key]
         else:
             post = random.choice(response)
 
