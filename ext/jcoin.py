@@ -182,7 +182,10 @@ class JoseCoin(jaux.Auxiliar):
 
             if res[0]:
                 self.reward_env[author_id] = time.time() + REWARD_COOLDOWN
-                await self.client.add_reaction(message, '💰')
+                try:
+                    await self.client.add_reaction(message, '💰')
+                except discord.NotFound:
+                    await self.client.send_message(message.channel, f'💰 to {message.author}')
             else:
                 jcommon.logger.error("do_josecoin->jc->err: %s", res[1])
                 await cxt.say("jc->err: %s", (res[1],))
