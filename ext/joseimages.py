@@ -35,6 +35,7 @@ HYPNOHUB_CONFIG = {
     'name': 'hypnohub',
     'urls': {
         'index': 'https://hypnohub.net/post/index.json',
+        'show': 'https://hypnohub.net/post/index.json',
     },
     'keys': {
         'post': 'file_url',
