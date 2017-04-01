@@ -89,7 +89,7 @@ def img_function(board_config):
     _key = _cfg('keys', {}).get
     _url = _cfg('urls', {}).get
 
-    id_tags         _cfg('id_tags', False)
+    id_tags =       _cfg('id_tags', False)
 
     '''
         index_url: index page of the image board
