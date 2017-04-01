@@ -126,7 +126,7 @@ def img_function(board_config):
         try:
             response = await json_function(url)
         except je.JSONError as err:
-            await cxt.say("`[%s] JSONError@%r: %r`", board_id, url, err)
+            await cxt.say("`[%s] JSONError@%r: %r`", (board_id, url, err))
             return
 
         if posts_key: response = response[posts_key]
