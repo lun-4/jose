@@ -291,7 +291,7 @@ class JoseImages(jaux.Auxiliar):
                 self.logger.info("[do_board:%s]: %r", board_id, search_terms)
                 await self.boards[board_id](self.json_from_url, cxt, search_terms)
             except Exception as err:
-                await cxt.say("`ERROR: %r`", (err,))
+                await cxt.say("`ERROR: %s`", (traceback.format_exc(),))
 
     async def c_hypno(self, message, args, cxt):
         await self.do_board(cxt, 'hypnohub', args)
