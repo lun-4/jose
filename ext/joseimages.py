@@ -105,7 +105,7 @@ def img_function(board_config):
     id_key =            _key('id', 'id')
     limit_key =         _key('limit', 'limit')
     search_key =        _key('tags', 'tags')
-    posts_key =         _key('posts')
+    posts_key =         _key('posts', False)
     from_search_key =   _key('from_search')
 
     async def func(json_function, cxt, search_data):
@@ -121,15 +121,18 @@ def img_function(board_config):
             url = f'{index_url}?{limit_key}=1'
         else:
             url = f'{search_url}?{lmt_params}&{srch_params}'
-            if from_search_key: posts_key = from_search_key
-
+            if from_search_key:
+                posts_key = from_search_key
         try:
             response = await json_function(url)
         except je.JSONError as err:
             await cxt.say("`[%s] JSONError@%r: %r`", (board_id, url, err))
             return
 
-        if posts_key: response = response[posts_key]
+        logger.info('[%s] %s %r', board_id, posts_key, search_data)
+
+        if posts_key:
+            response = response[posts_key]
 
         if len(response) < 1:
             await cxt.say("`[%s] No results found.`", (board_id,))
