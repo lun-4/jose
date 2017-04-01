@@ -39,9 +39,9 @@ HYPNOHUB_CONFIG = {
     },
     'keys': {
         'post': 'file_url',
-        'id': 'id:',
     },
     'id_tags': True,
+    'id_in_url': 'id:',
 }
 
 YANDERE_CONFIG = {
@@ -90,6 +90,7 @@ def img_function(board_config):
     _url = _cfg('urls', {}).get
 
     id_tags =       _cfg('id_tags', False)
+    id_in_url =     _cfg('id_in_url', 'id=')
 
     '''
         index_url: index page of the image board
@@ -110,7 +111,7 @@ def img_function(board_config):
     '''
 
     post_key =          _key('post', 'file_url')
-    id_key =            _key('id', 'id=')
+    id_key =            _key('id', 'id')
     limit_key =         _key('limit', 'limit')
     search_key =        _key('tags', 'tags')
     posts_key =         _key('posts', False)
@@ -159,7 +160,7 @@ def img_function(board_config):
             random_id = random.randint(1, int(most_recent_id))
             rand_post_url = f'{show_url}?{id_key}{random_id}'
             if id_tags:
-                rand_post_url = f'{show_url}?{search_key}={id_key}{random_id}'
+                rand_post_url = f'{show_url}?{search_key}={id_in_url}{random_id}'
             post = await json_function(rand_post_url)
         else:
             post = random.choice(response)
@@ -194,91 +195,6 @@ class JoseImages(jaux.Auxiliar):
 
     async def ext_unload(self):
         return True, ''
-
-    async def json_api(self, cxt, boardid, config):
-        '''
-        {
-            'search_term': stuff to search,
-            'index_url': where are the latest posts,
-            'search_url': search for stuff(defaults to index_url),
-            'show_url': get individual posts,
-            'post_key': where to get the post image URL,
-            'limit_key': what is the tag to limit results,
-            'search_key': what is the tag to search in search_url,
-
-            'list_key': where are the array of posts,
-            'search_url_key': same thing as list_key but in search,
-        }
-        '''
-        search_term = config.get('search_term')
-        index_url = config.get('index_url')
-        search_url = config.get('search_url', index_url)
-        show_url = config.get('show_url')
-        post_key = config.get('post_key')
-
-        limit_key = config.get('limit_key', 'limit')
-        search_key = config.get('search_key', 'tags')
-        list_key = config.get('list_key', None)
-        search_url_key = config.get('search_url_key', None)
-        random_flag = False
-
-        if search_term == '-latest':
-            # get latest
-            await cxt.say('`[img.%s] most recent posts`', (boardid,))
-            url = '%s?%s=%s' % (index_url, limit_key, IMAGE_LIMIT)
-        elif search_term == '-random':
-            # random id
-            await cxt.say('`[img.%s] random ID`', (boardid,))
-            random_flag = True
-            url = '%s?%s=%s' % (index_url, limit_key, 1)
-        else:
-            # normally, search tags
-            await cxt.say('`[img.%s] tags: %r`', (boardid, search_term))
-            url = '%s?%s=%s&%s=%s' % (search_url, limit_key, IMAGE_LIMIT,\
-                search_key, search_term)
-            if search_key:
-                list_key = search_url_key
-
-        self.logger.info("images: json_api->%s: %r", boardid, search_term)
-        response = await self.json_from_url(url)
-
-        if not response:
-            await cxt.say("`[img.%s] Error parsing JSON response, got %d bytes`", \
-                (boardid, len(response)))
-            return
-
-        if list_key:
-            response = response[list_key]
-
-        post = None
-        if random_flag:
-            if not show_url:
-                await cxt.say("`[img.%s] API doesn't support individual posts`", (boardid,))
-                return
-
-            most_recent_id = response[0]['id']
-
-            try:
-                random_id = random.randint(1, int(most_recent_id))
-            except Exception as e:
-                await cxt.say("`%r`", (e,))
-                return
-
-            random_post_url = '%s?id=%s' % (show_url, random_id)
-            post = await self.jsom_from_url(random_post_url)
-        else:
-            if len(response) < 1:
-                await cxt.say("`[img.%s] No results found.`", (boardid,))
-                return
-            post = random.choice(response)
-
-        post_url = post[post_key]
-        if ('hypnohub' in post_url) or ('derpi' in post_url):
-            post_url = post_url.replace('//', '/')
-            post_url = 'http:/%s' % post_url
-
-        await cxt.say('ID: %s, URL: %s', (str(post['id']), str(post_url)))
-        return
 
     async def img_routine(self, cxt):
         channel_id = await jcommon.configdb_get(cxt.message.server.id, 'imgchannel')
