@@ -39,7 +39,9 @@ HYPNOHUB_CONFIG = {
     },
     'keys': {
         'post': 'file_url',
+        'id': 'id:',
     },
+    'id_tags': True,
 }
 
 YANDERE_CONFIG = {
@@ -87,6 +89,8 @@ def img_function(board_config):
     _key = _cfg('keys', {}).get
     _url = _cfg('urls', {}).get
 
+    id_tags         _cfg('id_tags', False)
+
     '''
         index_url: index page of the image board
         search_url: get one post based on the tags (default index_url)
@@ -106,7 +110,7 @@ def img_function(board_config):
     '''
 
     post_key =          _key('post', 'file_url')
-    id_key =            _key('id', 'id')
+    id_key =            _key('id', 'id=')
     limit_key =         _key('limit', 'limit')
     search_key =        _key('tags', 'tags')
     posts_key =         _key('posts', False)
@@ -153,7 +157,9 @@ def img_function(board_config):
 
             # Assume posts start counting from 1
             random_id = random.randint(1, int(most_recent_id))
-            rand_post_url = f'{show_url}?{id_key}={random_id}'
+            rand_post_url = f'{show_url}?{id_key}{random_id}'
+            if id_tags:
+                rand_post_url = f'{show_url}?{search_key}={id_key}{random_id}'
             post = await json_function(rand_post_url)
         else:
             post = random.choice(response)
