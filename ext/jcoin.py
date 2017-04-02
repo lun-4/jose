@@ -42,6 +42,9 @@ STEAL_CONSTANT = decimal.Decimal(0.42)
 STEALDB_PATH = 'db/steal.json'
 ARREST_TIME = 8 * HOUR
 
+# lol
+TATSUMAKI_ID = '172002275412279296'
+
 DEFAULT_STEALDB = '''{
     "points": {},
     "cdown": {},
@@ -506,7 +509,7 @@ class JoseCoin(jaux.Auxiliar):
             await cxt.say("The person you're trying to steal from doesn't have a JoséCoin account")
             return
 
-        if self.jcoin.data[target_id]['times_stolen'] < 1:
+        if target_id != TATSUMAKI_ID and self.jcoin.data[target_id]['times_stolen'] < 1:
             await cxt.say("You can't steal from someone who never used the steal command.")
             return
 

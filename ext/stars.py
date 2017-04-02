@@ -310,8 +310,8 @@ class Stars(jaux.Auxiliar):
             return False
 
         try:
-            self.logger.info("Removing message:%s from starboard:%s:%r", \
-                message_id, server_id, message.server.name)
+            self.logger.info("Removing message:%s from starboard:%s", \
+                message_id, server_id)
             del starboard['stars'][message_id]
         except IndexError:
             return False
