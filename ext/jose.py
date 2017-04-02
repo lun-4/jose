@@ -560,9 +560,13 @@ use `j!lnick` for local nickname")
 
         guilds = 0
         for server in self.client.servers:
-            m = server.get_member(jcommon.JOSE_ID)
-            await self.client.change_nickname(m, self.nick)
-            guilds += 1
+            m = server.me
+            try:
+                await self.client.change_nickname(m, self.nick)
+                guilds += 1
+            except Exception as err:
+                logger.error("Error changing nickname in %s:%r", \
+                    server.id, server.name, exc_info=True)
 
         await cxt.say("Changed nickname to `%r` in %d guilds", (self.nick, guilds))
 
