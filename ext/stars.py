@@ -326,7 +326,10 @@ class Stars(jaux.Auxiliar):
             return
 
         m = reaction.message
-        await self.add_star(m, user)
+        res = await self.add_star(m, user)
+        if not res:
+            self.logger.warning('[add_star] Failed to add star to %s@%s, %s[%s]', \
+                m.id, m.server.id, user.name, user.id)
 
     async def e_reaction_remove(self, reaction, user):
         if reaction.custom_emoji:
@@ -336,7 +339,10 @@ class Stars(jaux.Auxiliar):
             return
 
         m = reaction.message
-        await self.remove_star(m, user)
+        res = await self.remove_star(m, user)
+        if not res:
+            self.logger.warning('[remove_star] Failed to Remove star to %s@%s, %s[%s]', \
+                m.id, m.server.id, user.name, user.id)
 
     async def e_reaction_clear(self, message, reactions):
         starboard = self.stars.get(str(message.server.id))
@@ -346,7 +352,10 @@ class Stars(jaux.Auxiliar):
         if str(message.id) not in starboard['stars']:
             return
 
-        await self.remove_all(message)
+        res = await self.remove_all(message)
+        if not res:
+            self.logger.warning("[remove_all] Failed to remove all stars,  %s@%s", \
+                message.id, message.server.id)
 
     async def c_starboard(self, message, args, cxt):
         '''`j!starboard channel_name` - initialize Starboard'''
