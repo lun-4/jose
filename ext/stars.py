@@ -65,7 +65,7 @@ class Stars(jaux.Auxiliar):
                 if guild is None:
                     self.logger.info("[starboard] autoremoving server %s", guild_id)
                     del self.stars[guild_id]
-                    return
+                    break
 
                 channel = guild.get_channel(star['channel_id'])
                 if channel is None:
@@ -158,10 +158,10 @@ class Stars(jaux.Auxiliar):
         starboard_id = starboard['starboard_id']
         starboard_channel = server.get_channel(starboard_id)
         if starboard_channel is None:
-            del self.stars[server_id]
             self.logger.info('Autoremoving %s[%s] from starboard', \
                 server.name, server_id)
-            raise Exception('Autoemoved %s from starboard')
+            del self.stars[server_id]
+            raise Exception('Autoemoved %s from starboard' % server_id)
 
         stars = len(star['starrers'])
         star_msg_id = star['star_message']
@@ -202,7 +202,7 @@ class Stars(jaux.Auxiliar):
 
         try:
             self.stars['locks'].index(server_id)
-            return
+            return False
         except ValueError:
             pass
 
@@ -232,7 +232,7 @@ class Stars(jaux.Auxiliar):
 
         try:
             done = await self.update_star(server_id, channel_id, message_id)
-        except:
+        except Exception as err:
             self.logger.error('add_star(%s, %s[%s])', message.id, \
                 user.name, user.id, exc_info=True)
             return False
@@ -428,9 +428,11 @@ class Stars(jaux.Auxiliar):
             try:
                 self.stars['locks'].index(server_id)
                 self.stars['locks'].remove(server_id)
-                await cxt.say("Removed lock for %s[%s]", (message.server.name, server_id))
+                await cxt.say(":unlock: Removed lock for %s[%s]", \
+                    (message.server.name, server_id))
             except ValueError:
                 self.stars['locks'].append(str(message.server.id))
-                await cxt.say(":lock: Locked starboard for %s[%s]", (message.server.name, server_id))
+                await cxt.say(":lock: Locked starboard for %s[%s]", \
+                    (message.server.name, server_id))
         else:
             await cxt.say("Operation not found")
