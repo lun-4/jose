@@ -142,8 +142,6 @@ class JoseSpeak(jcommon.Extension):
         except:
             channel = server.default_channel
 
-        self.logger.info("server_messages debug %r %r", channel_id, channel)
-
         if channel is None:
             self.logger.warning("channel %r is None", channel_id)
             return 'None'
