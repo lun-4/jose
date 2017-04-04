@@ -269,6 +269,9 @@ class JoseMod(jaux.Auxiliar):
         if voice_state is None:
             return
 
+        if voice_state.voice_channel is None:
+            return
+
         if voice_state.voice_channel.id != DYNO_CHANNEL:
             dyno_channel = after.server.get_channel(DYNO_CHANNEL)
             await self.client.move_member(after, dyno_channel)
