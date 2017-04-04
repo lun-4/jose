@@ -518,6 +518,9 @@ class JoseCoin(jaux.Auxiliar):
             return
 
         thief_id = message.author.id
+        if self.jcoin.data[thief_id]['amount'] < 0.01:
+            await cxt.say("You have less than `0.01`JC, can't use the steal command")
+            return
 
         # check if thief has cooldowns in place
         cdown = self.stealdb['cdown'].get(thief_id, None)
