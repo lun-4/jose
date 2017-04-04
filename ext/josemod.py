@@ -14,11 +14,14 @@ MODERATION_DATABASE = 'db/moderation.json'
 MODERATOR_ROLE_NAME = 'Moderator'
 LOGID_MAX_TRIES = 20
 
+SERB = '212713131317788672'
+DYNO_ID = '155149108183695360'
+DYNO_CHANNEL = '278760658248663042'
+
 class JoseMod(jaux.Auxiliar):
     def __init__(self, cl):
         '''josemod - Moderator Extension'''
         jaux.Auxiliar.__init__(self, cl)
-        # TODO: Implement database
         self.moddb = {}
         self.cache = {
             'users': {},
@@ -247,6 +250,25 @@ class JoseMod(jaux.Auxiliar):
         }
 
         return True
+
+    async def e_voice_state_update(self, before, after):
+        # lol special shit
+        if before.server.id != SERB:
+            return
+
+        if before.id != after.id:
+            return
+
+        if after.id != DYNO_ID:
+            return
+
+        voice_state = after.voice
+        if voice_state is None:
+            return
+
+        if voice_state.channel.id != DYNO_CHANNEL:
+            dyno_channel = after.server.get_channel(DYNO_CHANNEL)
+            await self.client.move_member(after, dyno_channel)
 
     async def can_do(self, action, user):
         # TODO: specific actions to certain roles
