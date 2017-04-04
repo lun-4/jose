@@ -113,10 +113,7 @@ class JoseStats(jaux.Auxiliar):
         logging_ch = self.client.get_channel(jcommon.JOSE_LOG_CHANNEL_ID)
         if logging_ch is not None:
             await self.client.send_typing(logging_ch)
-
-        t2 = time.monotonic()
-
-        if logging_ch is not None:
+            t2 = time.monotonic()
             typing_ping = t2 - t1
         else:
             # make errors very obvious to the graph

@@ -1,6 +1,6 @@
 discord.py[voice]==0.16.7
 uvloop==0.8.0
-Pillow==4.0.0
+Pillow==4.1.0
 wolframalpha==3.0
 pyowm==2.6.1
 psutil==5.2.1
