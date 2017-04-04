@@ -80,6 +80,8 @@ class JoseBot(jaux.Auxiliar):
             'reaction_add': [],
             'reaction_remove': [],
             'reaction_clear': [],
+
+            'voice_state_update': [],
         }
 
     def ev_load(self, dflag=False):

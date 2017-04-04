@@ -388,6 +388,10 @@ async def on_message_edit(before, after):
     # this is bulky but yeah, fast solutions require ugliness
     await on_message(after)
 
+@bot.event
+async def on_voice_state_update(before, after):
+    await do_event('voice_state_update', [before, after])
+
 async def main_task():
     startupdelta = time.time() - jose.start_time
     jcommon.logger.info("--- STARTUP TOOK %.2f SECONDS ---", startupdelta)
