@@ -253,6 +253,9 @@ class JoseMod(jaux.Auxiliar):
 
     async def e_voice_state_update(self, before, after):
         # lol special shit
+        if before.server is None:
+            return
+
         if before.server.id != SERB:
             return
 
@@ -266,7 +269,7 @@ class JoseMod(jaux.Auxiliar):
         if voice_state is None:
             return
 
-        if voice_state.channel.id != DYNO_CHANNEL:
+        if voice_state.voice_channel.id != DYNO_CHANNEL:
             dyno_channel = after.server.get_channel(DYNO_CHANNEL)
             await self.client.move_member(after, dyno_channel)
 
