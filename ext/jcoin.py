@@ -385,7 +385,7 @@ class JoseCoin(jaux.Auxiliar):
         await cxt.say(HELPTEXT_JC_STEAL)
 
     async def c_stealreset(self, message, args, cxt):
-        '''`j!stealreset user` - reset an user's status in stealdb'''
+        '''`j!stealreset user` - reset a user's status in stealdb'''
         await self.is_admin(message.author.id)
 
         try:
