@@ -349,5 +349,7 @@ class JoseGambling(jaux.Auxiliar):
             _res = self.jcoin.transfer(tbank_id, message.author.id, applied_amount)
             if not _res[0]:
                 res.append(':sob: transfer error `%s`' % _res[1])
+        else:
+            res.append(':peach:')
 
         await cxt.say('\n'.join(res))
