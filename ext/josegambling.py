@@ -325,7 +325,8 @@ class JoseGambling(jaux.Auxiliar):
             await cxt.say("Error parsing `amount`")
             return
 
-        await self.jcoin_pricing(message.author.id, amount)
+        tbank_id = self.tbank_fmt(cxt)
+        await self.jcoin_pricing(cxt, amount)
 
         res = []
         slots = [random.choice(EMOJI_POOL) for i in range(3)]
