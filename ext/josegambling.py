@@ -317,7 +317,7 @@ class JoseGambling(jaux.Auxiliar):
         return
 
     async def c_slots(self, message, args, cxt):
-        await self.sane_jcoin(cxt)
+        self.sane_jcoin(cxt)
 
         try:
             amount = decimal.Decimal(args[1])
