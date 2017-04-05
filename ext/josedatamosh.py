@@ -28,7 +28,7 @@ def read_chunks(fh):
             break
         yield chunk
 
-async def datamosh_jpg(source_image, iterations):
+def datamosh_jpg(source_image, iterations):
     output_image = io.BytesIO()
     for chunk in read_chunks(source_image):
         output_image.write(chunk)
@@ -121,11 +121,14 @@ Resultados de fotos jogadas ao !datamosh:
             # read the image, copy into a buffer for manipulation
             width, height = img.size
 
-            if width > 1280 or height > 720:
-                await cxt.say("High resolution to work on(width > 1280 or height > 720)")
+            if width > 4096 or height > 2048:
+                await cxt.say("High resolution to work on(4096x2048 is the hard limit)")
                 return
 
-            output_image = await datamosh_jpg(source_image, iterations)
+            future = self.client.loop.run_in_executor(None, datamosh_jpg, \
+                source_image, iterations)
+
+            output_image = await future
 
             # send file
             await self.client.send_file(message.channel, \
