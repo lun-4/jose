@@ -26,6 +26,12 @@ a winner that will win all the money everyone paid.
 `j!jrcheck` checks if a JCR session is on/off
 ''' % (BETTING_FEE)
 
+EMOJI_POOL = ':thinking: :snail: :shrug: :chestnut: :ok_hand: :eggplant:'.split()
+
+BET_MULTIPLIER_EMOJI = ':thinking:'
+X6_EMOJI = ':eggplant: :ok_hand:'.split()
+X4_EMOJI = ':snail: :chestnut: :shrug:'.split()
+
 class JoseGambling(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
@@ -309,3 +315,37 @@ class JoseGambling(jaux.Auxiliar):
         await cxt.say("<@%s> won %.2fJC\n`%s`", (winner, amount, res[1]))
         del self.duels[challenger]
         return
+
+    async def c_slots(self, message, args, cxt):
+        await self.sane_jcoin(cxt)
+
+        try:
+            amount = decimal.Decimal(args[1])
+        except:
+            await cxt.say("Error parsing `amount`")
+            return
+
+        await self.jcoin_pricing(message.author.id, amount)
+
+        res = []
+        slots = [random.choice(EMOJI_POOL) for i in range(3)]
+
+        res.append(' '.join(slots))
+        bet_multiplier = slots.count(BET_MULTIPLIER_EMOJI)
+
+        for emoji in slots:
+            if slots.count(emoji) == 3:
+                if emoji in X4_EMOJI:
+                    bet_multiplier = 4
+                elif emoji in X6_EMOJI:
+                    bet_multiplier = 6
+
+        applied_amount = amount * bet_multiplier
+        res.append(f"**Multiplier**: {bet_multiplier}")
+        res.append(f'bet: {amount}, won: {applied_amount}')
+
+        res = self.jcoin.transfer(tbank_id, message.author.id, applied_amount)
+        if not res[0]:
+            res.append(':sob: transfer error `%s`' % res[1])
+
+        await cxt.say('\n'.join(res))
