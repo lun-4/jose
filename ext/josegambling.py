@@ -345,8 +345,9 @@ class JoseGambling(jaux.Auxiliar):
         res.append(f"**Multiplier**: {bet_multiplier}")
         res.append(f'bet: {amount}, won: {applied_amount}')
 
-        _res = self.jcoin.transfer(tbank_id, message.author.id, applied_amount)
-        if not _res[0]:
-            res.append(':sob: transfer error `%s`' % _res[1])
+        if applied_amount > 0:
+            _res = self.jcoin.transfer(tbank_id, message.author.id, applied_amount)
+            if not _res[0]:
+                res.append(':sob: transfer error `%s`' % _res[1])
 
         await cxt.say('\n'.join(res))
