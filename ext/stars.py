@@ -369,6 +369,9 @@ class Stars(jaux.Auxiliar):
 
         server = message.server
 
+        self.logger.info('[stars] Initializing starboard @ %s[%s]', \
+            str(message.server.name), message.server.id)
+
         # everyone can read, only jose can write
         everyone_perms = perm_overwrite(read_messages=True, write_messages=False)
         jose_perms = perm_overwrite(read_messages=True, write_messages=True)
