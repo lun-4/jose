@@ -57,7 +57,7 @@ Command | Description | Example | Alias
 
 ### `josestats`
 
-[Documentation for the `j!query` command](https://github.com/lkmnds/jose/blob/master/doc/queries.md)
+[Documentation for the `j!query` command](https://github.com/lkmnds/jose/blob/master/doc/cmd/queries.md)
 
 ### `josextra`
 
@@ -67,7 +67,7 @@ Command | Description | Example | Alias
 `j!tm text` | Transform a Text In A Trademark™ | `j!tm Hell` |
 `j!status` | Status of josé, with results from pings to Discord and Google | |
 `j!report` | José Report | |
-`j!docs [topic | "list"]` | Shows documentation for josé | |
+`j!docs [topic or "list"]` | Shows documentation for josé | |
 `j!yt search_terms` | Search YouTube | `j!yt Tunak Tunak Tun sped up every time they say Tunak` |
 `j!sndc search_terms` | Search Soundcloud | `j!sndc Tunak Tunak Tun` |
 `j!color "rand"|#aabbcc|red,green,blue` | show colors | `j!color #DEADAF`, `j!color 100,50,100`, `j!color rand` |
