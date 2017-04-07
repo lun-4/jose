@@ -368,11 +368,6 @@ class JoseSpeak(jcommon.Extension):
         output = subprocess.Popen(['wc', 'db/jose-data.txt'], stdout=subprocess.PIPE).communicate()[0]
         await cxt.say(output)
 
-    async def c_zelaotxt(self, message, args, cxt):
-        '''`j!zelaotxt` - Mostra a quantidade de linhas, palavras e bytes no db/zelao.txt'''
-        output = subprocess.Popen(['wc', 'db/zelao.txt'], stdout=subprocess.PIPE).communicate()[0]
-        await cxt.say(output)
-
     async def say_prefixed(self, cxt, prefix):
         await cxt.send_typing()
         ecxt = jcommon.EmptyContext(self.client, cxt.message)
