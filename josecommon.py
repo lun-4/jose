@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import time
 import re
 import json
@@ -46,7 +47,8 @@ JOSE_APP_ID = '202586824013643777'
 JOSE_LOG_CHANNEL_ID = '290698227483934721'
 OAUTH_URL = 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=67259457' % JOSE_APP_ID
 
-APRIL_FOOLS = False
+_now = datetime.datetime.utcnow()
+APRIL_FOOLS = _now.month == 4 and _now.day == 1
 
 #configuration things
 ADMIN_TOPICS = {
