@@ -436,11 +436,14 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
             em.add_field(name='JoséCoin Wallet', value='{}JC'.format(account['amount']))
             em.add_field(name='Tax paid', value='{}JC'.format(account['taxpaid']))
 
-            ratio = account['success_steal'] / account['times_stolen']
-            ratio = round(ratio, 2)
+            try:
+                ratio = account['success_steal'] / account['times_stolen']
+                ratio = round(ratio, 2)
 
-            em.add_field(name='Stealing', value='{} tries, {} success, ratio of success: {}/steal'.format( \
-                account['times_stolen'], account['success_steal'], ratio))
+                em.add_field(name='Stealing', value='{} tries, {} success, ratio of success: {}/steal'.format( \
+                    account['times_stolen'], account['success_steal'], ratio))
+            except ZeroDivisionError:
+                pass
 
         await cxt.say_embed(em)
 
