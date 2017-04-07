@@ -15,8 +15,6 @@ import jcoin.josecoin as josecoin
 import joseconfig as jconfig
 import joseerror as je
 
-# profiling
-from pympler import tracker
 from random import SystemRandom
 random = SystemRandom()
 
@@ -426,8 +424,6 @@ def main(args):
     except:
         mode = 'normal'
 
-    tr = tracker.SummaryTracker()
-
     if mode == 'dev':
         print("===ENTERING DEVELOPER MODE===")
         jose.dev_mode = True
@@ -468,8 +464,6 @@ def main(args):
 
     jcommon.logger.info("[asyncio] Closing event loop")
     loop.close()
-
-    tr.print_diff()
 
     jcommon.logger.info("[exit] main")
     logging.shutdown()
