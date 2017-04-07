@@ -90,7 +90,7 @@ class JoseMod(jaux.Auxiliar):
         await self.client.send_message(log_channel, embed=em)
 
     async def e_member_update(self, before, after):
-        log_channel = self.get_from_data(member.server.id, 'log_channel')
+        log_channel = self.get_from_data(after.server.id, 'log_channel')
         if log_channel is None:
             return
 
