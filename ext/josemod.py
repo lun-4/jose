@@ -9,6 +9,7 @@ import josecommon as jcommon
 import uuid
 import time
 import copy
+import datetime
 
 MODERATION_DATABASE = 'db/moderation.json'
 MODERATOR_ROLE_NAME = 'Moderator'
@@ -96,7 +97,7 @@ class JoseMod(jaux.Auxiliar):
 
         flag = False
         em = discord.Embed(title='Nickname Change', colour=discord.Colour.green())
-        em.timestamp = member.created_at
+        em.timestamp = datetime.datetime.now()
         em.set_author(name=str(after), icon_url=after.avatar_url or after.default_avatar_url)
         em.set_footer(text='Changed')
 
