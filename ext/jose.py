@@ -75,6 +75,7 @@ class JoseBot(jaux.Auxiliar):
 
             'member_ban': [],
             'member_unban': [],
+            'member_update': [],
             'message_edit': [],
 
             'reaction_add': [],

@@ -89,6 +89,31 @@ class JoseMod(jaux.Auxiliar):
 
         await self.client.send_message(log_channel, embed=em)
 
+    async def e_member_update(self, before, after):
+        log_channel = self.get_from_data(member.server.id, 'log_channel')
+        if log_channel is None:
+            return
+
+        flag = False
+        em = discord.Embed(title='Nickname Change', colour=discord.Colour.green())
+        em.timestamp = member.created_at
+        em.set_author(name=str(after), icon_url=after.avatar_url or after.default_avatar_url)
+        em.set_footer(text='Changed')
+
+        if before.nick is None and after.nick is not None:
+            flag = True
+            em.add_field(name='Add', value=f'**{after.nick}**')
+        elif before.nick is not None and after.nick is None:
+            flag = True
+            em.add_field(name='Remove')
+        else before.nick != after.nick:
+            flag = True
+            em.add_field(name='Before', value=f'{before.nick!s}')
+            em.add_field(name='After', value=f'{after.nick!s}')
+
+        if flag:
+            await self.client.send_message(log_channel, embed=em)
+
     async def e_member_ban(self, member):
         await self.mod_log('ban', member.server, member, None)
 

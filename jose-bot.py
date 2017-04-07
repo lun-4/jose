@@ -390,6 +390,10 @@ async def on_message_edit(before, after):
 async def on_voice_state_update(before, after):
     await do_event('voice_state_update', [before, after])
 
+@bot.event
+async def on_member_update(before, after):
+    await do_event('member_update', [before, after])
+
 async def main_task():
     startupdelta = time.time() - jose.start_time
     jcommon.logger.info("--- STARTUP TOOK %.2f SECONDS ---", startupdelta)
