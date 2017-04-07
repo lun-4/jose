@@ -109,10 +109,8 @@ class JoseSpeak(jcommon.Extension):
 
     async def ext_load(self):
         try:
-
             # make generators
             self.cult_generator = await make_texter('db/jose-data.txt', 1)
-            self.global_generator = await make_texter('db/zelao.txt', 1)
 
             return True, ''
         except Exception as e:
@@ -364,10 +362,6 @@ class JoseSpeak(jcommon.Extension):
     async def c_falar(self, message, args, cxt):
         """`j!falar` - josé fala"""
         await self.speak(self.cult_generator, cxt)
-
-    async def c_gfalar(self, message, args, cxt):
-        """`j!gfalar` - falar usando o texto global"""
-        await self.speak(self.global_generator, cxt)
 
     async def c_josetxt(self, message, args, cxt):
         '''`j!josetxt` - Mostra a quantidade de linhas, palavras e bytes no db/jose-data.txt'''
