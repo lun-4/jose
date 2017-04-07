@@ -101,7 +101,6 @@ class JoseSpeak(jcommon.Extension):
 
         self.text_generators = {}
 
-        self.txcleaned = -1
         self.last_texter_mcount = -1
         self.last_texter_time = -1
 
@@ -204,7 +203,6 @@ class JoseSpeak(jcommon.Extension):
 
         deadtexters = len(sid_to_clear)
         if deadtexters > 0:
-            self.txcleaned = deadtexters
             lentg = len(self.text_generators)
 
             for serverid in sid_to_clear:
