@@ -57,7 +57,6 @@ class JoseMod(jaux.Auxiliar):
             return
 
         if 'channel' in field:
-            self.logger.info("[get_from_data] field %r channel %r", field, data[field])
             return self.channel_cache(data[field])
         else:
             return data.get(field)
@@ -96,7 +95,7 @@ class JoseMod(jaux.Auxiliar):
             return
 
         flag = False
-        em = discord.Embed(title='Nickname Change', colour=discord.Colour.green())
+        em = discord.Embed(title='Nickname Change', colour=discord.Colour(0x9649cb))
         em.timestamp = datetime.datetime.now()
         em.set_author(name=str(after), icon_url=after.avatar_url or after.default_avatar_url)
         em.set_footer(text='Changed')
@@ -109,8 +108,8 @@ class JoseMod(jaux.Auxiliar):
             em.add_field(name='Remove')
         elif before.nick != after.nick:
             flag = True
-            em.add_field(name='Before', value=f'{before.nick!s}')
-            em.add_field(name='After', value=f'{after.nick!s}')
+            em.add_field(name='Before', value=f'**{before.nick!s}**')
+            em.add_field(name='After', value=f'**{after.nick!s}**')
 
         if flag:
             await self.client.send_message(log_channel, embed=em)
