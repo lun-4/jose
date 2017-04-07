@@ -215,6 +215,7 @@ class JoseMod(jaux.Auxiliar):
         elif logtype == 'reason':
             log_id = data[1]
             reason = data[2]
+            moderator_id = data[3]
 
             if reason is None:
                 return False
@@ -478,7 +479,8 @@ class JoseMod(jaux.Auxiliar):
         except:
             await cxt.say("Error parsing `reason`")
 
-        done = await self.mod_log('reason', message.server, log_id, reason)
+        done = await self.mod_log('reason', message.server, log_id, reason, \
+            str(message.author.id))
         if done:
             await cxt.say(":ok_hand: Reason processed")
         else:
