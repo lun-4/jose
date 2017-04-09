@@ -116,8 +116,8 @@ class JoseStats(jaux.Auxiliar):
             t2 = time.monotonic()
             typing_ping = t2 - t1
         else:
-            # make errors very obvious to the graph
-            typing_ping = -1
+            # make errors *almost* obvious to the graph
+            typing_ping = -0.2
 
         self.timed_stats[timestamp] = [
             # num of messages received
