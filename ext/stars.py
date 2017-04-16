@@ -13,6 +13,13 @@ DEFAULT_STARDB = '''{
 perm_overwrite = discord.PermissionOverwrite
 channel_perms = discord.ChannelPermissions
 
+BLUE    = 0x0066ff
+BRONZE  = 0xb87333
+SILVER  = 0xC0C0C0
+GOLD    = 0xD4AF37
+RED     = 0xff0000
+WHITE   = 0xffffff
+
 def _data(message, user):
     if isinstance(message, dict) and user is None:
         return message['server_id'], message['channel_id'], message['message_id']
@@ -105,11 +112,24 @@ class Stars(jaux.Auxiliar):
         return '%d stars, <#%s> ID: %s' % \
             (len(star['starrers']), message.channel.id, message.id)
 
-    def make_embed(self, message):
+    def make_embed(self, message, stars):
         content = message.content
 
         em = discord.Embed(description=content, colour=discord.Colour(0xffff00))
         em.timestamp = message.timestamp
+
+        if stars >= 0:
+            em.colour = BLUE
+        if stars >= 3:
+            em.colour = BRONZE
+        if stars >= 5:
+            em.colour = SILVER
+        if stars >= 10:
+            em.colour = GOLD
+        if stars >= 20:
+            em.colour = RED
+        if stars >= 50:
+            em.colour = WHITE
 
         author = message.author
         avatar = author.avatar_url or author.default_avatar_url
@@ -180,7 +200,7 @@ class Stars(jaux.Auxiliar):
         if stars < 1:
             return True
 
-        m_embed = self.make_embed(message)
+        m_embed = self.make_embed(message, stars)
         m_str = self.star_str(star, message)
 
         if star_msg is not None:
