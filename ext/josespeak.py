@@ -252,11 +252,11 @@ class JoseSpeak(jcommon.Extension):
         del texter, result, res, logs
 
     async def c_spt(self, message, args, cxt):
-        '''`j!spt` - alias para `!speaktrigger`'''
+        '''`j!spt` - alias for `!speaktrigger`'''
         await self.c_speaktrigger(message, args, cxt)
 
     async def c_ntexter(self, message, args, cxt):
-        '''`j!ntexter serverid1 serverid2 ...` - Create Texters **[ADMIN COMMAND]**'''
+        '''`j!ntexter serverid1 serverid2 ...` - Create Texters'''
         await self.is_admin(message.author.id)
 
         try:
