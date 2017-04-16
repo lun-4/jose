@@ -476,7 +476,7 @@ class Stars(jaux.Auxiliar):
         except discord.HTTPException:
             await cxt.say("Failed to retreive the message")
         else:
-            server_id, channel_id, message_id, user_id = _data(message, message.author)
+            server_id, _, _, _ = _data(message, message.author)
 
             try:
                 starboard = self.stars[server_id]
