@@ -490,7 +490,7 @@ class Stars(jaux.Auxiliar):
 
             star = starboard['stars'].get(message_id)
             if star is None:
-                await cxt.say('message not found in starboard')
+                await cxt.say(f'message {message_id} not found in starboard: `{star}`')
                 return False
 
             em = discord.Embed(title='Message', colour=discord.Colour(0xffff00))
