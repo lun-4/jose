@@ -439,3 +439,50 @@ class Stars(jaux.Auxiliar):
                     (message.server.name, server_id))
         else:
             await cxt.say("Operation not found")
+
+    async def c_starrers(self, message, args, cxt):
+        try:
+            message_id = args[1]
+        except:
+            await cxt.say("Error parsing Message ID.")
+            return
+
+        try:
+            msg = await self.client.get_message(message.channel, message_id)
+        except discord.NotFound:
+            await cxt.say("Message not found in this channel.")
+        except discord.Forbidden:
+            await cxt.say("No permissions to get messages")
+        except discord.HTTPException:
+            await cxt.say("Failed to retreive the message")
+        else:
+            server_id, channel_id, message_id, user_id = _data(message, message.author)
+
+            try:
+                starboard = self.stars[server_id]
+            except IndexError:
+                await cxt.say("No starboard initialized")
+                return
+
+            if message.channel.id == starboard['starboard_id']:
+                await cxt.say('lol no')
+                return False
+
+            star = starboard['stars'].get(message_id)
+            if star is None:
+                await cxt.say('message not found in starboard')
+                return False
+
+            em = discord.Embed(title='Message', colour=discord.Colour(0xffff00))
+            em.timestamp = msg.timestamp
+            em.description = msg.content
+
+            author = msg.author
+            avatar = author.avatar_url or author.default_avatar_url
+            em.set_author(name=author.display_name, icon_url=avatar)
+
+            starrers_as_members = [discord.utils.get(self.client.get_all_members(), \
+                id=mid) for mid in star['starrers']]
+
+            em.add_field(name='Starrers', value='\n'.join([str(m) for m in starrers_as_members]))
+            await cxt.say_embed(em)
