@@ -791,7 +791,7 @@ class Context:
                     return ret
             except discord.Forbidden:
                 # I don't care anymore
-                pass
+                return False
 
 class EmptyContext:
     def __init__(self, _client, message):
@@ -814,6 +814,7 @@ class EmptyContext:
             translated = translated % tup
 
         self.messages.append(translated)
+        return False
 
     async def getall(self):
         return '\n'.join(self.messages)
