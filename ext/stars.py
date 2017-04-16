@@ -505,7 +505,7 @@ class Stars(jaux.Auxiliar):
             em.set_author(name=author.display_name, icon_url=avatar)
 
             starrers_as_members = [discord.utils.get(self.client.get_all_members(), \
-                id=mid) for mid in star['starrers']]
+                id=mid, server__id=server_id) for mid in star['starrers']]
 
             em.add_field(name='Starrers', value=', '.join([m.display_name \
                 for m in starrers_as_members]))
