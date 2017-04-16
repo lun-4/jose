@@ -112,24 +112,27 @@ class Stars(jaux.Auxiliar):
         return '%d stars, <#%s> ID: %s' % \
             (len(star['starrers']), message.channel.id, message.id)
 
+    def star_color(self, stars):
+        color = 0xffff00
+        if stars >= 0:
+            color = BLUE
+        if stars >= 3:
+            color = BRONZE
+        if stars >= 5:
+            color = SILVER
+        if stars >= 10:
+            color = GOLD
+        if stars >= 20:
+            color = RED
+        if stars >= 50:
+            color = WHITE
+        return color
+
     def make_embed(self, message, stars):
         content = message.content
 
-        em = discord.Embed(description=content, colour=discord.Colour(0xffff00))
+        em = discord.Embed(description=content, colour=self.star_color(stars))
         em.timestamp = message.timestamp
-
-        if stars >= 0:
-            em.colour = BLUE
-        if stars >= 3:
-            em.colour = BRONZE
-        if stars >= 5:
-            em.colour = SILVER
-        if stars >= 10:
-            em.colour = GOLD
-        if stars >= 20:
-            em.colour = RED
-        if stars >= 50:
-            em.colour = WHITE
 
         author = message.author
         avatar = author.avatar_url or author.default_avatar_url
@@ -493,7 +496,7 @@ class Stars(jaux.Auxiliar):
                 await cxt.say(f'message {message_id} not found in starboard: `{star}`')
                 return False
 
-            em = discord.Embed(title='Message', colour=discord.Colour(0xffff00))
+            em = discord.Embed(title='Message', colour=self.star_color(len(star['starrers'])))
             em.timestamp = msg.timestamp
             em.description = msg.content
 
@@ -504,5 +507,7 @@ class Stars(jaux.Auxiliar):
             starrers_as_members = [discord.utils.get(self.client.get_all_members(), \
                 id=mid) for mid in star['starrers']]
 
-            em.add_field(name='Starrers', value='\n'.join([str(m) for m in starrers_as_members]))
+            em.add_field(name='Starrers', value=', '.join([m.display_name \
+                for m in starrers_as_members]))
+
             await cxt.say_embed(em)
