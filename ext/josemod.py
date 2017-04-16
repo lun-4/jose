@@ -253,7 +253,8 @@ class JoseMod(jaux.Auxiliar):
             if log is None:
                 return False
 
-            # overwrite reason
+            # overwrite moderator and reason
+            log['data'][3] = moderator_id
             log['data'][4] = reason
 
             logmsg = await self.client.get_message(mod_channel, log['msg_id'])
