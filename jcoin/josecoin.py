@@ -27,6 +27,12 @@ def lockdb():
     '''Locks JoséCoin database, no transactions can be done'''
     global lock
     lock = True
+    return lock
+
+def unlockdb():
+    global lock
+    lock = False
+    return lock
 
 def ledger_data(fpath, data):
     with open(fpath, 'a') as f:
@@ -86,7 +92,7 @@ def get(id_acc):
         return False, 'database is locked'
 
     if id_acc not in data:
-        return False, 'account doesn\'t exist'
+        return False, 'account doesn\'t exist, read `j!docs jcoin`'
     return True, data[id_acc]
 
 def gen():
