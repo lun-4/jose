@@ -6,7 +6,6 @@ José
 *Este arquivo em português pode ser encontrado em [README-pt.md](https://github.com/lkmnds/jose/blob/master/README-pt.md)*
 
 José is a general-purpose bot for Discord written in Python.
-The bot talks in portuguese and only that, no translation module is available for now, nor is planned.
 
 **Redis and Python 3.5+ is needed**
 
