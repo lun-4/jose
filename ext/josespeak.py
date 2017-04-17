@@ -160,7 +160,7 @@ class JoseSpeak(jcommon.Extension):
                 filtered = jcommon.speak_filter(message.content)
                 messages.append(filtered)
         except discord.Forbidden:
-            self.logger.info(f'got Forbidden from {server_id}')
+            self.logger.info(f'got Forbidden from {serverid}')
             del server, logs, botblock, channel
             return ['None']
 
