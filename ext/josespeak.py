@@ -147,19 +147,23 @@ class JoseSpeak(jcommon.Extension):
         botblock = await jcommon.configdb_get(serverid, 'botblock')
 
         messages = []
-        async for message in logs:
-            author = message.author
-            if author.id == jcommon.JOSE_ID:
-                continue
+        try:
+            async for message in logs:
+                author = message.author
+                if author.id == jcommon.JOSE_ID:
+                    continue
 
-            if author.bot and botblock:
-                continue
+                if author.bot and botblock:
+                    continue
 
-            filtered = jcommon.speak_filter(message.content)
-            messages.append(filtered)
+                filtered = jcommon.speak_filter(message.content)
+                messages.append(filtered)
+        except discord.Forbidden:
+            self.logger.info(f'got Forbidden from {server_id}')
+            del server, logs, botblock, channel
+            return ['None']
 
         del server, logs, botblock, channel
-
         return messages
 
     async def server_messages_string(self, serverid, limit=None):
