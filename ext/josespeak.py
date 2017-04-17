@@ -5,6 +5,7 @@ import random
 import subprocess
 import time
 import asyncio
+import discord
 import sys
 sys.path.append("..")
 import josecommon as jcommon
