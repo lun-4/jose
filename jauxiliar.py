@@ -55,7 +55,7 @@ class Auxiliar(jcommon.Extension):
 
         authorid = cxt.message.author.id
         if authorid not in self.jcoin.data:
-            raise je.JoseCoinError("Account doesn't exist")
+            raise je.JoseCoinError("Account doesn't exist, use j!account")
 
         # check if account is in top 10 most rich people
         sorted_data = sorted(self.jcoin.data, key=lambda userid: \
@@ -115,7 +115,7 @@ class Auxiliar(jcommon.Extension):
         self.ensure_tbank(cxt)
 
         if author_id not in self.jcoin.data:
-            raise je.JoseCoinError('You don\'t have a JoséCoin account')
+            raise je.JoseCoinError('You don\'t have a JoséCoin account, use j!account')
 
     def parse_channel(self, string):
         if string[0:2] == '<#':
