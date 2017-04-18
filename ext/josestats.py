@@ -41,6 +41,7 @@ class JoseStats(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
         self.statistics = {}
+        self.jose = self.client.jose
 
         # every 2 minutes, save databases
         self.cbk_new('jstats.savedb', self.savedb, 180)
@@ -119,6 +120,8 @@ class JoseStats(jaux.Auxiliar):
             # make errors *almost* obvious to the graph
             typing_ping = -0.2
 
+        jose = self.jose
+
         self.timed_stats[timestamp] = [
             # num of messages received
             self.statistics['gl_messages'],
@@ -131,6 +134,18 @@ class JoseStats(jaux.Auxiliar):
 
             # ping to send a typing status
             typing_ping,
+
+            # message more like meme
+            jose.msgcount_min,
+            jose.msgcount_hour,
+
+            jose.best_msg_minute,
+            jose.best_msg_hour,
+
+            jose.total_msg,
+
+            # total socket events
+            sum(jose.socket_stats.values()),
         ]
 
         self.jsondb_save('timed_stats')
