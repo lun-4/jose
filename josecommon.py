@@ -56,7 +56,6 @@ ADMIN_TOPICS = {
     '162819866682851329': ('Development',),
     '144377237997748224': ('General Support',),
     '191334773744992256': ('General Support',),
-    '142781100152848384': ('Development',),
 }
 
 ADMIN_IDS = list(ADMIN_TOPICS.keys())
