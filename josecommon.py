@@ -31,7 +31,7 @@ handler.setFormatter(formatter)
 # add the handlers to the logger
 logger.addHandler(handler)
 
-JOSE_VERSION = '1.5.3'
+JOSE_VERSION = '1.5.4'
 JOSE_PREFIX = 'j!'
 LEN_PREFIX = len(JOSE_PREFIX)
 
