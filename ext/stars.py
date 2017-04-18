@@ -6,6 +6,9 @@ import copy
 sys.path.append("..")
 import jauxiliar as jaux
 
+from random import SystemRandom
+random = SystemRandom()
+
 DEFAULT_STARDB = '''{
     "locks": []
 }'''
