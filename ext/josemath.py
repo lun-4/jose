@@ -180,7 +180,7 @@ class JoseMath(jaux.Auxiliar):
 
         res = [f'{location}']
         res.append(f' - Status: `{status}` : {icon}')
-        res.append(f' - `{_wg("celsius")} °C, {_wg("fahrenheit")} °F, {_wg()} °K`')
+        res.append(f' - `{_wg("celsius")} °C, {_wg("fahrenheit")} °F, {_wg(None)} °K`')
 
         await cxt.say('\n'.join(res))
 
