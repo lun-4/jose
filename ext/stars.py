@@ -545,5 +545,5 @@ class Stars(jaux.Auxiliar):
             return
 
         em = self.make_embed(msg, len(star['starrers']))
-        m_str = self.star_str(star, message)
+        m_str = self.star_str(star, msg)
         await self.client.send_message(message.channel, m_str, embed=em)
