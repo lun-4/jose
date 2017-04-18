@@ -547,3 +547,7 @@ class Stars(jaux.Auxiliar):
         em = self.make_embed(msg, len(star['starrers']))
         m_str = self.star_str(star, msg)
         await self.client.send_message(message.channel, m_str, embed=em)
+
+    async def c_rs(self, message, args, cxt):
+        '''`j!rs` - alias for `j!randomstar`'''
+        await self.c_randomstar(message, args, cxt)
