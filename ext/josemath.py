@@ -29,6 +29,28 @@ CRYPTOAPI_HELPURL = 'https://www.cryptocompare.com/api'
 CRYPTOAPI_MULTIPRICE = 'https://min-api.cryptocompare.com/data/pricemulti?fsyms=%s&tsyms=%s'
 CRYPTOAPI_ONEPRICE = 'https://min-api.cryptocompare.com/data/price?fsym=%s&tsyms=%s'
 
+W_CLEAR_SKY =           ':sunny:'
+W_FEW_CLOUDS =          ':white_sun_small_cloud:'
+W_SCATTERED_CLOUDS =    ':partly_sunny:'
+W_BROKEN_CLOUDS =       ':cloud:'
+W_SHOWER_RAIN =         ':cloud_rain:'
+W_RAIN =                ':cloud_rain:'
+W_THUNDERSTORM =        ':thunder_cloud_rain:'
+W_SNOW =                ':snowflake:'
+W_MIST =                ':foggy:'
+
+W_ICONS = {
+    '01d': W_CLEAR_SKY,
+    '02d': W_FEW_CLOUDS,
+    '03d': W_SCATTERED_CLOUDS,
+    '04d': W_BROKEN_CLOUDS,
+    '09d': W_SHOWER_RAIN,
+    '10d': W_RAIN,
+    '11d': W_THUNDERSTORM,
+    '13d': W_SNOW,
+    '50d': W_MIST,
+}
+
 class JoseMath(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
@@ -133,7 +155,6 @@ class JoseMath(jaux.Auxiliar):
 
     async def c_temperature(self, message, args, cxt):
         '''`j!temperature location` - temperature data from OpenWeatherMap'''
-        # ratelimit 60/minute
         if len(args) < 2:
             await cxt.say(self.c_temperature.__doc__)
             return
@@ -147,27 +168,28 @@ class JoseMath(jaux.Auxiliar):
                 self.owm.weather_at_place, location)
             observation = await future
         except:
-            await cxt.say("Erro tentando conseguir a temperatura para esse local")
+            await cxt.say("Error gathering weather data")
             return
+
         w = observation.get_weather()
+        _wg = lambda t: w.get_temperature(t)['temp']
 
-        tempkelvin = w.get_temperature()
-        tempcelsius = w.get_temperature("celsius")
-        tempfahren = w.get_temperature("fahrenheit")
+        _icon = w.get_weather_icon_name()
+        icon = W_ICONS.get(_icon)
+        status = w.get_detailed_status()
 
-        celsiusnow = tempcelsius['temp']
-        fahnow = tempfahren['temp']
-        kelnow = tempkelvin['temp']
+        res = [f'{location}']
+        res.append(f' - Status: `{status}` : {icon}')
+        res.append(f' - `{_wg("celsius")} °C, {_wg("fahrenheit")} °F, {_wg()} °K`')
 
-        await cxt.say("`%s` is at `%s °C, %s °F, %s °K`", \
-            (location, celsiusnow, fahnow, kelnow))
+        await cxt.say('\n'.join(res))
 
-    async def c_temp(self, message, args, cxt):
-        '''`j!temp location` - alias para `!temperature`'''
+    async def c_weather(self, message, args, cxt):
+        '''`j!weather location` - alias for `j!temperature`'''
         await self.c_temperature(message, args, cxt)
 
-    async def c_therm(self, message, args, cxt):
-        '''`j!therm location` - alias para `!temperature`'''
+    async def c_temp(self, message, args, cxt):
+        '''`j!temp location` - alias for `j!temperature`'''
         await self.c_temperature(message, args, cxt)
 
     def lewd(self, n):
