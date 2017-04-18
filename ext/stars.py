@@ -511,3 +511,36 @@ class Stars(jaux.Auxiliar):
                 for m in starrers_as_members]))
 
             await cxt.say_embed(em)
+
+    async def c_randomstar(self, message, args, cxt):
+        server_id, _, _, _ = _data(message, message.author)
+
+        try:
+            starboard = self.stars[server_id]
+        except IndexError:
+            await cxt.say("No starboard initialized")
+            return
+
+        stars = starboard['stars']
+        message_id = random.choice(list(stars.keys()))
+        star = stars.get(message_id)
+        if star is None:
+            await cxt.say(f'LOL I CHOSE A NONEXISTING MESSAGE')
+            return False
+
+        msg_channel = self.client.get_channel(star['channel_id'])
+        try:
+            msg = await self.client.get_message(msg_channel, message_id)
+        except discord.NotFound:
+            await cxt.say("Message not found in this channel.")
+            return
+        except discord.Forbidden:
+            await cxt.say("No permissions to get messages")
+            return
+        except discord.HTTPException:
+            await cxt.say("Failed to retreive the message")
+            return
+
+        em = self.make_embed(msg, len(star['starrers']))
+        m_str = self.star_str(star, message)
+        await self.client.send_message(message.channel, m_str, embed=em)
