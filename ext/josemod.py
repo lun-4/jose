@@ -105,7 +105,7 @@ class JoseMod(jaux.Auxiliar):
             em.add_field(name='Add', value=f'**{after.nick}**')
         elif before.nick is not None and after.nick is None:
             flag = True
-            em.add_field(name='Remove', value="<nickaneme removal>")
+            em.add_field(name='Remove', value="<nickname removal>")
         elif before.nick != after.nick:
             flag = True
             em.add_field(name='Before', value=f'**{before.nick!s}**')
