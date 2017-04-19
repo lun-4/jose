@@ -44,6 +44,7 @@ ARREST_TIME = 8 * HOUR
 
 # lol
 TATSUMAKI_ID = '172002275412279296'
+MAX_LOAN = 20
 
 DEFAULT_STEALDB = '''{
     "points": {},
@@ -794,6 +795,10 @@ class JoseCoin(jaux.Auxiliar):
                 await cxt.say("You can't loan more than what taxbank has.")
                 return
 
+            if loan > MAX_LOAN:
+                await cxt.say("You can't make a loan higher than 20JC.")
+                return
+
             if tbank['loans'].get(message.author.id, False):
                 await cxt.say("You can't make another loan")
                 return
@@ -813,7 +818,7 @@ class JoseCoin(jaux.Auxiliar):
         else:
             need_to_pay = tbank['loans'].get(message.author.id)
             if need_to_pay is None:
-                await cxt.say("You don't need to pay nothing.")
+                await cxt.say("You don't need to pay anything.")
                 return
 
             ok = self.jcoin.transfer(message.author.id, tbank_id, need_to_pay)

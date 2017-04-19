@@ -52,7 +52,7 @@ APRIL_FOOLS = _now.month == 4 and _now.day == 1
 
 #configuration things
 ADMIN_TOPICS = {
-    # Luna, Corno, Dan and Nat
+    # Luna, Corno, Dan
     '162819866682851329': ('Development',),
     '144377237997748224': ('General Support',),
     '191334773744992256': ('General Support',),
