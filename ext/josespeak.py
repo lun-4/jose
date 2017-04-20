@@ -21,7 +21,7 @@ MESSAGE_LIMIT = 3000
 LETTER_TO_PITCH = jcommon.LETTER_TO_PITCH
 
 SPEAK_TRIGGER_PREFIX = 'jose '
-GOOD_TEXT_PROBABILITY = 0.69
+GOOD_TEXT_PROBABILITY = 0.6
 
 async def make_texter(textpath=None, markov_length=2, text=None):
     texter = NewTexter(textpath, markov_length, text)
