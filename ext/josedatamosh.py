@@ -83,15 +83,8 @@ class JoseDatamosh(jaux.Auxiliar):
     async def c_datamosh(self, message, args, cxt):
         '''
         `j!datamosh <url> [iterations]` - *Datamoshing.*
-        ```
-Formatos recomendados(*testados*): JPG, PNG
-Formatos NÃO recomendados: BMP, GIF
-
-Resultados de fotos jogadas ao !datamosh:
- * ou o resultado é imcompreensível
- * ou o resultado é legalzinho
- * ou não tem visualização(o datamosh quebrou o arquivo)
-        ```
+        Sometimes the result given by `j!datamosh` doesn't have any visualization,
+        that means `j!datamosh` broke the file and you need to try again.
         '''
 
         iterations = 10
