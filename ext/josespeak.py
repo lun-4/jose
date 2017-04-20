@@ -13,11 +13,15 @@ import joseerror as je
 
 from midiutil.MidiFile import MIDIFile
 import markovify
+import _letters as letters
 
 logger = None
 PROB_FULLWIDTH_TEXT = 0.1
 MESSAGE_LIMIT = 3000
 LETTER_TO_PITCH = jcommon.LETTER_TO_PITCH
+
+SPEAK_TRIGGER_PREFIX = 'jose'
+GOOD_TEXT_PROBABILITY = 0.69
 
 async def make_texter(textpath=None, markov_length=2, text=None):
     texter = NewTexter(textpath, markov_length, text)
@@ -326,12 +330,20 @@ class JoseSpeak(jcommon.Extension):
             return
 
         random_chance = False
+        in_conversation = False
+
         if probability > 0:
             # don't spend random calls when probability is 0
             if random.random() < probability:
                 random_chance = True
 
-        if random_chance or cxt.env.get('flag', False):
+        _content = message.content
+        if _content.startswith(SPEAK_TRIGGER_PREFIX):
+            statement = _content[len(SPEAK_TRIGGER_PREFIX):]
+            if letters.english_probability(statement) > GOOD_TEXT_PROBABILITY:
+                in_conversation = True
+
+        if random_chance or cxt.env.get('flag', False) or in_conversation:
             await cxt.send_typing()
 
             # ensure the server already has its texter loaded up

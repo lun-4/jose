@@ -77,12 +77,33 @@ PORTUGUESE_FREQUENCIES = {
 }
 
 # improving this to ngrams or even markov chains, using some seed text.
+def english_probability(text):
+    """
+    Returns a float representing the likelihood that the given text is a
+    plaintext written in English. Range: (0.0 - 1.0), higher is better.
+    """
+    # Ignore whitespace (revisit this later).
+    text = text.upper()
+    letters, other = partition(lambda c: c in ENGLISH_FREQUENCIES, text)
+    if not letters: return 0.0
+    # Expect roughly 15% of text to be spaces.
+    spaces, other = partition(lambda c: c.isspace(), other)
+    space_error = abs(float(len(spaces))/len(text) - 0.15)
+    # As a rough approximation, expect 2% of characters to be punctuation.
+    punc_error = abs(float(len(other))/len(text) - 0.02)
+    counts = Counter(text)
+    letter_error = 0.0
+    for c, target_freq in ENGLISH_FREQUENCIES.items():
+        letter_error += (target_freq *
+                        abs(float(counts.get(c, 0))/len(letters) - target_freq))
+    return max(1.0 - (punc_error + letter_error + space_error), 0.0)
+
+# copy from english_probability
 def portuguese_probability(text):
     """
     Returns a float representing the likelihood that the given text is a
     plaintext written in Portuguese. Range: (0.0 - 1.0), higher is better.
     """
-    # Ignore whitespace (revisit this later).
     text = text.upper()
     letters, other = partition(lambda c: c in PORTUGUESE_FREQUENCIES, text)
     if not letters: return 0.0
