@@ -20,7 +20,7 @@ PROB_FULLWIDTH_TEXT = 0.1
 MESSAGE_LIMIT = 3000
 LETTER_TO_PITCH = jcommon.LETTER_TO_PITCH
 
-SPEAK_TRIGGER_PREFIX = 'jose'
+SPEAK_TRIGGER_PREFIX = 'jose '
 GOOD_TEXT_PROBABILITY = 0.69
 
 async def make_texter(textpath=None, markov_length=2, text=None):
@@ -340,7 +340,9 @@ class JoseSpeak(jcommon.Extension):
         _content = message.content
         if _content.startswith(SPEAK_TRIGGER_PREFIX):
             statement = _content[len(SPEAK_TRIGGER_PREFIX):]
-            if letters.english_probability(statement) > GOOD_TEXT_PROBABILITY:
+            pb_english = letters.english_probability(statement)
+            self.logger.info('pb english %.2f', pb_english)
+            if pb_english >= GOOD_TEXT_PROBABILITY:
                 in_conversation = True
 
         if random_chance or cxt.env.get('flag', False) or in_conversation:
