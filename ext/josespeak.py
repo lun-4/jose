@@ -13,7 +13,7 @@ import joseerror as je
 
 from midiutil.MidiFile import MIDIFile
 import markovify
-import _letters as letters
+import ext.letters as letters
 
 logger = None
 PROB_FULLWIDTH_TEXT = 0.1
