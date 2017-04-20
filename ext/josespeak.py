@@ -21,7 +21,8 @@ MESSAGE_LIMIT = 3000
 LETTER_TO_PITCH = jcommon.LETTER_TO_PITCH
 
 SPEAK_TRIGGER_PREFIX = 'jose '
-GOOD_TEXT_PROBABILITY = 0.6
+SPEAK_PREFIXES = ['jose ', 'josé ']
+GOOD_TEXT_PROBABILITY = 0.7
 
 async def make_texter(textpath=None, markov_length=2, text=None):
     texter = NewTexter(textpath, markov_length, text)
@@ -337,13 +338,13 @@ class JoseSpeak(jcommon.Extension):
             if random.random() < probability:
                 random_chance = True
 
-        _content = message.content
-        if _content.startswith(SPEAK_TRIGGER_PREFIX):
-            statement = _content[len(SPEAK_TRIGGER_PREFIX):]
-            pb_english = letters.english_probability(statement)
-            self.logger.info('pb english %.2f', pb_english)
-            if pb_english >= GOOD_TEXT_PROBABILITY:
-                in_conversation = True
+        _content = message.content.lower()
+        for prefix in SPEAK_PREFIXES:
+            if _content.startswith(prefix):
+                statement = _content[len(prefix):]
+                pb_english = letters.english_probability(statement)
+                if pb_english >= GOOD_TEXT_PROBABILITY:
+                    in_conversation = True
 
         if random_chance or cxt.env.get('flag', False) or in_conversation:
             await cxt.send_typing()
