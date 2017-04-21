@@ -168,7 +168,11 @@ def img_function(board_config):
         else:
             post = random.choice(response)
 
-        post_url = post[post_key]
+        post_url = post.get(post_key)
+        if post_url is None:
+            await cxt.say(":warning: Failed to retrieve post URL")
+            return
+
         if not post_url.startswith('http'):
             post_url = post_url.replace('//', '/')
             post_url = 'http:/%s' % post_url
