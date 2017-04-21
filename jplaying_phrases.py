@@ -147,5 +147,9 @@ JOSE_PLAYING_PHRASES = [
     'Other Virtual Reality ( ͡° ͜ʖ ͡°)',
     'Thinking',
     'dunno ¯\_(ツ)_/¯',
-    'capture the flag with 4chan'
+    'capture the flag with 4chan',
+    'Real think hours',
+    'True',
+    'False',
+    'Cache misses',
 ]

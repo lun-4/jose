@@ -62,15 +62,17 @@ ADMIN_IDS = list(ADMIN_TOPICS.keys())
 
 COOLDOWN_SECONDS = 4
 
-# 1 percent
+# 1.5 percent
 JC_PROBABILITY = .015
 JC_REWARDS = [0, 0, 0, 0.6, 0.7, 1, 1.2, 1.5, 1.7]
 
+# pricing for things
 LEARN_PRICE = 10
 IMG_PRICE = 1.3
 OP_TAX_PRICE = 0.80
 API_TAX_PRICE = 0.60
 
+# playing status
 PL_MIN_MINUTES = 3.2
 PL_MAX_MINUTES = 12
 
@@ -209,8 +211,24 @@ async def parse_id(data, message=None):
     elif data[0] == 'u':
         return data[1:]
     else:
-        logger.error("parse_id: %s", data)
         return None
+
+def parse_command(message):
+    if not isinstance(message, str):
+        message = message.content
+
+    if message.startswith(JOSE_PREFIX):
+        k = message.find(" ")
+
+        command = message[LEN_PREFIX:k]
+        if k == -1:
+            command = message[LEN_PREFIX:]
+
+        args = message.split(' ')
+        method = "c_%s" % command
+        return command, args, method
+    else:
+        return False, None, None
 
 def speak_filter(message):
     # remove URLs
@@ -241,6 +259,11 @@ def speak_filter(message):
 callbacks = {}
 
 class Callback:
+    '''
+    A callback is just an asyncio.Task on steroids.
+    It does the "while True" and the "asyncio.sleep" for you
+    Also Callbacks handle asyncio.CancelledError automatically
+    '''
     def __init__(self, cid, func, sec):
         self.func = func
         self.sec = sec
@@ -330,6 +353,13 @@ def commit_changes():
     conn.commit()
 
 class DatabaseAPI:
+    '''
+    DatabaseAPI - A general SQL API for Extensions
+    All operations are handled using Python's SQLite, meaning its blocking.
+
+    There is a Callback at the joselang module that runs
+    every 5 minutes to commit data to the database
+    '''
     def __init__(self, _client):
         global conn, statements
         self.client = _client
@@ -354,13 +384,13 @@ class DatabaseAPI:
         commit_changes()
 
 class Extension:
-    def __init__(self, _client):
-        '''
-        Extension - A general extension used by josé
+    '''
+    Extension - A general extension used by josé
 
-        The Extension class defines the API for josé's modules,
-        all modules inherit from this class.
-        '''
+    The Extension class defines the API for josé's modules,
+    all modules inherit from this class.
+    '''
+    def __init__(self, _client):
         self.client = _client
         self.loop = _client.loop
         self.logger = logger.getChild('Extension')
@@ -402,6 +432,7 @@ class Extension:
         return asyncio.ensure_future(func(*args), loop=self.loop)
 
     def cbk_new(self, callback_id, func, timer_sec):
+        '''Create a new callback'''
         logger.info("New callback %s every %d seconds", callback_id, timer_sec)
 
         self._callbacks[callback_id] = Callback(callback_id, func, timer_sec)
@@ -413,6 +444,7 @@ class Extension:
             logger.error("Error happened in callback %s", callback_id)
 
     async def cbk_call(self, callback_id):
+        '''Call an already running callback'''
         status = await callback_call(callback_id)
         if status is None:
             logger.error("Error calling callback %s", callback_id)
@@ -421,6 +453,7 @@ class Extension:
         logger.info("called callback %s", callback_id)
 
     def cbk_remove(self, callback_id):
+        '''Remove an existing callback'''
         status = callback_remove(callback_id)
         if status is None:
             logger.error("Error removing callback %s", callback_id)
@@ -437,6 +470,7 @@ class Extension:
             self.jsondb_save(database_id)
 
     def jsondb(self, database_id, **kwargs):
+        '''Use JSON storage'''
         if database_id in self._databases:
             return None
 
@@ -462,6 +496,7 @@ class Extension:
         setattr(self, attribute, json.load(open(database_path, 'r')))
 
     def jsondb_save(self, database_id):
+        '''Save an already existing jsondb'''
         if database_id not in self._databases:
             return None
 
@@ -473,23 +508,6 @@ class Extension:
             json.dump(getattr(self, attribute), open(database_path, 'w'))
         except:
             return False
-
-def parse_command(message):
-    if not isinstance(message, str):
-        message = message.content
-
-    if message.startswith(JOSE_PREFIX):
-        k = message.find(" ")
-
-        command = message[LEN_PREFIX:k]
-        if k == -1:
-            command = message[LEN_PREFIX:]
-
-        args = message.split(' ')
-        method = "c_%s" % command
-        return command, args, method
-    else:
-        return False, None, None
 
 # === LANGUAGE STUFF ===
 
@@ -521,8 +539,6 @@ def get_defaultcdb():
     return {
         'botblock': 1,
         'language': 'default',
-
-        # TODO: use them????
         'imgchannel': 'None',
         'speak_channel': '',
         'prefix': JOSE_PREFIX,
@@ -721,6 +737,13 @@ async def get_translated(langid, string):
         return lang.gettext(string)
 
 class Context:
+    '''
+    Context - context class
+    The context is passed to commands when they are called
+
+    Context abstracts Client.send_message into Context.say,
+    which handles translation, if possible
+    '''
     def __init__(self, _client, message, t_creation=None, jose=None):
         if t_creation is None:
             t_creation = time.time()
@@ -793,6 +816,12 @@ class Context:
                 return False
 
 class EmptyContext:
+    '''
+    EmptyContext - Capture output from commands
+
+    This Context clone just implements the send_typing and say methods.
+    It also provides a getall method when your command ends.
+    '''
     def __init__(self, _client, message):
         self.client = _client
         self.message = message
@@ -821,26 +850,38 @@ class EmptyContext:
 # logging
 
 class ChannelHandler(logging.Handler):
+    '''
+    ChannelHandler - Logging handler to send log messages to a Discord channel
+
+    The handler already asummes that the client can see the
+    channel when it receives a READY event.
+
+    To prevent ratelimiting, instead of sending a message on every log entry,
+    the handler queues log events and sends them every 10 seconds(ChannelHandler.watcher),
+    emptying the queue afterwards.
+    '''
     def __init__(self, channel_id):
-        '''
-        This is weird.
-        '''
         logging.Handler.__init__(self)
         self.channel_id = channel_id
         self.channel = None
         self._queue = []
+
+        # You don't want to disable this.
         self.use_queue = True
 
     async def setup(self):
+        '''Wait until the client is ready to get a Channel object'''
         await client.wait_until_ready()
         self.channel = client.get_channel(self.channel_id)
 
     def dump_queue(self):
+        # only dump the queue if actually needed
         if len(self._queue) > 0:
             res = '\n'.join(self._queue)
             asyncio.ensure_future(client.send_message(self.channel, res), \
                 loop=client.loop)
 
+            # empty it afterwards
             self._queue = []
 
     async def watcher(self):
@@ -853,6 +894,8 @@ class ChannelHandler(logging.Handler):
         self._queue.append(string)
 
     def emit(self, record):
+        # only start receiving log entries when José is actually ready
+        # and has a log channel in place
         if self.channel is not None:
             _msg = self.format(record)
             msg = '\n**`[{}] [{}]`** `{}`'.format(record.levelname, \
