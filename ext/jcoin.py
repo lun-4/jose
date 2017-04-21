@@ -518,7 +518,7 @@ class JoseCoin(jaux.Auxiliar):
         available = False
         for member in cxt.server.members:
             acc_id = str(member.id)
-            acc = self.jcoin.get(target_id)
+            acc = self.jcoin.data.get(target_id)
             if acc is None: continue
             if acc['times_stolen'] > 0:
                 available = True
