@@ -17,7 +17,7 @@ perm_overwrite = discord.PermissionOverwrite
 channel_perms = discord.ChannelPermissions
 
 BLUE    = 0x0066ff
-BRONZE  = 0xb87333
+BRONZE  = 0xc67931
 SILVER  = 0xC0C0C0
 GOLD    = 0xD4AF37
 RED     = 0xff0000
