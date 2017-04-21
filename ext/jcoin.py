@@ -488,6 +488,7 @@ class JoseCoin(jaux.Auxiliar):
         '''`j!steal @target amount` - Steal JoséCoins from someone'''
         self.sane_jcoin(cxt)
         tbank_id = self.tbank_fmt(cxt)
+        thief_id = str(message.author.id)
 
         if len(args) < 2:
             await cxt.say(self.c_steal.__doc__)
@@ -510,7 +511,23 @@ class JoseCoin(jaux.Auxiliar):
             await cxt.say("The person you're trying to steal from doesn't have a JoséCoin account")
             return
 
-        if target_id != TATSUMAKI_ID and self.jcoin.data[target_id]['times_stolen'] < 1:
+        # flag is True if person can't steal from the victim
+        flag = (target_id != TATSUMAKI_ID) and (self.jcoin.data[target_id]['times_stolen'] < 1)
+
+        # check if anyone in the server is available to be stolen from
+        available = False
+        for member in cxt.server.members:
+            acc_id = str(member.id)
+            acc = self.jcoin.get(target_id)
+            if acc is None: continue
+            if acc['times_stolen'] > 0:
+                available = True
+
+        if message.author == cxt.server.owner and not available:
+            # no one is available to steal from, the owner can steal from anybody
+            flag = False
+
+        if flag:
             await cxt.say("You can't steal from someone who never used the steal command.")
             return
 
@@ -518,7 +535,6 @@ class JoseCoin(jaux.Auxiliar):
             await cxt.say("good one haha :ok_hand: actually no")
             return
 
-        thief_id = message.author.id
         if self.jcoin.data[thief_id]['amount'] < 0.01:
             await cxt.say("You have less than `0.01`JC, can't use the steal command")
             return
