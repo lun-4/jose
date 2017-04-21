@@ -100,11 +100,11 @@ Command | Description | Example | Alias
 
 Command | Description | Example | Alias
 ------------- | ------------- | ------------- | -------------
-`j!jcrhelp` | Help about JoséCoin Roulette :tm: | |
-`j!jrstart` | Starts a JoséCoin Roulette :tm: session in your server | |
-`j!jrbet amount` | Bet on the currently running JCR :tm: session | `j!jrbet 1` |
-`j!jrdo` | Do the JCR :tm: aka see the winner | |
-`j!jreport` | JCR :tm: report, shows what amount each one paid in the session | |
-`j!jrcheck` | Shows if a JCR :tm: session is on/off | |
+`j!jcrhelp` | Help about JoséCoin Roulette™| |
+`j!jrstart` | Starts a JoséCoin Roulette™ session in your server | |
+`j!jrbet amount` | Bet on the currently running JCR™ session | `j!jrbet 1` |
+`j!jrdo` | Do the JCR™ aka see the winner | |
+`j!jreport` | JCR™ report, shows what amount each one paid in the session | |
+`j!jrcheck` | Shows if a JCR™ session is on/off | |
 `j!flip` | Flips a coin. | |
 `j!duel @someone amount` | Makes a duel with someone | `j!duel @aaa 1` |
