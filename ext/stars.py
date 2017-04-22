@@ -586,8 +586,8 @@ class Stars(jaux.Auxiliar):
         starrers_as_members = [(discord.utils.get(self.client.get_all_members(), id=mid, server__id=server_id), n_stars) for mid, _ in top10_starrers]
 
         _members = [
-            ((discord.utils.get(self.client.get_all_members(), id=mid, server__id=server_id), n_stars)
-            for (mid, n_stars) in top10_starrers
+            ((discord.utils.get(self.client.get_all_members(), id=mid, server__id=server_id), n_stars) \
+                for (mid, n_stars) in top10_starrers
         ]
 
         stats.add_field(name='Most stars received',
