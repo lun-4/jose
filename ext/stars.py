@@ -462,7 +462,7 @@ class Stars(jaux.Auxiliar):
         elif operation == 'local':
             try:
                 server_id = args[2]
-                server = client.get_server(server_id)
+                server = self.client.get_server(server_id)
             except IndexError:
                 server = message.server
                 server_id = str(server.id)
