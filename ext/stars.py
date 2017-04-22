@@ -578,7 +578,7 @@ class Stars(jaux.Auxiliar):
             star = stars[message_id]
             _starrers = star['starrers']
             if len(_starrers) > max_message[0]:
-                max_message = [len(_starrers), star]
+                max_message = [len(_starrers), message_id]
 
             for starrer_id in star['starrers']:
                 starrers[starrer_id] += 1
@@ -588,10 +588,10 @@ class Stars(jaux.Auxiliar):
         _members = [(discord.utils.get(self.client.get_all_members(), id=mid, server__id=server_id), n_stars) for (mid, n_stars) in top10_starrers]
 
         stats.add_field(name='Most stars received',
-                        value=f'{max_message[0]} Stars, ID {max_message[1]["message_id"]}')
+                        value=f'{max_message[0]} Stars, ID {max_message[1]}')
 
         stats.add_field(name='Starrer #1',
-                        value=f'{_members[0][0].mention} with {_members[0][1]}')
+                        value=f'{_members[0][0].mention} with {_members[0]1]}')
         stats.add_field(name='Starrer #2',
                         value=f'{_members[1][0].mention} with {_members[1][1]}')
         stats.add_field(name='Starrer #3',
