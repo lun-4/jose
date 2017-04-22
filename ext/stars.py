@@ -574,7 +574,8 @@ class Stars(jaux.Auxiliar):
         # thats dumb, but needed
         starrers = collections.Counter()
         max_message = [0, None]
-        for star in stars:
+        for message_id in stars:
+            star = stars[message_id]
             _starrers = star['starrers']
             if len(_starrers) > max_message[0]:
                 max_message = [len(_starrers), star]
