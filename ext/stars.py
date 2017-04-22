@@ -25,6 +25,7 @@ RED     = 0xff0000
 WHITE   = 0xffffff
 
 def _data(message, user):
+    '''Extract data from message and user objects'''
     if isinstance(message, dict) and user is None:
         return message['server_id'], message['channel_id'], message['message_id']
 
@@ -37,12 +38,12 @@ def _data(message, user):
 class Stars(jaux.Auxiliar):
     '''
     Stars - Starboard module
-
-
     '''
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
         self.star_global_lock = False
+
+        # Clean messages with 0 stars from starboard
         self.cbk_new('stars.cleaner', self.stars_cleaner, 1200)
 
     async def ext_load(self):
@@ -63,6 +64,10 @@ class Stars(jaux.Auxiliar):
             return False, repr(err)
 
     async def stars_cleaner(self):
+        '''
+        stars_cleaner - checks all stars and removes messages
+        with 0 stars from the database.
+        '''
         for guild_id in self.stars:
             # skip locks
             if guild_id == 'locks':
@@ -71,21 +76,22 @@ class Stars(jaux.Auxiliar):
             starboard = self.stars[guild_id]
             stars = starboard['stars']
 
-            c_stars = copy.copy(stars)
-            for message_id in c_stars:
+            # use a copy since we delete while iterating
+            for message_id in copy.copy(stars):
                 star = stars[message_id]
                 if len(star['starrers']) > 0:
                     continue
 
                 guild = self.client.get_server(guild_id)
                 if guild is None:
-                    self.logger.info("[starboard] autoremoving server %s", guild_id)
+                    self.logger.info("[cleaner] autoremoving server %s", guild_id)
                     del self.stars[guild_id]
                     break
 
                 channel = guild.get_channel(star['channel_id'])
                 if channel is None:
                     continue
+
                 try:
                     await self.client.get_message(channel, message_id)
                 except discord.NotFound:
@@ -138,8 +144,8 @@ class Stars(jaux.Auxiliar):
         return color
 
     def make_embed(self, message, stars):
+        '''Creates an embed with the attachments from the message, etc'''
         content = message.content
-
         em = discord.Embed(description=content, colour=self.star_color(stars))
         em.timestamp = message.timestamp
 
@@ -162,6 +168,13 @@ class Stars(jaux.Auxiliar):
         return em
 
     async def update_star(self, server_id, channel_id, message_id, delete=False):
+        # Do usual checking because of sanity
+
+        try:
+            starboard = self.stars[server_id]
+        except IndexError:
+            raise Exception('starboard not found')
+
         server = self.client.get_server(server_id)
         if server is None:
             self.logger.warning("Server %s not found", server_id)
@@ -178,43 +191,45 @@ class Stars(jaux.Auxiliar):
             raise Exception('message not found')
 
         try:
-            starboard = self.stars[server_id]
-        except IndexError:
-            raise Exception('starboard not found')
-
-        try:
             star = starboard['stars'][message_id]
         except KeyError:
             raise Exception('star not found')
 
+        # check if the starboard is sane enough
         starboard_id = starboard['starboard_id']
         starboard_channel = server.get_channel(starboard_id)
         if starboard_channel is None:
+            # if the starboard channel isn't found, there is no need to maintain it.
             self.logger.info('Autoremoving %s[%s] from starboard', \
                 server.name, server_id)
             del self.stars[server_id]
             raise Exception('Autoemoved %s from starboard' % server_id)
 
+        # check star object
         stars = len(star['starrers'])
         star_msg_id = star['star_message']
         star_msg = None
 
         try:
+            # if possible, edit the message
             if star_msg_id is not None:
                 star_msg = await self.client.get_message(starboard_channel, star_msg_id)
         except discord.NotFound:
             pass
 
+        # remove message if stars came to 0
         if stars < 1 and star_msg is not None:
             await self.client.delete_message(star_msg)
             return True
 
+        # don't do anything if 0 stars, pls
         if stars < 1:
             return True
 
         m_embed = self.make_embed(message, stars)
         m_str = self.star_str(star, message)
 
+        # edit if possible
         if star_msg is not None:
             await self.client.edit_message(star_msg, \
                 m_str, embed=m_embed)
@@ -246,6 +261,7 @@ class Stars(jaux.Auxiliar):
         if message.channel.id == starboard['starboard_id']:
             return False
 
+        # create star object if needed
         stars = starboard['stars']
         if message_id not in stars:
             starboard['stars'][message_id] = {
@@ -254,8 +270,8 @@ class Stars(jaux.Auxiliar):
                 'starrers': [],
             }
 
+        # add star
         star = starboard['stars'][message_id]
-
         try:
             star['starrers'].index(user_id)
             return False
@@ -331,6 +347,7 @@ class Stars(jaux.Auxiliar):
         except IndexError:
             return False
 
+        # remove all stars from the message, also delete it
         try:
             done = await self.update_star(server_id, channel_id, \
                 message_id, delete=True)
@@ -448,6 +465,7 @@ class Stars(jaux.Auxiliar):
                 await cxt.say(":star: :ok_hand:")
 
     async def c_starlock(self, message, args, cxt):
+        '''`j!starlock <op> [server_id]` - lock a server's starboard or lock globally'''
         await self.is_admin(message.author.id)
 
         try:
@@ -561,6 +579,7 @@ class Stars(jaux.Auxiliar):
             await cxt.say("Failed to retreive the message")
             return
 
+        # make the embed same way it would be on starboard channel
         em = self.make_embed(msg, len(star['starrers']))
         m_str = self.star_str(star, msg)
         await self.client.send_message(message.channel, m_str, embed=em)
