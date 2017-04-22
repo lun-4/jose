@@ -587,8 +587,7 @@ class Stars(jaux.Auxiliar):
 
         _members = [
             ((discord.utils.get(self.client.get_all_members(), id=mid, server__id=server_id), n_stars) \
-                for (mid, n_stars) in top10_starrers
-        ]
+                for (mid, n_stars) in top10_starrers]
 
         stats.add_field(name='Most stars received',
                         value=f'{max_message[0]} Stars, ID {max_message[1]["message_id"]}')
