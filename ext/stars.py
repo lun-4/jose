@@ -462,18 +462,24 @@ class Stars(jaux.Auxiliar):
         elif operation == 'local':
             try:
                 server_id = args[2]
+                server = client.get_server(server_id)
             except IndexError:
-                server_id = str(message.server.id)
+                server = message.server
+                server_id = str(server.id)
+
+            if server is None:
+                await cxt.say("Server not found")
+                return
 
             try:
                 self.stars['locks'].index(server_id)
                 self.stars['locks'].remove(server_id)
                 await cxt.say(":unlock: Removed lock for %s[%s]", \
-                    (message.server.name, server_id))
+                    (server.name, server_id))
             except ValueError:
                 self.stars['locks'].append(str(message.server.id))
                 await cxt.say(":lock: Locked starboard for %s[%s]", \
-                    (message.server.name, server_id))
+                    (server.name, server_id))
         else:
             await cxt.say("Operation not found")
 
