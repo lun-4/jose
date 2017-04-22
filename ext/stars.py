@@ -591,7 +591,7 @@ class Stars(jaux.Auxiliar):
                         value=f'{max_message[0]} Stars, ID {max_message[1]}')
 
         stats.add_field(name='Starrer #1',
-                        value=f'{_members[0][0].mention} with {_members[0]1]}')
+                        value=f'{_members[0][0].mention} with {_members[0][1]}')
         stats.add_field(name='Starrer #2',
                         value=f'{_members[1][0].mention} with {_members[1][1]}')
         stats.add_field(name='Starrer #3',
