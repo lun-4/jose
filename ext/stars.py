@@ -460,7 +460,11 @@ class Stars(jaux.Auxiliar):
             self.star_global_lock = not self.star_global_lock
             await cxt.say("`star_global_lock` set to %r" % self.star_global_lock)
         elif operation == 'local':
-            server_id = str(message.server.id)
+            try:
+                server_id = args[2]
+            except IndexError:
+                server_id = str(message.server.id)
+
             try:
                 self.stars['locks'].index(server_id)
                 self.stars['locks'].remove(server_id)
