@@ -425,6 +425,7 @@ class Stars(jaux.Auxiliar):
             await cxt.say(":sob: Starboard initialization failed :sob:")
 
     async def c_star(self, message, args, cxt):
+        '''`j!star message_id` - :star: stars a message in the current channel'''
         try:
             message_id = args[1]
         except:
@@ -473,6 +474,7 @@ class Stars(jaux.Auxiliar):
             await cxt.say("Operation not found")
 
     async def c_starrers(self, message, args, cxt):
+        '''`j!starrers message_id` - list all people who starred a message'''
         try:
             message_id = args[1]
         except:
@@ -522,6 +524,7 @@ class Stars(jaux.Auxiliar):
             await cxt.say_embed(em)
 
     async def c_randomstar(self, message, args, cxt):
+        '''`j!randomstar` - shows random star :thinking:'''
         server_id, _, _, _ = _data(message, message.author)
 
         try:
