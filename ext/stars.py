@@ -5,6 +5,7 @@ import sys
 import copy
 sys.path.append("..")
 import jauxiliar as jaux
+import collections
 
 from random import SystemRandom
 random = SystemRandom()
@@ -34,6 +35,11 @@ def _data(message, user):
     return server_id, channel_id, message_id, user_id
 
 class Stars(jaux.Auxiliar):
+    '''
+    Stars - Starboard module
+
+
+    '''
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
         self.star_global_lock = False
@@ -414,7 +420,7 @@ class Stars(jaux.Auxiliar):
 
         res = await self.init_starboard(message.server.id, starboard.id)
         if res:
-            await cxt.say(":ok_hand: Starboard initialized :ok_hand:")
+            await cxt.say(":ok_hand: Starboard initialized! Make sure only josé can send messages on the channel.")
         else:
             await cxt.say(":sob: Starboard initialization failed :sob:")
 
@@ -551,3 +557,47 @@ class Stars(jaux.Auxiliar):
     async def c_rs(self, message, args, cxt):
         '''`j!rs` - alias for `j!randomstar`'''
         await self.c_randomstar(message, args, cxt)
+
+    async def c_starstats(self, message, args, cxt):
+        '''`j!starstats` - Get statistics about your starboard'''
+        server_id, _, _, _ = _data(message, message.author)
+
+        try:
+            starboard = self.stars[server_id]
+        except IndexError:
+            await cxt.say("No starboard initialized")
+            return
+
+        stars = starboard['stars']
+        stats = discord.Embed(title="Starboard statistics", colour=discord.Colour(0xFFFF00))
+
+        # thats dumb, but needed
+        starrers = collections.Counter()
+        max_message = [0, None]
+        for star in stars:
+            _starrers = star['starrers']
+            if len(_starrers) > max_message[0]:
+                max_message = [len(_starrers), star]
+
+            for starrer_id in star['starrers']:
+                starrers[starrer_id] += 1
+
+        top10_starrers = starrers.most_common(3)
+        starrers_as_members = [(discord.utils.get(self.client.get_all_members(), id=mid, server__id=server_id), n_stars) for mid, _ in top10_starrers]
+
+        _members = [
+            ((discord.utils.get(self.client.get_all_members(), id=mid, server__id=server_id), n_stars)
+            for (mid, n_stars) in top10_starrers
+        ]
+
+        stats.add_field(name='Most stars received',
+                        value=f'{max_message[0]} Stars, ID {max_message[1]["message_id"]}')
+
+        stats.add_field(name='Starrer #1',
+                        value=f'{_members[0][0].mention} with {_members[0][1]}')
+        stats.add_field(name='Starrer #2',
+                        value=f'{_members[1][0].mention} with {_members[1][1]}')
+        stats.add_field(name='Starrer #3',
+                        value=f'{_members[2][0].mention} with {_members[2][1]}')
+
+        await cxt.say_embed(stats)
