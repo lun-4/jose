@@ -477,7 +477,7 @@ class Stars(jaux.Auxiliar):
                 await cxt.say(":unlock: Removed lock for %s[%s]", \
                     (server.name, server_id))
             except ValueError:
-                self.stars['locks'].append(str(message.server.id))
+                self.stars['locks'].append(server_id)
                 await cxt.say(":lock: Locked starboard for %s[%s]", \
                     (server.name, server_id))
         else:
