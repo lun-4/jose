@@ -511,13 +511,7 @@ class Stars(jaux.Auxiliar):
                 await cxt.say(f'message {message_id} not found in starboard: `{star}`')
                 return False
 
-            em = discord.Embed(title='Message', colour=self.star_color(len(star['starrers'])))
-            em.timestamp = msg.timestamp
-            em.description = msg.content
-
-            author = msg.author
-            avatar = author.avatar_url or author.default_avatar_url
-            em.set_author(name=author.display_name, icon_url=avatar)
+            em = self.make_embed(msg, len(star['starrers']))
 
             starrers_as_members = [discord.utils.get(self.client.get_all_members(), \
                 id=mid, server__id=server_id) for mid in star['starrers']]
