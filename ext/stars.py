@@ -538,6 +538,10 @@ class Stars(jaux.Auxiliar):
             return False
 
         msg_channel = self.client.get_channel(star['channel_id'])
+        if msg_channel is None:
+            await cxt.say("Try again. I got an unfindable channel")
+            return
+
         try:
             msg = await self.client.get_message(msg_channel, message_id)
         except discord.NotFound:
