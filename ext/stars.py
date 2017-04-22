@@ -583,7 +583,6 @@ class Stars(jaux.Auxiliar):
                 starrers[starrer_id] += 1
 
         top10_starrers = starrers.most_common(3)
-        starrers_as_members = [(discord.utils.get(self.client.get_all_members(), id=mid, server__id=server_id), n_stars) for mid, _ in top10_starrers]
 
         _members = [
             ((discord.utils.get(self.client.get_all_members(), id=mid, server__id=server_id), n_stars) \
