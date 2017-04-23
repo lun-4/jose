@@ -646,7 +646,7 @@ class Stars(jaux.Auxiliar):
         tot = 0
         stars = starboard['stars']
 
-        for message_id in stars:
+        for message_id in sorted(list(stars.keys())):
             star = stars[message_id]
             try:
                 stat = await self.update_star(server_id, star['channel_id'], message_id)
