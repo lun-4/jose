@@ -648,7 +648,11 @@ class Stars(jaux.Auxiliar):
 
         for message_id in stars:
             star = stars[message_id]
-            stat = await self.update_star(server_id, star['channel_id'], message_id)
+            try:
+                stat = await self.update_star(server_id, star['channel_id'], message_id)
+            except:
+                stat = False
+
             if stat:
                 done += 1
             tot += 1
