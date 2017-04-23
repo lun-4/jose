@@ -628,3 +628,29 @@ class Stars(jaux.Auxiliar):
                         value=f'{_members[2][0].mention} with {_members[2][1]}')
 
         await cxt.say_embed(stats)
+
+    async def c_restore(self, message, args, cxt):
+        '''`j!restore` - good luck'''
+        await self.is_admin(message.author.id)
+        await cxt.say("This will take.... time")
+
+        server_id, _, _, _ = _data(message, message.author)
+
+        try:
+            starboard = self.stars[server_id]
+        except IndexError:
+            await cxt.say("No starboard initialized")
+            return
+
+        done = 0
+        tot = 0
+        stars = starboard['stars']
+
+        for message_id in stars:
+            star = stars[message_id]
+            stat = await self.update_star(server_id, star['channel_id'], message_id)
+            if stat:
+                done += 1
+            tot += 1
+
+        await cxt.say(f"Restored {done}/{tot} messages")
