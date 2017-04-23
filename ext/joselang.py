@@ -23,7 +23,7 @@ class JoseLanguage(jaux.Auxiliar):
             'pt', 'en'
         )
 
-        self.cbk_new('jlang.dbapi_commit', self.dbapi_commit, 300)
+        # self.cbk_new('jlang.dbapi_commit', self.dbapi_commit, 300)
 
     async def dbapi_commit(self):
         t_start = time.time()
