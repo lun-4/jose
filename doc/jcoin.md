@@ -6,7 +6,7 @@ JC Wallets aren't created automatically, this is a design & performance choice. 
 
 ### JoséCoin Generation
 
-Each message you send (to a server where José is, obviously), has a 1% random chance of receiving a reward.
+Each message you send (to a server where José is, obviously), has a 1.5% random chance of receiving a reward.
 That reward can be 0.2, 0.6, 1, 1.2 or 1.5 JC. José reacts with :moneybag: when you receive a reward.
 The more tax you pay increases your probability of getting JoséCoins, with the maximum amount being 4.20%.
 
@@ -27,17 +27,26 @@ Command | Description | Example | Alias
 
 Stealing System works by using `j!steal`, where you can steal an arbritary amount
 of JC from someone's wallet. That comes with a cost though: You have a chance of getting
-caught and when you're arrested, you receive an 8 hours cooldown, as well as paying the bank half of the JC you tried to steal.
-If you don't have enough to pay the fine, your wallet goes down to 0 JC, and the amount you had gets converted to hours.
+caught and when you're arrested, you receive an 8 hours cooldown, as well as paying the bank half of the JC you tried to steal(the fine).
+If you don't have enough money to pay the fine, your wallet goes down to 0 JC, and the amount you had gets converted to hours.
 
 If you succeed, the victim has a grace period of 3 hours
 where no one can steal from the victim again. Admins get a grace period of 6 hours, however.
+
+
+You have 3 stealing points by default. When you use `j!steal` you pay 1 stealing point.
+Once you reach 0, you need to use `j!steal` again. José will notice you don't have any more points
+and he'll apply an 8 hour cooldown, when that cooldown ends, you'll get your stealing points back
+
+ * You need to have more than 0.01JC to use the steal command
+ * You can only steal from people who have used the steal command
+   * HOWEVER, if you are a server owner and nobody has used the steal command successfully, you can
+    steal from anyone(that doesn't mean it will be successful)
 
  * If you try to steal from someone who is in :angel: grace period :angel:, they get notified
  * The victim gets notified when someone steals from them
  * You don't have a cooldown when you aren't arrested
  * You are arrested if you try to steal from José, or steal a higher amount than the victim's wallet
- * If you use `j!steal` 3 times in a row and succeed in all 3 of them, you'll then have to use `j!steal` again and wait 8 hours to get 3 more uses.
 
 When you get arrested, you pay half the amount you want to steal to José,
 and your chances of getting more JoséCoins per message halves.
