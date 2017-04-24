@@ -8,10 +8,12 @@ import josecommon as jcommon
 
 CONFIG_HELP = """
 José Configuration:
- * `botblock`, if True, blocks all bot messages, use `j!botblock`
- * `language`, string representing the server's language, use `j!language`
+ * `j!botblock`, if True, blocks all bot messages
+ * `j!language`, string representing the server's language
+
  * `j!jsprob`, sets probability for JoséSpeak
  * `j!fwprob`, sets JoséSpeak's probability of sending fullwidth text
+
  * `j!schannel`, setup JoséSpeak's speak channel, the channel where josé will get all his messages from
  * `j!imgchannel`, setup JoséImage's image channel, image-related commands will only work in that channel.
 """
@@ -87,7 +89,7 @@ class JoseLanguage(jaux.Auxiliar):
         await self.c_jsprob(message, args, cxt)
 
     async def c_jsprob(self, message, args, cxt):
-        '''`j!jsprob prob` - Set JoseSpeak probability of responding to random messages, default 0, maximum 3'''
+        '''`j!jsprob prob` - Set JoseSpeak probability of responding to random messages, default 0'''
 
         if len(args) < 2:
             await cxt.say(self.c_jsprob.__doc__)

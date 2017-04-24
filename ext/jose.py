@@ -359,7 +359,7 @@ class JoseBot(jaux.Auxiliar):
             return False
 
     async def c_reload(self, message, args, cxt):
-        '''`j!reload module` - recarrega um módulo do josé'''
+        '''`j!reload module` - reload a module'''
         await self.is_admin(message.author.id)
 
         if len(args) < 2:
@@ -373,7 +373,7 @@ class JoseBot(jaux.Auxiliar):
             await cxt.say("%s: module not found/loaded", (n,))
 
     async def c_unload(self, message, args, cxt):
-        '''`j!unload module` - desrecarrega um módulo do josé'''
+        '''`j!unload module` - unload a module'''
         await self.is_admin(message.author.id)
 
         if len(args) < 2:
@@ -394,7 +394,7 @@ class JoseBot(jaux.Auxiliar):
                 await cxt.say(":warning: Error happened: %s", (res[1],))
 
     async def c_loadmod(self, message, args, cxt):
-        '''`j!loadmod class@module` - carrega um módulo do josé'''
+        '''`j!loadmod class@module` - load a module'''
         await self.is_admin(message.author.id)
 
         if len(args) < 2:

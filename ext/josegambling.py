@@ -317,6 +317,7 @@ class JoseGambling(jaux.Auxiliar):
         return
 
     async def c_slots(self, message, args, cxt):
+        '''`j!slots amount` - little slot machine'''
         self.sane_jcoin(cxt)
 
         try:

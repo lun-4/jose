@@ -11,15 +11,16 @@ Command | Description | Example | Alias
 `j!escolha a;b;c` | Chooses between any amount of choices | `j!escolha A;B;C` | `j!pick`
 `j!version` | Shows José version | |
 `j!modlist` | Shows all loaded modules | |
-`j!clist` | List commands that a module creates | |
-`j!report` | Makes a report on some stuff | |
+`j!clist module` | List commands that a module creates | |
+`j!report` | Makes a quick report on some stats | |
 `j!uptime` | Shows uptime | | |
 
 ### `joselang`
 
 Command | Description | Example | Alias
 ------------- | ------------- | ------------- | -------------
-`j!language lang` | Sets a language for a server | `j!language en` |
+`j!confighelp` | Shows a little summary of server configuration | |
+`j!language lang` | Sets a language for the current server | `j!language en` |
 `j!listlang` | Shows all available languages for josé | |
 `j!botblock` | Toggles botblock | |
 `j!jcprob probability` | Changes your server's probability of josé saying text, default is 0 | `j!jcprob 3` |
@@ -33,10 +34,13 @@ Command | Description | Example | Alias
 Command | Description | Example | Alias
 ------------- | ------------- | ------------- | -------------
 `j!wolframalpha terms` | Sends a request to [WolframAlpha](http://wolframalpha.com/) | `j!wolframalpha average dick size` | `j!wa`
-`j!temperature location` | Requests current temperature of a place using [OpenWeatherMap](openweathermap.org) | `j!temperature Sydney, Australia` | `j!temp`, `j!therm`
+`j!temperature location` | Requests current temperature of a place using [OpenWeatherMap](openweathermap.org) | `j!temperature Sydney, Australia` | `j!temp`, `j!weather`
 `j!money quantity base to` | Converts currency, use `j!money list` to see available currencies | `j!money 1 AUD USD` |
 `j!roll <amount>d<sides>` | Rolls `amount` dice of `sides` sides | `j!roll 20d6` |
 `j!percent amount total` | Calculates `amount`% out of `total` | `j!percent 50 100` |
+
+`j!bitcoin amount currency` | Get XBP price info | `j!bitcoin 20 USD`, shows 20 BTC to USD | `j!btc`
+`j!crypto amount from to` | Converts between various cryptocurrencies
 
 ### `josememes`
 
@@ -65,9 +69,7 @@ Command | Description | Example | Alias
 ------------- | ------------- | ------------- | -------------
 `j!xkcd [num]` | XKCD. (num can be any number or "rand" for a random comic) | `j!xkcd 1000` |
 `j!tm text` | Transform a Text In A Trademark™ | `j!tm Hell` |
-`j!status` | Status of josé, with results from pings to Discord and Google | |
-`j!report` | José Report | |
-`j!docs [topic or "list"]` | Shows documentation for josé | |
+`j!docs [topic or "list"]` | Searches documentation for josé | |
 `j!yt search_terms` | Search YouTube | `j!yt Tunak Tunak Tun sped up every time they say Tunak` |
 `j!sndc search_terms` | Search Soundcloud | `j!sndc Tunak Tunak Tun` |
 `j!color "rand"|#aabbcc|red,green,blue` | show colors | `j!color #DEADAF`, `j!color 100,50,100`, `j!color rand` |
@@ -84,11 +86,11 @@ Some commands in `joseimages` have special syntax:
 
 Command | Description | Example | Alias
 ------------- | ------------- | ------------- | -------------
+`j!urban stuff` | Searches the *Urban Dictionary* | `j!urban kys` |
 `j!hypno tags` | Searches *HypnoHub* | |
 `j!e621 tags` | Searches *e621* | |
 `j!yandere tags` | Searches *yande.re* | |
 `j!derpibooru tags` | Searches *Derpibooru* | |
-`j!urban stuff` | Searches the *Urban Dictionary* | `j!urban kys` |
 
 ### `josedatamosh`
 
@@ -107,4 +109,5 @@ Command | Description | Example | Alias
 `j!jreport` | JCR™ report, shows what amount each one paid in the session | |
 `j!jrcheck` | Shows if a JCR™ session is on/off | |
 `j!flip` | Flips a coin. | |
+`j!slots amount` | little slot machine | `j!slots 0.2` |
 `j!duel @someone amount` | Makes a duel with someone | `j!duel @aaa 1` |

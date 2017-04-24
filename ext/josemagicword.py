@@ -130,15 +130,15 @@ class JoseMagicWord(jaux.Auxiliar):
             self.logger.info("New MW Database for %s", message.server.id)
             self.magicwords[message.server.id] = {}
 
-        # case insensitive
-        for i, word in enumerate(magicwords):
-            magicwords[i] = word.lower()
-
         # check limits
         serverdb = self.magicwords[message.server.id]
         if len(serverdb) >= 10:
             await cxt.say(":elephant: Server reached the limit of 10 Magic Words.")
             return
+
+        # case insensitive
+        for i, word in enumerate(magicwords):
+            magicwords[i] = word.lower()
 
         # check duplicates
         for set_id in serverdb:
