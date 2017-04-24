@@ -630,7 +630,12 @@ class Stars(jaux.Auxiliar):
         await cxt.say_embed(stats)
 
     async def c_restore(self, message, args, cxt):
-        '''`j!restore` - good luck'''
+        '''
+        `j!restore` - good luck
+
+        This should only be used in the case of a catastrophic failure
+        where the starboard channel is deleted.
+        '''
         await self.is_admin(message.author.id)
         await cxt.say("This will take.... time")
 
@@ -646,7 +651,7 @@ class Stars(jaux.Auxiliar):
         tot = 0
         stars = starboard['stars']
 
-        for message_id in sorted(list(stars.keys())):
+        for message_id in list(stars.keys()).sort():
             star = stars[message_id]
             try:
                 stat = await self.update_star(server_id, star['channel_id'], message_id)
