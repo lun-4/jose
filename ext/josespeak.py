@@ -106,6 +106,7 @@ class JoseSpeak(jcommon.Extension):
         self.flag = False
 
         self.text_generators = {}
+        self._locks = {}
 
         self.last_texter_mcount = -1
         self.last_texter_time = -1
@@ -178,6 +179,15 @@ class JoseSpeak(jcommon.Extension):
 
     async def new_generator(self, serverid, limit=None):
         # create one Texter, for one server
+        lock = self._locks.get(server_id)
+        if lock:
+            await asyncio.sleep(8)
+            if serverid in self.text_generators:
+                return self.text_generators[server_id]
+
+        # set lock
+        self._locks[server_id] = True
+
         t_start = time.time()
 
         messages = await self.server_messages(serverid, limit)
@@ -191,6 +201,7 @@ class JoseSpeak(jcommon.Extension):
 
         self.last_texter_mcount = len(messages)
         self.last_texter_time = (time.time() - t_start)
+        self._locks[serverid] = False
 
         return True
 
