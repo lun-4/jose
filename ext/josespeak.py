@@ -179,7 +179,7 @@ class JoseSpeak(jcommon.Extension):
 
     async def new_generator(self, serverid, limit=None):
         # create one Texter, for one server
-        lock = self._locks.get(server_id)
+        lock = self._locks.get(serverid)
         if lock:
             await asyncio.sleep(8)
             if serverid in self.text_generators:
