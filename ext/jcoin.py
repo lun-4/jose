@@ -511,6 +511,10 @@ class JoseCoin(jaux.Auxiliar):
             await cxt.say("The person you're trying to steal from doesn't have a JoséCoin account")
             return
 
+        if thief_id == target_id:
+            await cxt.say("You can't steal from yourself")
+            return
+
         # flag is True if person can't steal from the victim
         flag = (target_id != TATSUMAKI_ID) and (self.jcoin.data[target_id]['times_stolen'] < 1)
 
