@@ -183,10 +183,10 @@ class JoseSpeak(jcommon.Extension):
         if lock:
             await asyncio.sleep(8)
             if serverid in self.text_generators:
-                return self.text_generators[server_id]
+                return self.text_generators[serverid]
 
         # set lock
-        self._locks[server_id] = True
+        self._locks[serverid] = True
 
         t_start = time.time()
 
