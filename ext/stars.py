@@ -556,16 +556,21 @@ class Stars(jaux.Auxiliar):
             return
 
         stars = starboard['stars']
-        message_id = random.choice(list(stars.keys()))
-        star = stars.get(message_id)
-        if star is None:
-            await cxt.say(f'LOL I CHOSE A NONEXISTING MESSAGE')
-            return False
+        msg_channel = None
+        tries = 0
+        while msg_channel is None:
+            if tries > 3:
+                await cxt.say("Tried 3 rerolls, didn't find anything")
+                return
 
-        msg_channel = self.client.get_channel(star['channel_id'])
-        if msg_channel is None:
-            await cxt.say("Try again. I got an unfindable channel")
-            return
+            message_id = random.choice(list(stars.keys()))
+            star = stars.get(message_id)
+            if star is None:
+                await cxt.say(f'LOL I CHOSE A NONEXISTING MESSAGE')
+                return
+
+            msg_channel = self.client.get_channel(star['channel_id'])
+            tries += 1
 
         try:
             msg = await self.client.get_message(msg_channel, message_id)

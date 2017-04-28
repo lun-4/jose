@@ -393,7 +393,7 @@ class JoseMod(jaux.Auxiliar):
             if done:
                 await cxt.say(':boxing_glove: **%s kicked**', (str(member),))
             else:
-                await cxt.say(':thinking:')
+                await cxt.say(':thinking: Registering in the modlogs failed.')
 
         except discord.Forbidden:
             await cxt.say('Not enough permissions to kick.')
@@ -411,7 +411,7 @@ class JoseMod(jaux.Auxiliar):
         await self.has_mod_system(message.server)
 
         if len(args) < 2:
-            await cxt.say(self.c_kick.__doc__)
+            await cxt.say(self.c_ban.__doc__)
             return
 
         try:
