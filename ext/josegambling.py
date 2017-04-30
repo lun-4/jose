@@ -333,7 +333,7 @@ class JoseGambling(jaux.Auxiliar):
         slots = [random.choice(EMOJI_POOL) for i in range(3)]
 
         res.append(' '.join(slots))
-        bet_multiplier = slots.count(BET_MULTIPLIER_EMOJI)
+        bet_multiplier = slots.count(BET_MULTIPLIER_EMOJI) * 2
 
         for emoji in slots:
             if slots.count(emoji) == 3:
@@ -342,9 +342,7 @@ class JoseGambling(jaux.Auxiliar):
                 elif emoji in X6_EMOJI:
                     bet_multiplier = 6
 
-        applied_amount = amount * pow(2, bet_multiplier)
-        if bet_multiplier < 1:
-            applied_amount = 0
+        applied_amount = amount * bet_multiplier
         res.append(f"**Multiplier**: {bet_multiplier}")
         res.append(f'bet: {amount}, won: {applied_amount}')
 
