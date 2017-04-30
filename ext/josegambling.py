@@ -342,7 +342,7 @@ class JoseGambling(jaux.Auxiliar):
                 elif emoji in X6_EMOJI:
                     bet_multiplier = 6
 
-        applied_amount = amount * bet_multiplier
+        applied_amount = amount * pow(2, bet_multiplier)
         res.append(f"**Multiplier**: {bet_multiplier}")
         res.append(f'bet: {amount}, won: {applied_amount}')
 
