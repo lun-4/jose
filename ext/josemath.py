@@ -120,6 +120,10 @@ class JoseMath(jaux.Auxiliar):
             res = await asyncio.wait_for(future, 13)
         except asyncio.TimeoutError:
             await cxt.say("`[wolframalpha] Timeout reached`")
+            return
+        except Exception as err:
+            await cxt.say(f":cry: {err!r}")
+            return
 
         if getattr(res, 'results', False):
             try:
