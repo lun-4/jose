@@ -343,6 +343,8 @@ class JoseGambling(jaux.Auxiliar):
                     bet_multiplier = 6
 
         applied_amount = amount * pow(2, bet_multiplier)
+        if bet_multiplier < 1:
+            applied_amount = 0
         res.append(f"**Multiplier**: {bet_multiplier}")
         res.append(f'bet: {amount}, won: {applied_amount}')
 
