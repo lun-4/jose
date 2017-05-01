@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import asyncio
 import discord
 import sys
 import copy
@@ -42,6 +43,9 @@ class Stars(jaux.Auxiliar):
     def __init__(self, _client):
         jaux.Auxiliar.__init__(self, _client)
         self.star_global_lock = False
+
+        # A real shitty solution, tbh
+        self.star_lock = asyncio.Lock()
 
         # Clean messages with 0 stars from starboard
         #self.cbk_new('stars.cleaner', self.stars_cleaner, 1200)
@@ -246,9 +250,11 @@ class Stars(jaux.Auxiliar):
             return False
 
         server_id, channel_id, message_id, user_id = _data(message, user)
+        await self.star_lock
 
         try:
             self.stars['locks'].index(server_id)
+            self.star_lock.release()
             return False
         except ValueError:
             pass
@@ -256,9 +262,11 @@ class Stars(jaux.Auxiliar):
         try:
             starboard = self.stars[server_id]
         except KeyError:
+            self.star_lock.release()
             return False
 
         if message.channel.id == starboard['starboard_id']:
+            self.star_lock.release()
             return False
 
         # create star object if needed
@@ -274,6 +282,7 @@ class Stars(jaux.Auxiliar):
         star = starboard['stars'][message_id]
         try:
             star['starrers'].index(user_id)
+            self.star_lock.release()
             return False
         except ValueError:
             star['starrers'].append(user_id)
@@ -283,12 +292,15 @@ class Stars(jaux.Auxiliar):
         except Exception as err:
             self.logger.error('add_star(%s, %s[%s])', message.id, \
                 user.name, user.id, exc_info=True)
+            self.star_lock.release()
             return False
 
         if not done:
             self.logger.error('update_star sent False')
+            self.star_lock.release()
             return False
 
+        self.star_lock.release()
         return True
 
     async def remove_star(self, message, user):
@@ -296,9 +308,11 @@ class Stars(jaux.Auxiliar):
             return False
 
         server_id, channel_id, message_id, user_id = _data(message, user)
+        await self.star_lock
 
         try:
             self.stars['locks'].index(server_id)
+            self.star_lock.release()
             return
         except ValueError:
             pass
@@ -306,18 +320,22 @@ class Stars(jaux.Auxiliar):
         try:
             starboard = self.stars[server_id]
         except IndexError:
+            self.star_lock.release()
             return False
 
         if message.channel.id == starboard['starboard_id']:
+            self.star_lock.release()
             return False
 
         star = starboard['stars'].get(message_id)
         if star is None:
+            self.star_lock.release()
             return False
 
         try:
             star['starrers'].remove(user_id)
         except ValueError:
+            self.star_lock.release()
             return False
 
         try:
@@ -325,19 +343,25 @@ class Stars(jaux.Auxiliar):
         except:
             self.logger.error('remove_star(%s, %s[%s])', message.id, \
                 user.name, user.id, exc_info=True)
+            self.star_lock.release()
             return False
 
         if not done:
             self.logger.error('update_star sent False')
+            self.star_lock.release()
             return False
 
+        self.star_lock.release()
         return True
 
     async def remove_all(self, message):
         server_id, channel_id, message_id = _data(message, None)
 
+        await self.star_lock
+
         try:
             self.stars['locks'].index(server_id)
+            self.star_lock.release()
             return
         except ValueError:
             pass
@@ -345,6 +369,7 @@ class Stars(jaux.Auxiliar):
         try:
             starboard = self.stars[server_id]
         except IndexError:
+            self.star_lock.release()
             return False
 
         # remove all stars from the message, also delete it
@@ -352,10 +377,12 @@ class Stars(jaux.Auxiliar):
             done = await self.update_star(server_id, channel_id, \
                 message_id, delete=True)
         except:
+            self.star_lock.release()
             return False
 
         if not done:
             self.logger.error('update_star sent False')
+            self.star_lock.release()
             return False
 
         try:
@@ -363,8 +390,10 @@ class Stars(jaux.Auxiliar):
                 message_id, server_id)
             del starboard['stars'][message_id]
         except IndexError:
+            self.star_lock.release()
             return False
 
+        self.star_lock.release()
         return True
 
     async def e_reaction_add(self, reaction, user):
