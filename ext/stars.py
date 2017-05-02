@@ -155,12 +155,15 @@ class Stars(jaux.Auxiliar):
             color = WHITE
         return color
 
-    def make_embed(self, message, stars):
+    def make_embed(self, message, stars, sfw_embed=True):
         '''Creates an embed with the attachments from the message, etc'''
         content = message.content
         nsfw_channel = self.is_nsfw_channel(message.channel.id)
 
         em = discord.Embed(description=content, colour=self.star_color(stars))
+        if nsfw_channel and sfw_embed:
+            em.description = f'**[WARNING: NSFW]**{em.description}'
+
         em.timestamp = message.timestamp
 
         author = message.author
@@ -171,8 +174,8 @@ class Stars(jaux.Auxiliar):
         if attch:
             attch_url = attch[0]['url']
             if attch_url.lower().endswith(('png', 'jpeg', 'jpg', 'gif')):
-                if nsfw_channel:
-                    em.description += f'[NSFW CHANNEL ATTACHMENT]({attch_url})'
+                if nsfw_channel and sfw_embed:
+                    em.description = f'{em.description}\n[NSFW ATTACHMENT]({attch_url})'
                 else:
                     em.set_image(url=attch_url)
             else:
@@ -577,7 +580,7 @@ class Stars(jaux.Auxiliar):
                 await cxt.say(f'message {message_id} not found in starboard: `{star}`')
                 return False
 
-            em = self.make_embed(msg, len(star['starrers']))
+            em = self.make_embed(msg, len(star['starrers']), False)
 
             starrers_as_members = [discord.utils.get(self.client.get_all_members(), \
                 id=mid, server__id=server_id) for mid in star['starrers']]
@@ -636,7 +639,7 @@ class Stars(jaux.Auxiliar):
             return
 
         # make the embed same way it would be on starboard channel
-        em = self.make_embed(msg, len(star['starrers']))
+        em = self.make_embed(msg, len(star['starrers']), False)
         m_str = self.star_str(star, msg)
         await self.client.send_message(message.channel, m_str, embed=em)
 
