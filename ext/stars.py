@@ -172,7 +172,7 @@ class Stars(jaux.Auxiliar):
             attch_url = attch[0]['url']
             if attch_url.lower().endswith(('png', 'jpeg', 'jpg', 'gif')):
                 if nsfw_channel:
-                    em.description += f'[NSFW CHANNEL ATTACHMENT]({attach_url})'
+                    em.description += f'[NSFW CHANNEL ATTACHMENT]({attch_url})'
                 else:
                     em.set_image(url=attch_url)
             else:
