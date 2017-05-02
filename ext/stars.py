@@ -591,6 +591,8 @@ class Stars(jaux.Auxiliar):
         '''`j!randomstar` - shows random star :thinking:'''
         server_id, _, _, _ = _data(message, message.author)
 
+        in_nsfw = self.is_nsfw_channel(message.channel.id)
+
         try:
             starboard = self.stars[server_id]
         except IndexError:
@@ -601,8 +603,8 @@ class Stars(jaux.Auxiliar):
         msg_channel = None
         tries = 0
         while msg_channel is None:
-            if tries > 3:
-                await cxt.say("Tried 3 rerolls, didn't find anything")
+            if tries > 20:
+                await cxt.say("Tried 20 rerolls, didn't find anything")
                 return
 
             message_id = random.choice(list(stars.keys()))
@@ -612,6 +614,12 @@ class Stars(jaux.Auxiliar):
                 return
 
             msg_channel = self.client.get_channel(star['channel_id'])
+            is_nsfw = self.is_nsfw_channel(msg_channel.id)
+
+            # if you run j!rs from NSFW channel, only stars from NSFW
+            # channel will appear. same for SFW channels
+            if in_nsfw != is_nsfw:
+                msg_channel = None
             tries += 1
 
         try:
