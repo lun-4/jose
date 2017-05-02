@@ -162,7 +162,7 @@ class Stars(jaux.Auxiliar):
 
         em = discord.Embed(description=content, colour=self.star_color(stars))
         if nsfw_channel and sfw_embed:
-            em.description = f'**[WARNING: NSFW]**{em.description}'
+            em.description = f'**[WARNING: NSFW]**\n{em.description}'
 
         em.timestamp = message.timestamp
 
@@ -588,7 +588,10 @@ class Stars(jaux.Auxiliar):
             em.add_field(name='Starrers', value=', '.join([m.display_name \
                 for m in starrers_as_members]))
 
-            await cxt.say_embed(em)
+            try:
+                await cxt.say_embed(em)
+            except Exception as err:
+                await cxt.say(":sob: `{err!r}`")
 
     async def c_randomstar(self, message, args, cxt):
         '''`j!randomstar` - shows random star :thinking:'''
