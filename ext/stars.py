@@ -67,6 +67,14 @@ class Stars(jaux.Auxiliar):
         except Exception as err:
             return False, repr(err)
 
+    def is_nsfw_channel(self, channel_id):
+        channel = self.client.get_channel(channel_id)
+        if channel is None:
+            return None
+
+        n = channel.name
+        return n == 'nsfw' if len(n) < 5 else n[:5] == 'nsfw-'
+
     async def stars_cleaner(self):
         '''
         stars_cleaner - checks all stars and removes messages
@@ -150,6 +158,8 @@ class Stars(jaux.Auxiliar):
     def make_embed(self, message, stars):
         '''Creates an embed with the attachments from the message, etc'''
         content = message.content
+        nsfw_channel = self.is_nsfw_channel(message.channel.id)
+
         em = discord.Embed(description=content, colour=self.star_color(stars))
         em.timestamp = message.timestamp
 
@@ -161,7 +171,10 @@ class Stars(jaux.Auxiliar):
         if attch:
             attch_url = attch[0]['url']
             if attch_url.lower().endswith(('png', 'jpeg', 'jpg', 'gif')):
-                em.set_image(url=attch_url)
+                if nsfw_channel:
+                    em.description += f'[NSFW CHANNEL ATTACHMENT]({attach_url})'
+                else:
+                    em.set_image(url=attch_url)
             else:
                 attachments = '[Attachment](%s)' % attch_url
                 if content:
