@@ -614,12 +614,13 @@ class Stars(jaux.Auxiliar):
                 return
 
             msg_channel = self.client.get_channel(star['channel_id'])
-            is_nsfw = self.is_nsfw_channel(msg_channel.id)
+            if msg_channel is not None:
+                is_nsfw = self.is_nsfw_channel(msg_channel.id)
 
-            # if you run j!rs from NSFW channel, only stars from NSFW
-            # channel will appear. same for SFW channels
-            if in_nsfw != is_nsfw:
-                msg_channel = None
+                # if you run j!rs from NSFW channel, only stars from NSFW
+                # channel will appear. same for SFW channels
+                if in_nsfw != is_nsfw:
+                    msg_channel = None
             tries += 1
 
         try:
