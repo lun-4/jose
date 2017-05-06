@@ -441,6 +441,10 @@ class JoseSpeak(jcommon.Extension):
         await cxt.send_typing()
 
         strrep = ' '.join(args[1:])
+        if strrep.count('---') < 1:
+            await cxt.say(":no_entry_sign: you can't just make josé say whatever you want! :no_entry_sign:")
+            return
+
         if strrep.count('---') > 5:
             await cxt.say("thats a .......... lot")
             return
