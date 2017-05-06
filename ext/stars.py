@@ -275,6 +275,9 @@ class Stars(jaux.Auxiliar):
         except ValueError:
             pass
 
+        if user.bot:
+            return
+
         try:
             starboard = self.stars[server_id]
         except KeyError:
@@ -332,6 +335,9 @@ class Stars(jaux.Auxiliar):
             return
         except ValueError:
             pass
+
+        if user.bot:
+            return
 
         try:
             starboard = self.stars[server_id]
