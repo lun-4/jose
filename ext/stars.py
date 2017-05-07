@@ -515,6 +515,29 @@ class Stars(jaux.Auxiliar):
             else:
                 await cxt.say(":star: :ok_hand:")
 
+    async def c_unstar(self, message, args, cxt):
+        '''`j!unstar message_id` - :hole: unstars a message in the current channel'''
+        try:
+            message_id = args[1]
+        except:
+            await cxt.say("Error parsing Message ID.")
+            return
+
+        try:
+            to_unstar = await self.client.get_message(message.channel, message_id)
+        except discord.NotFound:
+            await cxt.say("Message not found in this channel.")
+        except discord.Forbidden:
+            await cxt.say("No permissions to get messages")
+        except discord.HTTPException:
+            await cxt.say("Failed to retreive the message")
+        else:
+            res = await self.remove_star(to_unstar, message.author)
+            if not res:
+                await cxt.say("Error unstarring message.")
+            else:
+                await cxt.say("rip.")
+
     async def c_starlock(self, message, args, cxt):
         '''`j!starlock <op> [server_id]` - lock a server's starboard or lock globally'''
         await self.is_admin(message.author.id)
