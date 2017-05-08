@@ -241,8 +241,18 @@ class JoseCoin(jaux.Auxiliar):
 
         res = self.jcoin.get(id_check)
         if res[0]:
-            accdata = res[1]
-            await cxt.say(('%s -> %.2f' % (accdata['name'], accdata['amount'])))
+            account = res[1]
+
+            res = []
+            res.append(f'{account["name"]} -> `{account["amount"]:.3}`')
+
+            actual = account["actualmoney"]
+            fake = account["fakemoney"]
+
+            if actual > 0 or fake > 0:
+                res.append(f"Personal bank: `actual:{actual:.3} fake:{fake:.3}`")
+
+            await cxt.say('\n'.join(res))
         else:
             await cxt.say('account not found(`id:%s`)' % (id_check))
 
@@ -538,8 +548,8 @@ class JoseCoin(jaux.Auxiliar):
             await cxt.say("good one haha :ok_hand: actually no")
             return
 
-        if self.jcoin.data[thief_id]['amount'] < 0.01:
-            await cxt.say("You have less than `0.01`JC, can't use the steal command")
+        if self.jcoin.data[thief_id]['amount'] < 3:
+            await cxt.say("You have less than `3`JC, can't use the steal command")
             return
 
         # check if thief has cooldowns in place
