@@ -101,7 +101,8 @@ def gen():
         yield (acc_id, acc['name'], acc['amount'])
 
 def transfer(id_from, id_to, amnt, file_name=None):
-    amnt = round(amnt, 3)
+    if amnt < 0.001:
+        return False, 'very small transfer.'
 
     if file_name is None:
         file_name = LEDGER_PATH
