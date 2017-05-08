@@ -466,13 +466,15 @@ class JoseMemes(jaux.Auxiliar):
 
     async def c_8ball(self, message, args, cxt):
         '''`j!8ball` - 8ball'''
-        await self.jcoin_pricing(cxt, jcommon.API_TAX_PRICE)
+        answer = random.choice([
+            'Yes',
+            'No',
+            'Maybe',
+            'Potentially',
+            'Answer hazy',
+            'Only in your dreams',
+            'Ask later',
+        ])
 
-        try:
-            answer = await self.http_get('https://api.rtainc.co/twitch/8ball?format=[0]', timeout=4)
-        except asyncio.TimeoutError:
-            await cxt.say("`[8ball] Timeout reached`")
-            return
-
-        await cxt.say("**%s**, :8ball: said %s", (str(message.author.name), \
+        await cxt.say("**%s**, :8ball: said %s.", (str(message.author.name), \
             answer))
