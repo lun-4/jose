@@ -79,7 +79,7 @@ Command | Description | Example | Alias
 `j!bank` | Shows the amount of JC in the Taxbank, Storagebank, and what's stored in your personal bank | |
 `j!store amount` | Stores the amount of JoséCoins you specify in the StorageBank | `j!store 22` |
 `j!withdraw amount` | Withdraws the amount of JoséCoins you specify from the StorageBank | `j!withdraw 22` |
-`j!loan amount|"pay"|"see"` | Requests a loan from the TaxBank according to amount, you can also see how much is being lent to you, and pay back your loan | `j!loan 10`, `j!loan see`, or `j!loan pay` |
+`j!loan amount\|"pay"\|"see"` | Requests a loan from the TaxBank according to amount, you can also see how much is being lent to you, and pay back your loan | `j!loan 10`, `j!loan see`, or `j!loan pay` |
 `j!donate amount` | Donate money to your TaxBank, it will be counted as tax | `j!donate 0.1` |
 
 ### Coming Soon™
