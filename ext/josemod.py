@@ -67,11 +67,11 @@ class JoseMod(jaux.Auxiliar):
             return
 
         em = discord.Embed(title='Member Join', colour=discord.Colour.green())
-        em.timestamp = member.created_at
+        em.timestamp = member.joined_at
         em.set_footer(text='Created')
         em.set_author(name=str(member), icon_url=member.avatar_url or member.default_avatar_url)
         em.add_field(name='ID', value=member.id)
-        em.add_field(name='Joined', value=member.joined_at)
+        em.add_field(name='Joined Discord', value=member.joined_at)
 
         await self.client.send_message(log_channel, embed=em)
 
@@ -81,11 +81,11 @@ class JoseMod(jaux.Auxiliar):
             return
 
         em = discord.Embed(title='Member Remove', colour=discord.Colour.red())
-        em.timestamp = member.created_at
+        em.timestamp = datetime.datetime.now()
         em.set_footer(text='Created')
         em.set_author(name=str(member), icon_url=member.avatar_url or member.default_avatar_url)
         em.add_field(name='ID', value=member.id)
-        em.add_field(name='Removed', value=member.joined_at)
+        em.add_field(name='Joined Discord', value=member.joined_at)
 
         await self.client.send_message(log_channel, embed=em)
 
