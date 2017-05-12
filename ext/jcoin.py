@@ -332,7 +332,7 @@ class JoseCoin(jaux.Auxiliar):
         except:
             top_finish = 11
 
-        if top_finish > 16:
+        if top_finish > 17:
             await cxt.say("LimitError: values higher than 16 aren't valid")
             return
         elif top_finish <= 0:
