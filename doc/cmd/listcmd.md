@@ -72,7 +72,7 @@ Command | Description | Example | Alias
 `j!docs [topic or "list"]` | Searches documentation for josé | |
 `j!yt search_terms` | Search YouTube | `j!yt Tunak Tunak Tun sped up every time they say Tunak` |
 `j!sndc search_terms` | Search Soundcloud | `j!sndc Tunak Tunak Tun` |
-`j!color "rand"|#aabbcc|red,green,blue` | show colors | `j!color #DEADAF`, `j!color 100,50,100`, `j!color rand` |
+`j!color "rand"\|#aabbcc\|red,green,blue` | show colors | `j!color #DEADAF`, `j!color 100,50,100`, `j!color rand` |
 
 ### `jcoin`
 
