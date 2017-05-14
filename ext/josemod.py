@@ -76,7 +76,7 @@ class JoseMod(jaux.Auxiliar):
         em.set_footer(text='Created')
         em.set_author(name=str(member), icon_url=member.avatar_url or member.default_avatar_url)
         em.add_field(name='ID', value=member.id)
-        em.add_field(name='Account age', value=self.account_age(member.joined_at))
+        em.add_field(name='Account age', value=self.account_age(member.created_at))
 
         await self.client.send_message(log_channel, embed=em)
 
@@ -90,7 +90,7 @@ class JoseMod(jaux.Auxiliar):
         em.set_footer(text='Created')
         em.set_author(name=str(member), icon_url=member.avatar_url or member.default_avatar_url)
         em.add_field(name='ID', value=member.id)
-        em.add_field(name='Account age', value=self.account_age(member.joined_at))
+        em.add_field(name='Account age', value=self.account_age(member.created_at))
 
         await self.client.send_message(log_channel, embed=em)
 
