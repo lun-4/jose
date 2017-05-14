@@ -65,7 +65,7 @@ class JoseMod(jaux.Auxiliar):
         now = datetime.datetime.now()
         delta = now - dt
         delta_sec = delta.total_seconds()
-        delta_days = delta_sec / 86400
+        delta_days = round(delta_sec / 86400, 2)
         return f'{delta_days} days'
 
     async def e_member_join(self, member):
