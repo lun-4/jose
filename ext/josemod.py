@@ -64,9 +64,7 @@ class JoseMod(jaux.Auxiliar):
     def account_age(self, dt):
         now = datetime.datetime.now()
         delta = now - dt
-        delta_sec = delta.total_seconds()
-        delta_days = round(delta_sec / 86400, 2)
-        return f'{delta_days} days'
+        return f'{delta!s}'
 
     async def e_member_join(self, member):
         log_channel = self.get_from_data(member.server.id, 'log_channel')
