@@ -396,7 +396,7 @@ class JoseMod(jaux.Auxiliar):
             await self.client.kick(member)
             done = await self.mod_log('kick', message.server, member, message.author)
             if done:
-                await cxt.say(':boxing_glove: **%s kicked**', (str(member),))
+                await cxt.say(':boxing_glove: **%s: kicked**', (str(member),))
             else:
                 await cxt.say(':thinking: Registering in the modlogs failed.')
 
@@ -439,9 +439,7 @@ class JoseMod(jaux.Auxiliar):
             await cxt.say('Error banning.')
             return
         else:
-            await cxt.say(':hammer: **%s was banned**', (str(member),))
-
-        await self.mod_log('ban', message.server, member, message.author)
+            await cxt.say(':hammer: **%s: banned**', (str(member),))
 
     async def c_unban(self, message, args, cxt):
         '''`j!unban caseid reason` - unbans a user'''
@@ -486,7 +484,7 @@ class JoseMod(jaux.Auxiliar):
             await cxt.say('Error unbanning.')
             return
         else:
-            await cxt.say(':angel: **%s was unbanned**', (str(user),))
+            await cxt.say(':angel: **%s: unbanned**', (str(user),))
 
         await self.mod_log('unban', message.server, user, message.author, reason)
 
