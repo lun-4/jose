@@ -16,7 +16,7 @@ $ cd jose
 $ nano joseconfig.py
 
 # For Ubuntu-based Linuxes
-$ sudo apt-get intall gettext
+$ sudo apt-get install gettext
 
 # Make sure pip references python 3.5+
 $ sudo pip install -U -r requirements.txt
