@@ -630,7 +630,7 @@ class Stars(jaux.Auxiliar):
 
         try:
             starboard = self.stars[server_id]
-        except IndexError:
+        except KeyError:
             await cxt.say("No starboard initialized")
             return
 
