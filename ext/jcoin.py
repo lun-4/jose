@@ -466,6 +466,10 @@ class JoseCoin(jaux.Auxiliar):
                 res.append(":angel: you lost your grace period %.2f hours ago" % \
                     (-self.to_hours(grace_period)))
 
+        acc = self.jcoin.get(personid)[1]
+        if acc['times_stolen'] < 1:
+            res.append("You never stole before.")
+
         await cxt.say('\n'.join(res))
 
     async def do_arrest(self, thief_id, amount, arrest_type=0, tbank_id=None):
