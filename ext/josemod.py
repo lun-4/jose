@@ -179,6 +179,13 @@ class JoseMod(jaux.Auxiliar):
 
         return ban_report
 
+    async def e_on_message(self, message):
+        if message.server.id != "312073189138104320":
+            return
+
+        if 'bilada' in message.content:
+            await self.client.delete_message(message)
+
     async def mod_log(self, logtype, *data):
         server = data[0]
 
