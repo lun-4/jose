@@ -179,7 +179,7 @@ class JoseMod(jaux.Auxiliar):
 
         return ban_report
 
-    async def e_on_message(self, message):
+    async def e_on_message(self, message, cxt):
         if message.server.id != "312073189138104320":
             return
 
