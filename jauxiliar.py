@@ -28,6 +28,10 @@ class Auxiliar(jcommon.Extension):
         self.jcommon = jcommon
         self.jcoin = jcoin
 
+    def is_nsfw(self, channel):
+        n = channel.name
+        return n == 'nsfw' if len(n) < 5 else n[:5] == 'nsfw-'
+
     def tbank_fmt(self, cxt):
         if isinstance(cxt, jcommon.Context):
             return 'tbank#%s' % str(cxt.message.server.id)

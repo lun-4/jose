@@ -201,6 +201,10 @@ class JoseLanguage(jaux.Auxiliar):
             await cxt.say("Channel not found")
             return
 
+        if not self.is_nsfw(channel):
+            await cxt.say("Only NSFW channels are allowed to have the image module on.")
+            return
+
         self.logger.info("Set imgchannel in %r to %r", message.server.name, channel_id)
         done = await jcommon.configdb_set(message.server.id, 'imgchannel', channel_id)
         if done:

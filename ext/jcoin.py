@@ -17,8 +17,8 @@ PRICE_TABLE = {
     'api': ('Tax for Commands that use APIs', jcommon.API_TAX_PRICE, \
             ('wolframalpha', 'temperature', 'money', 'bitcoin', 'xkcd', 'sndc', 'urban')),
 
-    'img': ('Price for all commands in `joseimages`', jcommon.IMG_PRICE, \
-            ('derpibooru', 'hypno', 'e621', 'yandere')),
+    #'img': ('Price for all commands in `joseimages`', jcommon.IMG_PRICE, \
+    #        ('derpibooru', 'hypno', 'e621', 'yandere')),
 
     'opr': ('Operational tax for commands that use a lot of processing', jcommon.OP_TAX_PRICE, \
             ('datamosh', 'yt'))
