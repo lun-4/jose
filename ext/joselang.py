@@ -27,6 +27,10 @@ class JoseLanguage(jaux.Auxiliar):
 
         # self.cbk_new('jlang.dbapi_commit', self.dbapi_commit, 300)
 
+    def is_nsfw(self, channel):
+        n = channel.name
+        return n == 'nsfw' if len(n) < 5 else n[:5] == 'nsfw-'
+
     async def dbapi_commit(self):
         t_start = time.time()
         if self.dbapi.statements > 0:
