@@ -112,7 +112,7 @@ class JoseMagicWord(jaux.Auxiliar):
         # parse the string
         magicwords, mwresponse = mwstr.split(';')
         magicwords = magicwords.split(',')
-        mwresponse = mwresponse.split()
+        mwresponse = mwresponse.strip()
 
         if len(magicwords) > 6:
             await cxt.say(":warning: Maximum of 6 magic words allowed in each set.")
