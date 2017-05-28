@@ -520,6 +520,11 @@ class JoseCoin(jaux.Auxiliar):
             await cxt.say("Error parsing `amount`")
             return
 
+        # tfw hardcoded numbers
+        if amount < .002:
+            await cxt.say(f"Too low. Minimum is `0.002JC`")
+            return
+
         if target_id not in self.jcoin.data:
             await cxt.say("The person you're trying to steal from doesn't have a JoséCoin account")
             return
