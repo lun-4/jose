@@ -66,6 +66,9 @@ class JoseMod(jaux.Auxiliar):
         delta = now - dt
         return f'{delta!s}'
 
+    def guild_age(self, member):
+        return self.account_age(member.joined_at)
+
     async def e_member_join(self, member):
         log_channel = self.get_from_data(member.server.id, 'log_channel')
         if log_channel is None:
@@ -91,6 +94,7 @@ class JoseMod(jaux.Auxiliar):
         em.set_author(name=str(member), icon_url=member.avatar_url or member.default_avatar_url)
         em.add_field(name='ID', value=member.id)
         em.add_field(name='Account age', value=self.account_age(member.created_at))
+        em.add_field(name='Server age', value=self.guild_age(member))
 
         await self.client.send_message(log_channel, embed=em)
 
