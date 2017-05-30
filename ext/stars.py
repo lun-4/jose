@@ -471,8 +471,8 @@ class Stars(jaux.Auxiliar):
             str(message.server.name), message.server.id)
 
         # everyone can read, only jose can write
-        everyone_perms = perm_overwrite(read_messages=True, write_messages=False)
-        jose_perms = perm_overwrite(read_messages=True, write_messages=True)
+        everyone_perms = perm_overwrite(read_messages=True, send_messages=False)
+        jose_perms = perm_overwrite(read_messages=True, send_messages=True)
 
         everyone = channel_perms(target=server.default_role, overwrite=everyone_perms)
         jose = channel_perms(target=server.me, overwrite=jose_perms)
