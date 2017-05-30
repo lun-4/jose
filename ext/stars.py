@@ -44,7 +44,7 @@ class Stars(jaux.Auxiliar):
         jaux.Auxiliar.__init__(self, _client)
         self.star_global_lock = False
 
-        self.star_locks = collections.defaultdict(asyncio.Lock)
+        self.star_lock = collections.defaultdict(asyncio.Lock)
 
         # Clean messages with 0 stars from starboard
         self.cbk_new('stars.cleaner', self.stars_cleaner, 1200)
