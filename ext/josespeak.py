@@ -163,7 +163,7 @@ class JoseSpeak(jcommon.Extension):
                 if author.bot and botblock:
                     continue
 
-                filtered = jcommon.speak_filter(message.content)
+                filtered = jcommon.speak_filter(message.clean_content)
                 messages.append(filtered)
         except discord.Forbidden:
             self.logger.info(f'got Forbidden from {serverid}')
@@ -263,7 +263,7 @@ class JoseSpeak(jcommon.Extension):
         res = []
         async for message in logs:
             if message.author != jcommon.JOSE_ID:
-                res.append(jcommon.speak_filter(message.content))
+                res.append(jcommon.speak_filter(message.clean_content))
 
         texter = await make_texter(None, 1, '\n'.join(res))
 
@@ -349,7 +349,7 @@ class JoseSpeak(jcommon.Extension):
             if random.random() < probability:
                 random_chance = True
 
-        _content = message.content.lower()
+        _content = message.clean_content.lower()
         for prefix in SPEAK_PREFIXES:
             if _content.startswith(prefix):
                 statement = _content[len(prefix):]
