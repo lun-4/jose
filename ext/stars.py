@@ -457,7 +457,6 @@ class Stars(jaux.Auxiliar):
 
     async def c_starboard(self, message, args, cxt):
         '''`j!starboard channel_name` - initialize Starboard'''
-        await self.is_admin(message.author.id)
 
         try:
             starboard_name = args[1]
@@ -466,6 +465,10 @@ class Stars(jaux.Auxiliar):
             return
 
         server = message.server
+
+        if server.id in self.stars:
+            await cxt.say("dude you can't create 2 starboards")
+            return
 
         self.logger.info('[stars] Initializing starboard @ %s[%s]', \
             str(message.server.name), message.server.id)
@@ -486,7 +489,7 @@ class Stars(jaux.Auxiliar):
 
         res = await self.init_starboard(message.server.id, starboard.id)
         if res:
-            await cxt.say(":ok_hand: Starboard initialized! Make sure only josé can send messages on the channel.")
+            await cxt.say(":ok_hand: Starboard initialized! Make sure only josé can send messages on the channel(*psst* `j!helpme` if you have issues).")
         else:
             await cxt.say(":sob: Starboard initialization failed :sob:")
 
