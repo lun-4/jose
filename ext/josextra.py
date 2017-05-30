@@ -435,8 +435,9 @@ Made with :heart: by Luna Mendes""" % (jcommon.JOSE_VERSION))
                 globalrank, len(sorted_data))
             )
 
-            em.add_field(name='JoséCoin Wallet', value='{}JC'.format(account['amount']))
-            em.add_field(name='Tax paid', value='{}JC'.format(account['taxpaid']))
+            em.add_field(name='JoséCoin Wallet', value=f'{account["amount"]}JC')
+            em.add_field(name='Tax paid', value=f'{account["taxpaid"]}JC')
+            em.add_field(name='Personal bank', value=f'{account["actualmoney"]}JC')
 
             try:
                 ratio = account['success_steal'] / account['times_stolen']
