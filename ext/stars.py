@@ -691,6 +691,11 @@ class Stars(jaux.Auxiliar):
             return
 
         stars = starboard['stars']
+
+        if len(stars.keys()) < 1:
+            await cxt.say("how can I show statistics if there isn't anything starred to start with?")
+            return
+
         stats = discord.Embed(title="Starboard statistics", colour=discord.Colour(0xFFFF00))
 
         # thats dumb, but needed
