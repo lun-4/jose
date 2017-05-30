@@ -40,6 +40,8 @@ docsdict = {
 
     "contributing": "{}/CONTRIBUTING.md".format(JOSE_URL),
     "jcoin": "{}/doc/jcoin.md".format(JOSE_URL),
+
+    "starboard": "{}/doc/starboard.md".format(JOSE_URL),
 }
 
 COLOR_API = 'http://thecolorapi.com'
