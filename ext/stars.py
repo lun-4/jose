@@ -47,7 +47,7 @@ class Stars(jaux.Auxiliar):
         self.star_lock = collections.defaultdict(asyncio.Lock)
 
         # Clean messages with 0 stars from starboard
-        self.cbk_new('stars.cleaner', self.stars_cleaner, 1200)
+        #self.cbk_new('stars.cleaner', self.stars_cleaner, 1200)
 
     async def ext_load(self):
         try:
