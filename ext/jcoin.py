@@ -699,7 +699,7 @@ class JoseCoin(jaux.Auxiliar):
             return
 
         to_store = await self.sw_parse(args, cxt)
-        if to_store is None:
+        if not isinstance(to_store, decimal.Decimal):
             return
 
         account = self.jcoin.data.get(message.author.id, None)
