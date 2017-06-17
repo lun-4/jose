@@ -15,7 +15,7 @@ $ git clone https://github.com/lkmnds/jose.git
 $ cd jose
 $ nano joseconfig.py
 
-# For Ubuntu-based Linuxes
+# For Debian-based Linuxes
 $ sudo apt-get install gettext
 
 # Make sure pip references python 3.5+
