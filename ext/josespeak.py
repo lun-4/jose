@@ -197,9 +197,11 @@ class JoseSpeak(jcommon.Extension):
             await self.text_generators[serverid].clear()
 
         # create it
-        self.text_generators[serverid] = await make_texter(None, 1, '\n'.join(messages))
+        _joined = '\n'.join(messages)
+        self.text_generators[serverid] = await make_texter(None, 1, _joined)
 
-        self.last_texter_mcount = len(messages)
+        # wordcount lol
+        self.last_texter_mcount = _joined.count(' ') + 1
         self.last_texter_time = (time.time() - t_start)
         self._locks[serverid] = False
 
@@ -297,7 +299,7 @@ class JoseSpeak(jcommon.Extension):
 
         t_taken = (time.time() - t_start) * 1000
 
-        await cxt.say("`Created %d Texters with %d lines in total. Took %.2fms`", \
+        await cxt.say("`Created %d Texters with %d words in total. Took %.2fms`", \
             (len(servers), total_lines, t_taken))
 
     async def c_texclean(self, message, args, cxt):
@@ -326,7 +328,7 @@ class JoseSpeak(jcommon.Extension):
         '''`j!texstat` - Texter Stats'''
         svcount = len(self.client.servers)
         report = """%d/%d Texters loaded
- * Last Texter made had %d lines, took %.2fms to load it"""
+ * Last Texter made had %d words, took %.2fms to load it"""
 
         res = report % (len(self.text_generators), svcount, \
             self.last_texter_mcount, (self.last_texter_time * 1000))
