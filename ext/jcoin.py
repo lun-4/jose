@@ -13,6 +13,8 @@ import time
 from random import SystemRandom
 random = SystemRandom()
 
+import motor.motor_asyncio
+
 PRICE_TABLE = {
     'api': ('Tax for Commands that use APIs', jcommon.API_TAX_PRICE, \
             ('wolframalpha', 'temperature', 'money', 'bitcoin', 'xkcd', 'sndc', 'urban')),
@@ -911,3 +913,45 @@ class JoseCoin(jaux.Auxiliar):
         c = await self.jcoin_pricing(cxt, amount)
         if c:
             await cxt.say("Donated %.2fJC in taxes.", (amount,))
+
+    async def c_migrate(self, message, args, ctx):
+        """Migrate from JSON to MongoDB.    JSON SUCKS ASS."""
+        await self.is_admin(message.author.id)
+
+        # create mongo client
+        client = motor.motor_asyncio.AsyncIOMotorClient()
+
+        josedb = client['jose-migration']
+        jcoin_coll = jose['josecoin']
+
+        res = await jcoin_coll.delete_many({})
+        await ctx.say(f'Deleted `{res.deleted_count}` documents')
+
+        inserted = 0
+
+        for account_id in self.jcoin.data:
+            account = self.jcoin[account_id]
+            new_account = None
+
+            if account['type'] == 0:
+                new_account = {
+                    'id': int(account_id),
+                    'type': 'user',
+                    'amount': str(account['amount'])
+                    'taxpaid': str(account['taxpaid']),
+                    'times_stolen': account['times_stolen'],
+                    'success_steal': account['success_steal'],
+                }
+            elif account['type'] == 1:
+                new_account = {
+                    'id': int(account_id),
+                    'type': 'taxbank',
+                    'amount': str(account['taxes']),
+                    'loans': {},
+                }
+
+            res = await jcoin_coll.insert_one(new_account)
+            if res.acknowledged: inserted += 1
+
+        await ctx.say(f'Inserted {inserted} documents, {len(self.jcoin.data} total accounts')
+
