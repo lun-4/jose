@@ -930,7 +930,7 @@ class JoseCoin(jaux.Auxiliar):
         inserted = 0
 
         for account_id in self.jcoin.data:
-            account = self.jcoin[account_id]
+            account = self.jcoin.data[account_id]
             new_account = None
 
             if account['type'] == 0:
