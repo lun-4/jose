@@ -922,7 +922,7 @@ class JoseCoin(jaux.Auxiliar):
         client = motor.motor_asyncio.AsyncIOMotorClient()
 
         josedb = client['jose-migration']
-        jcoin_coll = jose['josecoin']
+        jcoin_coll = josedb['josecoin']
 
         res = await jcoin_coll.delete_many({})
         await ctx.say(f'Deleted `{res.deleted_count}` documents')
