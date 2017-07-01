@@ -921,7 +921,7 @@ class JoseCoin(jaux.Auxiliar):
         # create mongo client
         client = motor.motor_asyncio.AsyncIOMotorClient()
 
-        josedb = client['jose-migration']
+        josedb = client['jose']
         jcoin_coll = josedb['josecoin']
 
         res = await jcoin_coll.delete_many({})
