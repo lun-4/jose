@@ -943,7 +943,7 @@ class JoseCoin(jaux.Auxiliar):
                     'success_steal': account['success_steal'],
                 }
             elif account['type'] == 1:
-                acc_id = account.split('#')[1]
+                acc_id = account_id.split('#')[1]
                 new_account = {
                     'id': int(acc_id),
                     'type': 'taxbank',
