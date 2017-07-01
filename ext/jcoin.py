@@ -953,5 +953,5 @@ class JoseCoin(jaux.Auxiliar):
             res = await jcoin_coll.insert_one(new_account)
             if res.acknowledged: inserted += 1
 
-        await ctx.say(f'Inserted {inserted} documents, {len(self.jcoin.data} total accounts')
+        await ctx.say(f'Inserted {inserted} documents, {len(self.jcoin.data)} total accounts')
 
