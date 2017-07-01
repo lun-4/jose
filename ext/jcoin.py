@@ -937,7 +937,7 @@ class JoseCoin(jaux.Auxiliar):
                 new_account = {
                     'id': int(account_id),
                     'type': 'user',
-                    'amount': str(account['amount'])
+                    'amount': str(account['amount']),
                     'taxpaid': str(account['taxpaid']),
                     'times_stolen': account['times_stolen'],
                     'success_steal': account['success_steal'],
