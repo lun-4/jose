@@ -25,8 +25,10 @@ class Cog:
 
     async def get_json(self, url):
         async with self.bot.session.get(url) as resp:
-            j = await resp.json()
-            return j
+            try:
+                return await resp.json()
+            except Exception as err:
+                raise SayException(f'Error parsing JSON: {err!r}')
 
     async def http_get(self, url):
         async with self.bot.session.get(url) as resp:
