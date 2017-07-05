@@ -50,6 +50,9 @@ class Statistics(Cog):
     async def on_message(self, message):
         statsd.increment('jose.recv_messages')
 
+    async def on_guild_leave(self, guild):
+        log.info(f'Left guild {guild.name} {guild.id}, {guild.member_count} members')
+
     @commands.command(aliases=['cstats'])
     async def command_stats(self, ctx, limit: int = 10):
         """Shows the most used commands"""
