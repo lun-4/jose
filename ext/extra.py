@@ -6,6 +6,7 @@ import urllib.parse
 import datetime
 import collections
 import time
+import json
 
 import discord
 
@@ -14,6 +15,8 @@ from discord.ext import commands
 from .common import Cog
 
 log = logging.getLogger(__name__)
+
+RXKCD_ENDPOINT = 'http://0.0.0.0:8080/search'
 
 class Extra(Cog):
     """Extra commands that don't fit in any other cogs."""
@@ -59,6 +62,26 @@ class Extra(Cog):
                 info = await self.get_json(f'https://xkcd.com/{number}/info.0.json')
 
         await ctx.send(f'xkcd {info["num"]} => {info["img"]}')
+
+    @commands.command()
+    async def rxkcd(self, ctx, *, terms: str):
+        """Get a Relevant XKCD.
+        
+        Made with https://github.com/adtac/relevant-xkcd
+        """
+        async with self.bot.session.post(RXKCD_ENDPOINT, data={'search': terms}) as r:
+            data = await r.text()
+            data = json.loads(data)
+            if not data['success']:
+                raise self.SayException(f'XKCD retrieval failed: {data["message"]!r}')
+
+            comic = data['results'][0]
+            
+            em = discord.Embed(title=f'Relevant XKCD for {terms!r}')
+            em.description = f'XKCD {comic["number"]}, {comic["title"]}'
+            em.set_image(url=comic['image'])
+
+            await ctx.send(embed=em)
 
     @commands.command(aliases=['yt'])
     async def youtube(self, ctx, *, search_term: str):
