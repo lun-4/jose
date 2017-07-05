@@ -1,0 +1,201 @@
+import pprint
+import collections
+import time
+
+import motor.motor_asyncio
+import discord
+
+from discord.ext import commands
+
+from .common import Cog
+
+
+class Config(Cog):
+    def __init__(self, bot):
+        super().__init__(bot)
+
+        self.mongo_client = motor.motor_asyncio.AsyncIOMotorClient()
+        self.bot.mongo = self.mongo_client
+
+        self.jose_db = self.mongo_client['jose']
+
+        self.config_coll = self.jose_db['config']
+        self.block_coll = self.jose_db['block']
+        self.bot.block_coll = self.block_coll
+
+        # querying the db every time is not worth it
+        self.config_cache = collections.defaultdict(dict)
+        
+        # used to check if cache has all defined objects in it
+        self.default_keys = None
+
+    def cfg_default(self, guild_id):
+        default = {
+            'guild_id': guild_id,
+            'botblock': True,
+            'image_channel': None,
+            'speak_channel': None,
+            'prefix': 'j!',
+            'autoreply_prob': 0,
+            'fullwidth_prob': 0.1,
+        }
+        return default
+
+    async def block_one(self, user_id, k='user_id'):
+        if await self.block_coll.find_one({k: user_id}) is not None:
+            return False
+        
+        try:
+            await self.block_coll.insert_one({k: user_id})
+            self.bot.block_cache[user_id] = True
+            return True
+        except:
+            return False
+
+    async def unblock_one(self, user_id, k='user_id'):
+        d = await self.block_coll.delete_one({k: user_id})
+        self.bot.block_cache[user_id] = False
+        return d.deleted_count > 0
+
+    async def ensure_cfg(self, guild, query=False):
+        """Get a configuration object for a guild.
+        If `query` is `False`, it checks for a configuration object in cache
+        
+        Parameters
+        ----------
+        guild: discord.Guild
+            The guild to find a configuration object to.
+        query: bool
+            If this will check cache first or just query Mongo
+            for a configuration object.
+        """
+        cached = self.config_cache[guild.id]
+        if not query and self.default_keys is not None:
+            # check if the cached object satisfies all configuration keys
+            satisfies = all([field in cached for field in self.default_keys])
+            if satisfies: return cached
+
+        cfg = await self.config_coll.find_one({'guild_id': guild.id})
+        if cfg is None:
+            await self.config_coll.insert_one(self.cfg_default(guild.id))
+            return await self.ensure_cfg(guild)
+
+        self.config_cache[guild.id] = cfg
+        self.default_keys = list(cfg.keys())
+
+        return cfg
+
+    async def cfg_get(self, guild, key):
+        if key in self.config_cache[guild.id]:
+            return self.config_cache[guild.id][key]
+
+        cfg = await self.ensure_cfg(guild)
+        return cfg.get(key)
+
+    async def cfg_set(self, guild, key, value):
+        cfg = await self.ensure_cfg(guild)
+
+        res = await self.config_coll.update_one({'guild_id': guild.id}, {'$set': {
+            key: value
+        }})
+
+        self.config_cache[guild.id][key] = value
+
+        return res.modified_count > 0
+
+    @commands.command(name='cfg_get', hidden=True)
+    @commands.guild_only()
+    async def _config_get(self, ctx, key: str):
+        """Get a configuration key"""
+        res = await self.cfg_get(ctx.guild, key)
+        await ctx.send(f'{res!r}')
+
+    @commands.command(name='cfgall', hidden=True)
+    @commands.guild_only()
+    async def cfgall(self, ctx):
+        """Get the configuration object for a guild."""
+        t1 = time.monotonic()
+        cfg = await self.ensure_cfg(ctx.guild)
+        t2 = time.monotonic()
+        delta = round((t2 - t1) * 1000, 2)
+        await ctx.send(f'```py\n{pprint.pformat(cfg)}\nTook {delta}ms.\n```')
+
+    @commands.command(aliases=['speakchan'])
+    @commands.guild_only()
+    async def speakchannel(self, ctx, channel: discord.TextChannel):
+        """Set the channel José will gather messages to feed to his markov generator."""
+        success = await self.cfg_set(ctx.guild, 'speak_channel', channel.id)
+        await ctx.success(success)
+
+    @commands.command()
+    @commands.guild_only()
+    async def jsprob(self, ctx, prob: float):
+        """Set the probability per message that José will autoreply to it."""
+        if prob < 0 or prob > 5:
+            await ctx.send("`prob` is out of the range `[0-5]`")
+            return
+
+        success = await self.cfg_set(ctx.guild, 'autoreply_prob', prob / 100)
+        await ctx.success(success)
+
+    @commands.command()
+    @commands.guild_only()
+    async def fwprob(self, ctx, prob: float):
+        """Set the probability that josé will randomly respond in fullwidth."""
+        if prob < 0 or prob > 10:
+            await ctx.send('`prob` is out of the range `[0-10]`')
+            return
+
+        success = await self.cfg_set(ctx.guild, 'fullwidth_prob', prob / 100)
+        await ctx.success(success)
+
+    @commands.command()
+    @commands.guild_only()
+    async def botblock(self, ctx):
+        """Toggle bot blocking."""
+        botblock = await self.cfg_get(ctx.guild, 'botblock')
+        success = await self.cfg_set(ctx.guild, 'botblock', not botblock)
+        await ctx.success(success)
+        await ctx.send(f'`botblock` set to `{not botblock}`')
+
+    @commands.command()
+    @commands.is_owner()
+    async def block(self, ctx, user: discord.User):
+        """Block someone from using the bot, globally"""
+        await ctx.success(await self.block_one(user.id))
+
+    @commands.command()
+    @commands.is_owner()
+    async def unblock(self, ctx, user: discord.User):
+        """Unblock someone from using the bot, globally"""
+        await ctx.success(await self.unblock_one(user.id))
+    
+    @commands.command()
+    @commands.is_owner()
+    async def blockguild(self, ctx, guild_id: int):
+        """Block an entire guild from using José."""
+        await ctx.success(await self.block_one(guild_id, 'guild_id'))
+
+    @commands.command()
+    @commands.is_owner()
+    async def unblockguild(self, ctx, guild_id: int):
+        """Unblock a guild from using José."""
+        await ctx.success(await self.unblock_one(guild_id, 'guild_id'))
+
+    @commands.command()
+    @commands.is_owner()
+    async def dbstats(self, ctx):
+        """Show some mongoDB stuff because JSON sucks ass."""
+        colls = await self.jose_db.collection_names()
+        counts = collections.Counter()
+
+        for coll_name in colls:
+            coll = self.jose_db[coll_name]
+            counts[coll_name] = await coll.count()
+
+        coll_counts = '\n'.join([f'{collname:15} | {count}' for collname, count in counts.most_common()])
+        coll_counts = f'```\n{coll_counts}```'
+        await ctx.send(coll_counts)
+
+def setup(bot):
+    bot.add_cog(Config(bot))
