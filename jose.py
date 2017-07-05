@@ -116,8 +116,9 @@ class JoseBot(commands.Bot):
     async def on_command(self, ctx):
         # thanks dogbot ur a good
         author = ctx.message.author
+        guild = ctx.guild
         checks = [c.__qualname__.split('.')[0] for c in ctx.command.checks]
-        location = '[DM]' if isinstance(ctx.channel, discord.DMChannel) else '[Guild]'
+        location = '[DM]' if isinstance(ctx.channel, discord.DMChannel) else '[Guild {guild.name} {guild.id}]'
         log.info('%s [cmd] %s(%d) "%s" checks=%s', location, author, author.id, ctx.message.content,
                  ','.join(checks) or '(none)')
 
