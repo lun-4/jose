@@ -7,3 +7,4 @@ pyowm==2.6.1
 uvloop==0.8.0
 motor==1.1
 Pillow==4.1.0
+datadog==0.16.0
