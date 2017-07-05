@@ -4,7 +4,6 @@ import time
 import sys
 import traceback
 import asyncio
-import collections
 
 import discord
 import aiohttp
