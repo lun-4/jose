@@ -70,7 +70,10 @@ class ChannelHandler(logging.Handler):
             joined = '\n'.join(messages)
             channel = self.channels[level]
  
-            self.loop.create_task(channel.send(joined))
+            try:
+                self.loop.create_task(channel.send(joined))
+            except AttributeError:
+                print('[chlog] Log channel not found')
 
             # empty queue
             self.queue[level] = []

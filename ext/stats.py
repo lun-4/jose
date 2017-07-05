@@ -1,8 +1,13 @@
 import collections
+import asyncio
+import logging
 
+from datadog import statsd
 from discord.ext import commands
 
 from .common import Cog
+
+log = logging.getLogger(__name__)
 
 def empty_stats(c_name):
     return {
@@ -16,6 +21,20 @@ class Statistics(Cog):
         super().__init__(bot)
 
         self.cstats_coll = self.config.jose_db['command_stats']
+        self.stats_task = bot.loop.create_task(self.querystats())
+
+    def __unload(self):
+        self.stats_task.cancel()
+
+    async def querystats(self):
+        try:
+            while True:
+                statsd.gauge('jose.guilds', len(self.bot.guilds))
+                statsd.gauge('jose.channels', len(list(self.bot.get_all_channels())))
+                statsd.gauge('jose.users', len(self.bot.users))
+                await asyncio.sleep(10)
+        except asyncio.CancelledError:
+            log.info('[statsd] stats machine broke')
 
     async def on_command_completion(self, ctx):
         command = ctx.command
@@ -24,8 +43,12 @@ class Statistics(Cog):
         stats = await self.cstats_coll.find_one({'name': c_name})
         if stats is None:
             await self.cstats_coll.insert_one(empty_stats(c_name))
-
+        
+        statsd.increment('jose.complete_commands')
         await self.cstats_coll.update_one({'name': c_name}, {'$inc': {'uses': 1}})
+
+    async def on_message(self, message):
+        statsd.increment('jose.recv_messages')
 
     @commands.command(aliases=['cstats'])
     async def command_stats(self, ctx, limit: int = 10):
