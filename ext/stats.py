@@ -27,6 +27,9 @@ class Statistics(Cog):
 
         await self.cstats_coll.update_one({'name': c_name}, {'$inc': {'uses': 1}})
 
+    async def on_guild_leave(self, guild):
+        log.info(f'Left guild {guild.name} {guild.id}, {guild.member_count} members')
+
     @commands.command(aliases=['cstats'])
     async def command_stats(self, ctx, limit: int = 10):
         """Shows the most used commands"""
