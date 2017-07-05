@@ -1,1 +1,0 @@
-python jose-bot.py
