@@ -20,8 +20,17 @@ REWARD_COOLDOWN = 1800
 # 1.2%
 COIN_BASE_PROBABILITY = 0.012
 
+
 class TransferError(Exception):
     pass
+
+
+TRANSFER_OBJECTS = [
+    'bananas',
+    'computers',
+    'dogs',
+    'memes',
+]
 
 
 class Coins(Cog):
@@ -278,7 +287,7 @@ class Coins(Cog):
 
         try:
             await self.transfer(ctx.author.id, person.id, amount)
-            await ctx.send(f'Transferred {amount!s} from {ctx.author!s} to {person!s}')
+            await ctx.send(f'Transferred {amount!s} {random.choice(TRANSFER_OBJECTS)} from {ctx.author!s} to {person!s}')
         except Exception as err:
             await ctx.send(f'rip: `{err!r}`')
 
