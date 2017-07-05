@@ -169,7 +169,7 @@ class JoseBot(commands.Bot):
         await self.invoke(ctx)
 
 
-jose = JoseBot(command_prefix='j.', description='i\'m a meme', pm_help=None)
+jose = JoseBot(command_prefix='j!', description='henlo dis is jose', pm_help=None)
 
 if __name__ == '__main__':
     for extension in extensions:
