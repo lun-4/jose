@@ -29,7 +29,7 @@ class BotCollection(Cog):
     async def on_guild_join(self, guild):
         bots, humans, ratio = self.bot_human_ratio(guild)
 
-        log.info(f'[bh] {guild!s} -> ratio {bots} / {humans} = {ratio:.2}')
+        log.info(f'[bh] {guild!s} -> ratio {len(bots)} / {len(humans)} = {ratio:.2}')
 
         if guild.id in WHITELIST:
             return
