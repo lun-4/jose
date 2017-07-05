@@ -109,7 +109,7 @@ class CoinsExt(Cog):
         """Removes a cooldown and resets the stealing points entry if cooldown type is 1."""
         await self.cooldown_coll.delete_one(cooldown)
         if cooldown['type'] == 1:
-            await self.thief_coll.update_one({'user_id': cooldown['user_id']}, {'$set': {'points': 3}})
+            await self.points_coll.update_one({'user_id': cooldown['user_id']}, {'$set': {'points': 3}})
 
     async def check_cooldowns(self, ctx, target):
         """Check if any cooldowns are applied to the thief.
