@@ -14,6 +14,9 @@ from .common import Cog
 
 FEEDBACK_CHANNEL_ID = 319540379495956490
 
+OAUTH_URL = 'https://discordapp.com/oauth2/authorize?permissions=379968&scope=bot&client_id=202586824013643777'
+SUPPORT_SERVER = 'https://discord.gg/5ASwg4C'
+
 class Basic(Cog):
     """Basic commands."""
     @commands.command(aliases=['p'])
@@ -133,7 +136,10 @@ class Basic(Cog):
     @commands.command()
     async def invite(self, ctx):
         """Get invite URL"""
-        await ctx.send('get pranked xDDddDxXDdXdXddXDDdxxDD no invite yet')
+        em = discord.Embed(title='Invite stuff')
+        em.add_field(name='OAuth URL', value=OAUTH_URL)
+        em.add_field(name='Support Server', value=SUPPORT_SERVER)
+        await ctx.send(embed=em)
 
 def setup(bot):
     bot.add_cog(Basic(bot))
