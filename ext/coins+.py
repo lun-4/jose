@@ -250,12 +250,12 @@ class CoinsExt(Cog):
 
         if target.id == self.bot.user.id or target.id in WHITELISTED_ACCOUNTS:
             hours, transfer_info = await self.do_arrest(ctx, amount)
-            await ctx.send(f":cop: Hell no! You can't steal from whitelisted accounts, {hours} hours of jail now\n{transfer_info}")
+            raise self.SayException(f":cop: Hell no! You can't steal from whitelisted accounts, {hours} hours of jail now\n{transfer_info}")
+            
 
         if amount > target_account['amount']:
             hours, transfer_info = await self.do_arrest(ctx, amount)
-            await ctx.send(f":cop: Arrested from trying to steal more than the target's wallet, {hours} hours in jail\n{transfer_info}")
-            return
+            raise self.SayException(f":cop: Arrested from trying to steal more than the target's wallet, {hours} hours in jail\n{transfer_info}")
 
         chance = (BASE_CHANCE + (target_account['amount'] / amount)) * STEAL_CONSTANT
         if chance > 5: chance = 5
