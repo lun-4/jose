@@ -239,8 +239,8 @@ class CoinsExt(Cog):
         if amount <= 0:
             raise self.SayException('haha good one :ok_hand: but nah')
 
-        if thief_account['amount'] < 3:
-            raise self.SayException("You have less than `3JC`, can't use the steal command")
+        if thief_account['amount'] < 6:
+            raise self.SayException("You have less than `6JC`, can't use the steal command")
 
         await self.check_cooldowns(ctx, target)
         await self.check_grace(target)
