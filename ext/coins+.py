@@ -72,7 +72,7 @@ class CoinsExt(Cog):
 
         if mode == 'l':
             accounts = [account for account in all_accounts if \
-                ctx.guild.get_member(account['id']) is not None]
+                ctx.guild.get_member(account['id']) is not None][:limit]
         elif mode == 'g':
             pass
         elif mode == 't':
