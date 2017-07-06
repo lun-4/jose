@@ -259,9 +259,10 @@ class CoinsExt(Cog):
 
         chance = (BASE_CHANCE + (target_account['amount'] / amount)) * STEAL_CONSTANT
         if chance > 5: chance = 5
+        chance = round(chance, 3)
 
         res = random.uniform(0, 10)
-        res = round(res, 2)
+        res = round(res, 3)
 
         if res < chance:
             # successful steal
