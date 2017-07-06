@@ -75,6 +75,9 @@ class Extra(Cog):
             if not data['success']:
                 raise self.SayException(f'XKCD retrieval failed: {data["message"]!r}')
 
+            if len(data['results']) < 1:
+                raise self.SayException('No comics found.')
+
             comic = data['results'][0]
             
             em = discord.Embed(title=f'Relevant XKCD for {terms!r}')
