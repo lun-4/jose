@@ -18,6 +18,8 @@ ARREST_TIME = 8
 # cooldown when you need to regen stealing points
 STEAL_REGEN = 10
 
+WHITELISTED_ACCOUNTS = (319522792854913025,)
+
 def make_default_points(ctx):
     """Default stealing points object for someone."""
     return {
@@ -246,9 +248,9 @@ class CoinsExt(Cog):
 
         thief_account['times_stolen'] += 1
 
-        if target.id == self.bot.user.id:
+        if target.id == self.bot.user.id or target.id in WHITELISTED_ACCOUNTS:
             hours, transfer_info = await self.do_arrest(ctx, amount)
-            await ctx.send(f":cop: Hell no! You can't steal from José, {hours} hours of jail now\n{transfer_info}")
+            await ctx.send(f":cop: Hell no! You can't steal from whitelisted accounts, {hours} hours of jail now\n{transfer_info}")
 
         if amount > target_account['amount']:
             hours, transfer_info = await self.do_arrest(ctx, amount)
