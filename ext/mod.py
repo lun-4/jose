@@ -19,6 +19,8 @@ ACTION_AS_AUDITLOG = [None, 'kick', 'ban', 'unban', None]
 
 def is_moderator():
     def _is_moderator(ctx):
+        if ctx.guild is None:
+            return False
         member = ctx.guild.get_member(ctx.author.id)
         perms = ctx.channel.permissions_for(member)
         return (ctx.author.id == ctx.bot.owner_id) or perms.kick_members or perms.ban_members 
