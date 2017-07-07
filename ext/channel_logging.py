@@ -121,6 +121,8 @@ class ChannelHandler(logging.Handler):
         log_level = record.levelno
         formatted = self.format(record) 
         log_message = f'\n**`[{record.levelname}] [{record.name}]`** `{formatted}`'
+        if log_level in (logging.WARNING, logging.ERROR):
+            log_message = f'\n**`[{record.levelname}] [{record.name}]`**\n```py\n{formatted}\n```'
 
         self.queue[log_level].append(log_message)
 

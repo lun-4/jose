@@ -19,6 +19,10 @@ SUPPORT_SERVER = 'https://discord.gg/5ASwg4C'
 
 class Basic(Cog):
     """Basic commands."""
+    def __init__(self, bot):
+        super().__init__(bot)
+        self.process = psutil.Process(os.getpid())
+
     @commands.command(aliases=['p'])
     async def ping(self, ctx):
         """Ping."""
@@ -73,11 +77,10 @@ class Basic(Cog):
         em = discord.Embed(title='Statistics')
 
         # get memory usage
-        process = psutil.Process(os.getpid())
-        mem_bytes = process.memory_full_info().rss
+        mem_bytes = self.process.memory_full_info().rss
         mem_mb = round(mem_bytes / 1024 / 1024, 2)
 
-        cpu_usage = round(process.cpu_percent() / psutil.cpu_count(), 2)
+        cpu_usage = round(self.process.cpu_percent() / psutil.cpu_count(), 2)
 
         em.add_field(name='Memory / CPU usage', value=f'`{mem_mb}MB / {cpu_usage}% CPU`')
 
