@@ -190,12 +190,14 @@ class Extra(Cog):
         await ctx.send(embed=em)
 
     @commands.command()
-    async def setdesc(self, ctx, *, description: str):
+    async def setdesc(self, ctx, *, description: str = ''):
         """Set your profile card description."""
         description = description.strip()
         if len(description) < 1:
-            await ctx.send('pls')
-            return
+            raise self.SayException('pls put something')
+
+        if len(description) > 300:
+            raise self.SayException('3 long 5 me pls bring it down dud')
 
         await self.set_description(ctx.author.id, description)
         await ctx.ok()

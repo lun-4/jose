@@ -679,6 +679,16 @@ class Starboard(Cog):
 
         await ctx.send('Done!')
 
+    @commands.command()
+    @commands.guild_only()
+    async def streload(self, ctx, message_id: int):
+        """Star reload.
+        
+        Reload a message, its starrers and update the star in the starboard.
+        Useful if the starred message was edited.
+        """
+        pass
+
 
 def setup(bot):
     bot.add_cog(Starboard(bot))
