@@ -147,7 +147,7 @@ class Logging(Cog):
     @commands.command()
     @commands.is_owner()
     async def err(self, ctx):
-        meme
+        raise Exception('THIS IS A TEST ERROR!!!!!')
 
 def setup(bot):
     bot.add_cog(Logging(bot))
