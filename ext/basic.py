@@ -12,7 +12,7 @@ from discord.ext import commands
 
 from .common import Cog
 
-FEEDBACK_CHANNEL_ID = 273863625590964224 
+FEEDBACK_CHANNEL_ID = 290244095820038144
 
 OAUTH_URL = 'https://discordapp.com/oauth2/authorize?permissions=379968&scope=bot&client_id=202586824013643777'
 SUPPORT_SERVER = 'https://discord.gg/5ASwg4C'
