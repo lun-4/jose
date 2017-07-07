@@ -12,13 +12,17 @@ from discord.ext import commands
 
 from .common import Cog
 
-FEEDBACK_CHANNEL_ID = 319540379495956490
+FEEDBACK_CHANNEL_ID = 290244095820038144
 
 OAUTH_URL = 'https://discordapp.com/oauth2/authorize?permissions=379968&scope=bot&client_id=202586824013643777'
 SUPPORT_SERVER = 'https://discord.gg/5ASwg4C'
 
 class Basic(Cog):
     """Basic commands."""
+    def __init__(self, bot):
+        super().__init__(bot)
+        self.process = psutil.Process(os.getpid())
+
     @commands.command(aliases=['p'])
     async def ping(self, ctx):
         """Ping."""
@@ -73,11 +77,10 @@ class Basic(Cog):
         em = discord.Embed(title='Statistics')
 
         # get memory usage
-        process = psutil.Process(os.getpid())
-        mem_bytes = process.memory_full_info().rss
+        mem_bytes = self.process.memory_full_info().rss
         mem_mb = round(mem_bytes / 1024 / 1024, 2)
 
-        cpu_usage = round(process.cpu_percent() / psutil.cpu_count(), 2)
+        cpu_usage = round(self.process.cpu_percent() / psutil.cpu_count(), 2)
 
         em.add_field(name='Memory / CPU usage', value=f'`{mem_mb}MB / {cpu_usage}% CPU`')
 
@@ -114,6 +117,9 @@ class Basic(Cog):
         em.add_field(name="Channel", value=f'{channel.name} [{channel.id}]')
 
         feedback_channel = self.bot.get_channel(FEEDBACK_CHANNEL_ID)
+        if feedback_channel is None:
+            await ctx.send('feedback channel not found we are fuckd')
+            return
 
         await feedback_channel.send(embed=em)
         await ctx.ok()
