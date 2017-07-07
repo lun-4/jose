@@ -6,7 +6,12 @@ from .common import Cog
 
 BOT_RATIO_MAX = 1.1
 
-WHITELIST = (295341979800436736, 319540379495956490)
+WHITELIST = (
+    273863625590964224, # José's server
+    295341979800436736, # Memework
+    319540379495956490, # le tru meme lounge
+    297710090687873024, # Luma's testing server
+)
 
 log = logging.getLogger(__name__)
 
@@ -29,25 +34,24 @@ class BotCollection(Cog):
     async def on_guild_join(self, guild):
         bots, humans, ratio = self.bot_human_ratio(guild)
 
-        log.info(f'[bh] {guild!s} -> ratio {len(bots)} / {len(humans)} = {ratio:.2}')
+        log.info(f'[bh:join] {guild!s} -> ratio {len(bots)} / {len(humans)} = {ratio:.2}')
 
         if guild.id in WHITELIST:
             return
 
         if ratio > BOT_RATIO_MAX:
-            log.info(f'[bh] leaving {guild!s}')
+            log.info(f'[bh:leave] leaving {guild!s}')
             await guild.leave()
 
     async def on_member_join(self, member):
         guild = member.guild
-
         bots, humans, ratio = self.bot_human_ratio(guild)
 
         if guild.id in WHITELIST:
             return
 
         if ratio > BOT_RATIO_MAX:
-            log.info('[bh:member_join] leaving')
+            log.info('[bh:leave:member_join] leaving {guild!r} {guild.id}, {len(bots)}/{len(humans)} = {ratio}')
             await guild.leave()
 
     @commands.command()
