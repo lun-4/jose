@@ -9,6 +9,11 @@ from discord.ext import commands
 
 from .common import Cog
 
+PRICES = {
+    'OPR': ('Operational tax', ('datamosh', 'youtube')),
+    'API': ('API tax', ('xkcd', 'wolframalpha', 'weather', 'money', 'urban')),
+}
+
 BASE_CHANCE = decimal.Decimal(1)
 STEAL_CONSTANT = decimal.Decimal(0.42)
 
@@ -85,6 +90,12 @@ class CoinsExt(Cog):
 
         await self.show(ctx, accounts)
         return
+
+    @commands.command(name='prices')
+    async def _prices(self, ctx):
+        """Show price information for commands."""
+        res = (f'- `{ptype} - {self.prices[ptype]}JC`: {val[0]}, `{val[1]}`' for ptype, val in PRICES.items())
+        await ctx.send('\n'.join(res))
 
     @commands.command()
     async def coinprob(self, ctx):

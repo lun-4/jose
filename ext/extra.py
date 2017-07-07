@@ -93,7 +93,7 @@ class Extra(Cog):
 
         query_string = urllib.parse.urlencode({"search_query" : search_term})
 
-        await self.jcoin.pricing(ctx, self.prices['API'])
+        await self.jcoin.pricing(ctx, self.prices['OPR'])
 
         url = f'http://www.youtube.com/results?{query_string}'
 

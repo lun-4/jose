@@ -30,6 +30,9 @@ TRANSFER_OBJECTS = [
     'computers',
     'dogs',
     'memes',
+    'cats',
+    'coins',
+    'paitings',
 ]
 
 

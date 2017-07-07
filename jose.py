@@ -176,7 +176,8 @@ class JoseBot(commands.Bot):
 
 
 jose = JoseBot(
-    command_prefix=getattr(config, 'prefix', None) or 'j!',
+    #command_prefix=getattr(config, 'prefix', None) or 'j!',
+    command_prefix=config.prefix,
     description='henlo dis is jose',
     pm_help=None
 )
