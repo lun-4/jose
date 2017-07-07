@@ -18,6 +18,8 @@ ARREST_TIME = 8
 # cooldown when you need to regen stealing points
 STEAL_REGEN = 10
 
+WHITELISTED_ACCOUNTS = (319522792854913025,)
+
 def make_default_points(ctx):
     """Default stealing points object for someone."""
     return {
@@ -70,7 +72,7 @@ class CoinsExt(Cog):
 
         if mode == 'l':
             accounts = [account for account in all_accounts if \
-                ctx.guild.get_member(account['id']) is not None]
+                ctx.guild.get_member(account['id']) is not None][:limit]
         elif mode == 'g':
             pass
         elif mode == 't':
@@ -237,8 +239,8 @@ class CoinsExt(Cog):
         if amount <= 0:
             raise self.SayException('haha good one :ok_hand: but nah')
 
-        if thief_account['amount'] < 3:
-            raise self.SayException("You have less than `3JC`, can't use the steal command")
+        if thief_account['amount'] < 6:
+            raise self.SayException("You have less than `6JC`, can't use the steal command")
 
         await self.check_cooldowns(ctx, target)
         await self.check_grace(target)
@@ -246,20 +248,21 @@ class CoinsExt(Cog):
 
         thief_account['times_stolen'] += 1
 
-        if target.id == self.bot.user.id:
+        if target.id == self.bot.user.id or target.id in WHITELISTED_ACCOUNTS:
             hours, transfer_info = await self.do_arrest(ctx, amount)
-            await ctx.send(f":cop: Hell no! You can't steal from José, {hours} hours of jail now\n{transfer_info}")
+            raise self.SayException(f":cop: Hell no! You can't steal from whitelisted accounts, {hours} hours of jail now\n{transfer_info}")
+            
 
         if amount > target_account['amount']:
             hours, transfer_info = await self.do_arrest(ctx, amount)
-            await ctx.send(f":cop: Arrested from trying to steal more than the target's wallet, {hours} hours in jail\n{transfer_info}")
-            return
+            raise self.SayException(f":cop: Arrested from trying to steal more than the target's wallet, {hours} hours in jail\n{transfer_info}")
 
         chance = (BASE_CHANCE + (target_account['amount'] / amount)) * STEAL_CONSTANT
         if chance > 5: chance = 5
+        chance = round(chance, 3)
 
         res = random.uniform(0, 10)
-        res = round(res, 2)
+        res = round(res, 3)
 
         if res < chance:
             # successful steal

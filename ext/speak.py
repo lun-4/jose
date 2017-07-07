@@ -213,6 +213,9 @@ class Speak(Cog):
     async def madlibs(self, ctx, *, inputstr: str):
         """Changes any "---" in the input to a 12-letter generated sentence"""
 
+        inputstr = inputstr.replace('@everyone', '@\u200beveryone')
+        inputstr = inputstr.replace('@here', '@\u200bhere')
+
         splitted = inputstr.split()
         if splitted.count('---') < 1:
             await ctx.send(":no_entry_sign: you can't just make josé say whatever you want! :no_entry_sign:")

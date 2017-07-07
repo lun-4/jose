@@ -648,7 +648,7 @@ class Starboard(Cog):
             return
 
         sfw = ctx.channel.is_nsfw()
-        if sfw is channel.is_nsfw():
+        if not (sfw is channel.is_nsfw()):
             await ctx.send('Star found is NSFW, but we are in a SFW channel.')
             return
 
