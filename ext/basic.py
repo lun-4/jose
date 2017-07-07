@@ -12,7 +12,7 @@ from discord.ext import commands
 
 from .common import Cog
 
-FEEDBACK_CHANNEL_ID = 319540379495956490
+FEEDBACK_CHANNEL_ID = 273863625590964224 
 
 OAUTH_URL = 'https://discordapp.com/oauth2/authorize?permissions=379968&scope=bot&client_id=202586824013643777'
 SUPPORT_SERVER = 'https://discord.gg/5ASwg4C'
@@ -114,6 +114,9 @@ class Basic(Cog):
         em.add_field(name="Channel", value=f'{channel.name} [{channel.id}]')
 
         feedback_channel = self.bot.get_channel(FEEDBACK_CHANNEL_ID)
+        if feedback_channel is None:
+            await ctx.send('feedback channel not found we are fuckd')
+            return
 
         await feedback_channel.send(embed=em)
         await ctx.ok()
