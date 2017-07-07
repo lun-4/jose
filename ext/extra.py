@@ -191,7 +191,7 @@ class Extra(Cog):
 
     @commands.command()
     async def setdesc(self, ctx, *, description: str):
-        """Set your profile card description"""
+        """Set your profile card description."""
         description = description.strip()
         if len(description) < 1:
             await ctx.send('pls')

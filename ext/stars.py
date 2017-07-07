@@ -203,6 +203,8 @@ class Starboard(Cog):
         """Remove all starrers from a message(deletes from the collection)."""
         guild_id = config['guild_id']
         star = await self.get_star(guild_id, message.id)
+        if star is None:
+            raise StarError('Star object not found to be reset')
         star['starrers'] = []
         await self.starboard_coll.delete_one({'message_id': message.id, 'guild_id': guild_id})
         return star

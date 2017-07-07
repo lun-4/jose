@@ -312,5 +312,10 @@ class Memes(Cog):
 
         await ctx.send(f'```\n{term!r}:\n{c_list[0]["definition"]}\n```')
 
+    @commands.command(hidden=True)
+    async def ejaculate(self, ctx):
+        """PUMPE THE MOOSCLES YIIIS"""
+        await ctx.send('https://www.youtube.com/watch?v=S6UqgjaBt4w')
+
 def setup(bot):
     bot.add_cog(Memes(bot))
