@@ -36,7 +36,7 @@ extensions = [
     'stats',
     'mod', 'botcollection',
     'channel_logging',
-    'playing',
+    'playing', 'sub',
 ]
 
 
@@ -57,6 +57,12 @@ BAD_ARG_MESSAGES = [
 
 
 class JoseContext(commands.Context):
+    @property
+    def member(self):
+        if self.guild is None:
+            return None
+        return self.guild.get_member(self.author.id)
+
     async def ok(self):
         try:
             await self.message.add_reaction('👌')
