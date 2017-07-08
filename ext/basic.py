@@ -55,10 +55,10 @@ class Basic(Cog):
     async def version(self, ctx):
         """Show current josé version"""
         pyver = '%d.%d.%d' % (sys.version_info[:3])
-        head_id = subprocess.check_output("git rev-parse --short HEAD", \
-            shell=True).decode('utf-8')
+        head_id = subprocess.check_output("git rev-parse --short HEAD", shell=True).decode('utf-8').strip()
+        branch = subprocess.check_output('git rev-parse --abbrev-ref HEAD', shell=True).decode('utf-8').strip()
 
-        await ctx.send(f'`José v{self.JOSE_VERSION} git:{head_id} py:{pyver} d.py:{discord.__version__}`')
+        await ctx.send(f'`José v{self.JOSE_VERSION} git:{branch}-{head_id} py:{pyver} d.py:{discord.__version__}`')
 
     @commands.command()
     async def uptime(self, ctx):
