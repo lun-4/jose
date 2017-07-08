@@ -24,7 +24,7 @@ TAX_CONSTANT = decimal.Decimal('1.0048')
 PROB_CONSTANT = decimal.Decimal('1.003384590736')
 
 # 1.2%
-COIN_BASE_PROBABILITY = 0.012
+COIN_BASE_PROBABILITY = decimal.Decimal('0.012')
 
 
 class TransferError(Exception):
@@ -263,8 +263,8 @@ class Coins(Cog):
         if taxpaid < 40:
             return prob
 
-        prob += pow(PROB_CONSTANT, taxpaid)
-        if prob > 4.2: prob = 4.2
+        prob += (pow(PROB_CONSTANT, taxpaid) / 100)
+        if prob > 0.042: prob = 0.042
         return prob
 
     async def on_message(self, message):
