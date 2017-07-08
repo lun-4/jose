@@ -285,7 +285,20 @@ class Coins(Cog):
         if not isinstance(message.channel, discord.TextChannel):
             return
 
+        # get prison data from CoinsExt
+        coinsext = self.bot.get_cog('CoinsExt')
+        if coinsext is None:
+            log.warning('CoinsExt NOT LOADED.')
+            return
+
         now = time.time()
+
+        cdown = await coinsext.cooldown_coll.find_one({'user_id': author_id})
+        if cdown is not None:
+            if cdown['type'] == 0:
+                if cdown['finish'] > now:
+                    return
+
         last_cooldown = self.reward_env.get(author_id, 0)
         if now < last_cooldown:
             return
