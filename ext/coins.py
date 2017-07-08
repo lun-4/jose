@@ -14,8 +14,12 @@ random = SystemRandom()
 
 # JoséCoin constants
 JOSECOIN_REWARDS = [0, 0, 0, 0.6, 0.7, 1, 1.2, 1.5, 1.7]
+
 # cooldown reward: 40 minutes
 REWARD_COOLDOWN = 1800
+
+# Tax constant: used for tax increase calculation
+TAX_CONSTANT = decimal.Decimal('1.0048')
 
 # 1.2%
 COIN_BASE_PROBABILITY = 0.012
@@ -237,9 +241,15 @@ class Coins(Cog):
 
         return guildrank, globalrank, len(guild_ids), len(all_ids)
 
-    async def pricing(self, ctx, price):
+    async def pricing(self, ctx, base_tax):
+        """Tax someone. [insert evil laugh of capitalism]"""
         await self.ensure_taxbank(ctx)
         try:
+            account = await self.get_account(ctx.author.id)
+            if account is None:
+                raise self.SayException('No JoséCoin account found to tax')
+
+            tax = base_tax + (pow(TAX_CONSTANT, account['amount']) - 1)
             await self.transfer(ctx.author.id, ctx.guild.id, price)
         except self.TransferError as err:
             raise self.SayException(f'TransferError: `{err.args[0]}`')
