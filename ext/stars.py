@@ -237,6 +237,10 @@ class Starboard(Cog):
             Starboard configuration for the guild.
         star: dict
             Star object being updated.
+        delete: bool, optional
+            If this should delete the star.
+        msg: discord.Message, optional
+            A message object reffering to the star.
 
         Raises
         ------
@@ -246,6 +250,10 @@ class Starboard(Cog):
 
         delete_mode = kwargs.get('delete', False)
         message = kwargs.get('msg')
+
+        if message is not None:
+            assert star['message_id'] == message.id
+            assert star['channel_id'] == message.channel.id
 
         guild_id = config['guild_id']
         guild = self.bot.get_guild(guild_id)
@@ -687,8 +695,25 @@ class Starboard(Cog):
         Reload a message, its starrers and update the star in the starboard.
         Useful if the starred message was edited.
         """
-        pass
+        channel = ctx.channel
+        cfg = await self._get_starconfig(channel.guild.id)
 
+        try:
+            message = await channel.get_message(message_id)
+        except discord.NotFound:
+            raise self.SayException('message not found')
+
+        star = await self.get_star(ctx.guild, message_id)
+        if star is None:
+            raise self.SayException('star object not found')
+
+        try:
+            await self.update_star(cfg, star, msg=message)
+        except StarError as err:
+            log.error(f'force_reload: {err!r}')
+            raise self.SayException(f'rip {err!r}')
+
+        await ctx.ok()
 
 def setup(bot):
     bot.add_cog(Starboard(bot))
