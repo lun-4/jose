@@ -19,7 +19,9 @@ JOSECOIN_REWARDS = [0, 0, 0, 0.6, 0.7, 1, 1.2, 1.5, 1.7]
 REWARD_COOLDOWN = 1800
 
 # Tax constant: used for tax increase calculation
+# Probability constant: used for probability increase with your paid tax
 TAX_CONSTANT = decimal.Decimal('1.0048')
+PROB_CONSTANT = decimal.Decimal('1.003384590736')
 
 # 1.2%
 COIN_BASE_PROBABILITY = 0.012
@@ -254,6 +256,17 @@ class Coins(Cog):
         except self.TransferError as err:
             raise self.SayException(f'TransferError: `{err.args[0]}`')
 
+    async def get_probability(self, account):
+        """Get the coin probability of someone."""
+        prob = COIN_BASE_PROBABILITY
+        taxpaid = account['taxpaid']
+        if taxpaid < 40:
+            return prob
+
+        prob += pow(PROB_CONSTANT, taxpaid)
+        if prob > 4.2: prob = 4.2
+        return prob
+
     async def on_message(self, message):
         author_id = message.author.id
         if author_id == self.bot.user.id:
@@ -271,7 +284,9 @@ class Coins(Cog):
         if now < last_cooldown:
             return
 
-        if random.random() > COIN_BASE_PROBABILITY:
+        prob = await self.get_probability(account)
+
+        if random.random() > prob:
             return
 
         amount = random.choice(JOSECOIN_REWARDS)
