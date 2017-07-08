@@ -185,11 +185,14 @@ class Coins(Cog):
         """
         await self.sane()
 
+        if amount > 200:
+            raise TransferError('Transferring too much.')
+
         try:
             amount = decimal.Decimal(amount)
             amount = round(amount, 3)
         except:
-            raise TransferError('Error parsing to decimal.')
+            raise TransferError('Error converting to decimal.')
 
         if amount < .001:
             raise TransferError('no small transfers kthx')
@@ -246,13 +249,16 @@ class Coins(Cog):
     async def pricing(self, ctx, base_tax):
         """Tax someone. [insert evil laugh of capitalism]"""
         await self.ensure_taxbank(ctx)
+
+        # yes ugly
+        base_tax = decimal.Decimal(base_tax)
         try:
             account = await self.get_account(ctx.author.id)
             if account is None:
                 raise self.SayException('No JoséCoin account found to tax')
 
             tax = base_tax + (pow(TAX_CONSTANT, account['amount']) - 1)
-            await self.transfer(ctx.author.id, ctx.guild.id, price)
+            await self.transfer(ctx.author.id, ctx.guild.id, tax)
         except self.TransferError as err:
             raise self.SayException(f'TransferError: `{err.args[0]}`')
 
