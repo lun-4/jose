@@ -275,6 +275,7 @@ class Math(Cog):
         if self.w_config is None:
             raise self.SayException('No weather API data found in config file')
 
+        await self.jcoin.pricing(ctx, self.prices['API'])
         async with ctx.typing():
             _locations = await self.w_api_post('location', {'query': querylocation})
             locations = _locations['locations']
