@@ -82,7 +82,7 @@ class Speak(Cog):
         super().__init__(bot)
         self.text_generators = {}
 
-        self.coll_task = self.bot.loop.create_task(self.coll_task_func)
+        self.coll_task = self.bot.loop.create_task(self.coll_task_func())
 
     async def coll_task_func(self):
         try:
