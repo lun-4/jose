@@ -435,7 +435,7 @@ class Starboard(Cog):
         try:
             await self.remove_all(message, cfg)
         except (StarError, StarRemoveError) as err:
-            log.error('raw_reaction_clear: {err!r}')
+            log.error(f'raw_reaction_clear: {err!r}')
         except Exception:
             log.error('Error in remove_all from raw_reaction_clear', exc_info=True)
 
