@@ -1,6 +1,7 @@
 import logging
 import asyncio
 import collections
+import json
 
 from discord.ext import commands
 
@@ -10,6 +11,7 @@ log = logging.getLogger(__name__)
 
 
 LOGGING_PERIOD = 5 
+PACKET_CHANNEL = 319540379495956490
 
 LEVELS = {
     logging.INFO: 326388782829928448,
@@ -58,6 +60,9 @@ class ChannelHandler(logging.Handler):
 
         self.root_logger = logging.getLogger(None)
 
+        self._special_packet_channel = None
+
+    
     def dump(self):
         """Dump all queued log messages into their respective channels."""
         if len(self.queue) < 1: 
@@ -81,7 +86,7 @@ class ChannelHandler(logging.Handler):
     async def ready(self):
         """Waits for the bot to be ready and gets the channel IDs to send the logs to."""
         await self.bot.wait_until_ready()
-
+       
         self.channels = {}
         for level, channel_id in LEVELS.items():
             self.channels[level] = self.bot.get_channel(channel_id)
@@ -131,6 +136,32 @@ class ChannelHandler(logging.Handler):
 
 
 class Logging(Cog):
+    def __init__(self, bot):
+        super().__init__(bot)
+        self._special_packet_channel = None
+
+    async def on_ready(self):
+        self._special_packet_channel = self.bot.get_channel(PACKET_CHANNEL)
+
+    async def on_socket_raw_receive(self, msg):
+        """Convert msg to JSON and check for specific
+        OP codes"""
+        if self._special_packet_channel is None:
+            return
+
+        try:
+            j = json.loads(msg)
+        except:
+            log.warning('Failed to get JSON from WS_RECEIVE')
+            return
+
+        op = j['op']
+        t = j['t']
+        if op == 0:
+            if t in ('WEBHOOKS_UPDATE','PRESENCES_REPLACE'):
+                log.info('GOT A WANTED PACKET!!')
+                await self._special_packet_channel.send(f'HELLO I GOT A GOOD PACKET PLS SEE ```py\n{j}\n```')
+
     @commands.command()
     @commands.is_owner()
     async def dumplogs(self, ctx):
