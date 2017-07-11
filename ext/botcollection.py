@@ -51,7 +51,7 @@ class BotCollection(Cog):
             return
 
         if ratio > BOT_RATIO_MAX:
-            log.info('[bh:leave:member_join] leaving {guild!r} {guild.id}, {len(bots)}/{len(humans)} = {ratio}')
+            log.info(f'[bh:leave:member_join] leaving {guild!r} {guild.id}, {len(bots)}/{len(humans)} = {ratio}')
             await guild.leave()
 
     @commands.command()
