@@ -266,12 +266,28 @@ class Coins(Cog):
         """Get the coin probability of someone."""
         prob = COIN_BASE_PROBABILITY
         taxpaid = account['taxpaid']
-        if taxpaid < 40:
+        if taxpaid < 50:
             return prob
 
-        prob += (pow(PROB_CONSTANT, taxpaid) / 100)
+        prob += round((pow(PROB_CONSTANT, taxpaid) / 100), 5)
         if prob > 0.042: prob = 0.042
         return prob
+
+    @commands.command()
+    async def coinprob(self, ctx):
+        """Show your probability of getting JoséCoins."""
+        account = await self.get_account(ctx.author.id)
+        if account is None:
+            raise self.SayException('Account not found.')
+
+        em = discord.Embed(title='Probability Breakdown of JCs per message')
+        em.add_field(name='Base probability', value=f'{COIN_BASE_PROBABILITY * 100}%')
+        if account['taxpaid'] >= 50:
+            em.add_field(name='Increase from tax paid', value=f'{round(pow(PROB_CONSTANT, account["taxpaid"]), 5)}%')
+            res = await self.get_probability(account)
+            em.add_field(name='Total', value=f'{res * 100}%')
+        
+        await ctx.send(embed=em)
 
     async def on_message(self, message):
         author_id = message.author.id

@@ -14,7 +14,8 @@ PRICES = {
     'API': ('API tax', ('xkcd', 'wolframalpha', 'weather', 'money', 'urban')),
 }
 
-BASE_CHANCE = decimal.Decimal(1)
+# steal constants
+BASE_CHANCE = decimal.Decimal('1')
 STEAL_CONSTANT = decimal.Decimal(0.42)
 
 # default cooldown when you are arrested
@@ -96,12 +97,6 @@ class CoinsExt(Cog):
         """Show price information for commands."""
         res = (f'- `{ptype} - {self.prices[ptype]}JC`: {val[0]}, `{val[1]}`' for ptype, val in PRICES.items())
         await ctx.send('\n'.join(res))
-
-    @commands.command()
-    async def coinprob(self, ctx):
-        """Show your probability of getting coins per message."""
-        res = f'Base Probability: {self.jcoin.BASE_PROBABILITY * 100}%/message\n'
-        await ctx.send(res)
 
     @commands.command()
     @commands.guild_only()
