@@ -68,6 +68,10 @@ class Coins(Cog):
             if obj is not None:
                 obj = f'taxbank:{obj}'
 
+        if obj is None:
+            # we tried stuff, show a special text
+            return f'Unfindable Account {user_id}'
+
         return str(obj)
 
     def empty_account(self, account_id, account_type, amount):
