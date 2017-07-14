@@ -66,7 +66,12 @@ class CoinsExt(Cog):
     async def top(self, ctx, mode: str = 'g', limit: int = 10):
         """Shows top 10 of accounts.
 
-         - mode "g": global, "l": local, "t": tax
+        Available modes:
+         - g: global, all accounts in José's database.
+         - l: local, all accounts in this server/guild.
+         - t: tax, all accounts in José's database, ordered
+            by the amount of tax they paid.
+         - 
         """
 
         if limit > 20:
