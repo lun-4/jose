@@ -26,39 +26,36 @@ class Gambling(Cog):
         The winner of the duel is the person that sends a message first as soon
         as josé says "GO".
         """
+    
+        if challenged_user == ctx.author:
+            raise self.SayException('frigger go get some friends you cant do this alone :ccccccccc')
 
         amount = round(amount, 2)
         if amount > 3:
-            await ctx.send('Can\'t duel with more than 3JC.')
-            return
+            raise self.SayException("Can't duel with more than 3JC.")
 
         if amount <= 0:
-            await ctx.send('lul')
-            return
+            raise self.SayException('lul')
 
         challenger_user = ctx.author
         challenger = ctx.author.id
         challenged = challenged_user.id
 
         if challenger in self.duels:
-            await ctx.send('You are already in a duel.')
-            return
+            raise self.SayException('You are already in a duel')
 
         challenger_acc = await self.jcoin.get_account(challenger)
 
         if challenger_acc is None:
-            await ctx.send('You don\'t have a wallet.')
-            return
+            raise self.SayException("You don't have a wallet.")
 
         challenged_acc = await self.jcoin.get_account(challenged)
 
         if challenged_acc is None:
-            await ctx.send('Challenged person doesn\'t have a wallet.')
-            return
+            raise self.SayException("Challenged person doesn't have a wallet.")
 
         if amount > challenger_acc['amount'] or amount > challenged_acc['amount']:
-            await ctx.send('One of you don\'t have tnough funds to make the duel.')
-            return
+            raise self.SayException("One of you don't have enough funds to make the duel.")
 
         await ctx.send(f'{challenged_user}, you got challenged for a duel :gun: by {challenger_user} with a total of {amount}JC, accept it? (y/n)')
 
@@ -72,8 +69,7 @@ class Gambling(Cog):
             return
 
         if msg.content != 'y':
-            await ctx.send('Challenged person didn\'t say a lowercase y.')
-            return
+            raise self.SayException("Challenged person didn't say a lowercase `y`.")
 
         self.duels[challenger] = {
             'challenged': challenged,
@@ -98,8 +94,7 @@ class Gambling(Cog):
         try:
             msg = await self.bot.wait_for('message', timeout=5, check=duel_check)
         except asyncio.TimeoutError:
-            await ctx.send('u guys suck')
-            return
+            raise self.SayException('u guys suck')
 
         winner = msg.author.id
         duelists.remove(winner)
@@ -108,8 +103,7 @@ class Gambling(Cog):
         try:
             await self.jcoin.transfer(loser, winner, amount)
         except self.jcoin.TransferError as err:
-            await ctx.send(f'Failed to tranfer: {err!r}')
-            return
+            raise self.SayException(f'Failed to transfer: {err!r}')
 
         await ctx.send(f'<@{winner}> won {amount}JC.')
         del self.duels[challenger]

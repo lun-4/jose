@@ -189,6 +189,9 @@ class Coins(Cog):
         """
         await self.sane()
 
+        if id_from == id_to:
+            raise TransferError("Can't transfer from the account to itself.")
+
         if amount > 200:
             raise TransferError('Transferring too much.')
 
