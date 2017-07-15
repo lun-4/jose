@@ -308,7 +308,7 @@ class Memes(Cog):
         c_list = content['list']
 
         if len(c_list) < 1:
-            await ctx.send('No results found')
+            raise self.SayException('No results found')
 
         await ctx.send(f'```\n{term!r}:\n{c_list[0]["definition"]}\n```')
 
