@@ -159,6 +159,10 @@ class JoseBot(commands.Bot):
     async def on_message(self, message):
         author_id = message.author.id
 
+        # fucking spam, i hate it >:c
+        if message.author.bot:
+            return
+
         if await self.is_blocked(author_id):
             return
 
