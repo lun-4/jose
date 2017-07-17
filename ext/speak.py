@@ -81,6 +81,7 @@ class Speak(Cog):
     def __init__(self, bot):
         super().__init__(bot)
         self.text_generators = {}
+        self.generating = {}
 
         self.coll_task = self.bot.loop.create_task(self.coll_task_func())
 
@@ -115,12 +116,13 @@ class Speak(Cog):
             delta = round((t_end - t_start) * 1000, 2)
             log.info(f'{amount} -> {amount - cleaned} in {delta}ms')
 
-    async def get_messages(self, guild, amount=2000):
+    async def get_messages(self, guild, amount=2000) -> list:
         channel_id = await self.config.cfg_get(guild, 'speak_channel')
         channel = guild.get_channel(channel_id)
         if channel is None:
             channel = guild.default_channel
 
+        self.generating[guild.id] = True
         try:
             messages = []
             async for message in channel.history(limit=amount):
@@ -136,6 +138,8 @@ class Speak(Cog):
         except discord.Forbidden:
             log.info(f'got Forbidden from {guild.id} when making message history')
             return ['None']
+        finally:
+            self.generating[guild.id] = False
 
     async def get_messages_str(self, guild, amount=2000):
         m = await self.get_messages(guild, amount)
@@ -192,7 +196,14 @@ class Speak(Cog):
     @commands.command(aliases=['spt'])
     @commands.guild_only()
     async def speaktrigger(self, ctx):
-        """Force your Texter to say a sentence."""
+        """Force your Texter to say a sentence.
+        
+        If the texter is still being generated, this command
+        does nothing while it isn't completly generated.
+        """
+        if self.generating.get(ctx.guild.id):
+            return
+
         sentence = await self.make_sentence(ctx)
         await ctx.send(sentence)
 
