@@ -253,7 +253,7 @@ class Speak(Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def txstress(self):
+    async def txstress(self, ctx):
         """Stress test texters LUL"""
         t1 = time.monotonic()
         txs = [(await self.new_texter(guild)) for guild in self.bot.guilds]
