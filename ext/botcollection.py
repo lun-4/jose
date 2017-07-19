@@ -9,8 +9,9 @@ BOT_RATIO_MAX = 1.1
 WHITELIST = (
     273863625590964224, # José's server
     295341979800436736, # Memework
-    319540379495956490, # le tru meme lounge
+    319540379495956490, # v2 testing serv
     297710090687873024, # Luma's testing server
+    319252487280525322, # robert is gay
 )
 
 log = logging.getLogger(__name__)
