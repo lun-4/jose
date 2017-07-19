@@ -11,13 +11,13 @@ from .common import Cog
 log = logging.getLogger(__name__)
 
 
-def make_textmodel(texter):
-    texter.model = markovify.NewlineText(texter.data, texter.chain_length)
+def make_textmodel(texter, data):
+    texter.model = markovify.NewlineText(data, texter.chain_length)
 
 
 async def make_texter(chain_length, data, texter_id):
-    texter = Texter(data, texter_id, chain_length)
-    await texter.fill()
+    texter = Texter(texter_id, chain_length)
+    await texter.fill(data)
     return texter
 
 
@@ -26,7 +26,7 @@ class Texter:
 
     This class holds information about a markov chain generator.
     """
-    def __init__(self, data, texter_id, chain_length=1, loop=None):
+    def __init__(self, texter_id, chain_length=1, loop=None):
         if loop is None:
             loop = asyncio.get_event_loop()
 
@@ -34,17 +34,16 @@ class Texter:
         self.refcount = 1
         self.chain_length = chain_length
         self.loop = loop
-        self.data = data
         self.model = None
 
     def __repr__(self):
         return f'Texter(refcount={self.refcount})'
 
-    async def fill(self):
+    async def fill(self, data):
         """Fill a texter with its text model."""
         t_start = time.monotonic()
 
-        future_textmodel = self.loop.run_in_executor(None, make_textmodel, self)
+        future_textmodel = self.loop.run_in_executor(None, make_textmodel, self, data)
         await future_textmodel
 
         delta = round((time.monotonic() - t_start) * 1000, 2)
@@ -92,7 +91,7 @@ class Speak(Cog):
         try:
             while True:
                 await self.texter_collection()
-                await asyncio.sleep(300)
+                await asyncio.sleep(360)
         except asyncio.CancelledError:
             pass
 
@@ -137,12 +136,14 @@ class Speak(Cog):
                     continue
 
                 messages.append(message.clean_content)
+
+            self.generating[guild.id] = False
             return messages
         except discord.Forbidden:
             log.info(f'got Forbidden from {guild.id} when making message history')
-            return ['None']
-        finally:
+
             self.generating[guild.id] = False
+            return ['None']
 
     async def get_messages_str(self, guild, amount=2000):
         m = await self.get_messages(guild, amount)
@@ -193,6 +194,7 @@ class Speak(Cog):
         t1 = time.monotonic()
         await self.new_texter(guild)
         t2 = time.monotonic()
+
         delta = round((t2 - t1), 2)
         await ctx.send(f'Took {delta} seconds loading texter.')
 
@@ -248,6 +250,17 @@ class Speak(Cog):
                 res.append(word)
 
         await ctx.send(' '.join(res))
+
+    @commands.command()
+    @commands.is_owner()
+    async def txstress(self):
+        """Stress test texters LUL"""
+        t1 = time.monotonic()
+        txs = [(await self.new_texter(guild)) for guild in self.bot.guilds]
+        t2 = time.monotonic()
+
+        delta = round((t2 - t1), 2)
+        await ctx.send(f'Generated {len(txs)} in {delta}')
 
 def setup(bot):
     bot.add_cog(Speak(bot))
