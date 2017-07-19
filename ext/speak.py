@@ -37,6 +37,9 @@ class Texter:
         self.data = data
         self.model = None
 
+    def __repr__(self):
+        return f'Texter(refcount={self.refcount})'
+
     async def fill(self):
         """Fill a texter with its text model."""
         t_start = time.monotonic()
