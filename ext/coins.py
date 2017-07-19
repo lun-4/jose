@@ -297,6 +297,10 @@ class Coins(Cog):
         await ctx.send(embed=em)
 
     async def on_message(self, message):
+        # fuck bots
+        if message.author.bot:
+            return
+
         author_id = message.author.id
         if author_id == self.bot.user.id:
             return
