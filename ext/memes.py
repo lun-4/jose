@@ -99,7 +99,7 @@ class Memes(Cog):
         await ctx.ok()
 
     @meme.command(name='get')
-    async def get(self, ctx, name: str):
+    async def get(self, ctx, *, name: str):
         """Retrieve a meme.
         
         Doesn't allow NSFW memes(memes created in NSFW channels) to be shown
