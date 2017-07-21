@@ -76,7 +76,7 @@ class Texter:
         return str(res)
 
     def clear(self):
-        del self.model, self.data
+        del self.model
 
 
 class Speak(Cog):
