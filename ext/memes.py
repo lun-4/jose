@@ -187,7 +187,7 @@ class Memes(Cog):
         res = []
 
         cur = self.memes_coll.find({}).sort('uses')
-        for (idx, meme) in enumerate(reversed(await cur.to_list(length=15))):
+        for (idx, meme) in enumerate(await cur.to_list(length=15)):
             res.append(f'[{idx}] {meme["name"]} used {meme["uses"]} times')
 
         _joined = "\n".join(res)
