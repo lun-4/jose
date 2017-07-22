@@ -45,14 +45,16 @@ CHECK_FAILURE_PHRASES = [
     'u died [real] [Not ClickBait]',
     'rEEEEEEEEEEEEE',
     'not enough permissions lul',
+    'you sure you can run this?',
 ]
 
 
 BAD_ARG_MESSAGES = [
     'dude give me the right thing',
     'u can\'t give me this and think i can do something',
-    'succ my rod',
+    'succ',
     'i\'m not a god, fix your args',
+    'why. just why',
 ]
 
 
