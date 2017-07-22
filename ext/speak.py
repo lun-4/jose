@@ -26,6 +26,8 @@ class Texter:
 
     This class holds information about a markov chain generator.
     """
+    __slots__ = ('loop', 'id', 'refcount', 'chain_length', 'model')
+
     def __init__(self, texter_id, chain_length=1, loop=None):
         if loop is None:
             loop = asyncio.get_event_loop()
