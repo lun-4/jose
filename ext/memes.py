@@ -248,7 +248,7 @@ class Memes(Cog):
         await ctx.send(f'```\n{",".join(memes)}\n```')
 
     @commands.command(aliases=['fw'])
-    async def c_fullwidth(self, ctx, *, text: str):
+    async def fullwidth(self, ctx, *, text: str):
         """Convert text to full width."""
         if len(text.strip()) <= 0:
             return
