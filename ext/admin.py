@@ -57,8 +57,8 @@ class Admin(Cog):
         """Execute shell commands."""
 
         p = await asyncio.create_subprocess_shell(command,
-            stderr=asyncio.subprocess.PIPE
-            stdout=asyncio.subprocess.PIPE
+            stderr=asyncio.subprocess.PIPE,
+            stdout=asyncio.subprocess.PIPE,
         )
         with ctx.typing:
             await p.wait()
