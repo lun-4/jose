@@ -56,11 +56,11 @@ class Admin(Cog):
     async def shell(self, ctx, *, command: str):
         """Execute shell commands."""
 
-        p = await asyncio.create_subprocess_shell(command,
-            stderr=asyncio.subprocess.PIPE,
-            stdout=asyncio.subprocess.PIPE,
-        )
         with ctx.typing():
+            p = await asyncio.create_subprocess_shell(command,
+                stderr=asyncio.subprocess.PIPE,
+                stdout=asyncio.subprocess.PIPE,
+            )
             await p.wait()
 
         result = (await p.stdout.read()).decode("utf-8")
