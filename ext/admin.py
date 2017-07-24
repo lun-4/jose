@@ -1,5 +1,5 @@
 import traceback
-import subprocess
+import asyncio
 import logging
 
 from discord.ext import commands
@@ -56,10 +56,14 @@ class Admin(Cog):
     async def shell(self, ctx, *, command: str):
         """Execute shell commands."""
 
-        out = subprocess.check_output(command, shell=True, \
-            stderr=subprocess.STDOUT)
-        res = out.decode("utf-8")
+        p = await asyncio.create_subprocess_shell(command,
+            stderr=asyncio.subprocess.PIPE
+            stdout=asyncio.subprocess.PIPE
+        )
+        with ctx.typing:
+            await p.wait()
 
+        result = (await p.stdout.read()).decode("utf-8")
         await ctx.send(f"`{command}`: ```{res}```\n")
 
 def setup(bot):
