@@ -60,7 +60,7 @@ class Admin(Cog):
             stderr=asyncio.subprocess.PIPE,
             stdout=asyncio.subprocess.PIPE,
         )
-        with ctx.typing:
+        with ctx.typing():
             await p.wait()
 
         result = (await p.stdout.read()).decode("utf-8")
