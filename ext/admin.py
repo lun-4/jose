@@ -64,7 +64,7 @@ class Admin(Cog):
             await p.wait()
 
         result = (await p.stdout.read()).decode("utf-8")
-        await ctx.send(f"`{command}`: ```{res}```\n")
+        await ctx.send(f"`{command}`: ```{result}```\n")
 
 def setup(bot):
     bot.add_cog(Admin(bot))
