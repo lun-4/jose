@@ -1,6 +1,7 @@
 import logging
 import asyncio
 import time
+import random
 
 import discord
 import markovify
@@ -168,6 +169,28 @@ class Speak(Cog):
 
         sentence = await texter.sentence(char_limit)
         return sentence
+
+    async def on_message(self, message):
+        ctx = await self.bot.get_context(message)
+        if message.author.bot:
+            return
+
+        if not isinstance(ctx.channel, discord.TextChannel):
+            return
+
+        prob = await self.config.cfg_get(ctx.guild, 'autoreply_prob')
+        if prob is None:
+            log.warning('[autoreply] how can autoreply_prob be none??')
+            return
+
+        if random.random() > prob:
+            return
+
+        if self.generating.get(ctx.guild.id):
+            return
+
+        sentence = await self.make_sentence(ctx)
+        await ctx.send(sentence)
 
     @commands.command()
     @commands.is_owner()
