@@ -80,7 +80,7 @@ class Texter:
         return str(res)
 
     def clear(self):
-        del self.model, self.id, self.refcount, self.chain_length, self.loop
+        del self.model, self.refcount, self.chain_length, self.loop
 
 class Speak(Cog):
     def __init__(self, bot):
