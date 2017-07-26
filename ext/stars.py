@@ -648,19 +648,18 @@ class Starboard(Cog):
         try:
             message = await channel.get_message(message_id)
         except discord.NotFound:
-            await ctx.send('Message not found')
-            return
+            raise self.SayException('Message not found')
         except discord.Forbidden:
-            await ctx.send("Can't retrieve message")
-            return
+            raise self.SayException("Can't retrieve message")
         except discord.HTTPException as err:
-            await ctx.send(f'Failed to retrieve message: {err!r}')
-            return
+            raise self.SayException(f'Failed to retrieve message: {err!r}')
 
         sfw = ctx.channel.is_nsfw()
-        if not (sfw is channel.is_nsfw()):
-            await ctx.send('Star found is NSFW, but we are in a SFW channel.')
-            return
+        current = ctx.channel.is_nsfw()
+        schan = channel.is_nsfw()
+
+        if not current and schan:
+            raise self.SayException(f'current_nsfw={current} nsfw={schan}, nope')
 
         title, embed = make_star_embed(star, message)
         await ctx.send(title, embed=embed)
