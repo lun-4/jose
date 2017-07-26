@@ -2,6 +2,7 @@ import logging
 import asyncio
 import time
 import random
+import itertools
 
 import discord
 import markovify
