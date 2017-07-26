@@ -307,7 +307,8 @@ class Speak(Cog):
 
         res = ['refcount | texters']
         res += [f'{r}      | {txc}' for (r, txc) in refcounts.most_common()]
-        await ctx.send(f"```{'\n'.join(res)}```")
+        res = '\n'.join(res)
+        await ctx.send(f'```{res}```')
 
 
 def setup(bot):
