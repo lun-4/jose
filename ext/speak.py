@@ -189,8 +189,9 @@ class Speak(Cog):
                 log.info('[autoreply] forcing from speak prefix')
                 force = True
 
-        if random.random() > prob or force:
-            return
+        if not force:
+            if random.random() > prob:
+                return
 
         if self.generating.get(ctx.guild.id):
             return
