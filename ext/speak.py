@@ -2,7 +2,6 @@ import logging
 import asyncio
 import time
 import random
-import itertools
 
 import discord
 import markovify
@@ -298,11 +297,12 @@ class Speak(Cog):
     async def txstat(self, ctx):
         """Show statistics about all texters"""
         tg = self.text_generators
-        f = lambda gid: tg[gid].refcount
-        sorted_tg = sorted(tg.keys(), key=f)
-        grouped = itertools.groupby(tg.keys(), key=f)
 
-        res = [f'refcount={r}, {len(tx)} texters' for (r, tx) in grouped]
+        refcounts = collections.Counter()
+        for gid, tx in tg.items():
+            refcounts[tx.refcount] += 1
+
+        res = [f'refcount={r}, {txc} texters' for (r, txc) in refcounts]
         await ctx.send('\n'.join(res))
 
 
