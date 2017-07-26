@@ -298,12 +298,14 @@ class Speak(Cog):
     async def txstat(self, ctx):
         """Show statistics about all texters"""
         tg = self.text_generators
+        if len(tg) < 1:
+            await ctx.send('No texters to do statistic stuff upon')
 
         refcounts = collections.Counter()
         for gid, tx in tg.items():
             refcounts[tx.refcount] += 1
 
-        res = [f'refcount={r}, {txc} texters' for (r, txc) in refcounts]
+        res = [f'refcount={r}, {txc} texters' for (r, txc) in refcounts.most_common()]
         await ctx.send('\n'.join(res))
 
 
