@@ -2,6 +2,7 @@ import logging
 import asyncio
 import collections
 import json
+import zlib
 
 from discord.ext import commands
 
