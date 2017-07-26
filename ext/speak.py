@@ -183,7 +183,13 @@ class Speak(Cog):
             log.warning('[autoreply] how can autoreply_prob be none??')
             return
 
-        if random.random() > prob:
+        force = False
+        for prefix in self.bot.config.SPEAK_PREFIXES:
+            if message.content.startswith(prefix):
+                log.info('[autoreply] forcing from speak prefix')
+                force = True
+
+        if random.random() > prob or (not force):
             return
 
         if self.generating.get(ctx.guild.id):

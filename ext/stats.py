@@ -21,7 +21,11 @@ class Statistics(Cog):
         super().__init__(bot)
 
         self.cstats_coll = self.config.jose_db['command_stats']
-        self.stats_task = bot.loop.create_task(self.querystats())
+
+        if self.bot.config.datadog:
+            self.stats_task = bot.loop.create_task(self.querystats())
+        else:
+            log.warning('Datadog is disabled!')
 
     def __unload(self):
         self.stats_task.cancel()
@@ -44,11 +48,13 @@ class Statistics(Cog):
         if stats is None:
             await self.cstats_coll.insert_one(empty_stats(c_name))
         
-        statsd.increment('jose.complete_commands')
+        if self.bot.config.datadog:
+            statsd.increment('jose.complete_commands')
         await self.cstats_coll.update_one({'name': c_name}, {'$inc': {'uses': 1}})
 
     async def on_message(self, message):
-        statsd.increment('jose.recv_messages')
+        if self.bot.config.datadog:
+            statsd.increment('jose.recv_messages')
 
     async def on_guild_leave(self, guild):
         log.info(f'Left guild {guild.name} {guild.id}, {guild.member_count} members')
