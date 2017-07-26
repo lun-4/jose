@@ -1,48 +1,43 @@
 José
 =========
 
-*The documentation for José is available in English as well as in Portuguese*
-
-*Este arquivo em português pode ser encontrado em [README-pt.md](https://github.com/lkmnds/jose/blob/master/README-pt.md)*
-
-José is a general-purpose bot for Discord written in Python.
-
-**Redis and Python 3.5+ is needed**
-
-Instructions for Linuxes:
+Installation
 ```bash
-$ git clone https://github.com/lkmnds/jose.git
-$ cd jose
-$ nano joseconfig.py
+# You'll need mongo
+# and Python 3.6+
+git clone https://github.com/lkmnds/jose.git
 
-# For Debian-based Linuxes
-$ sudo apt-get install gettext
+cd jose
 
-# Make sure pip references python 3.5+
-$ sudo pip install -U -r requirements.txt
+python3.6 -m venv env
+env/bin/python3.6 -m pip install -Ur requirements.txt
+
+# fill in stuff from the example config file
+# as you wish
+nano joseconfig.py
+
+# profit
+env/bin/python3.6 jose.py
 ```
 
-Setup a cron job to make backups every hour:
-```
-0 * * * * /path/to/jose/backup.bash
-```
-
-Example `joseconfig.py` file:
+Example config file
 ```python
-discord_token = 'DISCORD OAUTH2 BOT TOKEN'
-soundcloud_id = 'SOUNDCLOUD API ID'
-jcoin_path = 'jcoin/josecoin.db'
-WOLFRAMALPHA_APP_ID = 'WOLFRAM|ALPHA APP ID'
-OWM_APIKEY = 'OpenWeatherMap API Key'
-MAGICWORD_PATH = 'db/magicwords.json'
-```
+# discord stuff
+token = 'discord token'
+prefix = 'j!'
 
-Run Redis somewhere:
-```
-redis-server jose/redis.conf
-```
+# api stuff
+WOLFRAMALPHA_APP_ID = 'app id for wolframalpha'
+OWM_APIKEY = 'api key for OpenWeatherMap'
+WEATHER_API = {
+    'base_url': 'Base URL for a custom Weather API',
+    'key': 'something',
+    'secret': 'something',
+}
 
-Starting:
-```
-python3 jose-bot.py
+# set those to whatever
+SPEAK_PREFIXES = ['josé ', 'José ', 'jose ', 'Jose ']
+
+# enable/disable datadog reporting
+datadog = False
 ```
