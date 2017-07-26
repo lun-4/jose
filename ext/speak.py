@@ -305,8 +305,9 @@ class Speak(Cog):
         for gid, tx in tg.items():
             refcounts[tx.refcount] += 1
 
-        res = [f'refcount={r}, {txc} texters' for (r, txc) in refcounts.most_common()]
-        await ctx.send('\n'.join(res))
+        res = ['refcount | texters']
+        res += [f'{r}      | {txc}' for (r, txc) in refcounts.most_common()]
+        await ctx.send(f"```{'\n'.join(res)}```")
 
 
 def setup(bot):
