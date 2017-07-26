@@ -149,10 +149,15 @@ class Logging(Cog):
         if self._special_packet_channel is None:
             return
 
+        # thanks danno
+        if isinstance(msg, bytes):
+            msg = zlib.decompress(msg, 15, 10490000)
+            msg = msg.decode('utf-8')
+
         try:
             j = json.loads(msg)
-        except:
-            log.warning('Failed to get JSON from WS_RECEIVE')
+        except json.JSONDecodeError as e:
+            log.warning('Failed to get JSON from WS_RECEIVE: %r', e)
             return
 
         op = j['op']
