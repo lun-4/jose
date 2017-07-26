@@ -79,8 +79,7 @@ class Texter:
         return str(res)
 
     def clear(self):
-        del self.model
-
+        del self.model, self.id, self.refcount, self.chain_length, self.loop
 
 class Speak(Cog):
     def __init__(self, bot):
@@ -293,6 +292,17 @@ class Speak(Cog):
 
         delta = round((t2 - t1), 2)
         await ctx.send(f'Generated {len(txs)} in {delta}')
+
+    @commands.command()
+    async def txstat(self, ctx):
+        """Show statistics about all texters"""
+        tg = self.text_generators
+        f = lambda gid: tg[gid].refcount
+        sorted_tg = sorted(tg.keys(), key=f)
+        grouped = itertools.groupby(tg.keys(), key=f)
+
+        await ctx.send(f'{f"refcount={r}, {len(tx)} texters\n" for (r, tx) in grouped}')
+
 
 def setup(bot):
     bot.add_cog(Speak(bot))
