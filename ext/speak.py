@@ -301,7 +301,8 @@ class Speak(Cog):
         sorted_tg = sorted(tg.keys(), key=f)
         grouped = itertools.groupby(tg.keys(), key=f)
 
-        await ctx.send(f'{f"refcount={r}, {len(tx)} texters\n" for (r, tx) in grouped}')
+        res = [f'refcount={r}, {len(tx)} texters' for (r, tx) in grouped]
+        await ctx.send('\n'.join(res))
 
 
 def setup(bot):
