@@ -22,7 +22,7 @@ class Cog:
         }
 
     def get_name(self, user_id):
-        return str(discord.utils.get(self.bot.get_all_members(), id=int(user_id)))
+        return str(self.bot.get_user(user_id))
 
     async def get_json(self, url):
         async with self.bot.session.get(url) as resp:
