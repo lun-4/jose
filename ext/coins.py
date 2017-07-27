@@ -46,7 +46,7 @@ class Coins(Cog):
     def __init__(self, bot):
         super().__init__(bot)
         self.jcoin_coll = self.config.jose_db['josecoin']
-        self.steal_coll = self.config.jose_db['jcoin-steal']
+        self.hidecoin_coll = self.config.jose_db['jcoin-hidecoin']
 
         self.BASE_PROBABILITY = COIN_BASE_PROBABILITY
 
@@ -339,17 +339,25 @@ class Coins(Cog):
             return
 
         amount = random.choice(JOSECOIN_REWARDS)
-        if amount != 0:
+        if amount == 0:
+            return
+        
+        try:
+            await self.transfer(self.bot.user.id, author_id, amount)
+            self.reward_env[author_id] = time.time() + REWARD_COOLDOWN
+            if message.guild.large:
+                return
+
+            hide = await self.hidecoin_coll.find_one({'user_id': author_id})
+            if hide:
+                return
+                
             try:
-                await self.transfer(self.bot.user.id, author_id, amount)
-                self.reward_env[author_id] = time.time() + REWARD_COOLDOWN
-                if not message.guild.large:
-                    try:
-                        await message.add_reaction('💰')
-                    except:
-                        pass
+                await message.add_reaction('💰')
             except:
-                log.error('autocoin->err', exc_info=True)
+                pass
+        except:
+            log.error('autocoin->err', exc_info=True)
 
     @commands.command()
     async def account(self, ctx):
@@ -403,6 +411,33 @@ class Coins(Cog):
         amount = round(amount, 3)
         await self.jcoin_coll.update_one({'id': person.id}, {'$set': {'amount': float(amount)}})
         await ctx.send(f'Set {self.get_name(account["id"])} to {amount}')
+
+    @commands.command()
+    async def hidecoins(self, ctx):
+        """Toggle the reaction when you receive money, globally."""
+        user = ctx.author
+        query = {'user_id': user.id}
+        ex = await self.hidecoin_coll.find_one(query)
+        if ex is None:
+            r = await self.hidecoin_coll.insert_one(query)
+            if r.acknowledged:
+                await ctx.message.add_reaction('\N{UPWARDS BLACK ARROW}')
+            else:
+                await ctx.not_ok()
+        else:
+            r = await self.hidecoin_coll.delete_many(query)
+            dc = r.deleted_count
+            if dc == 1:
+                await ctx.message.add_reaction('\N{DOWNWARDS BLACK ARROW}')
+            else:
+                log.warning('[hidecoins] N-Nani?!?!?! %d deleted', dc)
+                await ctx.not_ok()
+
+    @commands.command()
+    async def _hidecoin(self, ctx):
+        """Show if you are hiding the coin reaction or not"""
+        ex = await self.hidecoin_coll.find_one({'user_id': ctx.author.id})
+        await ctx.send(f'Enabled: {bool(ex)}')
 
 def setup(bot):
     bot.add_cog(Coins(bot))
