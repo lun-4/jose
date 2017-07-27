@@ -57,10 +57,13 @@ class Coins(Cog):
         self.reward_env = {}
 
     def get_name(self, user_id):
+        """Get a string representation of a user or guild."""
         if isinstance(user_id, discord.Guild):
             return f'taxbank:{user_id.name}'
+        elif isinstance(user_id, discord.User):
+            return str(user_id)
 
-        obj = discord.utils.get(self.bot.get_all_members(), id=int(user_id))
+        obj = self.bot.get_user(int(user_id))
 
         if obj is None:
             # try to find guild
