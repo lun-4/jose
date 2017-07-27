@@ -40,7 +40,7 @@ class Statistics(Cog):
         except asyncio.CancelledError:
             log.info('[statsd] stats machine broke')
 
-    async def on_command_completion(self, ctx):
+    async def on_command(self, ctx):
         command = ctx.command
         c_name = command.name
 
@@ -76,6 +76,15 @@ class Statistics(Cog):
         res = [f'{name}: used {uses} times' for (name, uses) in most_used]
         _res = '\n'.join(res)
         await ctx.send(f'```\n{_res}\n```')
+
+    @commands.command(aliases=['cstat'])
+    async def command_stat(self, ctx, command: str):
+        """Get usage for a single command"""
+        stat = await self.cstats_coll.find_one({'name': command})
+        if stat is None:
+            raise self.SayException('Command not found')
+
+        await ctx.send(f'`{command}: {stat["uses"]} uses`')
 
 def setup(bot):
     bot.add_cog(Statistics(bot))
