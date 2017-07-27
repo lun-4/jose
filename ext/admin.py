@@ -55,15 +55,15 @@ class Admin(Cog):
     @commands.is_owner()
     async def shell(self, ctx, *, command: str):
         """Execute shell commands."""
-
         with ctx.typing():
             p = await asyncio.create_subprocess_shell(command,
                 stderr=asyncio.subprocess.PIPE,
                 stdout=asyncio.subprocess.PIPE,
             )
-            await p.wait()
 
-        result = (await p.stdout.read()).decode("utf-8")
+            out, err = map(lambda s: s.decode('utf-8'), await p.communicate())
+
+        result = f'{out}{err}' 
         await ctx.send(f"`{command}`: ```{result}```\n")
 
 def setup(bot):
