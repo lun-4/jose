@@ -91,7 +91,8 @@ class Extra(Cog):
         Made with https://github.com/adtac/relevant-xkcd
         """
         try:
-            await self._do_rxkcd(ctx, terms)
+            async with ctx.typing():
+                await self._do_rxkcd(ctx, terms)
         except Exception as err:
             raise self.SayException(f'Error while requesting data: `{err!r}`')
 
