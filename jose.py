@@ -98,8 +98,8 @@ class JoseBot(commands.Bot):
 
     async def on_ready(self):
         log.info(f'Logged in! {self.user!s}')
-        if bot.channel_handler is not None:
-            bot.channel_handler.do_ready()
+        if self.channel_handler is not None:
+            self.channel_handler.do_ready()
 
     async def is_blocked(self, user_id: int):
         """Returns If a user is blocked to use José. Uses cache"""
