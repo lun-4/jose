@@ -79,7 +79,7 @@ class ChannelHandler(logging.Handler):
             send = getattr(channel, 'send', None)
 
             if send is None:
-                print('[chdump] you sure this is a channel')
+                print(f'[chdump] you sure this is a channel: {channel!r}')
             else:
                 self.loop.create_task(channel.send(joined))
 
