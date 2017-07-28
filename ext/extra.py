@@ -229,9 +229,11 @@ class Extra(Cog):
 
     @commands.command()
     @commands.guild_only()
-    async def presence(self, ctx):
+    async def presence(self, ctx, member: discord.Member = None):
         """Shows your status/presence info in José's view."""
-        member = ctx.guild.get_member(ctx.author.id)
+        if member is None:
+            member = ctx.member
+
         status = member.status
         try:
             game_name = member.game.name
