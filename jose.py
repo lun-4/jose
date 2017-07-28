@@ -91,12 +91,15 @@ class JoseBot(commands.Bot):
         self.config = config
         self.session = aiohttp.ClientSession()
         self.simple_exc = [SayException]
+        self.channel_handler = None
 
         # reeeeee dont query mongo every message god damn it
         self.block_cache = {}
 
     async def on_ready(self):
         log.info(f'Logged in! {self.user!s}')
+        if bot.channel_handler is not None:
+            bot.channel_handler.do_ready()
 
     async def is_blocked(self, user_id: int):
         """Returns If a user is blocked to use José. Uses cache"""

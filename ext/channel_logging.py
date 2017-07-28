@@ -86,18 +86,13 @@ class ChannelHandler(logging.Handler):
             # empty queue
             self.queue[level] = []
 
-    async def ready(self):
-        """Waits for the bot to be ready and gets the channel IDs to send the logs to."""
-        await self.bot.wait_until_ready()
-       
-        print('ready')
-
+    def do_ready(self):
         for level, channel_id in LEVELS.items():
             channel = self.bot.get_channel(channel_id)
             self.channels[level] = channel
             print(f'[ch:ready] {level} -> {channel_id} -> {channel!s}')
 
-        self.dumper_task = self.bot.loop.create_task(self.dumper())
+        self.dumper_task = self.loop.create_task(self.dumper())
         self.attach()
 
     def attach(self):
@@ -199,5 +194,5 @@ def setup(bot):
         bot.channel_handler.detach()
 
     bot.channel_handler = ChannelHandler(bot)
-    bot.loop.create_task(bot.channel_handler.ready())
+    #bot.loop.create_task(bot.channel_handler.ready())
 
