@@ -65,7 +65,7 @@ class Extra(Cog):
 
     async def _do_rxkcd(self, ctx, terms):
         async with self.bot.session.post(RXKCD_ENDPOINT, data={'search': terms}) as r:
-            if r.code != 200:
+            if r.status != 200:
                 raise self.SayException(f'Got a not good error code: {r.code}')
 
             data = await r.text()
