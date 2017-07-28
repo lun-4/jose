@@ -75,11 +75,13 @@ class ChannelHandler(logging.Handler):
 
             joined = '\n'.join(messages)
             channel = self.channels[level]
- 
-            try:
+
+            send = getattr(channel, 'send', None)
+
+            if send is None:
+                print('[chdump] you sure this is a channel')
+            else:
                 self.loop.create_task(channel.send(joined))
-            except AttributeError:
-                print('[chlog] Log channel not found')
 
             # empty queue
             self.queue[level] = []
@@ -88,6 +90,8 @@ class ChannelHandler(logging.Handler):
         """Waits for the bot to be ready and gets the channel IDs to send the logs to."""
         await self.bot.wait_until_ready()
        
+        print('ready')
+
         self.channels = {}
         for level, channel_id in LEVELS.items():
             self.channels[level] = self.bot.get_channel(channel_id)
