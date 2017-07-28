@@ -64,7 +64,7 @@ class Extra(Cog):
         await ctx.send(f'xkcd {info["num"]} => {info["img"]}')
 
     async def _do_rxkcd(self, ctx, terms):
-        async with self.bot.session.post(RXKCD_ENDPOINT, data={'search': terms}) as r:
+        async with self.bot.session.post(RXKCD_ENDPOINT, json={'search': terms}) as r:
             if r.status != 200:
                 raise self.SayException(f'Got a not good error code: {r.code}')
 
@@ -252,7 +252,7 @@ class Extra(Cog):
         if base is None:
             raise self.SayException('No URL for elixir-docsearch is in config.')
 
-        async with self.bot.session.get(f'http://{base}/search', data={'query': terms}) as r:
+        async with self.bot.session.get(f'http://{base}/search', json={'query': terms}) as r:
             if r.status != 200:
                 raise self.SayException(f'{r.status} is not 200, rip.')
 
