@@ -238,6 +238,7 @@ class Extra(Cog):
         except AttributeError:
             game_name = '<no game>'
 
+        game_name = await commands.clean_content().convert(ctx, game_name)
         await ctx.send(f'status: `{status}`, game: `{game_name}`')
 
 def setup(bot):
