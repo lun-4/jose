@@ -240,6 +240,37 @@ class Extra(Cog):
 
         game_name = await commands.clean_content().convert(ctx, game_name)
         await ctx.send(f'status: `{status}`, game: `{game_name}`')
+    
+    @commands.command()
+    async def elixir(self, ctx, *, terms: str):
+        """Search through the Elixir documentation.
+        
+        Powered by https://github.com/lnmds/elixir-docsearch.
+        """
+        try:
+            await ctx.trigger_typing()
+            base = getattr(self.bot.config, 'elixir_docsearch', None)
+            if base is None:
+                raise self.SayException('No URL for elixir-docsearch is in config.')
+
+            async with self.bot.session.get(f'http://{base}/search?query={terms}') as r:
+                if r.status != 200:
+                    raise self.SayException(f'{r.code} is not 200, rip.')
+
+                res = await r.json()
+                if len(res) == 0:
+                    raise self.SayException('No results found.')
+
+                res = res[:5]
+                em = discord.Embed(colour=discord.Colour.blurple())
+                em.description = ''
+                for (entry, score) in res:
+                    name = entry.split('/')[-1].replace('.html', '')
+                    em.description += f'[{name}](https://hexdocs.pm{entry}) ({score * 100}%)\n'
+
+                await ctx.send(embed=em)
+        except Exception as err:
+            raise self.SayException(f'err {err!r}')
 
 def setup(bot):
     bot.add_cog(Extra(bot))
