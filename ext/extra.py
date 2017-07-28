@@ -252,7 +252,7 @@ class Extra(Cog):
         if base is None:
             raise self.SayException('No URL for elixir-docsearch is in config.')
 
-        async with self.bot.session.get(f'http://{base}/search?query={terms}') as r:
+        async with self.bot.session.get(f'http://{base}/search', data={'query': terms}) as r:
             if r.status != 200:
                 raise self.SayException(f'{r.status} is not 200, rip.')
 
