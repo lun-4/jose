@@ -63,13 +63,11 @@ class Extra(Cog):
 
         await ctx.send(f'xkcd {info["num"]} => {info["img"]}')
 
-    @commands.command()
-    async def rxkcd(self, ctx, *, terms: str):
-        """Get a Relevant XKCD.
-        
-        Made with https://github.com/adtac/relevant-xkcd
-        """
+    async def _do_rxkcd(self, ctx, terms):
         async with self.bot.session.post(RXKCD_ENDPOINT, data={'search': terms}) as r:
+            if r.code != 200:
+                raise self.SayException(f'Got a not good error code: {r.code}')
+
             data = await r.text()
             data = json.loads(data)
             if not data['success']:
@@ -85,6 +83,17 @@ class Extra(Cog):
             em.set_image(url=comic['image'])
 
             await ctx.send(embed=em)
+
+    @commands.command()
+    async def rxkcd(self, ctx, *, terms: str):
+        """Get a Relevant XKCD.
+        
+        Made with https://github.com/adtac/relevant-xkcd
+        """
+        try:
+            await self._do_rxkcd(ctx, terms)
+        except Exception as err:
+            raise self.SayException(f'Error while requesting data: `{err!r}`')
 
     @commands.command(aliases=['yt'])
     async def youtube(self, ctx, *, search_term: str):
