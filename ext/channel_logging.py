@@ -55,7 +55,7 @@ class ChannelHandler(logging.Handler):
         self.bot = bot
         self.loop = bot.loop
         
-        self.channels = None
+        self.channels = {} 
         self.dumper_task = None
         self.queue = collections.defaultdict(list)
 
@@ -92,9 +92,10 @@ class ChannelHandler(logging.Handler):
        
         print('ready')
 
-        self.channels = {}
         for level, channel_id in LEVELS.items():
-            self.channels[level] = self.bot.get_channel(channel_id)
+            channel = self.bot.get_channel(channel_id)
+            self.channels[level] = channel
+            print(f'[ch:ready] {level} -> {channel_id} -> {channel!s}')
 
         self.dumper_task = self.bot.loop.create_task(self.dumper())
         self.attach()
