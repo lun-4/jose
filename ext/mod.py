@@ -59,7 +59,7 @@ class Moderation(Cog):
     async def _modcfg_get(self, guild):
         modconfig = await self.modcfg_get(guild)
         if modconfig is None:
-            raise self.SayException('Mod ocnfiguration not found')
+            raise self.SayException('Mod configuration not found')
 
         return modconfig
 
