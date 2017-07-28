@@ -255,7 +255,7 @@ class Extra(Cog):
 
             async with self.bot.session.get(f'http://{base}/search?query={terms}') as r:
                 if r.status != 200:
-                    raise self.SayException(f'{r.code} is not 200, rip.')
+                    raise self.SayException(f'{r.status} is not 200, rip.')
 
                 res = await r.json()
                 if len(res) == 0:
