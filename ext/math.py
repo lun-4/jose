@@ -288,6 +288,12 @@ class Math(Cog):
 
         current = _weather_data['current']
         location = _weather_data['location']
+
+        for field in current:
+            try:
+                current[field] = round(current[field], 2)
+            except: pass
+
         location_time = datetime.datetime.fromtimestamp(int(current['time']))
 
         em = discord.Embed(title=f"Weather for '{querylocation}'")
@@ -295,7 +301,7 @@ class Math(Cog):
 
         em.add_field(name='Location', value=f'{location["city"]}, {location["stateName"]}, {location["country"]}')
         em.add_field(name='Situation', value=f'{current["text"]} {W_API_ICONS[current["condition"]]}')
-        em.add_field(name='Temperature', value=f'`{current["tempC"]:.1} °C, {current["temp"]:.1} °F, {current["tempK"]:.1} °K`')
+        em.add_field(name='Temperature', value=f'`{current["tempC"]} °C, {current["temp"]} °F, {current["tempK"]} °K`')
 
         await ctx.send(embed=em)
 
