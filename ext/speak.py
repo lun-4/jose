@@ -36,12 +36,14 @@ class Texter:
 
         self.id = texter_id
         self.refcount = 1
+        self.wordcount = 0
+
         self.chain_length = chain_length
         self.loop = loop
         self.model = None
 
     def __repr__(self):
-        return f'Texter(refcount={self.refcount})'
+        return f'<Texter refcount={self.refcount} wordcount={self.wordcount}>'
 
     async def fill(self, data):
         """Fill a texter with its text model."""
@@ -50,8 +52,10 @@ class Texter:
         future_textmodel = self.loop.run_in_executor(None, make_textmodel, self, data)
         await future_textmodel
 
+        self.wordcount = data.count(' ') + 1
         delta = round((time.monotonic() - t_start) * 1000, 2)
-        log.info(f"Texter.fill: {data.count(' ') + 1} words, {delta}ms")
+
+        log.info(f"Texter.fill: {self.wordcount} words, {delta}ms")
 
     def _sentence(self, char_limit):
         """Get a sentence from a initialized texter."""
@@ -309,6 +313,17 @@ class Speak(Cog):
         res = '\n'.join(res)
         await ctx.send(f'```{res}```')
 
+    @commands.command()
+    @commands.is_owner()
+    async def alltx(self, ctx):
+        """Get info about all loaded texters."""
+        em = discord.Embed(colour=discord.Colour.blurple())
+        em.description = ''
+        for guild_id, tx in self.text_generators.items():
+            guild = self.bot.get_guild(guild_id)
+            em.description += '{guild.name!r}, gid={guild_id} - refcount={tx.refcount}, wordcount={tx.wordcount}'
+
+        await ctx.send(embed=em)
 
 def setup(bot):
     bot.add_cog(Speak(bot))
