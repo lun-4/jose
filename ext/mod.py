@@ -1,5 +1,6 @@
 import datetime
 import logging
+from collections import namedtuple
 
 import discord
 from discord.ext import commands
@@ -262,6 +263,20 @@ class Moderation(Cog):
             kwargs.pop('reason') # because we already give the reason to handler
         except KeyError:
             pass
+
+        try:
+            guild = gulid
+        except AttributeError:
+            guild = namedtuple('Fake Guild', 'name id')
+            guild.name = 'fake guild'
+            guild.id = -1
+
+        try:
+            user = user
+        except AttributeError:
+            user = namedtuple('FakeUser', 'name id')
+            user.name = 'fake user'
+            user.id = -1
 
         log.info('[modlog:handle] a=%d g=%r[gid=%d], u=%r[uid=%d] r=%r', \
             action, guild.name, guild.id, user.name, user.id, reason)

@@ -28,7 +28,8 @@ class Texter:
 
     This class holds information about a markov chain generator.
     """
-    __slots__ = ('loop', 'id', 'refcount', 'chain_length', 'model', 'wordcount', 'linecount')
+    __slots__ = ('loop', 'id', 'refcount', 'chain_length', \
+        'model', 'wordcount', 'linecount')
 
     def __init__(self, texter_id, chain_length=1, loop=None):
         if loop is None:
@@ -135,7 +136,7 @@ class Speak(Cog):
 
         if cleaned > 0:
             delta = round((t_end - t_start) * 1000, 2)
-            log.info(f'[txc] {amount} -> {amount - cleaned} in {delta}ms')
+            log.info(f'[tx:coll] {amount} -> {amount - cleaned}, {delta}ms')
 
     async def get_messages(self, guild, amount=2000) -> list:
         channel_id = await self.config.cfg_get(guild, 'speak_channel')
