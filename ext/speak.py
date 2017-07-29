@@ -98,10 +98,13 @@ class Speak(Cog):
 
     def __unload(self):
         """Remove all texters from memory"""
+        to_del = []
         for tx in self.text_generators.values():
             tx.clear()
+            to_del.append(tx.id)
 
-        del self.text_generators[tx.id]
+        for tx_id in to_del:
+            del self.text_generators[tx_id]
 
     async def coll_task_func(self):
         try:
