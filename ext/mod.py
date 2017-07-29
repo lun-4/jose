@@ -332,8 +332,8 @@ class Moderation(Cog):
         except discord.HTTPException as err:
             raise self.SayException('wtf is happening discord `{err!r}`')
 
-        _reason = {'reason': reason, 'moderator': ctx.author}
-        await self.modlog(Actions.BAN, ctx.guild, member, reason=_reason, modconfig=modconfig)
+        #_reason = {'reason': reason, 'moderator': ctx.author}
+        #await self.modlog(Actions.BAN, ctx.guild, member, reason=_reason, modconfig=modconfig)
         await ctx.ok()
 
 
