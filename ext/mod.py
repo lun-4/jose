@@ -266,14 +266,14 @@ class Moderation(Cog):
 
         try:
             guild = gulid
-        except AttributeError:
+        except (AttributeError, NameError):
             guild = namedtuple('Fake Guild', 'name id')
             guild.name = 'fake guild'
             guild.id = -1
 
         try:
             user = user
-        except AttributeError:
+        except (AttributeError, NameError):
             user = namedtuple('FakeUser', 'name id')
             user.name = 'fake user'
             user.id = -1
