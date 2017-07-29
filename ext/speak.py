@@ -51,7 +51,7 @@ class Texter:
         await future_textmodel
 
         delta = round((time.monotonic() - t_start) * 1000, 2)
-        log.info(f"Texter.fill: {delta}ms")
+        log.info(f"Texter.fill: {data.count(' ') + 1} words, {delta}ms")
 
     def _sentence(self, char_limit):
         """Get a sentence from a initialized texter."""
@@ -119,7 +119,7 @@ class Speak(Cog):
 
         if cleaned > 0:
             delta = round((t_end - t_start) * 1000, 2)
-            log.info(f'{amount} -> {amount - cleaned} in {delta}ms')
+            log.info(f'[txc] {amount} -> {amount - cleaned} in {delta}ms')
 
     async def get_messages(self, guild, amount=2000) -> list:
         channel_id = await self.config.cfg_get(guild, 'speak_channel')
@@ -143,7 +143,7 @@ class Speak(Cog):
             self.generating[guild.id] = False
             return messages
         except discord.Forbidden:
-            log.info(f'got Forbidden from {guild.id} when making message history')
+            log.info(f'[get_messages] Forbidden from {guild.name}[{guild.id}]')
 
             self.generating[guild.id] = False
             return ['None']
