@@ -291,11 +291,11 @@ class Math(Cog):
         location_time = datetime.datetime.fromtimestamp(int(current['time']))
 
         em = discord.Embed(title=f"Weather for '{querylocation}'")
-        em.description = f"Time at observation(location's timezone): {location_time}"
+        em.description = f"Time of observation (GMT+0): {location_time}"
 
         em.add_field(name='Location', value=f'{location["city"]}, {location["stateName"]}, {location["country"]}')
         em.add_field(name='Situation', value=f'{current["text"]} {W_API_ICONS[current["condition"]]}')
-        em.add_field(name='Temperature', value=f'`{current["tempC"]} °C, {current["temp"]} °F, {current["tempK"]} °K`')
+        em.add_field(name='Temperature', value=f'`{current["tempC"]:.1} °C, {current["temp"]:.1} °F, {current["tempK"]:.1} °K`')
 
         await ctx.send(embed=em)
 
