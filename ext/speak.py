@@ -94,11 +94,18 @@ class Speak(Cog):
 
         self.coll_task = self.bot.loop.create_task(self.coll_task_func())
 
+    def __unload(self):
+        """Remove all texters from memory"""
+        for tx in self.text_generators.values():
+            tx.clear()
+
+        del self.text_generators[tx.id]
+
     async def coll_task_func(self):
         try:
             while True:
                 await self.texter_collection()
-                await asyncio.sleep(360)
+                await asyncio.sleep(120)
         except asyncio.CancelledError:
             pass
 
@@ -321,7 +328,7 @@ class Speak(Cog):
         em.description = ''
         for guild_id, tx in self.text_generators.items():
             guild = self.bot.get_guild(guild_id)
-            em.description += f'{guild.name!r}, gid={guild_id} - refcount={tx.refcount}, wordcount={tx.wordcount}'
+            em.description += f'**{guild!s}**, gid={guild_id} - `refcount={tx.refcount}, wordcount={tx.wordcount}`'
 
         await ctx.send(embed=em)
 
