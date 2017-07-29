@@ -55,8 +55,9 @@ class Basic(Cog):
     async def version(self, ctx):
         """Show current josé version"""
         pyver = '%d.%d.%d' % (sys.version_info[:3])
-        head_id = subprocess.check_output("git rev-parse --short HEAD", shell=True).decode('utf-8').strip()
-        branch = subprocess.check_output('git rev-parse --abbrev-ref HEAD', shell=True).decode('utf-8').strip()
+        do = lambda cmd: subprocess.check_output(cmd, shell=True).decode('utf-8').strip()
+        head_id = do('git rev-parse --short HEAD')
+        branch = do('git rev-parse --abbrev-ref HEAD')
 
         await ctx.send(f'`José v{self.JOSE_VERSION} git:{branch}-{head_id} py:{pyver} d.py:{discord.__version__}`')
 
@@ -89,8 +90,6 @@ class Basic(Cog):
         em.add_field(name='Guilds', value=f'{len(self.bot.guilds)}')
         em.add_field(name='Channels', value=f'{channels}')
         em.add_field(name='Texters', value=f'{len(self.bot.cogs["Speak"].text_generators)}/{len(self.bot.guilds)}')
-
-
         em.add_field(name='Members', value=len(list(self.bot.get_all_members())))
 
         humans = [m for m in self.bot.get_all_members() if not m.bot]

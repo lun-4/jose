@@ -1,6 +1,7 @@
 import pprint
 import collections
 import time
+import logging
 
 import motor.motor_asyncio
 import discord
@@ -8,6 +9,8 @@ import discord
 from discord.ext import commands
 
 from .common import Cog
+
+log = logging.getLogger(__name__)
 
 
 class Config(Cog):
@@ -90,7 +93,12 @@ class Config(Cog):
             return self.config_cache[guild.id][key]
 
         cfg = await self.ensure_cfg(guild)
-        return cfg.get(key)
+        value = cfg.get(key)
+
+        log.info('[cfg:get] %s[gid=%d] k=%r -> v=%r', \
+            guild, guild.id, key, value)
+
+        return value
 
     async def cfg_set(self, guild, key, value):
         cfg = await self.ensure_cfg(guild)
@@ -98,6 +106,9 @@ class Config(Cog):
         res = await self.config_coll.update_one({'guild_id': guild.id}, {'$set': {
             key: value
         }})
+
+        log.info('[cfg:set] %s[gid=%d] k=%r <- v=%r', \
+            guild, guild.id, key, value)
 
         self.config_cache[guild.id][key] = value
 

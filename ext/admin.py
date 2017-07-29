@@ -14,6 +14,7 @@ class Admin(Cog):
     @commands.command(hidden=True)
     @commands.is_owner()
     async def shutdown(self, ctx):
+        log.info('Logging out! %s', ctx.author)
         await ctx.send("dude rip")
         #await self.bot.session.close()        
         await self.bot.logout()

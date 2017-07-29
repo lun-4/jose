@@ -1,5 +1,6 @@
 import decimal
 import time
+import logging
 
 from random import SystemRandom
 random = SystemRandom()
@@ -9,20 +10,23 @@ from discord.ext import commands
 
 from .common import Cog
 
+log = logging.getLogger(__name__)
+
 PRICES = {
     'OPR': ('Operational tax', ('datamosh', 'youtube')),
     'API': ('API tax', ('xkcd', 'wolframalpha', 'weather', 'money', 'urban')),
 }
+
 
 # steal constants
 BASE_CHANCE = decimal.Decimal('1')
 STEAL_CONSTANT = decimal.Decimal(0.42)
 
 # default cooldown when you are arrested
-ARREST_TIME = 8
+ARREST_TIME = 6 
 
 # cooldown when you need to regen stealing points
-STEAL_REGEN = 10
+STEAL_REGEN = 9
 
 WHITELISTED_ACCOUNTS = (319522792854913025,)
 
@@ -178,7 +182,7 @@ class CoinsExt(Cog):
 
         if points['points'] < 1:
             await self.add_cooldown(thief, 1, STEAL_REGEN)
-            raise self.SayException(f'You ran out of stealing points! wait 8 hours.')
+            raise self.SayException(f'You ran out of stealing points! wait {STEAL_REGEN} hours.')
 
         await self.points_coll.update_one({'user_id': thief.id}, {'$set': {'points': points['points'] - 1}})
 
@@ -245,10 +249,10 @@ class CoinsExt(Cog):
             raise self.SayException("One of you don't have a JoséCoin account")
 
         if amount <= .01:
-            raise self.SayException('Minimum amount to steal  `0.01JC`')
+            raise self.SayException('Minimum amount to steal  needs to be higher than `0.01JC`')
 
         if amount <= 0:
-            raise self.SayException('haha good one :ok_hand: but nah')
+            raise self.SayException('haha good one :ok_hand:')
 
         if thief_account['amount'] < 6:
             raise self.SayException("You have less than `6JC`, can't use the steal command")
@@ -274,6 +278,9 @@ class CoinsExt(Cog):
 
         res = random.uniform(0, 10)
         res = round(res, 3)
+
+        log.info('[steal:cmd] chance=%.2f res=%.2f thief=%s[uid=%d] target=%s[uid=%d] amount=%.2f', \
+            chance, res, thief, thief.id, target, target.id, amount)
 
         if res < chance:
             # successful steal
