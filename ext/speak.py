@@ -37,6 +37,7 @@ class Texter:
         self.id = texter_id
         self.refcount = 1
         self.wordcount = 0
+        self.linecount = 0
 
         self.chain_length = chain_length
         self.loop = loop
@@ -53,9 +54,10 @@ class Texter:
         await future_textmodel
 
         self.wordcount = data.count(' ') + 1
+        self.linecount = data.count('\n')
         delta = round((time.monotonic() - t_start) * 1000, 2)
 
-        log.info(f"Texter.fill: {self.wordcount} words, {delta}ms")
+        log.info(f"Texter.fill: {self.linecount} lines, {self.wordcount} words, {delta}ms")
 
     def _sentence(self, char_limit):
         """Get a sentence from a initialized texter."""
@@ -328,7 +330,7 @@ class Speak(Cog):
         em.description = ''
         for guild_id, tx in self.text_generators.items():
             guild = self.bot.get_guild(guild_id)
-            em.description += f'**{guild!s}**, gid={guild_id} - `refcount={tx.refcount}, wordcount={tx.wordcount}`'
+            em.description += f'**{guild!s}**, gid={guild_id} - `refcount={tx.refcount}, words={tx.wordcount} lines={tx.linecount}`\n'
 
         await ctx.send(embed=em)
 
