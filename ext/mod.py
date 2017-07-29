@@ -1,9 +1,12 @@
 import datetime
+import logging
 
 import discord
 from discord.ext import commands
 
 from .common import Cog
+
+log = logging.getLogger(__name__)
 
 
 class Actions:
@@ -21,6 +24,7 @@ def is_moderator():
     def _is_moderator(ctx):
         if ctx.guild is None:
             return False
+
         member = ctx.guild.get_member(ctx.author.id)
         perms = ctx.channel.permissions_for(member)
         return (ctx.author.id == ctx.bot.owner_id) or perms.kick_members or perms.ban_members 
@@ -259,6 +263,9 @@ class Moderation(Cog):
         except KeyError:
             pass
 
+        log.info('[modlog:handle] a=%d g=%r[gid=%d], u=%r[uid=%d] r=%r', \
+            action, guild.name, guild.id, user.name, user.id, reason)
+
         await handler(modconfig, guild, user, reason, **kwargs)
 
     @commands.command()
@@ -275,6 +282,9 @@ class Moderation(Cog):
             'mod_log_id': modlog.id,
             'last_action_id': 0,
         }
+
+        log.info('[modlog:attach] Creating a modcfg @ g=%s[gid=%d]', \
+            ctx.guild.name, ctx.guild.id)
 
         res = await self.modcfg_coll.insert_one(modconfig)
         await ctx.success(res.acknowledged)
