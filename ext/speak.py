@@ -186,7 +186,8 @@ class Speak(Cog):
         force = False
         for prefix in self.bot.config.SPEAK_PREFIXES:
             if message.content.startswith(prefix):
-                log.info('[autoreply] forcing from speak prefix')
+                log.info('[autoreply:speak_prefix] %s(%d), %s(%d) - %r', \
+                    message.guild, message.guild.id, message.author, message.author.id, message.content)
                 force = True
 
         if not force:
