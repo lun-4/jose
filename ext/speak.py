@@ -155,6 +155,10 @@ class Speak(Cog):
                 if author.bot:
                     continue
 
+                content = message.clean_content
+                if content.startswith('j!'):
+                    continue
+
                 messages.append(message.clean_content)
 
             self.generating[guild.id] = False
