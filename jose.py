@@ -129,14 +129,16 @@ class JoseBot(commands.Bot):
         
         return is_blocked
 
-    async def on_command(self, ctx):
-        # thanks dogbot ur a good
-        content = ctx.message.content
-
-        # fuck heating
+    def clean_content(content):
         content = content.replace('`', '\'')
         content = content.replace('@', '@\u200b')
         content = content.replace('<#', '<#\u200b')
+        return content
+
+    async def on_command(self, ctx):
+        # thanks dogbot ur a good
+        content = ctx.message.content
+        content = self.clean_content(content)
 
         author = ctx.message.author
         guild = ctx.guild
@@ -147,11 +149,17 @@ class JoseBot(commands.Bot):
 
     async def on_command_error(self, ctx, error):
         message = ctx.message
+        content = self.clean_content(message.content)
 
         if isinstance(error, commands.errors.CommandInvokeError):
             orig = error.original
             if isinstance(orig, SayException):
-                await ctx.send(orig.args[0])
+                arg0 = orig.args[0]
+
+                log.warning('SayException: %s[%d] %s %r => %r', ctx.guild, \
+                    ctx.guild.id, ctx.author, content, arg0)
+
+                await ctx.send(arg0)
                 return
 
             tb = ''.join(traceback.format_exception(
@@ -160,9 +168,9 @@ class JoseBot(commands.Bot):
             ))
 
             if isinstance(orig, tuple(self.simple_exc)):
-                log.error(f'Errored at {message.content!r} from {message.author!s}\n{error.original!r}')
+                log.error(f'Errored at {content!r} from {ctx.author!s}\n{orig!r}')
             else:
-                log.error(f'Errored at {message.content!r} from {message.author!s}\n{tb}')
+                log.error(f'Errored at {content!r} from {ctx.author!s}\n{tb}')
 
             if isinstance(orig, self.cogs['Coins'].TransferError):
                 await ctx.send(f'JoséCoin error: `{error.original!r}`')
