@@ -23,6 +23,10 @@ async def make_texter(chain_length, data, texter_id):
     return texter
 
 
+class TexterFail(Exception):
+    pass
+
+
 class Texter:
     """Texter - Main texter class.
 
@@ -142,7 +146,7 @@ class Speak(Cog):
         channel_id = await self.config.cfg_get(guild, 'speak_channel')
         channel = guild.get_channel(channel_id)
         if channel is None:
-            channel = guild.default_channel
+            raise TexterFail('Channel to read messages not found, use "j!help speakchan"?')
 
         self.generating[guild.id] = True
         try:
@@ -165,9 +169,8 @@ class Speak(Cog):
             return messages
         except discord.Forbidden:
             log.info(f'[get_messages] Forbidden from {guild.name}[{guild.id}]')
-
             self.generating[guild.id] = False
-            return ['None']
+            raise TexterFail("Can't read from the channel, setup your permissions!")
 
     async def get_messages_str(self, guild, amount=2000):
         m = await self.get_messages(guild, amount)
@@ -186,7 +189,10 @@ class Speak(Cog):
 
     async def make_sentence(self, ctx, char_limit=None):
         with ctx.typing():
-            texter = await self.get_texter(ctx.guild)
+            try:
+                texter = await self.get_texter(ctx.guild)
+            except TexterFail as err:
+                raise self.SayException(f'Failed to generate a texter: `{err.args[0]!r}`')
 
         sentence = await texter.sentence(char_limit)
         return sentence
