@@ -142,7 +142,7 @@ class JoseBot(commands.Bot):
         guild = ctx.guild
         checks = [c.__qualname__.split('.')[0] for c in ctx.command.checks]
         location = '[DM]' if isinstance(ctx.channel, discord.DMChannel) else f'[Guild {guild.name} {guild.id}]'
-        log.info('%s [cmd] %s(%d) "%s" checks=%s', location, author, author.id, _content,
+        log.info('%s [cmd] %s(%d) "%s" checks=%s', location, author, author.id, content,
                  ','.join(checks) or '(none)')
 
     async def on_command_error(self, ctx, error):
