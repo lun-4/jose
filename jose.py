@@ -134,7 +134,7 @@ class JoseBot(commands.Bot):
         content = ctx.message.content
 
         # fuck heating
-        content = content.replace('`', '`\u200b')
+        content = content.replace('`', '\'')
         content = content.replace('@', '@\u200b')
         content = content.replace('<#', '<#\u200b')
 
