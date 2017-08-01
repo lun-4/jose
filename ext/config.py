@@ -12,6 +12,16 @@ from .common import Cog
 
 log = logging.getLogger(__name__)
 
+def is_moderator():
+    def _is_moderator(ctx):
+        if ctx.guild is None:
+            return False
+
+        member = ctx.guild.get_member(ctx.author.id)
+        perms = ctx.channel.permissions_for(member)
+        return (ctx.author.id == ctx.bot.owner_id) or perms.manage_guild
+    
+    return commands.check(_is_moderator)
 
 class Config(Cog):
     def __init__(self, bot):
@@ -133,6 +143,7 @@ class Config(Cog):
 
     @commands.command(aliases=['speakchan'])
     @commands.guild_only()
+    @is_moderator()
     async def speakchannel(self, ctx, channel: discord.TextChannel):
         """Set the channel José will gather messages to feed to his markov generator."""
         success = await self.cfg_set(ctx.guild, 'speak_channel', channel.id)
@@ -140,6 +151,7 @@ class Config(Cog):
 
     @commands.command()
     @commands.guild_only()
+    @is_moderator()
     async def jsprob(self, ctx, prob: float):
         """Set the probability per message that José will autoreply to it."""
         if prob < 0 or prob > 5:
@@ -151,6 +163,7 @@ class Config(Cog):
 
     @commands.command()
     @commands.guild_only()
+    @is_moderator()
     async def fwprob(self, ctx, prob: float):
         """Set the probability that josé will randomly respond in fullwidth."""
         if prob < 0 or prob > 10:
@@ -162,6 +175,7 @@ class Config(Cog):
 
     @commands.command()
     @commands.guild_only()
+    @is_moderator()
     async def botblock(self, ctx):
         """Toggle bot blocking."""
         botblock = await self.cfg_get(ctx.guild, 'botblock')
