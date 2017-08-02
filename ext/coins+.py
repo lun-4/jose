@@ -96,7 +96,7 @@ class CoinsExt(Cog):
             await self.show(ctx, accounts, 'taxpaid')
         elif mode == 'b' or mode == '\N{NEGATIVE SQUARED LATIN CAPITAL LETTER B}':
             accounts = filter(lambda acc: acc['type'] == 'taxbank', all_accounts)
-            accounts = accounts[:limit]
+            accounts = list(accounts)[:limit]
             await self.show(ctx, accounts)
         else:
             await ctx.send('mode not found')
