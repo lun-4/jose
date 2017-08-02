@@ -8,7 +8,7 @@ random = SystemRandom()
 class GuildConverter(commands.Converter):
     async def guild_name_lookup(self, ctx, arg):
         def f(guild):
-            return arg in guild.name.lower()
+            return arg == guild.name.lower()
         return discord.utils.get(f, ctx.bot.guilds)
 
     async def convert(self, ctx, arg):
