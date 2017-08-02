@@ -92,7 +92,7 @@ class CoinsExt(Cog):
                 ctx.guild.get_member(account['id']) is not None][:limit]
             await self.show(ctx, accounts)
         elif mode == 'g':
-            accounts = filter(lambda a: a['type'] == 'user', accounts)
+            accounts = filter(lambda a: a['type'] == 'user', all_accounts)
             accounts = all_accounts[:limit]
             await self.show(ctx, accounts)
 
@@ -102,6 +102,7 @@ class CoinsExt(Cog):
         elif mode == 'b' or mode == '\N{NEGATIVE SQUARED LATIN CAPITAL LETTER B}':
             accounts = filter(lambda acc: acc['type'] == 'taxbank', all_accounts)
             accounts = list(accounts)[:limit]
+            await ctx.send(f'debug: {len(accounts)}')
             await self.show(ctx, accounts)
         else:
             raise self.SayException('mode not found')
