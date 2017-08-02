@@ -44,6 +44,9 @@ class HypnohubBooru(BooruProvider):
 
 class NSFW(Cog):
     async def booru(self, ctx, booru, tags):
+        # taxxx
+        await self.jcoin.pricing(ctx, self.prices['API'])
+
         try:
             # grab posts
             posts = await booru.get_posts(ctx.bot, tags)
@@ -74,13 +77,15 @@ class NSFW(Cog):
     @commands.is_nsfw()
     async def e621(self, ctx, *tags):
         """Randomly searches e621 for posts."""
-        await self.booru(ctx, E621Booru, tags)
+        async with ctx.typing():
+            await self.booru(ctx, E621Booru, tags)
 
     @commands.command(aliases=['hh'])
     @commands.is_nsfw()
     async def hypnohub(self, ctx, *tags):
         """Randomly searches Hypnohub for posts."""
-        await self.booru(ctx, HypnohubBooru, tags)
+        async with ctx.typing():
+            await self.booru(ctx, HypnohubBooru, tags)
 
 
 def setup(bot):
