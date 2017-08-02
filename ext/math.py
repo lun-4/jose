@@ -135,7 +135,7 @@ class Math(Cog):
                 await ctx.send(f':poop: `{pod!r}`')
             return
         else:
-            await ctx.send(':cyclone: No answer :cyclone:')
+            await ctx.send(f'{ctx.author.mention}, :cyclone: No answer :cyclone:')
             return
 
     #@commands.command(aliases=['temperature'])
