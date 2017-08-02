@@ -83,27 +83,22 @@ class CoinsExt(Cog):
             return
 
         all_accounts = await self.jcoin.all_accounts()
-        accounts = all_accounts[:limit]
 
         if mode == 'l':
             accounts = [account for account in all_accounts if \
                 ctx.guild.get_member(account['id']) is not None][:limit]
+            await self.show(ctx, accounts)
         elif mode == 'g':
-            pass
+            accounts = all_accounts[:limit]
+            await self.show(ctx, accounts)
         elif mode == 't':
             accounts = await self.jcoin.all_accounts('taxpaid')
             await self.show(ctx, accounts, 'taxpaid')
-            return
         elif mode == 'b' or mode == '\N{NEGATIVE SQUARED LATIN CAPITAL LETTER B}':
-            accounts = filter(lambda acc: acc['type'] == 'taxbank', accounts)
+            accounts = filter(lambda acc: acc['type'] == 'taxbank', all_accounts)
             await self.show(ctx, accounts)
-            return
         else:
             await ctx.send('mode not found')
-            return
-
-        await self.show(ctx, accounts)
-        return
 
     @commands.command(name='prices')
     async def _prices(self, ctx):
