@@ -56,7 +56,7 @@ class Coins(Cog):
         # Reward cooldown dict
         self.reward_env = {}
 
-    def get_name(self, user_id):
+    def get_name(self, user_id, account=None):
         """Get a string representation of a user or guild."""
         if isinstance(user_id, discord.Guild):
             return f'taxbank:{user_id.name}'
@@ -73,7 +73,15 @@ class Coins(Cog):
 
         if obj is None:
             # we tried stuff, show a special text
-            return f'Unfindable Account {user_id}'
+            if account:
+                if account['type'] == 'user':
+                    return f'Unfindable User {user_id}'
+                elif account['type'] == 'guild':
+                    return f'Unfindable Guild {user_id}'
+                else:
+                    return f'Unfindable Unknown {user_id}'
+            else:
+                 return f'Unfindable ID {user_id}'
 
         return str(obj)
 

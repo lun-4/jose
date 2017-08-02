@@ -59,8 +59,7 @@ class CoinsExt(Cog):
         res = []
 
         for (idx, account) in enumerate(accounts):
-            name = self.jcoin.get_name(account['id'])
-
+            name = self.jcoin.get_name(account['id'], account=account)
             res.append(f'{idx:3d}. {name:30s} -> {account[field]}')
 
         joined = '\n'.join(res)
@@ -75,7 +74,7 @@ class CoinsExt(Cog):
          - l: local, all accounts in this server/guild.
          - t: tax, all accounts in José's database, ordered
             by the amount of tax they paid.
-         - 
+         - b: taxbanks, all taxbanks, globally
         """
 
         if limit > 20:
@@ -85,11 +84,13 @@ class CoinsExt(Cog):
         all_accounts = await self.jcoin.all_accounts()
 
         if mode == 'l':
+            # TODO: get member list and make account list from that
             accounts = [account for account in all_accounts if \
                 ctx.guild.get_member(account['id']) is not None][:limit]
             await self.show(ctx, accounts)
         elif mode == 'g':
             accounts = all_accounts[:limit]
+            accounts = filter(lambda a: a['type'] == 'user', accounts)
             await self.show(ctx, accounts)
         elif mode == 't':
             accounts = await self.jcoin.all_accounts('taxpaid')
@@ -99,7 +100,7 @@ class CoinsExt(Cog):
             accounts = list(accounts)[:limit]
             await self.show(ctx, accounts)
         else:
-            await ctx.send('mode not found')
+            raise self.SayException('mode not found')
 
     @commands.command(name='prices')
     async def _prices(self, ctx):
