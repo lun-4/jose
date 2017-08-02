@@ -75,7 +75,7 @@ class JoinSession:
         try:
             self.users.index(user_id)
             raise SayException('User already in the session')
-        except IndexError:
+        except ValueError:
             self.users.append(user_id)
 
     async def do_heist(self, ctx) -> dict:
