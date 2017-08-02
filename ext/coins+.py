@@ -63,8 +63,8 @@ class CoinsExt(Cog):
             res.append(f'{idx:3d}. {name:30s} -> {account[field]}')
 
         joined = '\n'.join(res)
-        if len(joined) > 1800:
-            await ctx.send('very big cant show')
+        if len(joined) > 1950:
+            await ctx.send('very big cant show: {len(joined)}')
         else:
             await ctx.send(f'```\n{joined}\n```')
 
@@ -93,7 +93,7 @@ class CoinsExt(Cog):
             await self.show(ctx, accounts)
         elif mode == 'g':
             accounts = filter(lambda a: a['type'] == 'user', all_accounts)
-            accounts = accounts[:limit]
+            accounts = list(accounts)[:limit]
             await self.show(ctx, accounts)
 
         elif mode == 't':
