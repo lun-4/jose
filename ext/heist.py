@@ -89,6 +89,7 @@ class JoinSession:
         """
 
         await self.finish.wait()
+        log.info('Doing the heist')
 
         res = {
             'success': False,
@@ -117,6 +118,18 @@ class JoinSession:
         return res
 
     async def force_finish(self):
+        """Force the join session to finish
+        and the heist to start.
+        
+        Raises
+        ------
+        Exception
+            Whatever :class:`JoinSession.do_heist` raises.
+        RuntimeError
+            If no task is provided to the session.
+        """
+        guild = self.ctx.guild
+        log.info('Forcing a finish at {guild!s}[{guild.id}]')
         self.finish.set()
 
         if self.task is None:
@@ -132,7 +145,7 @@ class JoinSession:
         if err is not None:
             raise err
         
-        return self.task.result
+        return self.task.result()
 
 class Heist(Cog):
     """Heist system
