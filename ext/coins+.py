@@ -14,7 +14,8 @@ log = logging.getLogger(__name__)
 
 PRICES = {
     'OPR': ('Operational tax', ('datamosh', 'youtube')),
-    'API': ('API tax', ('xkcd', 'wolframalpha', 'weather', 'money', 'urban')),
+    'API': ('API tax', ('xkcd', 'wolframalpha', 'weather', 'money', \
+            'urban', 'hh', 'e621')),
 }
 
 
@@ -116,7 +117,15 @@ class CoinsExt(Cog):
     @commands.command()
     @commands.guild_only()
     async def taxes(self, ctx):
-        """Get the amount of taxes your taxbank holds."""
+        """Get the amount of taxes your taxbank holds.
+        
+        All taxed commands have a base price you can check with "j!prices".
+        However, the total tax you pay when using the command
+        is defined by the base tax + some weird shit.
+
+        Ok, "some weird shit" = maths, it is a constant that is raised to your current
+        wallet's amount.
+        """
         await self.jcoin.ensure_taxbank(ctx)
         taxbank = await self.jcoin.get_account(ctx.guild.id)
         await ctx.send(f'`{self.jcoin.get_name(ctx.guild)}: {taxbank["amount"]}`')
