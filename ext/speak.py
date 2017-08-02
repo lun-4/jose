@@ -208,6 +208,9 @@ class Speak(Cog):
         if await self.bot.is_blocked(message.author.id):
             return
 
+        if await self.bot.is_blocked_guild(message.guild.id):
+            return
+
         prob = await self.config.cfg_get(ctx.guild, 'autoreply_prob')
         if prob is None:
             log.warning('[autoreply] how can autoreply_prob be none??')

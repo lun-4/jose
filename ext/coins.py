@@ -320,6 +320,12 @@ class Coins(Cog):
         if account is None:
             return
 
+        if await self.bot.is_blocked(author_id):
+            return
+        
+        if await self.bot.is_blocked_guild(message.guild.id):
+            return
+
         if not isinstance(message.channel, discord.TextChannel):
             return
 
