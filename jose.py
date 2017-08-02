@@ -179,7 +179,7 @@ class JoseBot(commands.Bot):
 
             await ctx.send(f'fucking 🅱enis, u 🅱roke the bot ```py\n{tb}\n```')
         elif isinstance(error, commands.errors.BadArgument):
-            await ctx.send(f'bad arg — {random.choice(BAD_ARG_MESSAGES)}')
+            await ctx.send(f'bad arg — {random.choice(BAD_ARG_MESSAGES)} - {error!s}')
         elif isinstance(error, commands.errors.CheckFailure):
             await ctx.send(f'check fail — {random.choice(CHECK_FAILURE_PHRASES)}')
 

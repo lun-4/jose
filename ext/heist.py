@@ -1,6 +1,7 @@
 import collections
 import asyncio
 import logging
+import discord
 from random import SystemRandom
 
 from discord.ext import commands
@@ -22,14 +23,19 @@ class GuildConverter(commands.Converter):
         return discord.utils.find(f, ctx.bot.guilds)
 
     async def convert(self, ctx, arg):
+        bot = ctx.bot
+
         try:
-            guild_id = int(argument)
-        except (TypeError, ValueError):
-            guild = await self.guild_name_lookup(ctx, arg)
+            guild_id = int(arg)
+        except ValueError:
+            f = lambda g: arg == g.name.lower()
+            guild = discord.utils.find(f, bot.guilds)
+
             if guild is None:
                 raise commands.BadArgument('Guild not found')
+            return guild
 
-        guild = ctx.bot.get_guild(guild_id)
+        guild = bot.get_guild(guild_id)
         if guild is None:
             raise commands.BadArgument('Guild not found')
         return guild
@@ -117,13 +123,13 @@ class Heist(Cog):
     """
     def __init__(self, bot):
         super().__init__(bot)
-        self.join_sessions = {}
+        self.sessions = {}
 
     @property
     def coinsext(self):
         return self.bot.get_cog('Coins+')
 
-    def get_session(self, ctx, target=None, clean=False):
+    def get_sess(self, ctx, target=None, clean=False):
         """Get a join session.
         
         Parameters
@@ -143,13 +149,13 @@ class Heist(Cog):
 
             - If the session isn't started and we required a started session
         """
-        session = self.join_sessions.get(ctx.guild.id)
+        session = self.sessions.get(ctx.guild.id)
         if session is None and target is None:
             raise self.SayException('Cannot create a session without a target')
 
         if session is None:
             session = JoinSession(ctx, target)
-            self.join_sessions[ctx.guild.id] = session
+            self.sessions[ctx.guild.id] = session
 
         if session.started and clean:
             raise self.SayException('An already started join session exists')
@@ -211,4 +217,7 @@ class Heist(Cog):
         """Force a current heist join session to be finish already."""
         session = self.get_sess(ctx)
         session.finish()
+
+def setup(bot):
+    bot.add_cog(Heist(bot))
 
