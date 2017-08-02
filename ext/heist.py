@@ -56,8 +56,10 @@ class Heist(Cog):
     @heist.command(name='join')
     async def heist_join(self, ctx):
         """Enter the current heist join session."""
+        pass
 
     @heist.command(name='force')
     async def heist_force(self, ctx):
         """Force a current heist join session to be done."""
+        pass
 
