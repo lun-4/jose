@@ -37,6 +37,7 @@ extensions = [
     'mod', 'botcollection',
     'channel_logging',
     'playing', 'sub',
+    'nsfw'
 ]
 
 
@@ -115,7 +116,7 @@ class JoseBot(commands.Bot):
         blocked = await self.block_coll.find_one({'user_id': user_id})
         is_blocked = bool(blocked)
         self.block_cache[user_id] = is_blocked
-        
+
         return is_blocked
 
     async def is_blocked_guild(self, guild_id: int):
@@ -126,7 +127,7 @@ class JoseBot(commands.Bot):
         blocked = await self.block_coll.find_one({'guild_id': guild_id})
         is_blocked = bool(blocked)
         self.block_cache[guild_id] = is_blocked
-        
+
         return is_blocked
 
     def clean_content(self, content):
