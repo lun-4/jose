@@ -1,5 +1,6 @@
 import collections
 import asyncio
+import logging
 from random import SystemRandom
 
 from discord.ext import commands
@@ -7,6 +8,12 @@ from discord.ext import commands
 from .common import Cog
 
 random = SystemRandom()
+log = logging.getLogger(__name__)
+
+
+class HeistSessionError(Exception):
+    pass
+
 
 class GuildConverter(commands.Converter):
     async def guild_name_lookup(self, ctx, arg):
@@ -31,7 +38,22 @@ class GuildConverter(commands.Converter):
 class JoinSession:
     """Heist join session class
     
-    TODO: add what it does
+    This managers all the users in the session and
+    does the actual "heisting", the "j!heist" subcommands
+    are just a frontend for this :^)
+
+    Attributes
+    ----------
+    ctx: `context`
+        Context of the session, how it was started
+    target: `discord.Guild`
+        Guild that is the target of this session
+    users: list[int]
+        Users that are in this session
+    started: bool
+        If the session is started and accepts new users
+    finished: bool
+        If the session is finished and ready to do the heisting
     """
     def __init__(self, ctx, target):
         self.ctx = ctx
@@ -39,17 +61,18 @@ class JoinSession:
         self.users = []
         self.started = False
         self.finished = False
+        self.finish = asyncio.Event()
 
     def add_member(self, user_id: int):
         self.started = True
 
         try:
             self.users.index(user_id)
-            raise Exception('User already in the session')
+            raise HeistSessionError('User already in the session')
         except IndexError:
             self.users.append(user_id)
 
-    async def do_heist(self, ctx):
+    async def do_heist(self, ctx) -> dict:
         """Actually does the heist.
 
         Returns
@@ -59,6 +82,8 @@ class JoinSession:
             or which members went to jail if it was unsuccessful.
         """
 
+        await self.finish.wait()
+
         res = {
             'success': False,
             'amount_stolen': 0,
@@ -66,25 +91,21 @@ class JoinSession:
         }
 
         # TODO: add the random shit about chances here
+        bot = ctx.bot
+        jcoin = bot.jcoin
+        account = jcoin.get_account(self.target.id)
+        if account is None:
+            await ctx.send('Guild not found')
+            return
+
+        if account['type'] != 'taxbank':
+            await ctx.send('Account is not a taxbank')
+            return
 
         # TODO: add the random chance of who went to jail and
         # who didn't
 
         return res
-
-    async def manager(self, ctx):
-        """Join session manager.
-        
-        This function installs a timeout of 5 minutes
-        under the session 
-        """
-        try:
-            while True:
-                if self.finished:
-                    await self.do_heist(ctx)
-                await asyncio.sleep(1)
-        except asyncio.CancelledError:
-            await ctx.send('Session manager was cancelled')
 
     def finish(self):
         self.finish.set()
@@ -142,19 +163,24 @@ class Heist(Cog):
     async def heist(self, ctx, target: GuildConverter):
         """Heist a server.
         
-        Heisting works better if you have more people joining in your heist
+        This works better if you have more people joining in your heist.
 
          - As soon as you use this command, a heist join session will start.
            - This session requires that all other people that want to join the
             heist to use the "j!heist join" command
+
            - There is a timeout of 5 minutes on the heist join session.
          - If your heist fails, all participants of the heist will be sentenced
             to jail or not, its random.
         """
         session = self.get_sess(ctx, target, True)
         session.add_member(ctx.author.id)
-        self.loop.create_task(session.manager(ctx))
+        self.loop.create_task(session.do_heist(ctx))
         await ctx.send('Join session started!')
+
+        await asyncio.sleep(300)
+        if not session.finish.is_set():
+            session.finish()
 
     @heist.command(name='join')
     async def heist_join(self, ctx):
@@ -162,6 +188,15 @@ class Heist(Cog):
 
         You can't leave a join session.
         """
+        # we need to check all current sessions
+        # and make users enter only one join session
+        # per time. so we don't have race conditions
+        # or whatever
+
+        for session in self.sessions.values():
+            if ctx.author.id in session.users:
+                raise self.SayException(f'You are already in a join session at `{session.ctx.guild!s}`')
+
         session = self.get_sess(ctx)
         session.add_member(ctx.author.id)
         await ctx.ok()
@@ -171,5 +206,4 @@ class Heist(Cog):
         """Force a current heist join session to be done."""
         session = self.get_sess(ctx)
         session.finish()
-        # TODO: this
 
