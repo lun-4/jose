@@ -93,7 +93,7 @@ class CoinsExt(Cog):
             await self.show(ctx, accounts)
         elif mode == 'g':
             accounts = filter(lambda a: a['type'] == 'user', all_accounts)
-            accounts = all_accounts[:limit]
+            accounts = accounts[:limit]
             await self.show(ctx, accounts)
 
         elif mode == 't':
