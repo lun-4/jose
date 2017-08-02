@@ -98,6 +98,7 @@ class CoinsExt(Cog):
 
         elif mode == 't':
             accounts = await self.jcoin.all_accounts('taxpaid')
+            accounts = accounts[:limit]
             await self.show(ctx, accounts, 'taxpaid')
         elif mode == 'b' or mode == '\N{NEGATIVE SQUARED LATIN CAPITAL LETTER B}':
             accounts = filter(lambda acc: acc['type'] == 'taxbank', all_accounts)
