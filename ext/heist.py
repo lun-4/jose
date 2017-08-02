@@ -5,7 +5,7 @@ from random import SystemRandom
 
 from discord.ext import commands
 
-from .common import Cog
+from .common import Cog, SayException
 
 random = SystemRandom()
 log = logging.getLogger(__name__)
@@ -52,23 +52,23 @@ class JoinSession:
         Users that are in this session
     started: bool
         If the session is started and accepts new users
-    finished: bool
-        If the session is finished and ready to do the heisting
+    task: `asyncio.Task` or :py:meth:`None`
+        Task for :meth:`JoinSession.do_heist`
     """
     def __init__(self, ctx, target):
         self.ctx = ctx
         self.target = target
         self.users = []
         self.started = False
-        self.finished = False
         self.finish = asyncio.Event()
+        self.task = None
 
     def add_member(self, user_id: int):
         self.started = True
 
         try:
             self.users.index(user_id)
-            raise HeistSessionError('User already in the session')
+            raise SayException('User already in the session')
         except IndexError:
             self.users.append(user_id)
 
@@ -90,7 +90,6 @@ class JoinSession:
             'jailed': [],
         }
 
-        # TODO: add the random shit about chances here
         bot = ctx.bot
         jcoin = bot.jcoin
         account = jcoin.get_account(self.target.id)
@@ -173,11 +172,17 @@ class Heist(Cog):
          - If your heist fails, all participants of the heist will be sentenced
             to jail or not, its random.
         """
+        for session in self.sessions.values():
+            if session.target.id == target.id:
+                raise self.SayException('An already existing session exists with the same target')
+
         session = self.get_sess(ctx, target, True)
         session.add_member(ctx.author.id)
         self.loop.create_task(session.do_heist(ctx))
         await ctx.send('Join session started!')
 
+        # timeout of 5 minutes accepting members
+        # OR "j!heist finish"
         await asyncio.sleep(300)
         if not session.finish.is_set():
             session.finish()
@@ -201,9 +206,9 @@ class Heist(Cog):
         session.add_member(ctx.author.id)
         await ctx.ok()
 
-    @heist.command(name='force')
+    @heist.command(name='finish')
     async def heist_force(self, ctx):
-        """Force a current heist join session to be done."""
+        """Force a current heist join session to be finish already."""
         session = self.get_sess(ctx)
         session.finish()
 
