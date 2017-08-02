@@ -49,6 +49,9 @@ class NSFW(Cog):
             posts = await booru.get_posts(ctx.bot, tags)
             log.info('Grabbed %d posts from %s.', len(posts), booru.__name__)
 
+            if not posts:
+                return await ctx.send('Found nothing.')
+
             # grab random post
             post = random.choice(posts)
             tags = (post['tags'].replace('_', '\\_'))[:500]
