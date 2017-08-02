@@ -63,7 +63,10 @@ class CoinsExt(Cog):
             res.append(f'{idx:3d}. {name:30s} -> {account[field]}')
 
         joined = '\n'.join(res)
-        await ctx.send(f'```\n{joined}\n```')
+        if len(joined) > 1800:
+            await ctx.send('very big cant show')
+        else:
+            await ctx.send(f'```\n{joined}\n```')
 
     @commands.command()
     async def top(self, ctx, mode: str = 'g', limit: int = 10):
@@ -89,9 +92,10 @@ class CoinsExt(Cog):
                 ctx.guild.get_member(account['id']) is not None][:limit]
             await self.show(ctx, accounts)
         elif mode == 'g':
-            accounts = all_accounts[:limit]
             accounts = filter(lambda a: a['type'] == 'user', accounts)
+            accounts = all_accounts[:limit]
             await self.show(ctx, accounts)
+
         elif mode == 't':
             accounts = await self.jcoin.all_accounts('taxpaid')
             await self.show(ctx, accounts, 'taxpaid')
