@@ -105,12 +105,10 @@ class JoinSession:
 
         account = await jcoin.get_account(self.target.id)
         if account is None:
-            await ctx.send('Guild not found')
-            return
+            raise self.SayException('Guild not found')
 
         if account['type'] != 'taxbank':
-            await ctx.send('Account is not a taxbank')
-            return
+            raise self.SayException('Account is not a taxbank')
 
         # TODO: add the random chance of who went to jail and
         # who didn't
@@ -135,9 +133,12 @@ class JoinSession:
         if self.task is None:
             raise RuntimeError('wat')
 
-        err = None
-        while True:
+        # since Task.exception() returns None
+        # I had to setup err as a string by default
+        err = 'nothing'
+        while err == 'nothing':
             try:
+                log.info(f'waiting for exception {self.finish.is_set()}')
                 err = self.task.exception()
             except asyncio.InvalidStateError:
                 await asyncio.sleep(1)
@@ -145,7 +146,12 @@ class JoinSession:
         if err is not None:
             raise err
         
+        log.info('returning result')
         return self.task.result()
+
+    async def process_heist(self, res):
+        """Process the result given by :meth:`JoinSession.do_heist`"""
+        await self.ctx.send(f'gay: `{res!r}`')
 
 class Heist(Cog):
     """Heist system
@@ -197,7 +203,7 @@ class Heist(Cog):
         return session
 
     @commands.group(invoke_without_command=True)
-    async def heist(self, ctx, target: GuildConverter):
+    async def heist(self, ctx, *, target: GuildConverter):
         """Heist a server.
         
         This works better if you have more people joining in your heist.
@@ -224,7 +230,7 @@ class Heist(Cog):
         # OR "j!heist finish"
         await asyncio.sleep(300)
         if not session.finish.is_set():
-            await session.force_finish()
+            await session.process_heist(await session.force_finish())
 
     @heist.command(name='join')
     async def heist_join(self, ctx):
@@ -260,7 +266,7 @@ class Heist(Cog):
     async def heist_force(self, ctx):
         """Force a current heist join session to be finish already."""
         session = self.get_sess(ctx)
-        await session.force_finish()
+        await session.process_heist(await session.force_finish())
 
 def setup(bot):
     bot.add_cog(Heist(bot))
