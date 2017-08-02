@@ -103,7 +103,6 @@ class CoinsExt(Cog):
         elif mode == 'b' or mode == '\N{NEGATIVE SQUARED LATIN CAPITAL LETTER B}':
             accounts = filter(lambda acc: acc['type'] == 'taxbank', all_accounts)
             accounts = list(accounts)[:limit]
-            await ctx.send(f'debug: {len(accounts)}')
             await self.show(ctx, accounts)
         else:
             raise self.SayException('mode not found')
