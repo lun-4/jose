@@ -116,7 +116,7 @@ class JoinSession:
 
         return res
 
-    await def force_finish(self):
+    async def force_finish(self):
         self.finish.set()
 
         if self.task is None:
