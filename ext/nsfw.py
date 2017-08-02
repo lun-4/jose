@@ -44,6 +44,9 @@ class HypnohubBooru(BooruProvider):
 
 class NSFW(Cog):
     async def booru(self, ctx, booru, tags):
+        # taxxx
+        await self.jcoin.pricing(ctx, self.prices['API'])
+
         try:
             # grab posts
             posts = await booru.get_posts(ctx.bot, tags)
