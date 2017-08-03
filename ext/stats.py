@@ -1,6 +1,7 @@
 import collections
 import asyncio
 import logging
+import decimal
 
 from datadog import statsd
 from discord.ext import commands
@@ -55,6 +56,7 @@ class Statistics(Cog):
         stars = self.bot.get_cog('Starboard')
         if stars is None:
             log.warning('[stats] Starboard cog not found, ignoring')
+            return
 
         total_sconfig = await stars.starconfig_coll.count()
         await self.gauge('jose.starboard.total_configs', total_sconfig)
@@ -62,12 +64,42 @@ class Statistics(Cog):
         total_stars = await stars.starboard_coll.count()
         await self.gauge('jose.starboard.total_stars', total_stars)
 
+    async def jcoin_stats(self):
+        """Push JoséCoin stats to datadog."""
+
+        coins = self.bot.get_cog('Coins')
+        if coins is None:
+            log.warning('[stats] Coins cog not found')
+            return
+
+        total_accounts = await coins.jcoin_coll.count()
+        total_users = await coins.jcoin_coll.count({'type': 'user'})
+        total_tbanks = await coins.jcoin_coll.count({'type': 'taxbank'})
+        await self.gauge('jose.coin.accounts', total_accounts)
+        await self.gauge('jose.coin.users', total_users)
+        await self.gauge('jose.coin.taxbanks', total_tbanks)
+
+        total_coins = [0, 0]
+        inf = decimal.Decimal('inf')
+        async for account in self.coins.jcoin_coll.find():
+            if account['amount'] == inf:
+                continue
+
+            acctype = acount['type']
+            if acctype == 'user':
+                total_coins[0] += account['amount']
+            else:
+                total_coins[1] += account['amount']
+
+        await self.gauge('jose.coin.usercoins', total_coins[0])
+        await self.gauge('jose.coin.taxcoins', total_coins[1])
+
     async def querystats(self):
         try:
             while True:
                 await self.basic_measures()
                 await self.starboard_stats()
-                #await self.jcoin_stats()
+                await self.jcoin_stats()
 
                 await asyncio.sleep(120)
         except asyncio.CancelledError:
