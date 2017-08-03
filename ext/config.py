@@ -54,18 +54,18 @@ class Config(Cog):
         }
         return default
 
-    async def block_one(self, user_id, k='user_id'):
+    async def block_one(self, user_id, k='user_id', reason=None):
         if await self.block_coll.find_one({k: user_id}) is not None:
             return False
         
         try:
-            await self.block_coll.insert_one({k: user_id})
+            await self.block_coll.insert_one({k: user_id, 'reason': reason})
             self.bot.block_cache[user_id] = True
             return True
         except:
             return False
 
-    async def unblock_one(self, user_id, k='user_id'):
+    async def unblock_one(self, user_id, k='user_id', reason=''):
         d = await self.block_coll.delete_one({k: user_id})
         self.bot.block_cache[user_id] = False
         return d.deleted_count > 0
@@ -185,27 +185,40 @@ class Config(Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def block(self, ctx, user: discord.User):
+    async def block(self, ctx, user: discord.User, reason: str=''):
         """Block someone from using the bot, globally"""
-        await ctx.success(await self.block_one(user.id))
+        await ctx.success(await self.block_one(user.id, 'user_id', reason))
 
     @commands.command()
     @commands.is_owner()
-    async def unblock(self, ctx, user: discord.User):
+    async def unblock(self, ctx, user: discord.User, reason: str=''):
         """Unblock someone from using the bot, globally"""
-        await ctx.success(await self.unblock_one(user.id))
+        await ctx.success(await self.unblock_one(user.id, 'user_id', reason))
     
     @commands.command()
     @commands.is_owner()
-    async def blockguild(self, ctx, guild_id: int):
+    async def blockguild(self, ctx, guild_id: int, reason: str=''):
         """Block an entire guild from using José."""
-        await ctx.success(await self.block_one(guild_id, 'guild_id'))
+        await ctx.success(await self.block_one(guild_id, 'guild_id', reason))
 
     @commands.command()
     @commands.is_owner()
-    async def unblockguild(self, ctx, guild_id: int):
+    async def unblockguild(self, ctx, guild_id: int, reason: str=''):
         """Unblock a guild from using José."""
-        await ctx.success(await self.unblock_one(guild_id, 'guild_id'))
+        await ctx.success(await self.unblock_one(guild_id, 'guild_id', reason))
+
+    @commands.command
+    async def blockreason(self, ctx, anything_id: int):
+        """Get a reason for a block if it exists"""
+        userblock = await self.block_coll.find_one({'user_id': anything_id})
+        if userblock is not None:
+            return await ctx.send(f'User blocked, reason `{userblock.get("reason")}`')
+        
+        guildblock = await self.block_coll.find_one({'guild_id': anything_id})
+        if guildblock is not None:
+            return await ctx.send(f'Guild blocked, reason `{guildblock.get("reason")}`')
+
+        await ctx.send('Block not found')
 
     @commands.command()
     @commands.is_owner()
