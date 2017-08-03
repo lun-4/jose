@@ -85,7 +85,7 @@ class Statistics(Cog):
             if account['amount'] == inf:
                 continue
 
-            acctype = acount['type']
+            acctype = account['type']
             if acctype == 'user':
                 total_coins[0] += account['amount']
             elif acctype == 'taxbank':
