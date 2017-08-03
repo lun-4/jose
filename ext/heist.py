@@ -63,7 +63,10 @@ class JoinSession:
     """
     def __init__(self, ctx, target):
         self.ctx = ctx
+        self.bot = ctx.bot
         self.target = target
+        self.amount = 0
+
         self.users = []
         self.started = False
         self.finish = asyncio.Event()
@@ -71,7 +74,6 @@ class JoinSession:
 
     def add_member(self, user_id: int):
         self.started = True
-
         try:
             self.users.index(user_id)
             raise SayException('User already in the session')
@@ -100,8 +102,7 @@ class JoinSession:
         bot = ctx.bot
         jcoin = bot.get_cog('Coins')
         if not jcoin:
-            await ctx.send('rip')
-            return
+            raise self.SayException('rip')
 
         account = await jcoin.get_account(self.target.id)
         if account is None:
@@ -114,6 +115,32 @@ class JoinSession:
         # who didn't
 
         return res
+
+    async def jail(self, res):
+        """Put people in jail"""
+        cext = bot.get_cog('Coins+')
+        ctx = self.ctx
+
+        for jailed_id in res['jailed']:
+            jailed = self.bot.get_user(jailed_id)
+            if jailed is None:
+                log.warning('uid=%d not found', jailed_id)
+                continue
+
+            # put them in normal jail
+            await cext.add_cooldown(thief)
+
+        res = ' '.join([f'<@{jailed}>' for jailed in res['jailed']])
+        await ctx.send('In jail: {res}')
+
+    async def process_heist(self, res):
+        """Process the result given by :meth:`JoinSession.do_heist`"""
+        await self.ctx.send(f'gay: `{res!r}`')
+        if not res['success']:
+            return await self.jail(res)
+        
+        # succ   ess
+        pass
 
     async def force_finish(self):
         """Force the join session to finish
@@ -149,9 +176,6 @@ class JoinSession:
         log.info('returning result')
         return self.task.result()
 
-    async def process_heist(self, res):
-        """Process the result given by :meth:`JoinSession.do_heist`"""
-        await self.ctx.send(f'gay: `{res!r}`')
 
 class Heist(Cog):
     """Heist system
@@ -207,7 +231,7 @@ class Heist(Cog):
         await cext.check_cooldowns(ctx)
 
     @commands.group(invoke_without_command=True)
-    async def heist(self, ctx, *, target: GuildConverter):
+    async def heist(self, ctx, amount: decimal.Decimal, *, target: GuildConverter):
         """Heist a server.
         
         This works better if you have more people joining in your heist.
@@ -227,6 +251,7 @@ class Heist(Cog):
         await self.check_user(ctx)
 
         session = self.get_sess(ctx, target, True)
+        session.amount = amount
         session.add_member(ctx.author.id)
         session.task = self.loop.create_task(session.do_heist(ctx))
 
@@ -263,7 +288,12 @@ class Heist(Cog):
     async def current(self, ctx):
         """Get your current heist join session."""
         session = self.get_sess(ctx)
-        res = ['Current users in the session:']
+
+        res = [f'Guild being attacked: `{session.guild!s}`', 
+            f'Amount: `{session.amount!s}i`',
+            'Current users in the session:'
+        ]
+
         for user_id in session.users:
             res.append(f'\t<@{user_id}>')
 
