@@ -81,14 +81,14 @@ class Statistics(Cog):
 
         total_coins = [0, 0]
         inf = decimal.Decimal('inf')
-        async for account in self.coins.jcoin_coll.find():
+        async for account in coins.jcoin_coll.find():
             if account['amount'] == inf:
                 continue
 
             acctype = acount['type']
             if acctype == 'user':
                 total_coins[0] += account['amount']
-            else:
+            elif acctype == 'taxbank':
                 total_coins[1] += account['amount']
 
         await self.gauge('jose.coin.usercoins', total_coins[0])
