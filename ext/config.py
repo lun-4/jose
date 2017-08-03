@@ -207,7 +207,7 @@ class Config(Cog):
         """Unblock a guild from using José."""
         await ctx.success(await self.unblock_one(guild_id, 'guild_id', reason))
 
-    @commands.command
+    @commands.command()
     async def blockreason(self, ctx, anything_id: int):
         """Get a reason for a block if it exists"""
         userblock = await self.block_coll.find_one({'user_id': anything_id})
