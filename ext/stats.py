@@ -15,6 +15,7 @@ def empty_stats(c_name):
         'uses': 0,
     }
 
+
 class Statistics(Cog):
     """Bot stats stuff."""
     def __init__(self, bot):
@@ -30,6 +31,25 @@ class Statistics(Cog):
     def __unload(self):
         self.stats_task.cancel()
 
+    async def datadog(self, method_str, *args):
+        method = getattr(statsd, method_str)
+        saviour = self.loop.run_in_executor(None, method, *args)
+        return await saviour
+
+    async def gauge(self, key, value):
+        return await self.datadog('gauge', key, value)
+
+    async def increment(self, key):
+        return await self.datadog('increment', key)
+
+    async def decrement(self, key):
+        return await self.datadog('decrement', key)
+
+    async def basic_measures(self):
+        await self.gauge('jose.guilds', len(self.bot.guilds))
+        await self.gauge('jose.users', len(self.bot.users))
+        await self.gauge('jose.channels', sum(1 for c in self.bot.get_all_channels()))
+
     async def starboard_stats(self):
         """Pushes starboard statistics to datadog."""
         stars = self.bot.get_cog('Starboard')
@@ -37,19 +57,18 @@ class Statistics(Cog):
             log.warning('[stats] Starboard cog not found, ignoring')
 
         total_sconfig = await stars.starconfig_coll.count()
-        statsd.gauge('jose.starboard.total_configs', total_sconfig)
+        await self.gauge('jose.starboard.total_configs', total_sconfig)
 
         total_stars = await stars.starboard_coll.count()
-        statsd.gauge('jose.starboard.total_stars', total_stars)
+        await self.gauge('jose.starboard.total_stars', total_stars)
 
     async def querystats(self):
         try:
             while True:
-                statsd.gauge('jose.guilds', len(self.bot.guilds))
-                statsd.gauge('jose.channels', len(list(self.bot.get_all_channels())))
-                statsd.gauge('jose.users', len(self.bot.users))
-
+                await self.basic_measures()
                 await self.starboard_stats()
+                #await self.jcoin_stats()
+
                 await asyncio.sleep(120)
         except asyncio.CancelledError:
             log.info('[statsd] stats machine broke')
