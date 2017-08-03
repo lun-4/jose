@@ -32,10 +32,12 @@ class BooruProvider:
 
 class E621Booru(BooruProvider):
     url = 'https://e621.net/post/index.json'
+    url_post = 'https://e621.net/post/show/{id}'
 
 
 class HypnohubBooru(BooruProvider):
     url = 'http://hypnohub.net/post/index.json'
+    url_post = 'https://hypnohub.net/post/show/{id}'
 
     @classmethod
     def transform_file_url(cls, url):
@@ -50,19 +52,26 @@ class NSFW(Cog):
         try:
             # grab posts
             posts = await booru.get_posts(ctx.bot, tags)
-            log.info('Grabbed %d posts from %s.', len(posts), booru.__name__)
 
             if not posts:
                 return await ctx.send('Found nothing.')
 
             # grab random post
             post = random.choice(posts)
+            try:
+                post_id = post['id']
+            except KeyError:
+                post_id = None
+
+            log.info('%d posts from %s, chose %d', len(posts), booru.__name__, post_id)
+
             tags = (post['tags'].replace('_', '\\_'))[:500]
 
             # add stuffs
             embed = discord.Embed(title=f'Posted by {post["author"]}')
             embed.set_image(url=post['file_url'])
             embed.add_field(name='Tags', value=tags)
+            embed.add_field(name='URL', value=booru.url_post.format(post_id))
 
             # hypnohub doesn't have this
             if 'fav_count' in post and 'score' in post:
