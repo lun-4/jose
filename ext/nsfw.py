@@ -32,12 +32,12 @@ class BooruProvider:
 
 class E621Booru(BooruProvider):
     url = 'https://e621.net/post/index.json'
-    url_post = 'https://e621.net/post/show/{id}'
+    url_post = 'https://e621.net/post/show/{0}'
 
 
 class HypnohubBooru(BooruProvider):
     url = 'http://hypnohub.net/post/index.json'
-    url_post = 'https://hypnohub.net/post/show/{id}'
+    url_post = 'https://hypnohub.net/post/show/{0}'
 
     @classmethod
     def transform_file_url(cls, url):
