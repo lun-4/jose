@@ -30,13 +30,27 @@ class Statistics(Cog):
     def __unload(self):
         self.stats_task.cancel()
 
+    async def starboard_stats(self):
+        """Pushes starboard statistics to datadog."""
+        stars = self.bot.get_cog('Starboard')
+        if stars is None:
+            log.warning('[stats] Starboard cog not found, ignoring')
+
+        total_sconfig = await stars.starconfig_coll.count()
+        statsd.gauge('jose.starboard.total_configs', total_sconfig)
+
+        total_stars = await stars.starboard_coll.count()
+        statsd.gauge('jose.starboard.total_stars', total_stars)
+
     async def querystats(self):
         try:
             while True:
                 statsd.gauge('jose.guilds', len(self.bot.guilds))
                 statsd.gauge('jose.channels', len(list(self.bot.get_all_channels())))
                 statsd.gauge('jose.users', len(self.bot.users))
-                await asyncio.sleep(10)
+
+                await self.starboard_stats()
+                await asyncio.sleep(120)
         except asyncio.CancelledError:
             log.info('[statsd] stats machine broke')
 

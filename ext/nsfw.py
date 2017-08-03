@@ -58,10 +58,7 @@ class NSFW(Cog):
 
             # grab random post
             post = random.choice(posts)
-            try:
-                post_id = post['id']
-            except KeyError:
-                post_id = None
+            post_id = post.get('id')
 
             log.info('%d posts from %s, chose %d', len(posts), booru.__name__, post_id)
 
