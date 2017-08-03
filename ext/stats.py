@@ -97,6 +97,7 @@ class Statistics(Cog):
     async def querystats(self):
         try:
             while True:
+                log.info('[statsd] publishing')
                 await self.basic_measures()
                 await self.starboard_stats()
                 await self.jcoin_stats()
@@ -104,6 +105,8 @@ class Statistics(Cog):
                 await asyncio.sleep(120)
         except asyncio.CancelledError:
             log.info('[statsd] stats machine broke')
+        except Exception:
+            log.error('[statsd] we had shit', exc_info=True)
 
     async def on_command(self, ctx):
         command = ctx.command
