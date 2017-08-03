@@ -89,7 +89,7 @@ class Statistics(Cog):
         if self.bot.config.datadog:
             statsd.increment('jose.recv_messages')
 
-    async def on_guild_leave(self, guild):
+    async def on_guild_remove(self, guild):
         log.info(f'Left guild {guild.name} {guild.id}, {guild.member_count} members')
 
     @commands.command(aliases=['cstats'])
