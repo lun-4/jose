@@ -202,6 +202,10 @@ class Heist(Cog):
 
         return session
 
+    async def check_user(self, ctx):
+        cext = bot.get_cog('CoinsExt')
+        await cext.check_cooldowns(ctx)
+
     @commands.group(invoke_without_command=True)
     async def heist(self, ctx, *, target: GuildConverter):
         """Heist a server.
@@ -219,6 +223,8 @@ class Heist(Cog):
         for session in self.sessions.values():
             if session.target.id == target.id:
                 raise self.SayException('An already existing session exists with the same target')
+
+        await self.check_user(ctx)
 
         session = self.get_sess(ctx, target, True)
         session.add_member(ctx.author.id)
@@ -246,6 +252,8 @@ class Heist(Cog):
         for session in self.sessions.values():
             if ctx.author.id in session.users:
                 raise self.SayException(f'You are already in a join session at `{session.ctx.guild!s}`')
+
+        await self.check_user(ctx)
 
         session = self.get_sess(ctx)
         session.add_member(ctx.author.id)

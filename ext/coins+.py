@@ -143,11 +143,9 @@ class CoinsExt(Cog):
         if cooldown['type'] == 1:
             await self.points_coll.update_one({'user_id': cooldown['user_id']}, {'$set': {'points': 3}})
 
-    async def check_cooldowns(self, ctx, target):
+    async def check_cooldowns(self, ctx):
         """Check if any cooldowns are applied to the thief.
         Removes them if the cooldowns are expired, sends a message if it isn't.
-        
-        This also checks if the target is in grace period, raises `SayException` if it is.
 
         Cooldown types:
          - 0: prison cooldown
@@ -272,7 +270,7 @@ class CoinsExt(Cog):
         if thief_account['amount'] < 6:
             raise self.SayException("You have less than `6JC`, can't use the steal command")
 
-        await self.check_cooldowns(ctx, target)
+        await self.check_cooldowns(ctx)
         await self.check_grace(target)
         await self.steal_points(ctx)
 
