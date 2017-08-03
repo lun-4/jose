@@ -244,7 +244,7 @@ class CoinsExt(Cog):
 
         There are other restrictions to stealing:
          - You can't steal less than 0.01JC
-         - You can't steal if you have less than 3JC
+         - You can't steal if you have less than 6JC
          - You can't steal from targets who are in grace period.
          - You have 3 "stealing points", you lose one every time you use the steal command
             successfully
