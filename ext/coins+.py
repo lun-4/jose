@@ -277,6 +277,7 @@ class CoinsExt(Cog):
         await self.steal_points(ctx)
 
         thief_account['times_stolen'] += 1
+        await self.jcoin.update_accounts([thief_account])
 
         if target.id == self.bot.user.id or target.id in WHITELISTED_ACCOUNTS:
             hours, transfer_info = await self.do_arrest(ctx, amount)
@@ -299,6 +300,9 @@ class CoinsExt(Cog):
 
         if res < chance:
             # successful steal
+            thief_account['success_teal'] += 1
+            await self.update_accounts([thief_account])
+
             transfer_info = await self.jcoin.transfer(target.id, thief.id, amount)
 
             # add grace period
@@ -310,7 +314,6 @@ class CoinsExt(Cog):
             if target.id == self.owner.id:
                 grace = 6
 
-            thief_account['success_steal'] += 1
             await target.send(f':gun: You got robbed! Thief(`{thief}`) stole `{amount}` from you. {grace}h grace period')
             await self.add_grace(target, grace)
             await ctx.send(f'`[res: {res} < prob: {chance}]` congrats lol\n{transfer_info}')
