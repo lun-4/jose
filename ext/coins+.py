@@ -1,235 +1,241 @@
-import decimal
-import time
-import logging
+    import decimal
+    import time
+    import logging
 
-from random import SystemRandom
-random = SystemRandom()
+    from random import SystemRandom
+    random = SystemRandom()
 
-import discord
-from discord.ext import commands
+    import discord
+    from discord.ext import commands
 
-from .common import Cog
+    from .common import Cog
 
-log = logging.getLogger(__name__)
+    log = logging.getLogger(__name__)
 
-PRICES = {
-    'OPR': ('Operational tax', ('datamosh', 'youtube')),
-    'API': ('API tax', ('xkcd', 'wolframalpha', 'weather', 'money', \
-            'urban', 'hh', 'e621')),
-}
-
-
-# steal constants
-BASE_CHANCE = decimal.Decimal('1')
-STEAL_CONSTANT = decimal.Decimal(0.42)
-
-# default cooldown when you are arrested
-ARREST_TIME = 6 
-
-# cooldown when you need to regen stealing points
-STEAL_REGEN = 9
-
-WHITELISTED_ACCOUNTS = (319522792854913025,)
-
-def make_default_points(ctx):
-    """Default stealing points object for someone."""
-    return {
-        'user_id': ctx.author.id,
-        'points': 3,
+    PRICES = {
+        'OPR': ('Operational tax', ('datamosh', 'youtube')),
+        'API': ('API tax', ('xkcd', 'wolframalpha', 'weather', 'money', \
+                'urban', 'hh', 'e621')),
     }
 
 
-def make_cooldown(thief, c_type=0, hours=8):
-    return {
-        'user_id': thief.id,
-        'type': c_type,
-        'finish': time.time() + (hours * 60 * 60),
-    }
+    # steal constants
+    BASE_CHANCE = decimal.Decimal('1')
+    STEAL_CONSTANT = decimal.Decimal(0.42)
+
+    # default cooldown when you are arrested
+    ARREST_TIME = 6 
+
+    # cooldown when you need to regen stealing points
+    STEAL_REGEN = 9
+
+    WHITELISTED_ACCOUNTS = (319522792854913025,)
+
+    def make_default_points(ctx):
+        """Default stealing points object for someone."""
+        return {
+            'user_id': ctx.author.id,
+            'points': 3,
+        }
 
 
-class CoinsExt(Cog):
-    """More currency commands separated into another cog."""
-    def __init__(self, bot):
-        super().__init__(bot)
-        self.cooldown_coll = self.config.jose_db['steal_cooldowns']
-        self.points_coll = self.config.jose_db['steal_points']
-        self.grace_coll = self.config.jose_db['steal_grace']
-        self.owner = None
+    def make_cooldown(thief, c_type=0, hours=8):
+        return {
+            'user_id': thief.id,
+            'type': c_type,
+            'finish': time.time() + (hours * 60 * 60),
+        }
 
-    async def show(self, ctx, accounts, field='amount'):
-        res = []
 
-        for (idx, account) in enumerate(accounts):
-            name = self.jcoin.get_name(account['id'], account=account)
-            res.append(f'{idx:3d}. {name:30s} -> {account[field]}')
+    class CoinsExt(Cog):
+        """More currency commands separated into another cog."""
+        def __init__(self, bot):
+            super().__init__(bot)
+            self.cooldown_coll = self.config.jose_db['steal_cooldowns']
+            self.points_coll = self.config.jose_db['steal_points']
+            self.grace_coll = self.config.jose_db['steal_grace']
+            self.owner = None
 
-        joined = '\n'.join(res)
-        if len(joined) > 1950:
-            await ctx.send('very big cant show: {len(joined)}')
-        else:
-            await ctx.send(f'```\n{joined}\n```')
+        async def show(self, ctx, accounts, field='amount'):
+            res = []
 
-    @commands.command()
-    async def top(self, ctx, mode: str = 'g', limit: int = 10):
-        """Shows top 10 of accounts.
+            for (idx, account) in enumerate(accounts):
+                name = self.jcoin.get_name(account['id'], account=account)
+                res.append(f'{idx:3d}. {name:30s} -> {account[field]}')
 
-        Available modes:
-         - g: global, all accounts in José's database.
-         - l: local, all accounts in this server/guild.
-         - t: tax, all accounts in José's database, ordered
-            by the amount of tax they paid.
-         - b: taxbanks, all taxbanks, globally
-        """
+            joined = '\n'.join(res)
+            if len(joined) > 1950:
+                await ctx.send('very big cant show: {len(joined)}')
+            else:
+                await ctx.send(f'```\n{joined}\n```')
 
-        if limit > 20:
-            await ctx.send('pls no')
-            return
+        @commands.command()
+        async def top(self, ctx, mode: str = 'g', limit: int = 10):
+            """Shows top 10 of accounts.
 
-        all_accounts = await self.jcoin.all_accounts()
+            Available modes:
+            - g: global, all accounts in José's database.
+            - l: local, all accounts in this server/guild.
+            - t: tax, all accounts in José's database, ordered
+                by the amount of tax they paid.
+            - b: taxbanks, all taxbanks, globally
+            """
 
-        if mode == 'l':
-            # TODO: get member list and make account list from that
-            accounts = [account for account in all_accounts if \
-                ctx.guild.get_member(account['id']) is not None][:limit]
-            await self.show(ctx, accounts)
-        elif mode == 'g':
-            accounts = filter(lambda a: a['type'] == 'user', all_accounts)
-            accounts = list(accounts)[:limit]
-            await self.show(ctx, accounts)
+            if limit > 20:
+                await ctx.send('pls no')
+                return
 
-        elif mode == 't':
-            accounts = await self.jcoin.all_accounts('taxpaid')
-            accounts = accounts[:limit]
-            await self.show(ctx, accounts, 'taxpaid')
-        elif mode == 'b' or mode == '\N{NEGATIVE SQUARED LATIN CAPITAL LETTER B}':
-            accounts = filter(lambda acc: acc['type'] == 'taxbank', all_accounts)
-            accounts = list(accounts)[:limit]
-            await self.show(ctx, accounts)
-        else:
-            raise self.SayException('mode not found')
+            all_accounts = await self.jcoin.all_accounts()
 
-    @commands.command(name='prices')
-    async def _prices(self, ctx):
-        """Show price information for commands."""
-        res = (f'- `{ptype} - {self.prices[ptype]}JC`: {val[0]}, `{val[1]}`' for ptype, val in PRICES.items())
-        await ctx.send('\n'.join(res))
+            if mode == 'l':
+                # TODO: get member list and make account list from that
+                accounts = [account for account in all_accounts if \
+                    ctx.guild.get_member(account['id']) is not None][:limit]
+                await self.show(ctx, accounts)
+            elif mode == 'g':
+                accounts = filter(lambda a: a['type'] == 'user', all_accounts)
+                accounts = list(accounts)[:limit]
+                await self.show(ctx, accounts)
 
-    @commands.command()
-    @commands.guild_only()
-    async def taxes(self, ctx):
-        """Get the amount of taxes your taxbank holds.
+            elif mode == 't':
+                accounts = await self.jcoin.all_accounts('taxpaid')
+                accounts = accounts[:limit]
+                await self.show(ctx, accounts, 'taxpaid')
+            elif mode == 'b' or mode == '\N{NEGATIVE SQUARED LATIN CAPITAL LETTER B}':
+                accounts = filter(lambda acc: acc['type'] == 'taxbank', all_accounts)
+                accounts = list(accounts)[:limit]
+                await self.show(ctx, accounts)
+            else:
+                raise self.SayException('mode not found')
+
+        @commands.command(name='prices')
+        async def _prices(self, ctx):
+            """Show price information for commands."""
+            res = (f'- `{ptype} - {self.prices[ptype]}JC`: {val[0]}, `{val[1]}`' for ptype, val in PRICES.items())
+            await ctx.send('\n'.join(res))
+
+        @commands.command()
+        @commands.guild_only()
+        async def taxes(self, ctx):
+            """Get the amount of taxes your taxbank holds.
+            
+            All taxed commands have a base price you can check with "j!prices".
+            However, the total tax you pay when using the command
+            is defined by the base tax + some weird shit.
+
+            Ok, "some weird shit" = maths, it is a constant that is raised to your current
+            wallet's amount.
+            """
+            await self.jcoin.ensure_taxbank(ctx)
+            taxbank = await self.jcoin.get_account(ctx.guild.id)
+            await ctx.send(f'`{self.jcoin.get_name(ctx.guild)}: {taxbank["amount"]}`')
+
+        async def add_cooldown(self, user, c_type=0, hours=ARREST_TIME):
+            """Add a cooldown to an user:
         
-        All taxed commands have a base price you can check with "j!prices".
-        However, the total tax you pay when using the command
-        is defined by the base tax + some weird shit.
+            Cooldown types follow the same as :meth:`CoinsExt.check_cooldowns`
+            """
+            r = await self.cooldown_coll.insert_one(make_cooldown(user, c_type, hours))
+            if not r.acknowledged:
+                raise RuntimeError('mongo did a dumb')
+            return hours
 
-        Ok, "some weird shit" = maths, it is a constant that is raised to your current
-        wallet's amount.
-        """
-        await self.jcoin.ensure_taxbank(ctx)
-        taxbank = await self.jcoin.get_account(ctx.guild.id)
-        await ctx.send(f'`{self.jcoin.get_name(ctx.guild)}: {taxbank["amount"]}`')
+        async def remove_cooldown(self, cooldown):
+            """Removes a cooldown and resets the stealing points entry if cooldown type is 1."""
+            await self.cooldown_coll.delete_one(cooldown)
+            if cooldown['type'] == 1:
+                await self.points_coll.update_one({'user_id': cooldown['user_id']}, {'$set': {'points': 3}})
 
-    async def add_cooldown(self, user, c_type=0, hours=ARREST_TIME):
-        """Add a cooldown to an user:
-    
-        Cooldown types follow the same as :meth:`CoinsExt.check_cooldowns`
-        """
-        return await self.cooldown_coll.insert_one(make_cooldown(user, c_type, hours))
+        async def check_cooldowns(self, ctx):
+            """Check if any cooldowns are applied to the thief.
+            Removes them if the cooldowns are expired, sends a message if it isn't.
 
-    async def remove_cooldown(self, cooldown):
-        """Removes a cooldown and resets the stealing points entry if cooldown type is 1."""
-        await self.cooldown_coll.delete_one(cooldown)
-        if cooldown['type'] == 1:
-            await self.points_coll.update_one({'user_id': cooldown['user_id']}, {'$set': {'points': 3}})
+            Cooldown types:
+            - 0: prison cooldown
+            - 1: stealing points regen
+            """
 
-    async def check_cooldowns(self, ctx):
-        """Check if any cooldowns are applied to the thief.
-        Removes them if the cooldowns are expired, sends a message if it isn't.
+            thief = ctx.author
+            now = time.time()
+            cooldown = await self.cooldown_coll.find_one({'user_id': thief.id})
 
-        Cooldown types:
-         - 0: prison cooldown
-         - 1: stealing points regen
-        """
+            if cooldown is None:
+                return
 
-        thief = ctx.author
-        now = time.time()
-        cooldown = await self.cooldown_coll.find_one({'user_id': thief.id})
+            cooldown_type, cooldown_end = cooldown['type'], cooldown['finish']
+            if now >= cooldown_end:
+                await self.remove_cooldown(cooldown)
+                return
 
-        if cooldown is None:
-            return
+            remaining = (cooldown_end - now) / 60 / 60
+            remaining = round(remaining, 2)
 
-        cooldown_type, cooldown_end = cooldown['type'], cooldown['finish']
-        if now >= cooldown_end:
-            await self.remove_cooldown(cooldown)
-            return
+            if cooldown_type == 0:
+                raise self.SayException(f'You are in prison, wait {remaining} hours')
+            elif cooldown_type == 1:
+                raise self.SayException(f'You are waiting for stealing points to regen, {remaining} hours to go')
 
-        remaining = (cooldown_end - now) / 60 / 60
-        remaining = round(remaining, 2)
+        async def check_grace(self, target):
+            """Check if the target is in grace period or not."""
+            now = time.time()
+            grace = await self.grace_coll.find_one({'user_id': target.id})
+            if grace is None:
+                return
 
-        if cooldown_type == 0:
-            raise self.SayException(f'You are in prison, wait {remaining} hours')
-        elif cooldown_type == 1:
-            raise self.SayException(f'You are waiting for stealing points to regen, {remaining} hours to go')
+            if now < grace['finish']:
+                grace_remaining = (grace['finish'] - now) / 60 / 60
+                grace_remaining = round(grace_remaining, 2)
+                raise self.SayException(f"Your target is in grace period, it'll expire in {grace_remaining} hours")
 
-    async def check_grace(self, target):
-        """Check if the target is in grace period or not."""
-        now = time.time()
-        grace = await self.grace_coll.find_one({'user_id': target.id})
-        if grace is None:
-            return
+        async def steal_points(self, ctx):
+            """Removes 1 stealing point from the thief."""
+            thief = ctx.author
+            points = await self.points_coll.find_one({'user_id': thief.id})
+            if points is None:
+                default = make_default_points(ctx)
+                await self.points_coll.insert_one(default)
+                points = default
 
-        if now < grace['finish']:
-            grace_remaining = (grace['finish'] - now) / 60 / 60
-            grace_remaining = round(grace_remaining, 2)
-            raise self.SayException(f"Your target is in grace period, it'll expire in {grace_remaining} hours")
+            if points['points'] < 1:
+                await self.add_cooldown(thief, 1, STEAL_REGEN)
+                raise self.SayException(f'You ran out of stealing points! wait {STEAL_REGEN} hours.')
 
-    async def steal_points(self, ctx):
-        """Removes 1 stealing point from the thief."""
-        thief = ctx.author
-        points = await self.points_coll.find_one({'user_id': thief.id})
-        if points is None:
-            default = make_default_points(ctx)
-            await self.points_coll.insert_one(default)
-            points = default
+            await self.points_coll.update_one({'user_id': thief.id}, {'$set': {'points': points['points'] - 1}})
 
-        if points['points'] < 1:
-            await self.add_cooldown(thief, 1, STEAL_REGEN)
-            raise self.SayException(f'You ran out of stealing points! wait {STEAL_REGEN} hours.')
+        async def add_grace(self, target, hours):
+            """Add a grace period to the target.
+            
+            If there already is a grace object attached to the target, it gets removed
+            """
+            grace = await self.grace_coll.find_one({'user_id': target.id})
+            if grace is not None:
+                await self.grace_coll.delete_one(grace)
 
-        await self.points_coll.update_one({'user_id': thief.id}, {'$set': {'points': points['points'] - 1}})
+            await self.grace_coll.insert_one({
+                'user_id': target.id,
+                'finish': time.time() + (hours * 60 * 60)
+            })
 
-    async def add_grace(self, target, hours):
-        """Add a grace period to the target.
-        
-        If there already is a grace object attached to the target, it gets removed
-        """
-        grace = await self.grace_coll.find_one({'user_id': target.id})
-        if grace is not None:
-            await self.grace_coll.delete_one(grace)
-
-        await self.grace_coll.insert_one({
-            'user_id': target.id,
-            'finish': time.time() + (hours * 60 * 60)
-        })
-
-    async def do_arrest(self, ctx, amount):
+        async def do_arrest(self, ctx, amount):
         thief = ctx.author
         fee = amount / 2
+        hours = 0
+
         taxbank = await self.jcoin.get_account(ctx.guild.id)
         try:
             transfer_info = await self.jcoin.transfer(thief.id, ctx.guild.id, fee)
-            await self.add_cooldown(thief)
+            hours = await self.add_cooldown(thief)
         except self.jcoin.TransferError as err:
             # oh you are so fucked
             if 'funds' not in err.args[0]:
                 raise self.SayException(f'wtf how did this happen {err!r}')
 
             thief_account = await self.jcoin.get_account(thief.id)
-            transfer_info = await self.jcoin.transfer(thief.id, ctx.guild.id, thief_account['amount'])
-            await self.add_cooldown(thief)
+            amnt = thief_account['amnt']
+            transfer_info = await self.jcoin.transfer(thief.id, ctx.guild.id, amnt)
+            hours = await self.add_cooldown(thief, 0, ARREST_TIME + int(amnt))
 
-        return ARREST_TIME, transfer_info
+        return hours, transfer_info
 
     @commands.command()
     @commands.guild_only()
