@@ -71,7 +71,7 @@ class Admin(Cog):
     @commands.is_owner()
     async def update(self, ctx):
         """im lazy"""
-        await ctx.invoke(self.bot.get_command('shell'), 'git pull')
+        await ctx.invoke(self.bot.get_command('shell'), command='git pull')
 
 
 def setup(bot):
