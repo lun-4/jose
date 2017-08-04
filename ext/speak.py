@@ -326,7 +326,7 @@ class Speak(Cog):
             try:
                 return await self.new_texter(guild)
             except TexterFail:
-                await ctx.send(f'Failed for `{guild!s}[{{guild.id}]`')
+                await ctx.send(f'Failed for `{guild!s}[{guild.id}]`')
         for guild in self.bot.guilds:
             await create_tx(guild)
         t2 = time.monotonic()
