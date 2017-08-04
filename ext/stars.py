@@ -312,6 +312,9 @@ class Starboard(Cog):
             if hasattr(author_id, 'id'):
                 author_id = author_id.id
 
+            if author_id == message.author.id:
+                raise StarAddError('No selfstarring allowed')
+
             star = await self.raw_add_star(config, message, author_id)
             star = await self.update_star(config, star, msg=message)
         finally:
@@ -345,6 +348,9 @@ class Starboard(Cog):
 
             if hasattr(author_id, 'id'):
                 author_id = author_id.id
+
+            if author_id == message.author.id:
+                raise StarRemoveError('No selfstarring allowed')
 
             star = await self.raw_remove_star(config, message, author_id)
             star = await self.update_star(config, star, msg=message)
