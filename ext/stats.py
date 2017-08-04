@@ -98,7 +98,6 @@ class Statistics(Cog):
     async def querystats(self):
         try:
             while True:
-                log.info('[statsd] publishing')
                 await self.basic_measures()
                 await self.starboard_stats()
                 await self.jcoin_stats()
