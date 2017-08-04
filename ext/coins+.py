@@ -217,168 +217,168 @@ class CoinsExt(Cog):
         })
 
     async def do_arrest(self, ctx, amount):
-    thief = ctx.author
-    fee = amount / 2
-    hours = 0
+        thief = ctx.author
+        fee = amount / 2
+        hours = 0
 
-    taxbank = await self.jcoin.get_account(ctx.guild.id)
-    try:
-        transfer_info = await self.jcoin.transfer(thief.id, ctx.guild.id, fee)
-        hours = await self.add_cooldown(thief)
-    except self.jcoin.TransferError as err:
-        # oh you are so fucked
-        if 'funds' not in err.args[0]:
-            raise self.SayException(f'wtf how did this happen {err!r}')
+        taxbank = await self.jcoin.get_account(ctx.guild.id)
+        try:
+            transfer_info = await self.jcoin.transfer(thief.id, ctx.guild.id, fee)
+            hours = await self.add_cooldown(thief)
+        except self.jcoin.TransferError as err:
+            # oh you are so fucked
+            if 'funds' not in err.args[0]:
+                raise self.SayException(f'wtf how did this happen {err!r}')
 
-        thief_account = await self.jcoin.get_account(thief.id)
-        amnt = thief_account['amnt']
-        transfer_info = await self.jcoin.transfer(thief.id, ctx.guild.id, amnt)
-        hours = await self.add_cooldown(thief, 0, ARREST_TIME + int(amnt))
+            thief_account = await self.jcoin.get_account(thief.id)
+            amnt = thief_account['amnt']
+            transfer_info = await self.jcoin.transfer(thief.id, ctx.guild.id, amnt)
+            hours = await self.add_cooldown(thief, 0, ARREST_TIME + int(amnt))
 
-    return hours, transfer_info
+        return hours, transfer_info
 
-@commands.command()
-@commands.guild_only()
-async def steal(self, ctx, target: discord.User, amount: decimal.Decimal):
-    """Steal JoséCoins from someone.
-    
-    Obviously, this isn't guaranteed to have 100% success.
-    The probability of success depends on the target's current wallet and the amount you want
-    to steal from them.
-
-    There are other restrictions to stealing:
-        - You can't steal less than 0.01JC
-        - You can't steal if you have less than 6JC
-        - You can't steal from targets who are in grace period.
-        - You have 3 "stealing points", you lose one every time you use the steal command
-        successfully
-        - You can't steal from José(lol).
-        - You are automatically arrested if you try to steal more than the target's wallet
-    """
-    await self.jcoin.ensure_taxbank(ctx)
-    thief = ctx.author
-
-    if thief == target:
-        raise self.SayException("You can't steal from yourself")
-
-    thief_account = await self.jcoin.get_account(thief.id)
-    target_account = await self.jcoin.get_account(target.id)
-
-    if thief_account is None or target_account is None:
-        raise self.SayException("One of you don't have a JoséCoin account")
-
-    if amount <= .01:
-        raise self.SayException('Minimum amount to steal  needs to be higher than `0.01JC`')
-
-    if amount <= 0:
-        raise self.SayException('haha good one :ok_hand:')
-
-    if thief_account['amount'] < 6:
-        raise self.SayException("You have less than `6JC`, can't use the steal command")
-
-    await self.check_cooldowns(ctx)
-    await self.check_grace(target)
-    await self.steal_points(ctx)
-
-    thief_account['times_stolen'] += 1
-    await self.jcoin.update_accounts([thief_account])
-
-    if target.id == self.bot.user.id or target.id in WHITELISTED_ACCOUNTS:
-        hours, transfer_info = await self.do_arrest(ctx, amount)
-        raise self.SayException(f":cop: Hell no! You can't steal from whitelisted accounts, {hours} hours of jail now\n{transfer_info}")
+    @commands.command()
+    @commands.guild_only()
+    async def steal(self, ctx, target: discord.User, amount: decimal.Decimal):
+        """Steal JoséCoins from someone.
         
+        Obviously, this isn't guaranteed to have 100% success.
+        The probability of success depends on the target's current wallet and the amount you want
+        to steal from them.
 
-    if amount > target_account['amount']:
-        hours, transfer_info = await self.do_arrest(ctx, amount)
-        raise self.SayException(f":cop: Arrested from trying to steal more than the target's wallet, {hours} hours in jail\n{transfer_info}")
+        There are other restrictions to stealing:
+            - You can't steal less than 0.01JC
+            - You can't steal if you have less than 6JC
+            - You can't steal from targets who are in grace period.
+            - You have 3 "stealing points", you lose one every time you use the steal command
+            successfully
+            - You can't steal from José(lol).
+            - You are automatically arrested if you try to steal more than the target's wallet
+        """
+        await self.jcoin.ensure_taxbank(ctx)
+        thief = ctx.author
 
-    chance = (BASE_CHANCE + (target_account['amount'] / amount)) * STEAL_CONSTANT
-    if chance > 5: chance = 5
-    chance = round(chance, 3)
+        if thief == target:
+            raise self.SayException("You can't steal from yourself")
 
-    res = random.uniform(0, 10)
-    res = round(res, 3)
-
-    log.info('[steal:cmd] chance=%.2f res=%.2f thief=%s[uid=%d] target=%s[uid=%d] amount=%.2f', \
-        chance, res, thief, thief.id, target, target.id, amount)
-
-    if res < chance:
-        # successful steal
         thief_account = await self.jcoin.get_account(thief.id)
-        thief_account['success_steal'] += 1
+        target_account = await self.jcoin.get_account(target.id)
+
+        if thief_account is None or target_account is None:
+            raise self.SayException("One of you don't have a JoséCoin account")
+
+        if amount <= .01:
+            raise self.SayException('Minimum amount to steal  needs to be higher than `0.01JC`')
+
+        if amount <= 0:
+            raise self.SayException('haha good one :ok_hand:')
+
+        if thief_account['amount'] < 6:
+            raise self.SayException("You have less than `6JC`, can't use the steal command")
+
+        await self.check_cooldowns(ctx)
+        await self.check_grace(target)
+        await self.steal_points(ctx)
+
+        thief_account['times_stolen'] += 1
         await self.jcoin.update_accounts([thief_account])
 
-        transfer_info = await self.jcoin.transfer(target.id, thief.id, amount)
+        if target.id == self.bot.user.id or target.id in WHITELISTED_ACCOUNTS:
+            hours, transfer_info = await self.do_arrest(ctx, amount)
+            raise self.SayException(f":cop: Hell no! You can't steal from whitelisted accounts, {hours} hours of jail now\n{transfer_info}")
+            
 
-        # add grace period
-        grace = 3
-        if self.owner is None:
-            appinfo = await self.bot.application_info()
-            self.owner = appinfo.owner
+        if amount > target_account['amount']:
+            hours, transfer_info = await self.do_arrest(ctx, amount)
+            raise self.SayException(f":cop: Arrested from trying to steal more than the target's wallet, {hours} hours in jail\n{transfer_info}")
 
-        if target.id == self.owner.id:
-            grace = 6
+        chance = (BASE_CHANCE + (target_account['amount'] / amount)) * STEAL_CONSTANT
+        if chance > 5: chance = 5
+        chance = round(chance, 3)
 
-        await target.send(f':gun: You got robbed! Thief(`{thief}`) stole `{amount}` from you. {grace}h grace period')
-        await self.add_grace(target, grace)
-        await ctx.send(f'`[res: {res} < prob: {chance}]` congrats lol\n{transfer_info}')
-    else:
-        # failure, get rekt
-        hours, transfer_info = await self.do_arrest(ctx, amount)
-        await ctx.send(f'`[res: {res} > prob: {chance}]` :cop: Arrested! {hours}h in jail\n{transfer_info}')
+        res = random.uniform(0, 10)
+        res = round(res, 3)
 
-@commands.command()
-async def stealstate(self, ctx):
-    """Show your current state in the stealing business.
+        log.info('[steal:cmd] chance=%.2f res=%.2f thief=%s[uid=%d] target=%s[uid=%d] amount=%.2f', \
+            chance, res, thief, thief.id, target, target.id, amount)
 
-    Shows your current cooldown(jail/points) and grace period if any.
-    """
-    uobj = {'user_id': ctx.author.id}
-    res = []
-    now = time.time()
+        if res < chance:
+            # successful steal
+            thief_account = await self.jcoin.get_account(thief.id)
+            thief_account['success_steal'] += 1
+            await self.jcoin.update_accounts([thief_account])
 
-    cooldown = await self.cooldown_coll.find_one(uobj)
-    grace = await self.grace_coll.find_one(uobj)
-    points = await self.points_coll.find_one(uobj)
+            transfer_info = await self.jcoin.transfer(target.id, thief.id, amount)
 
-    if points is not None:
-        res.append(f'You have {points["points"]} stealing points left to use.')
+            # add grace period
+            grace = 3
+            if self.owner is None:
+                appinfo = await self.bot.application_info()
+                self.owner = appinfo.owner
 
-    if cooldown is not None:
-        cdowntype_str = ['Jail', 'Stealing points regen'][cooldown['type']]
-        remaining = round((cooldown['finish'] - now) / 60 / 60, 2)
-        expired = '**[expired]**' if remaining < 0 else ''
-        res.append(f'{expired}Cooldown: `type: {cooldown["type"]}/{cdowntype_str}`, remaining: `{remaining}h`')
+            if target.id == self.owner.id:
+                grace = 6
 
-    if grace is not None:
-        remaining = round((grace['finish'] - now) / 60 / 60, 2)
-        expired = '**[expired]**' if remaining < 0 else ''
-        res.append(f'{expired}Grace period: remaining: `{remaining}h`')
+            await target.send(f':gun: You got robbed! Thief(`{thief}`) stole `{amount}` from you. {grace}h grace period')
+            await self.add_grace(target, grace)
+            await ctx.send(f'`[res: {res} < prob: {chance}]` congrats lol\n{transfer_info}')
+        else:
+            # failure, get rekt
+            hours, transfer_info = await self.do_arrest(ctx, amount)
+            await ctx.send(f'`[res: {res} > prob: {chance}]` :cop: Arrested! {hours}h in jail\n{transfer_info}')
 
-    if len(res) < 1:
-        await ctx.send('No state found for you')
-        return
+    @commands.command()
+    async def stealstate(self, ctx):
+        """Show your current state in the stealing business.
 
-    await ctx.send('\n'.join(res))
+        Shows your current cooldown(jail/points) and grace period if any.
+        """
+        uobj = {'user_id': ctx.author.id}
+        res = []
+        now = time.time()
 
-@commands.command()
-@commands.is_owner()
-async def stealreset(self, ctx, person: discord.User):
-    """Reset someone's state in steal-related collections.
-    
-    Deletes cooldowns, points and grace, resetting them(cooldowns and points)
-    to default on the person's next use of j!steal.
-    """
-    # don't repeat stuff lol
-    uobj = {'user_id': person.id}
-    cd_del = await self.cooldown_coll.delete_one(uobj)
-    pt_del = await self.points_coll.delete_one(uobj)
-    gr_del = await self.grace_coll.delete_one(uobj)
+        cooldown = await self.cooldown_coll.find_one(uobj)
+        grace = await self.grace_coll.find_one(uobj)
+        points = await self.points_coll.find_one(uobj)
 
-    await ctx.send(f'Deleted {cd_del.deleted_count} documents in `cooldown`\n'
-                    f'- {pt_del.deleted_count} in `points`\n'
-                    f'- {gr_del.deleted_count} in `graces`'
-        )
+        if points is not None:
+            res.append(f'You have {points["points"]} stealing points left to use.')
+
+        if cooldown is not None:
+            cdowntype_str = ['Jail', 'Stealing points regen'][cooldown['type']]
+            remaining = round((cooldown['finish'] - now) / 60 / 60, 2)
+            expired = '**[expired]**' if remaining < 0 else ''
+            res.append(f'{expired}Cooldown: `type: {cooldown["type"]}/{cdowntype_str}`, remaining: `{remaining}h`')
+
+        if grace is not None:
+            remaining = round((grace['finish'] - now) / 60 / 60, 2)
+            expired = '**[expired]**' if remaining < 0 else ''
+            res.append(f'{expired}Grace period: remaining: `{remaining}h`')
+
+        if len(res) < 1:
+            await ctx.send('No state found for you')
+            return
+
+        await ctx.send('\n'.join(res))
+
+    @commands.command()
+    @commands.is_owner()
+    async def stealreset(self, ctx, person: discord.User):
+        """Reset someone's state in steal-related collections.
+        
+        Deletes cooldowns, points and grace, resetting them(cooldowns and points)
+        to default on the person's next use of j!steal.
+        """
+        # don't repeat stuff lol
+        uobj = {'user_id': person.id}
+        cd_del = await self.cooldown_coll.delete_one(uobj)
+        pt_del = await self.points_coll.delete_one(uobj)
+        gr_del = await self.grace_coll.delete_one(uobj)
+
+        await ctx.send(f'Deleted {cd_del.deleted_count} documents in `cooldown`\n'
+                        f'- {pt_del.deleted_count} in `points`\n'
+                        f'- {gr_del.deleted_count} in `graces`'
+            )
 
 def setup(bot):
-bot.add_cog(CoinsExt(bot))
+    bot.add_cog(CoinsExt(bot))
