@@ -45,6 +45,13 @@ class BotCollection(Cog):
             log.info(f'[bh:leave] leaving {guild!s}')
             await guild.leave()
 
+        # check blocks
+        if await self.bot.is_blocked_guild(guild.id):
+            owner = guild.owner
+
+            await owner.send('Sorry. The guild you added José on is blocked. Appeal to the block at the support server(Use the invite provided in `j!invite`).')
+            await guild.leave()
+
     async def on_member_join(self, member):
         guild = member.guild
         bots, humans, ratio = self.bot_human_ratio(guild)
