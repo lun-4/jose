@@ -322,11 +322,17 @@ class Speak(Cog):
     async def txstress(self, ctx):
         """Stress test texters LUL"""
         t1 = time.monotonic()
-        txs = [(await self.new_texter(guild)) for guild in self.bot.guilds]
+        async def create_tx(guild):
+            try:
+                return await self.new_texter(guild)
+            except TexterFail:
+                await ctx.send(f'Failed for `{guild!s}[{{guild.id}]`')
+        for guild in self.bot.guilds:
+            await create_tx(guild)
         t2 = time.monotonic()
 
         delta = round((t2 - t1), 2)
-        await ctx.send(f'Generated {len(txs)} in {delta}')
+        await ctx.send(f'Generated {len(txs)} texters in {delta} seconds')
 
     @commands.command()
     async def txstat(self, ctx):
