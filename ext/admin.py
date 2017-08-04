@@ -67,5 +67,12 @@ class Admin(Cog):
         result = f'{out}{err}' 
         await ctx.send(f"`{command}`: ```{result}```\n")
 
+    @commands.command()
+    @commands.is_owner()
+    async def update(self, ctx):
+        """im lazy"""
+        await ctx.invoke(self.bot.get_command('shell'), 'git pull')
+
+
 def setup(bot):
     bot.add_cog(Admin(bot))
