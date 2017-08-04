@@ -11,6 +11,8 @@ from .common import Cog, SayException
 random = SystemRandom()
 log = logging.getLogger(__name__)
 
+BASE_HEIST_CHANCE = decimal.Decimal('1')
+HEIST_CONSTANT = decimal.Decimal('0.32')
 
 class HeistSessionError(Exception):
     pass
@@ -95,8 +97,8 @@ class JoinSession:
 
         res = {
             'success': False,
-            'amount_stolen': 0,
             'jailed': [],
+            'saved': [],
         }
 
         bot = ctx.bot
@@ -104,15 +106,36 @@ class JoinSession:
         if not jcoin:
             raise self.SayException('rip')
 
-        account = await jcoin.get_account(self.target.id)
-        if account is None:
+        target_account = await jcoin.get_account(self.target.id)
+        if target_account is None:
             raise self.SayException('Guild not found')
 
-        if account['type'] != 'taxbank':
+        if target_account['type'] != 'taxbank':
             raise self.SayException('Account is not a taxbank')
 
-        # TODO: add the random chance of who went to jail and
-        # who didn't
+        chance = BASE_HEIST_CHANCE + (amnt / self.amount) * HEIST_CONSTANT
+
+        # trim it to 50% success
+        if chance > 5:
+            chance = 5
+
+        res = random.uniform(0, 10)
+
+        res['chance'] = chance
+        res['result'] = res
+
+        if res < chance:
+            res['success'] = True
+        else:
+            res['success'] = False
+
+            # 50% chance of every person
+            # in the heist to go to jail
+            for user_id in self.users:
+                if random.random() < 0.5:
+                    res['jailed'].append(user_id)
+                else:
+                    res['saved'].append(user_id)
 
         return res
 
