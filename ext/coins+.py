@@ -298,6 +298,7 @@ class CoinsExt(Cog):
 
         if res < chance:
             # successful steal
+            thief_account = await self.jcoin.get_account(thief.id)
             thief_account['success_steal'] += 1
             await self.jcoin.update_accounts([thief_account])
 
