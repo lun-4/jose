@@ -13,6 +13,7 @@ WHITELIST = (
     297710090687873024, # Luma's testing server
     319252487280525322, # robert is gay
     340609473439596546, # slice is a furry that plays agario
+    191611344137617408, # dan's 'haha gay pussy party'
 )
 
 log = logging.getLogger(__name__)
