@@ -207,7 +207,11 @@ class JoseBot(commands.Bot):
         await self.invoke(ctx)
 
 async def get_prefix(bot, message):
-    return await bot.get_cog("Config").cfg_get(message.guild, "prefix")
+    custom = await bot.get_cog("Config").cfg_get(message.guild, "prefix")
+    if custom == bot.config.prefix:
+        return custom
+
+    return [bot.config.prefix, custom]
 
 jose = JoseBot(
     command_prefix=get_prefix,
