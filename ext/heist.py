@@ -192,7 +192,7 @@ class JoinSession:
 
     async def process_heist(self, res: dict):
         """Process the result given by :meth:`JoinSession.do_heist`"""
-        await self.ctx.send(f'gay: `{res!r}`')
+        await self.ctx.send(f'debug information, ignore: `{res!r}`')
 
         if not res['success']:
             self.heist.sessions.pop(self.id)
@@ -262,6 +262,7 @@ class Heist(Cog):
         self.sessions = {}
 
     def __unload(self):
+        log.info('Unloading with %d sessions', len(self.sessions))
         for session in self.sessions.values():
             session.destroy()
 
@@ -326,6 +327,9 @@ class Heist(Cog):
          - There is a timeout of 3 minutes on the heist join session.
          - If your heist fails, all participants of the heist will be sentenced
             to jail or not, its random.
+
+         - If your heist succeedes, you get a type 1 cooldown of 7 hours.
+           it will show you are "regenerating your steal points".
         """
         for session in self.sessions.values():
             if session.target.id == target.id:
