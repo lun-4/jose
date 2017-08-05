@@ -335,7 +335,7 @@ class Heist(Cog):
             if session.target.id == target.id:
                 raise self.SayException('An already existing session exists with the same target')
 
-        if target == guild:
+        if target == ctx.guild:
             return await ctx.send('lol')
 
         session = self.get_sess(ctx, target, True)
