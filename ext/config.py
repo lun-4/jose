@@ -46,9 +46,8 @@ class Config(Cog):
         default = {
             'guild_id': guild_id,
             'botblock': True,
-            'image_channel': None,
             'speak_channel': None,
-            'prefix': 'j!',
+            'prefix': self.bot.config.prefix,
             'autoreply_prob': 0,
             'fullwidth_prob': 0.1,
         }
