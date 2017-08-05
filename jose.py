@@ -206,10 +206,11 @@ class JoseBot(commands.Bot):
         ctx = await self.get_context(message, cls=JoseContext)
         await self.invoke(ctx)
 
+async def get_prefix(bot, message):
+    return await bot.get_cog("Config").cfg_get(message.guild, "prefix")
 
 jose = JoseBot(
-    #command_prefix=getattr(config, 'prefix', None) or 'j!',
-    command_prefix=config.prefix,
+    command_prefix=get_prefix,
     description='henlo dis is jose',
     pm_help=None
 )
