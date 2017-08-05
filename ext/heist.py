@@ -14,6 +14,7 @@ log = logging.getLogger(__name__)
 
 BASE_HEIST_CHANCE = decimal.Decimal('1')
 HEIST_CONSTANT = decimal.Decimal('0.32')
+INCREASE_PER_PERSON = decimal.Decimal('0.3')
 
 class HeistSessionError(Exception):
     pass
@@ -138,7 +139,8 @@ class JoinSession:
             raise self.SayException('Account is not a taxbank')
 
         amnt = target_account['amount']
-        chance = BASE_HEIST_CHANCE + (amnt / self.amount) * HEIST_CONSTANT
+        increase_people = len(self.users) * INCREASE_PER_PERSON
+        chance = BASE_HEIST_CHANCE + ((amnt / self.amount) + increase_people) * HEIST_CONSTANT
 
         # trim it to 50% success
         if chance > 5:
@@ -321,7 +323,7 @@ class Heist(Cog):
          - This session requires that all other people that want to join the
             heist to use the "j!heist join" command
 
-         - There is a timeout of 5 minutes on the heist join session.
+         - There is a timeout of 3 minutes on the heist join session.
          - If your heist fails, all participants of the heist will be sentenced
             to jail or not, its random.
         """
@@ -344,7 +346,7 @@ class Heist(Cog):
         await ctx.send('Join session started!')
 
         # timeout of 5 minutes accepting members
-        # OR "j!heist finish"
+        # OR "j!heist raid"
         await asyncio.sleep(300)
         if not session.finish.is_set():
             await session.process_heist(await session.force_finish())
@@ -386,7 +388,7 @@ class Heist(Cog):
         res = '\n'.join(res)
         await ctx.send(f'{res}')
 
-    @heist.command(name='finish')
+    @heist.command(name='raid')
     async def heist_force(self, ctx):
         """Force a current heist join session to be finish already."""
         session = self.get_sess(ctx)
