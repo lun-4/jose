@@ -221,6 +221,18 @@ class Config(Cog):
         await ctx.send('Block not found')
 
     @commands.command()
+    @commands.guild_only()
+    async def prefix(self, ctx, prefix: str=None):
+        """Sets a guild prefix. Returns the prefix if no args are passed."""
+        if not prefix:
+            return await ctx.send('The prefix for this guild is `{}`.'.format(await self.cfg_get(ctx.guild, 'prefix')))
+        
+        if not (1 < len(prefix) < 20):
+            return await ctx.send('Prefixes need to be 1-20 characters long')
+
+        return await ctx.success(await self.cfg_set(ctx.guild, 'prefix', prefix))
+
+    @commands.command()
     @commands.is_owner()
     async def dbstats(self, ctx):
         """Show some mongoDB stuff because JSON sucks ass."""
@@ -234,6 +246,6 @@ class Config(Cog):
         coll_counts = '\n'.join([f'{collname:15} | {count}' for collname, count in counts.most_common()])
         coll_counts = f'```\n{coll_counts}```'
         await ctx.send(coll_counts)
-
+    
 def setup(bot):
     bot.add_cog(Config(bot))
