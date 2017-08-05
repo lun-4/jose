@@ -221,6 +221,7 @@ class Config(Cog):
 
     @commands.command()
     @commands.guild_only()
+    @is_moderator()
     async def prefix(self, ctx, prefix: str=None):
         """Sets a guild prefix. Returns the prefix if no args are passed."""
         if not prefix:
