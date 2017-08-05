@@ -12,15 +12,15 @@ from .common import Cog
 
 log = logging.getLogger(__name__)
 
-def is_moderator():
-    def _is_moderator(ctx):
-        if ctx.guild is None:
-            return False
+def _is_moderator(ctx):
+    if ctx.guild is None:
+        return False
 
-        member = ctx.guild.get_member(ctx.author.id)
-        perms = ctx.channel.permissions_for(member)
-        return (ctx.author.id == ctx.bot.owner_id) or perms.manage_guild
-    
+    member = ctx.guild.get_member(ctx.author.id)
+    perms = ctx.channel.permissions_for(member)
+    return (ctx.author.id == ctx.bot.owner_id) or perms.manage_guild
+
+def is_moderator():    
     return commands.check(_is_moderator)
 
 class Config(Cog):
@@ -221,12 +221,14 @@ class Config(Cog):
 
     @commands.command()
     @commands.guild_only()
-    @is_moderator()
     async def prefix(self, ctx, prefix: str=None):
         """Sets a guild prefix. Returns the prefix if no args are passed."""
         if not prefix:
             return await ctx.send('The prefix for this guild is `{}`.'.format(await self.cfg_get(ctx.guild, 'prefix')))
         
+        if not _is_moderator(ctx):
+            return await ctx.send('Unauthorized to set prefix.')
+
         if not (1 < len(prefix) < 20):
             return await ctx.send('Prefixes need to be 1-20 characters long')
 
