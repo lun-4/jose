@@ -363,22 +363,23 @@ class CoinsExt(Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def stealreset(self, ctx, person: discord.User):
+    async def stealreset(self, ctx, *people: discord.User):
         """Reset someone's state in steal-related collections.
         
         Deletes cooldowns, points and grace, resetting them(cooldowns and points)
         to default on the person's next use of j!steal.
         """
-        # don't repeat stuff lol
-        uobj = {'user_id': person.id}
-        cd_del = await self.cooldown_coll.delete_one(uobj)
-        pt_del = await self.points_coll.delete_one(uobj)
-        gr_del = await self.grace_coll.delete_one(uobj)
+        for person in people:
+            # don't repeat stuff lol
+            uobj = {'user_id': person.id}
+            cd_del = await self.cooldown_coll.delete_one(uobj)
+            pt_del = await self.points_coll.delete_one(uobj)
+            gr_del = await self.grace_coll.delete_one(uobj)
 
-        await ctx.send(f'Deleted {cd_del.deleted_count} documents in `cooldown`\n'
-                        f'- {pt_del.deleted_count} in `points`\n'
-                        f'- {gr_del.deleted_count} in `graces`'
-            )
+            await ctx.send(f'Deleted {cd_del.deleted_count} documents in `cooldown`\n'
+                            f'- {pt_del.deleted_count} in `points`\n'
+                            f'- {gr_del.deleted_count} in `graces`'
+                )
 
 def setup(bot):
     bot.add_cog(CoinsExt(bot))
