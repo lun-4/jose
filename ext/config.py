@@ -221,12 +221,13 @@ class Config(Cog):
         await ctx.send('Block not found')
 
     @commands.command()
+    @commands.guild_only()
     async def prefix(self, ctx, prefix: str=None):
         """Sets a guild prefix. Returns the prefix if no args are passed."""
         if not prefix:
             return await ctx.send('The prefix for this guild is `{}`.'.format(await self.cfg_get(ctx.guild, 'prefix')))
         
-        if len(prefix) < 1 or len(prefix) > 20:
+        if not (1 < len(prefix) < 20):
             return await ctx.send('Prefixes need to be 1-20 characters long')
 
         return await ctx.success(await self.cfg_set(ctx.guild, 'prefix', prefix))
