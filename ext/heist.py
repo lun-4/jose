@@ -2,6 +2,7 @@ import collections
 import asyncio
 import logging
 import discord
+import decimal
 from random import SystemRandom
 
 from discord.ext import commands
@@ -74,6 +75,13 @@ class JoinSession:
         self.finish = asyncio.Event()
         self.task = None
 
+    @property
+    def fine(self) -> 'decimal.Decimal':
+        """Get the fine to be paid by all people in the session
+        if the heist failed.
+        """
+        return self.amount / len(self.users)
+
     def add_member(self, user_id: int):
         self.started = True
         try:
@@ -139,10 +147,15 @@ class JoinSession:
 
         return res
 
-    async def jail(self, res):
-        """Put people in jail"""
+    async def jail(self, res: dict):
+        """Put people in jail."""
         cext = bot.get_cog('Coins+')
+        coins = bot.get_cog('Coins')
+
         ctx = self.ctx
+
+        for user_id in res['users']:
+            await coins.transfer(user_id, self.target.id, self.fine)
 
         for jailed_id in res['jailed']:
             jailed = self.bot.get_user(jailed_id)
@@ -151,24 +164,32 @@ class JoinSession:
                 continue
 
             # put them in normal jail
-            await cext.add_cooldown(thief)
+            await cext.add_cooldown(jailed)
 
         res = ' '.join([f'<@{jailed}>' for jailed in res['jailed']])
         await ctx.send('In jail: {res}')
 
-    async def process_heist(self, res):
+        res2 = ' '.join([f'<@{saved}>' for saved in res['saved']])
+        await ctx.send('Not in Jail: {res2}')
+
+    async def process_heist(self, res: dict):
         """Process the result given by :meth:`JoinSession.do_heist`"""
         await self.ctx.send(f'gay: `{res!r}`')
+
         if not res['success']:
             return await self.jail(res)
-        
-        # succ   ess
+
+        # TODO: the actual success logic
         pass
 
-    async def force_finish(self):
+    async def force_finish(self) -> 'any':
         """Force the join session to finish
         and the heist to start.
         
+        Returns
+        any
+            Anything
+
         Raises
         ------
         Exception
@@ -249,9 +270,14 @@ class Heist(Cog):
 
         return session
 
-    async def check_user(self, ctx):
+    async def check_user(self, ctx, session):
         cext = bot.get_cog('CoinsExt')
+        coins = bot.get_cog('Coins')
+
         await cext.check_cooldowns(ctx)
+        acc = await coins.get_account(ctx.author.id)
+        if acc['amount'] < 10:
+            raise self.SayException("You don't have more than `10JC` to join the session.")
 
     @commands.group(invoke_without_command=True)
     async def heist(self, ctx, amount: decimal.Decimal, *, target: GuildConverter):
@@ -271,9 +297,14 @@ class Heist(Cog):
             if session.target.id == target.id:
                 raise self.SayException('An already existing session exists with the same target')
 
-        await self.check_user(ctx)
-
         session = self.get_sess(ctx, target, True)
+
+        try:
+            await self.check_user(ctx, session)
+        except self.SayException as err:
+            self.sessions.pop(ctx.guild.id)
+            raise err
+
         session.amount = amount
         session.add_member(ctx.author.id)
         session.task = self.loop.create_task(session.do_heist(ctx))
@@ -300,10 +331,10 @@ class Heist(Cog):
         for session in self.sessions.values():
             if ctx.author.id in session.users:
                 raise self.SayException(f'You are already in a join session at `{session.ctx.guild!s}`')
-
-        await self.check_user(ctx)
-
+        
         session = self.get_sess(ctx)
+        await self.check_user(ctx, session)
+
         session.add_member(ctx.author.id)
         await ctx.ok()
 
