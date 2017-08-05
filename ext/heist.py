@@ -31,7 +31,7 @@ class GuildConverter(commands.Converter):
         try:
             guild_id = int(arg)
         except ValueError:
-            f = lambda g: arg == g.name.lower()
+            f = lambda g: arg.lower() == g.name.lower()
             guild = discord.utils.find(f, bot.guilds)
 
             if guild is None:
@@ -64,9 +64,14 @@ class JoinSession:
     task: `asyncio.Task` or :py:meth:`None`
         Task for :meth:`JoinSession.do_heist`
     """
+
+    __slots__ = ('id', 'ctx', 'bot', 'heist', 'cext', 'coins', 'target', 'amount', \
+        'users', 'started', 'finish', 'task')
     def __init__(self, ctx, target):
         self.ctx = ctx
         self.bot = ctx.bot
+        self.heist = ctx.cog
+        self.id = ctx.guild.id
 
         self.cext = ctx.bot.get_cog('CoinsExt')
         self.coins = ctx.bot.get_cog('Coins')
@@ -88,6 +93,10 @@ class JoinSession:
         if the heist succeeded.
         """
         return self.amount / len(self.users)
+
+    def fmt_res(self, res):
+        """Format data from a heist result object to a nice string"""
+        return f'`success: {res["success"]}, chance: {res["chance"]}, res: {res["result"]}`'
 
     def add_member(self, user_id: int):
         self.started = True
@@ -128,18 +137,19 @@ class JoinSession:
         if target_account['type'] != 'taxbank':
             raise self.SayException('Account is not a taxbank')
 
+        amnt = target_account['amount']
         chance = BASE_HEIST_CHANCE + (amnt / self.amount) * HEIST_CONSTANT
 
         # trim it to 50% success
         if chance > 5:
             chance = 5
 
-        res = random.uniform(0, 10)
+        result = random.uniform(0, 10)
 
         res['chance'] = chance
-        res['result'] = res
+        res['result'] = result
 
-        if res < chance:
+        if result < chance:
             res['success'] = True
         else:
             res['success'] = False
@@ -156,13 +166,10 @@ class JoinSession:
 
     async def jail(self, res: dict):
         """Put people in jail."""
-        cext = bot.get_cog('Coins+')
-        coins = bot.get_cog('Coins')
-
         ctx = self.ctx
 
-        for user_id in res['users']:
-            await coins.transfer(user_id, self.target.id, self.fine)
+        for user_id in self.users:
+            await self.coins.transfer(user_id, self.target.id, self.fine)
 
         for jailed_id in res['jailed']:
             jailed = self.bot.get_user(jailed_id)
@@ -171,30 +178,34 @@ class JoinSession:
                 continue
 
             # put them in normal jail
-            await cext.add_cooldown(jailed)
+            await self.cext.add_cooldown(jailed)
 
-        res = ' '.join([f'<@{jailed}>' for jailed in res['jailed']])
-        await ctx.send('In jail: {res}')
+        await ctx.send(self.fmt_res(res))
 
-        res2 = ' '.join([f'<@{saved}>' for saved in res['saved']])
-        await ctx.send('Not in Jail: {res2}')
+        jailed_mentions = ' '.join([f'<@{jailed}>' for jailed in res['jailed']])
+        await ctx.send(f'In jail: {jailed_mentions}')
+
+        saved_mentions = ' '.join([f'<@{saved}>' for saved in res['saved']])
+        await ctx.send(f'Not in Jail: {saved_mentions}')
 
     async def process_heist(self, res: dict):
         """Process the result given by :meth:`JoinSession.do_heist`"""
         await self.ctx.send(f'gay: `{res!r}`')
 
         if not res['success']:
+            self.heist.sessions.pop(self.id)
             return await self.jail(res)
 
         for user_id in self.users:
-            user = bot.get_user(user_id)
+            user = self.bot.get_user(user_id)
             if user is None:
                 continue
 
             await self.coins.transfer(self.target.id, user_id, self.fine)
-            await self.cext.add_cooldown(self.user, 1, 7)
+            await self.cext.add_cooldown(user, 1, 7)
 
-        await self.ctx.send(f'Transferred {self.fine} to all {len(users)} users of the session')
+        self.heist.sessions.pop(self.id)
+        await self.ctx.send(f'{self.fmt_res(res)} Transferred {self.fine} to all {len(self.users)} users of the session')
 
     async def force_finish(self) -> 'any':
         """Force the join session to finish
@@ -234,6 +245,9 @@ class JoinSession:
         log.info('returning result')
         return self.task.result()
 
+    def destroy(self):
+        self.finish.set()
+
 
 class Heist(Cog):
     """Heist system
@@ -244,6 +258,10 @@ class Heist(Cog):
     def __init__(self, bot):
         super().__init__(bot)
         self.sessions = {}
+
+    def __unload(self):
+        for session in self.sessions.values():
+            session.destroy()
 
     @property
     def coinsext(self):
@@ -285,8 +303,8 @@ class Heist(Cog):
         return session
 
     async def check_user(self, ctx, session):
-        cext = bot.get_cog('CoinsExt')
-        coins = bot.get_cog('Coins')
+        cext = self.bot.get_cog('CoinsExt')
+        coins = self.bot.get_cog('Coins')
 
         await cext.check_cooldowns(ctx)
         acc = await coins.get_account(ctx.author.id)
@@ -300,10 +318,10 @@ class Heist(Cog):
         This works better if you have more people joining in your heist.
 
          - As soon as you use this command, a heist join session will start.
-           - This session requires that all other people that want to join the
+         - This session requires that all other people that want to join the
             heist to use the "j!heist join" command
 
-           - There is a timeout of 5 minutes on the heist join session.
+         - There is a timeout of 5 minutes on the heist join session.
          - If your heist fails, all participants of the heist will be sentenced
             to jail or not, its random.
         """
@@ -357,7 +375,7 @@ class Heist(Cog):
         """Get your current heist join session."""
         session = self.get_sess(ctx)
 
-        res = [f'Guild being attacked: `{session.guild!s}`', 
+        res = [f'Guild being attacked: `{session.target!s}`', 
             f'Amount: `{session.amount!s}i`',
             'Current users in the session:'
         ]
