@@ -222,7 +222,7 @@ class Config(Cog):
 
     @commands.command()
     async def prefix(self, ctx, prefix: str=None):
-        '''Sets a guild prefix. Returns the prefix if no args are passed.'''
+        """Sets a guild prefix. Returns the prefix if no args are passed."""
         if not prefix:
             return await ctx.send('The prefix for this guild is `{}`.'.format(await self.cfg_get(ctx.guild, 'prefix')))
         
