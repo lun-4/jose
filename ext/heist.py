@@ -67,6 +67,10 @@ class JoinSession:
     def __init__(self, ctx, target):
         self.ctx = ctx
         self.bot = ctx.bot
+
+        self.cext = ctx.bot.get_cog('CoinsExt')
+        self.coins = ctx.bot.get_cog('Coins')
+
         self.target = target
         self.amount = 0
 
@@ -79,6 +83,9 @@ class JoinSession:
     def fine(self) -> 'decimal.Decimal':
         """Get the fine to be paid by all people in the session
         if the heist failed.
+
+        Or to be paid by the taxbank to the users
+        if the heist succeeded.
         """
         return self.amount / len(self.users)
 
@@ -179,8 +186,15 @@ class JoinSession:
         if not res['success']:
             return await self.jail(res)
 
-        # TODO: the actual success logic
-        pass
+        for user_id in self.users:
+            user = bot.get_user(user_id)
+            if user is None:
+                continue
+
+            await self.coins.transfer(self.target.id, user_id, self.fine)
+            await self.cext.add_cooldown(self.user, 1, 7)
+
+        await self.ctx.send(f'Transferred {self.fine} to all {len(users)} users of the session')
 
     async def force_finish(self) -> 'any':
         """Force the join session to finish
