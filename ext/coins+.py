@@ -74,11 +74,11 @@ class CoinsExt(Cog):
         """Shows top 10 of accounts.
 
         Available modes:
-         - g: global, all accounts in José's database.
-         - l: local, all accounts in this server/guild.
-         - t: tax, all accounts in José's database, ordered
+        - g: global, all accounts in José's database.
+        - l: local, all accounts in this server/guild.
+        - t: tax, all accounts in José's database, ordered
             by the amount of tax they paid.
-         - b: taxbanks, all taxbanks, globally
+        - b: taxbanks, all taxbanks, globally
         """
 
         if limit > 20:
@@ -135,7 +135,10 @@ class CoinsExt(Cog):
     
         Cooldown types follow the same as :meth:`CoinsExt.check_cooldowns`
         """
-        return await self.cooldown_coll.insert_one(make_cooldown(user, c_type, hours))
+        r = await self.cooldown_coll.insert_one(make_cooldown(user, c_type, hours))
+        if not r.acknowledged:
+            raise RuntimeError('mongo did a dumb')
+        return hours
 
     async def remove_cooldown(self, cooldown):
         """Removes a cooldown and resets the stealing points entry if cooldown type is 1."""
@@ -148,8 +151,8 @@ class CoinsExt(Cog):
         Removes them if the cooldowns are expired, sends a message if it isn't.
 
         Cooldown types:
-         - 0: prison cooldown
-         - 1: stealing points regen
+        - 0: prison cooldown
+        - 1: stealing points regen
         """
 
         thief = ctx.author
@@ -216,20 +219,23 @@ class CoinsExt(Cog):
     async def do_arrest(self, ctx, amount):
         thief = ctx.author
         fee = amount / 2
+        hours = 0
+
         taxbank = await self.jcoin.get_account(ctx.guild.id)
         try:
             transfer_info = await self.jcoin.transfer(thief.id, ctx.guild.id, fee)
-            await self.add_cooldown(thief)
+            hours = await self.add_cooldown(thief)
         except self.jcoin.TransferError as err:
             # oh you are so fucked
             if 'funds' not in err.args[0]:
                 raise self.SayException(f'wtf how did this happen {err!r}')
 
             thief_account = await self.jcoin.get_account(thief.id)
-            transfer_info = await self.jcoin.transfer(thief.id, ctx.guild.id, thief_account['amount'])
-            await self.add_cooldown(thief)
+            amnt = thief_account['amnt']
+            transfer_info = await self.jcoin.transfer(thief.id, ctx.guild.id, amnt)
+            hours = await self.add_cooldown(thief, 0, ARREST_TIME + int(amnt))
 
-        return ARREST_TIME, transfer_info
+        return hours, transfer_info
 
     @commands.command()
     @commands.guild_only()
@@ -241,17 +247,17 @@ class CoinsExt(Cog):
         to steal from them.
 
         There are other restrictions to stealing:
-         - You can't steal less than 0.01JC
-         - You can't steal if you have less than 6JC
-         - You can't steal from targets who are in grace period.
-         - You have 3 "stealing points", you lose one every time you use the steal command
+            - You can't steal less than 0.01JC
+            - You can't steal if you have less than 6JC
+            - You can't steal from targets who are in grace period.
+            - You have 3 "stealing points", you lose one every time you use the steal command
             successfully
-         - You can't steal from José(lol).
-         - You are automatically arrested if you try to steal more than the target's wallet
+            - You can't steal from José(lol).
+            - You are automatically arrested if you try to steal more than the target's wallet
         """
         await self.jcoin.ensure_taxbank(ctx)
         thief = ctx.author
-    
+
         if thief == target:
             raise self.SayException("You can't steal from yourself")
 
@@ -298,6 +304,7 @@ class CoinsExt(Cog):
 
         if res < chance:
             # successful steal
+            thief_account = await self.jcoin.get_account(thief.id)
             thief_account['success_steal'] += 1
             await self.jcoin.update_accounts([thief_account])
 

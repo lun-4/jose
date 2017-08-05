@@ -12,15 +12,15 @@ from .common import Cog
 
 log = logging.getLogger(__name__)
 
-def is_moderator():
-    def _is_moderator(ctx):
-        if ctx.guild is None:
-            return False
+def _is_moderator(ctx):
+    if ctx.guild is None:
+        return False
 
-        member = ctx.guild.get_member(ctx.author.id)
-        perms = ctx.channel.permissions_for(member)
-        return (ctx.author.id == ctx.bot.owner_id) or perms.manage_guild
-    
+    member = ctx.guild.get_member(ctx.author.id)
+    perms = ctx.channel.permissions_for(member)
+    return (ctx.author.id == ctx.bot.owner_id) or perms.manage_guild
+
+def is_moderator():    
     return commands.check(_is_moderator)
 
 class Config(Cog):
@@ -46,9 +46,8 @@ class Config(Cog):
         default = {
             'guild_id': guild_id,
             'botblock': True,
-            'image_channel': None,
             'speak_channel': None,
-            'prefix': 'j!',
+            'prefix': self.bot.config.prefix,
             'autoreply_prob': 0,
             'fullwidth_prob': 0.1,
         }
@@ -221,6 +220,21 @@ class Config(Cog):
         await ctx.send('Block not found')
 
     @commands.command()
+    @commands.guild_only()
+    async def prefix(self, ctx, prefix: str=None):
+        """Sets a guild prefix. Returns the prefix if no args are passed."""
+        if not prefix:
+            return await ctx.send('The prefix for this guild is `{}`.'.format(await self.cfg_get(ctx.guild, 'prefix')))
+        
+        if not _is_moderator(ctx):
+            return await ctx.send('Unauthorized to set prefix.')
+
+        if not (1 < len(prefix) < 20):
+            return await ctx.send('Prefixes need to be 1-20 characters long')
+
+        return await ctx.success(await self.cfg_set(ctx.guild, 'prefix', prefix))
+
+    @commands.command()
     @commands.is_owner()
     async def dbstats(self, ctx):
         """Show some mongoDB stuff because JSON sucks ass."""
@@ -234,6 +248,6 @@ class Config(Cog):
         coll_counts = '\n'.join([f'{collname:15} | {count}' for collname, count in counts.most_common()])
         coll_counts = f'```\n{coll_counts}```'
         await ctx.send(coll_counts)
-
+    
 def setup(bot):
     bot.add_cog(Config(bot))

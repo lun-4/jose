@@ -32,7 +32,7 @@ class PlayingStatus(Cog):
     async def rotate(self):
         """Get a random playing status and use it"""
         msg = random.choice(self.phrases)
-        fmt = f'{msg} | v{self.JOSE_VERSION} | {self.bot.command_prefix}help'
+        fmt = f'{msg} | v{self.JOSE_VERSION} | {self.bot.config.prefix}help'
         log.info('Setting playing to %r', fmt)
         await self.bot.change_presence(game=discord.Game(name=fmt))
 
