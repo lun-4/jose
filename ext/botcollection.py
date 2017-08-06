@@ -15,6 +15,7 @@ WHITELIST = (
     340609473439596546, # slice is a furry that plays agario
     191611344137617408, # dan's 'haha gay pussy party'
     277919178340565002, # lold - lolbot testing server
+    248143597097058305, # cyn bae's private server we gotta get 69
 )
 
 log = logging.getLogger(__name__)
