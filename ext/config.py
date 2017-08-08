@@ -238,7 +238,7 @@ class Config(Cog):
     @commands.command()
     @commands.guild_only()
     @is_moderator()
-    async def notify(self, ctx, channel: discord.Channel):
+    async def notify(self, ctx, channel: discord.TextChannel):
         """Make a channel a notification channel.
         
         A notification channel will be used bu josé
