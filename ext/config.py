@@ -221,6 +221,7 @@ class Config(Cog):
 
     @commands.command()
     @commands.guild_only()
+    @is_moderator()
     async def prefix(self, ctx, prefix: str=None):
         """Sets a guild prefix. Returns the prefix if no args are passed."""
         if not prefix:
@@ -233,6 +234,25 @@ class Config(Cog):
             return await ctx.send('Prefixes need to be 1-20 characters long')
 
         return await ctx.success(await self.cfg_set(ctx.guild, 'prefix', prefix))
+
+    @commands.command()
+    @commands.guild_only()
+    @is_moderator()
+    async def notify(self, ctx, channel: discord.Channel):
+        """Make a channel a notification channel.
+        
+        A notification channel will be used bu josé
+        to say when your server/guild is successfully
+        stolen from by another guild.
+
+        José NEEDS TO HAVE "Send Message" permissions upfront
+        for this to work.
+        """
+        perms = channel.permissions_for(ctx.guild.me)
+        if not perms.send_messages:
+            return await ctx.send('Add `Send Messages` permission to josé please')
+
+        return await ctx.success(await self.cfg_set(ctx.guild, 'notify_channel', channel.id))
 
     @commands.command()
     @commands.is_owner()
