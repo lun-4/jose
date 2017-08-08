@@ -93,7 +93,8 @@ class JoinSession:
         Or to be paid by the taxbank to the users
         if the heist succeeded.
         """
-        return self.amount / len(self.users)
+        fine = self.amount / len(self.users)
+        return round(fine, 3)
 
     def fmt_res(self, res):
         """Format data from a heist result object to a nice string"""
@@ -171,7 +172,10 @@ class JoinSession:
         ctx = self.ctx
 
         for user_id in self.users:
-            await self.coins.transfer(user_id, self.target.id, self.fine)
+            try:
+                await self.coins.transfer(user_id, self.target.id, self.fine)
+            except self.coins.TransferError:
+                await self.coins.zero(user_id)
 
         for jailed_id in res['jailed']:
             jailed = self.bot.get_user(jailed_id)
@@ -190,6 +194,26 @@ class JoinSession:
         saved_mentions = ' '.join([f'<@{saved}>' for saved in res['saved']])
         await ctx.send(f'Not in Jail: {saved_mentions}')
 
+    async def target_send(self, msg):
+        """Send a message to the target guild.
+        
+        This:
+         - Checks the configuration for a notification channel
+          - If it exists, but it is None, nothing is done
+          - If it exists, the message is sent
+        """
+        config = self.heist.config
+        
+        chan_id = await config.cfg_get(self.target, 'notify_channel')
+        if chan_id is None:
+            return
+
+        notify = self.target.get_channel(chan_id)
+        if notify is None:
+            return
+
+        await notify.send(msg)
+
     async def process_heist(self, res: dict):
         """Process the result given by :meth:`JoinSession.do_heist`"""
         await self.ctx.send(f'debug information, ignore: `{res!r}`')
@@ -203,11 +227,15 @@ class JoinSession:
             if user is None:
                 continue
 
-            await self.coins.transfer(self.target.id, user_id, self.fine)
+            try:
+                await self.coins.transfer(self.target.id, user_id, self.fine)
+            except self.coins.TransferError:
+                pass
             await self.cext.add_cooldown(user, 1, 7)
 
         self.heist.sessions.pop(self.id)
         await self.ctx.send(f'{self.fmt_res(res)} Transferred {self.fine} to all {len(self.users)} users of the session')
+        await self.target_send('Your taxbank got stolen from a heist, the thiefs got {self.fine}JC')
 
     async def force_finish(self) -> 'any':
         """Force the join session to finish
@@ -313,6 +341,9 @@ class Heist(Cog):
         acc = await coins.get_account(ctx.author.id)
         if acc['amount'] < 10:
             raise self.SayException("You don't have more than `10JC` to join the session.")
+
+        if acc['amount'] < session.fine:
+            raise self.SayException(f"You can't pay the fine(`{session.fine}JC`)")
 
     @commands.group(invoke_without_command=True)
     async def heist(self, ctx, amount: decimal.Decimal, *, target: GuildConverter):

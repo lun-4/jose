@@ -251,6 +251,14 @@ class Coins(Cog):
         return sorted(accounts, \
             key=lambda account: float(account[field]), reverse=True)
 
+    async def zero(self, user_id: int) -> 'None':
+        """Zero an account."""
+        account = await self.get_account(user_id)
+        if account is None:
+            return
+
+        return await self.transfer(user_id, self.bot.user.id, account['amount'])
+
     async def ranks(self, user_id, guild):
         all_accounts = await self.all_accounts()
 
