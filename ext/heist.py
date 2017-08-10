@@ -93,6 +93,9 @@ class JoinSession:
         Or to be paid by the taxbank to the users
         if the heist succeeded.
         """
+        if len(self.users) < 1:
+            return round(self.amount, 3)
+
         fine = self.amount / len(self.users)
         return round(fine, 3)
 
