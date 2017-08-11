@@ -16,6 +16,7 @@ WHITELIST = (
     191611344137617408, # dan's 'haha gay pussy party'
     277919178340565002, # lold - lolbot testing server
     248143597097058305, # cyn bae's private server we gotta get 69
+    291990349776420865, # em's meme heaven
 )
 
 log = logging.getLogger(__name__)
