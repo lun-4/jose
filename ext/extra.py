@@ -84,6 +84,11 @@ class Extra(Cog):
 
             await ctx.send(embed=em)
 
+    async def _do_rxkcd_debug(self, ctx):
+        async with self.bot.session.post(RXKCD_ENDPOINT, json={'search': 'standards'}) as r:
+            await ctx.send(repr(r))
+            await ctx.send(await r.text())
+
     @commands.command()
     async def rxkcd(self, ctx, *, terms: str):
         """Get a Relevant XKCD.
@@ -91,6 +96,9 @@ class Extra(Cog):
         Made with https://github.com/adtac/relevant-xkcd
         """
         try:
+            if '-debug' in terms:
+                return await self._do_rxkcd_debug(ctx)
+
             async with ctx.typing():
                 await self._do_rxkcd(ctx, terms)
         except Exception as err:
