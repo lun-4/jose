@@ -42,19 +42,30 @@ class MIDI(Cog):
             await self.loop.run_in_executor(None, midifile.add_one,\
                 0, 0, note, index, duration, 100)
 
+
         return midifile
 
     @commands.command()
+    @commands.is_owner()
     async def midi(self, ctx, tempo: int=120, *, data: str):
         """Convert text to MIDI.
         
         The actual letter-to-note map? idk :shrug:
         """
+        t1 = time.monotonic()
         midifile = await self.make_midi(tempo, data)
+        t2 = time.monotonic()
+
         if midifile is None:
             return await ctx.send('Failed to generate MIDI file')
 
-        # TODO: add file uploading
+        delta = round((t2 - t1) * 1000, 2)
+
+        fp = io.BytesIO()
+        await self.loop.run_in_executor(None, midifile.writeFile, fp)
+
+        wrapped = discord.File(fp, filename='gay.midi')
+        await ctx.send(f'took {delta}ms', file=wrapped)
 
 def setup(bot):
     bot.add_cog(MIDI(bot))
