@@ -74,6 +74,9 @@ class ChannelHandler(logging.Handler):
                 continue
 
             joined = '\n'.join(messages)
+            if len(joined) >= 2000:
+                joined = joined[:2000]
+
             channel = self.channels[level]
 
             send = getattr(channel, 'send', None)
