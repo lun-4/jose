@@ -198,7 +198,7 @@ class Extra(Cog):
 
             try:
                 ratio = account['success_steal'] / account['times_stolen']
-                ratio = round(ratio, 2)
+                ratio = round((ratio * 100), 3)
 
                 em.add_field(name='Stealing', value='{} tries, {} success, ratio of success: {}/steal'.format( \
                     account['times_stolen'], account['success_steal'], ratio))
