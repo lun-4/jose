@@ -209,6 +209,9 @@ async def get_prefix(bot, message):
     if message.guild is None:
         return bot.config.prefix
 
+    if message.guild.id == 216292020371718146:
+        return ['j%']
+
     custom = await bot.get_cog("Config").cfg_get(message.guild, "prefix")
     if custom == bot.config.prefix:
         return custom
