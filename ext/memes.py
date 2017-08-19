@@ -3,6 +3,7 @@ import string
 import urllib.parse
 
 import discord
+import pymongo
 
 from discord.ext import commands
 from .common import Cog, WIDE_MAP
@@ -185,8 +186,8 @@ class Memes(Cog):
     async def top(self, ctx):
         """Shows the top 15 most used memes."""
         res = []
+        cur = self.memes_coll.find({}).sort('uses', pymongo.DESCENDING)
 
-        cur = self.memes_coll.find({}).sort('uses')
         for (idx, meme) in enumerate(await cur.to_list(length=15)):
             res.append(f'[{idx}] {meme["name"]} used {meme["uses"]} times')
 
