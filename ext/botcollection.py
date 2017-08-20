@@ -39,6 +39,7 @@ class BotCollection(Cog):
 
     async def on_guild_join(self, guild):
         bots, humans, ratio = self.bot_human_ratio(guild)
+        owner = guild.owner
 
         log.info(f'[bh:join] {guild!s} -> ratio {len(bots)} / {len(humans)} = {ratio:.2}')
 
@@ -46,15 +47,19 @@ class BotCollection(Cog):
             return
 
         if ratio > BOT_RATIO_MAX:
-            log.info(f'[bh:leave] leaving {guild!s}')
+            log.info(f'[bh:leave:guild_join] leaving {guild!s}')
             await guild.leave()
+            return
 
-        # check blocks
         if await self.bot.is_blocked_guild(guild.id):
-            owner = guild.owner
-
             await owner.send('Sorry. The guild you added José on is blocked. Appeal to the block at the support server(Use the invite provided in `j!invite`).')
             await guild.leave()
+            return
+
+        await owner.send('Hello, welcome to José!'
+                         "Discord's API Terms of Service requires me to tell you I log"
+                         'Command usage and errors to a special channel.'
+                         '**Only commands and errors are logged, no messages are logged, ever.**')
 
     async def on_member_join(self, member):
         guild = member.guild
