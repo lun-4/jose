@@ -138,8 +138,8 @@ class Math(Cog):
             await ctx.send(f'{ctx.author.mention}, :cyclone: No answer :cyclone:')
             return
 
-    @commands.command(aliases=['vgay'])
-    async def owm(self, ctx, location: str):
+    @commands.command(aliases=['owm'])
+    async def weather(self, ctx, location: str):
         """Get weather data for a location."""
 
         await self.jcoin.pricing(ctx, self.prices['API'])
@@ -247,67 +247,6 @@ class Math(Cog):
 
         joined = ', '.join(str(r) for r in dices)
         await ctx.send(f'{dicestr} : `{joined}` => {sum(dices)}')
-
-    async def w_api_post(self, route, payload):
-        payload_send = {**self.w_api_base_payload, **payload}
-        base_url = self.w_api_base_url
-
-        async with self.bot.session.post(f'{base_url}{route}', json=payload_send) as resp:
-            try:
-                data = await resp.json()
-            except Exception:
-                data = {}
-            
-            status = data.get('status')
-
-            if resp.status != 200:
-                if resp.status == 500:
-                    log.error(f'```<@116693403147698181>```api shitted itself {status!r}')
-                    raise self.SayException(f'x_x 500. `{status["decrypted"]}`')
-                else:
-                    raise self.SayException(f'Failed to retrieve weather data, code {resp.status}')
-
-
-            return data
-
-    @commands.command(aliases=['temperature', 'therm'])
-    async def weather(self, ctx, *, querylocation: str):
-        """Query temperature data.
-        
-        Uses data from The Weather Channel
-        """
-        if self.w_config is None:
-            raise self.SayException('No weather API data found in config file')
-
-        await self.jcoin.pricing(ctx, self.prices['API'])
-        async with ctx.typing():
-            _locations = await self.w_api_post('location', {'query': querylocation})
-            locations = _locations['locations']
-            if len(locations) < 1:
-                raise self.SayException('No locations found')
-
-            location_found = locations[0]
-
-            _weather_data = await self.w_api_post('weather', {'location': location_found['id']})
-
-        current = _weather_data['current']
-        location = _weather_data['location']
-
-        for field in current:
-            try:
-                current[field] = round(current[field], 2)
-            except: pass
-
-        location_time = datetime.datetime.fromtimestamp(int(current['time']))
-
-        em = discord.Embed(title=f"Weather for '{querylocation}'")
-        em.description = f"Time of observation (GMT+0): {location_time}"
-
-        em.add_field(name='Location', value=f'{location["city"]}, {location["stateName"]}, {location["country"]}')
-        em.add_field(name='Situation', value=f'{current["text"]} {W_API_ICONS[current["condition"]]}')
-        em.add_field(name='Temperature', value=f'`{current["tempC"]} °C, {current["temp"]} °F, {current["tempK"]} °K`')
-
-        await ctx.send(embed=em)
 
 
 def setup(bot):
