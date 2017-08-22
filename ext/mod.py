@@ -236,15 +236,12 @@ class Moderation(Cog):
             reason = {}
             action_as_auditlog = getattr(discord.AuditLogAction, ACTION_AS_AUDITLOG[action])
             try:
-                async for entry in guild.audit_logs(limit=10):
+                async for entry in guild.audit_logs(limit=10, action=action_as_auditlog):
                     if entry.target.id != user.id:
                         continue
 
-                    if entry.action != action_as_auditlog:
-                        continue
-
                     try:
-                        reason['moderator'] = user
+                        reason['moderator'] = entry.user
                         reason['reason'] = entry.reason
                     except AttributeError:
                         reason['reason'] = None
