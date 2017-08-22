@@ -138,8 +138,8 @@ class Math(Cog):
             await ctx.send(f'{ctx.author.mention}, :cyclone: No answer :cyclone:')
             return
 
-    #@commands.command(aliases=['temperature'])
-    async def weather(self, ctx, location: str):
+    @commands.command(aliases=['vgay'])
+    async def owm(self, ctx, location: str):
         """Get weather data for a location."""
 
         await self.jcoin.pricing(ctx, self.prices['API'])
