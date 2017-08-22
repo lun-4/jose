@@ -212,7 +212,7 @@ class Coins(Cog):
         except:
             raise TransferError('Error converting to decimal.')
 
-        if amount < .001:
+        if amount < .0009:
             raise TransferError('no small transfers kthx')
 
         if amount <= 0:
