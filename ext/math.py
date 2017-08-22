@@ -159,11 +159,15 @@ class Math(Cog):
         icon = OWM_ICONS.get(_icon, '*<no icon>*')
         status = w.get_detailed_status()
 
-        res = [f'{location}']
-        res.append(f' - Status: `{status}` : {icon}')
-        res.append(f' - `{_wg("celsius")} °C, {_wg("fahrenheit")} °F, {_wg("kelvin")} °K`')
+        em = discord.Embed(title=f"Weather for '{location}'")
 
-        await ctx.send('\n'.join(res))
+        o_location = observation.get_location()
+
+        em.add_field(name='Location', value=f'{o_location.get_name()}')
+        em.add_field(name='Situation', value=f'{status} {icon}')
+        em.add_field(name='Temperature', value=f'`{_wg("celsius")} °C, {_wg("fahrenheit")} °F, {_wg("kelvin")} °K`')
+
+        await ctx.send(embed=em)
 
     @commands.command()
     async def money(self, ctx, amount: str, currency_from: str = '', currency_to: str = ''):
