@@ -35,40 +35,6 @@ OWM_ICONS = {
     '50d': W_MIST,
 }
 
-W_API_ICONS = {
-    'tornado': ':cloud_tornado:',
-    'tropical-storm': ':cyclone:',
-    'thunderstorm': ':thunder_cloud_rain:',
-    'rain-snow': ':cloud_rain: :snowflake:',
-    'rain-hail': ':cloud_rain: *(hail)*',
-    'freezing-drizzle': ':cloud_rain: *(freezing)*',
-    'scattered-showers': ':white_sun_rain_cloud:',
-    'rain': ':cloud_rain:',
-    'flurries': ':cloud_snow:',
-    'snow': ':cloud_snow:',
-    'blowing-snow': ':cloud_snow: :dash:',
-    'hail': '*(hail)*',
-    'fog': ':fog: *(fog)*',
-    'wind': ':dash:',
-    'cloudy': ':cloud:',
-    'mostly-cloudy-night': ':partly_sunny:',
-    'mostly-cloudy': ':partly_sunny:',
-    'partly-cloudy-night': ':white_sun_small_cloud:',
-    'partly-cloudy': ':white_sun_small_cloud:',
-    'clear-night': ':full_moon:',
-    'sunny': ':sunny:',
-    'mostly-clear-night': ':full_moon: :cloud: *(partly cloudy)*',
-    'mostly-sunny': ':white_sun_small_cloud:',
-    'isolated-thunderstorms': ':thunder_cloud_rain:',
-    'scattered-thunderstorms': ':thunder_cloud_rain:',
-    'heavy-rain': ':cloud_rain: *(heavy)*',
-    'scattered-snow': ':cloud_snow: *(scattered)*',
-    'heavy-snow': ':cloud_snow: *(heavy)*',
-    'na': ':no_entry_sign: *(na)*',
-    'scattered-showers-night': ':white_sun_rain_cloud:',
-    'scattered-snow-night': ':cloud_snow: *(scattered)*',
-    'scattered-thunderstorms-night': ':thunder_cloud_rain:'
-}
 
 class Math(Cog):
     """Math related commands."""
@@ -77,16 +43,7 @@ class Math(Cog):
 
         self.wac = wolframalpha.Client(self.bot.config.WOLFRAMALPHA_APP_ID)
         self.owm = pyowm.OWM(self.bot.config.OWM_APIKEY)
-        self.w_config = getattr(self.bot.config, 'WEATHER_API', None)
         
-        if self.w_config is not None:
-            self.w_api_base_url = self.w_config['base_url']
-            self.w_api_base_payload = {
-                'key': self.w_config['key'],
-                'secret': self.w_config['secret'],
-            }
-
-
     @commands.command(aliases=['wa'])
     async def wolframalpha(self, ctx, *, term: str):
         """Query Wolfram|Alpha"""
