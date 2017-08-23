@@ -56,9 +56,9 @@ class BotCollection(Cog):
             await guild.leave()
             return
 
-        await owner.send('Hello, welcome to José!'
-                         "Discord's API Terms of Service requires me to tell you I log"
-                         'Command usage and errors to a special channel.'
+        await owner.send('Hello, welcome to José!\n'
+                         "Discord's API Terms of Service requires me to tell you I log\n"
+                         'Command usage and errors to a special channel.\n'
                          '**Only commands and errors are logged, no messages are logged, ever.**')
 
     async def on_member_join(self, member):
