@@ -227,11 +227,11 @@ class CoinsExt(Cog):
             hours = await self.add_cooldown(thief)
         except self.jcoin.TransferError as err:
             # oh you are so fucked
-            if 'funds' not in err.args[0]:
+            if 'enough' not in err.args[0]:
                 raise self.SayException(f'wtf how did this happen {err!r}')
 
             thief_account = await self.jcoin.get_account(thief.id)
-            amnt = thief_account['amnt']
+            amnt = thief_account['amount']
             transfer_info = await self.jcoin.transfer(thief.id, ctx.guild.id, amnt)
             hours = await self.add_cooldown(thief, 0, ARREST_TIME + int(amnt))
 
