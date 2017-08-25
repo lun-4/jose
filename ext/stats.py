@@ -97,7 +97,7 @@ class Statistics(Cog):
 
     async def texter_stats(self):
         """Report Texter statistics to datadog."""
-        speak = bot.get_cog('Speak')
+        speak = self.bot.get_cog('Speak')
         if not speak:
             log.warning('[stats] Speak not found')
             return
