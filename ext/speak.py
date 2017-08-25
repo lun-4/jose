@@ -126,7 +126,7 @@ class Speak(Cog):
         try:
             while True:
                 await self.texter_collection()
-                await asyncio.sleep(120)
+                await asyncio.sleep(60)
         except asyncio.CancelledError:
             pass
 
