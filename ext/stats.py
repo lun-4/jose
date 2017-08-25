@@ -103,8 +103,8 @@ class Statistics(Cog):
             return
 
         await self.gauge('jose.tx.count', len(speak.text_generators))
-        await self.gayge('jose.tx.avg_gen', speak.st_gen_totalms / speak.st_gen_count)
-        await self.gayge('jose.tx.txc_avg_run', speak.st_txc_totalms / speak.st_txc_runs)
+        await self.gauge('jose.tx.avg_gen', speak.st_gen_totalms / speak.st_gen_count)
+        await self.gauge('jose.tx.txc_avg_run', speak.st_txc_totalms / speak.st_txc_runs)
 
     async def querystats(self):
         try:
