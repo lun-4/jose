@@ -162,7 +162,7 @@ class Speak(Cog):
         channel_id = await self.config.cfg_get(guild, 'speak_channel')
         channel = guild.get_channel(channel_id)
         if channel is None:
-            raise TexterFail('Channel to read messages not found, use "j!help speakchan"?')
+            raise TexterFail('Channel to read messages not found, check the j!speakchan command(j!help speakchan)')
 
         self.generating[guild.id] = True
         try:
@@ -250,8 +250,12 @@ class Speak(Cog):
         if self.generating.get(ctx.guild.id):
             return
 
-        sentence = await self.make_sentence(ctx)
-        await ctx.send(sentence)
+        try:
+            sentence = await self.make_sentence(ctx)
+        except SayException as err:
+            return await ctx.send(f'Failed to generate a sentence: `{err.args[0]!r}`')
+
+        await ctx.send(sentence)0
 
     @commands.command()
     @commands.is_owner()
