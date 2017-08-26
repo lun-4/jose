@@ -29,8 +29,11 @@ class Basic(Cog):
         t1 = time.monotonic()
         m = await ctx.send('pinging...')
         t2 = time.monotonic()
-        delta = round((t2 - t1) * 1000, 2)
-        await m.edit(content=f'`{delta}ms`')
+        rtt = (t2 - t1) * 1000
+
+        ws = self.bot.latency * 1000
+
+        await m.edit(content=f'rtt: `{rtt:.1f}ms`, gateway: `{ws:.1f}ms`')
 
     @commands.command(aliases=['rand'])
     async def random(self, ctx, n_min: int, n_max: int):
