@@ -82,7 +82,11 @@ class Math(Cog):
                 text = pod.text
             elif pod.get('subpod', False):
                 subpod = pod['subpod']
-                text = subpod['img']['@src']
+                img = subpod['img']
+                if isinstance(img, dict):
+                    text = subpod['img']['@src']
+                else:
+                    text = img
             else:
                 text = None
 
