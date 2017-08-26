@@ -255,7 +255,7 @@ class Speak(Cog):
         except SayException as err:
             return await ctx.send(f'Failed to generate a sentence: `{err.args[0]!r}`')
 
-        await ctx.send(sentence)0
+        await ctx.send(sentence)
 
     @commands.command()
     @commands.is_owner()
