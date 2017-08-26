@@ -17,6 +17,8 @@ class Subscribe(Cog):
         super().__init__(bot)
     
     def __local_check(self, ctx):
+        if not ctx.guild:
+            return False
         return ctx.guild.id == JOSE_SERVER
 
     def get_role(self, ctx, roleid):
