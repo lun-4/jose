@@ -152,10 +152,11 @@ class Speak(Cog):
         if cleaned > 0:
             delta = round((t_end - t_start) * 1000, 2)
 
-            self.st_txc_runs += 1
             self.st_txc_totalms += delta
 
             log.info(f'[tx:coll] {amount} -> {amount - cleaned}, {delta}ms')
+
+        self.st_txc_runs += 1
 
     async def get_messages(self, guild, amount=2000) -> list:
         channel_id = await self.config.cfg_get(guild, 'speak_channel')
@@ -195,8 +196,8 @@ class Speak(Cog):
         guild_messages = await self.get_messages_str(guild)
         new_texter = await make_texter(1, guild_messages, guild.id)
 
-        self.st_txc_totalms += new_texter.time_taken
-        self.st_txc_runs += 1
+        self.st_gen_totalms += new_texter.time_taken
+        self.st_gen_runs += 1
 
         self.text_generators[guild.id] = new_texter
 
