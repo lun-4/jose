@@ -197,7 +197,7 @@ class Speak(Cog):
         new_texter = await make_texter(1, guild_messages, guild.id)
 
         self.st_gen_totalms += new_texter.time_taken
-        self.st_gen_runs += 1
+        self.st_gen_count += 1
 
         self.text_generators[guild.id] = new_texter
 
