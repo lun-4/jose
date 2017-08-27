@@ -396,7 +396,7 @@ class Speak(Cog):
 
         lines = (f'Refcount: {tx.refcount}\n',
                 f'Words: {tx.wordcount}\n',
-                f'Lines: {tx.linecounr\n}',
+                f'Lines: {tx.linecount}\n',
         )
         await ctx.send(''.join(lines))
 
