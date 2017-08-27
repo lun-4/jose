@@ -132,6 +132,11 @@ class ChannelHandler(logging.Handler):
 
         log_level = record.levelno
         formatted = self.format(record) 
+
+        # because commands like eval can fuck the
+        # codeblock up
+        formatted = bot.clean_content(formatted)
+
         log_message = f'\n**`[{record.levelname}] [{record.name}]`** `{formatted}`'
         if log_level in (logging.WARNING, logging.ERROR):
             log_message = f'\n**`[{record.levelname}] [{record.name}]`**\n```py\n{formatted}\n```'
