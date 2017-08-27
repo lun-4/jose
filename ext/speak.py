@@ -394,10 +394,11 @@ class Speak(Cog):
         if not tx:
             return await ctx.send('No texter loaded for this guild')
 
-        await ctx.send(f'Refcount: {tx.refcount}\n'
-                        f'Words: {tx.wordcount}\n'
-                        f'Lines: {tx.linecounr\n}'
+        lines = (f'Refcount: {tx.refcount}\n',
+                f'Words: {tx.wordcount}\n',
+                f'Lines: {tx.linecounr\n}',
         )
+        await ctx.send(''.join(lines))
 
 def setup(bot):
     bot.add_cog(Speak(bot))
