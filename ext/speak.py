@@ -384,5 +384,20 @@ class Speak(Cog):
 
         await ctx.send(embed=em)
 
+    @commands.command()
+    @commands.guild_only()
+    async def curtx(self, ctx):
+        """Get information about the current Texter(if any)
+        loaded at your guild.
+        """
+        tx = self.text_generators.get(ctx.guild.id)
+        if not tx:
+            return await ctx.send('No texter loaded for this guild')
+
+        await ctx.send(f'Refcount: {tx.refcount}\n'
+                        f'Words: {tx.wordcount}\n'
+                        f'Lines: {tx.linecounr\n}'
+        )
+
 def setup(bot):
     bot.add_cog(Speak(bot))

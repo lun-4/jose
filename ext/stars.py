@@ -406,9 +406,9 @@ class Starboard(Cog):
         try:
             await self.add_star(message, user_id, cfg)
         except (StarError, StarAddError) as err:
-            log.error(f'raw_reaction_add: {err!r}')
+            log.warning(f'raw_reaction_add: {err!r}')
         except Exception:
-            log.error('Error in add_star from raw_reaction_add', exc_info=True)
+            log.exception('Error in add_star from raw_reaction_add')
 
     async def on_raw_reaction_remove(self, emoji_partial, message_id, channel_id, user_id): 
         if emoji_partial.is_custom_emoji():
@@ -426,9 +426,9 @@ class Starboard(Cog):
         try:
             await self.remove_star(message, user_id, cfg)
         except (StarError, StarRemoveError) as err:
-            log.error(f'raw_reaction_remove: {err!r}')
+            log.warning(f'raw_reaction_remove: {err!r}')
         except Exception:
-            log.error('Error in remove_star from raw_reaction_remove', exc_info=True)
+            log.exception('Error in remove_star from raw_reaction_remove')
 
     async def on_raw_reaction_clear(self, message_id, channel_id):
         channel = self.bot.get_channel(channel_id)
@@ -441,9 +441,9 @@ class Starboard(Cog):
         try:
             await self.remove_all(message, cfg)
         except (StarError, StarRemoveError) as err:
-            log.error(f'raw_reaction_clear: {err!r}')
+            log.warning(f'raw_reaction_clear: {err!r}')
         except Exception:
-            log.error('Error in remove_all from raw_reaction_clear', exc_info=True)
+            log.exception('Error in remove_all from raw_reaction_clear')
 
     @commands.command()
     @commands.guild_only()
@@ -463,11 +463,12 @@ class Starboard(Cog):
             await ctx.send("You already have a starboard. If you want to detach josé from it, use the `stardetach` command")
             return
 
-        # permission overwrites etc
+        po = discord.PermissionOverwrite
         overwrites = {
-                guild.default_role: discord.PermissionOverwrite(read_messages=True, send_messages=False),
-                guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True),
+                guild.default_role: po(read_messages=True, send_messages=False),
+                guild.me: po(read_messages=True, send_messages=True),
         }
+
         try:
             starboard_chan = await guild.create_text_channel(channel_name, overwrites=overwrites, reason='Created starboard channel')
         except discord.Forbidden:
