@@ -180,9 +180,9 @@ class JoseBot(commands.Bot):
             b = '\N{NEGATIVE SQUARED LATIN CAPITAL LETTER B}'
             await ctx.send(f'{b}ot machine {b}roke\n ```py\n{error.original!r}\n```')
         elif isinstance(error, commands.errors.BadArgument):
-            await ctx.send(f'bad arg — {random.choice(BAD_ARG_MESSAGES)} - {error!s}')
+            await ctx.send(f'bad argument — {random.choice(BAD_ARG_MESSAGES)} - {error!s}')
         elif isinstance(error, commands.errors.CheckFailure):
-            await ctx.send(f'check fail — {random.choice(CHECK_FAILURE_PHRASES)}')
+            await ctx.send(f'check failed — {random.choice(CHECK_FAILURE_PHRASES)}')
 
     async def on_message(self, message):
         author_id = message.author.id
