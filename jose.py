@@ -177,7 +177,8 @@ class JoseBot(commands.Bot):
                 await ctx.send(f'JoséCoin error: `{error.original!r}`')
                 return
 
-            await ctx.send(f'fucking 🅱enis, u 🅱roke the bot ```py\n{tb}\n```')
+            b = '\N{NEGATIVE SQUARED LATIN CAPITAL LETTER B}'
+            await ctx.send(f'{b}ot machine {b}roke\n ```py\n{error.original!r}\n```')
         elif isinstance(error, commands.errors.BadArgument):
             await ctx.send(f'bad arg — {random.choice(BAD_ARG_MESSAGES)} - {error!s}')
         elif isinstance(error, commands.errors.CheckFailure):
