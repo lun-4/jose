@@ -153,5 +153,9 @@ class Basic(Cog):
         em.add_field(name='Support Server', value=SUPPORT_SERVER)
         await ctx.send(embed=em)
 
+    @commands.command()
+    async def source(self, ctx):
+        await ctx.send('https://github.com/lnmds/jose')
+
 def setup(bot):
     bot.add_cog(Basic(bot))
