@@ -320,6 +320,7 @@ class Memes(Cog):
         await ctx.send('https://www.youtube.com/watch?v=S6UqgjaBt4w')
 
     @commands.command()
+    @commands.is_owner()
     async def blink(self, ctx, *, text: str):
         m = await ctx.send(text)
         for i in range(10):
