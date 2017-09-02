@@ -369,6 +369,10 @@ class Speak(Cog):
 
         res = ['refcount | texters']
         res += [f'{r}        | {txc}' for (r, txc) in refcounts.most_common()]
+
+        res += [f'avg tx gen: {self.st_gen_totalms / self.st_gen_count} ms/generated']
+        res += [f'avg txc run: {self.st_txc_totalms / self.st_txc_runs} ms/runs']
+
         res = '\n'.join(res)
         await ctx.send(f'```{res}```')
 
