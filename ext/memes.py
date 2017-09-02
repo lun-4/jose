@@ -327,7 +327,7 @@ class Memes(Cog):
                 await m.edit(content=f'**{text}**')
             else:
                 await m.edit(content=f'{text}')
-            await asyncio.sleep(1)
+            await asyncio.sleep(2)
 
 def setup(bot):
     bot.add_cog(Memes(bot))
