@@ -318,5 +318,15 @@ class Memes(Cog):
         """PUMPE THE MOOSCLES YIIIS"""
         await ctx.send('https://www.youtube.com/watch?v=S6UqgjaBt4w')
 
+    @commands.command()
+    async def blink(self, ctx, *, text: str):
+        m = await ctx.send(text)
+        for i in range(10):
+            if i % 2 == 0:
+                await m.edit(content=f'**{text}**')
+            else:
+                await m.edit(content=f'{text}'
+            await asyncio.sleep(1)
+
 def setup(bot):
     bot.add_cog(Memes(bot))
