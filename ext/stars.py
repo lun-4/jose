@@ -50,8 +50,14 @@ def empty_starconfig(guild):
 
 def get_humans(message):
     l = len([1 for m in message.guild.members if not m.bot])
+
+    # Since selfstarring isn't allowed,
+    # we need to remove 1 from the total amount.
+    l -= 1
+
     if l < 0:
         return 1
+
     return l
 
 def make_color(star, message):
