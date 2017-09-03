@@ -97,11 +97,14 @@ def get_emoji(star, message):
     return emoji
 
 def make_star_embed(star, message):
-    star_emoji = get_emoji(star)
+    """Create the starboard embed."""
+    star_emoji = get_emoji(star, message)
+    embed_color = make_color(star, message)
+
     title = f'{len(star["starrers"])} {star_emoji} {message.channel.mention}, ID: {message.id}'
 
     content = message.content
-    em = discord.Embed(description=content, colour=make_color(star))
+    em = discord.Embed(description=content, colour=embed_color)
     em.timestamp = message.created_at
 
     au = message.author
