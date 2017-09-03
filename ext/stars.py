@@ -48,26 +48,57 @@ def empty_starconfig(guild):
         'starboard_id': None,
     }
 
-def make_color(star):
-    color = 0xffff00
+def get_humans(message):
+    l = len([1 for m in message.guild.members if not m.bot])
+    if l < 0:
+        return 1
+    return l
+
+def make_color(star, message):
+    color = 0x0
     stars = len(star['starrers'])
-    if stars >= 0:
-        color = BLUE
-    if stars >= 3:
-        color = BRONZE
-    if stars >= 5:
-        color = SILVER
-    if stars >= 10:
-        color = GOLD
-    if stars >= 20:
+
+    star_ratio = stars / get_humans(message)
+
+    if star_ratio >= 0:
         color = RED
-    if stars >= 50:
+    if star_ratio >= 0.1:
+        color = BLUE
+    if star_ratio >= 0.2:
+        color = BRONZE
+    if star_ratio >= 0.4:
+        color = SILVER
+    if star_ratio >= 0.8:
+        color = GOLD
+    if star_ratio >= 1:
         color = WHITE
+
     return color
 
+def get_emoji(star, message):
+    emoji = ''
+    stars = len(star['starrers'])
+
+    star_ratio = stars / get_humans(message)
+
+    if star_ratio >= 0:
+        emoji = '<:josestar1:353997747772456980>'
+    if star_ratio >= 0.1:
+        emoji = '<:josestar2:353997748216922112>'
+    if star_ratio >= 0.2:
+        emoji = '<:josestar3:353997748288225290>'
+    if star_ratio >= 0.4:
+        emoji = '<:josestar4:353997749341126657>'
+    if star_ratio >= 0.8:
+        emoji = '<:josestar5:353997749949300736>'
+    if star_ratio >= 1:
+        emoji = '<:josestar6:353997749630402561>'
+
+    return emoji
 
 def make_star_embed(star, message):
-    title = f'{len(star["starrers"])} stars, {message.channel.mention}, ID: {message.id}'
+    star_emoji = get_emoji(star)
+    title = f'{len(star["starrers"])} {star_emoji} {message.channel.mention}, ID: {message.id}'
 
     content = message.content
     em = discord.Embed(description=content, colour=make_color(star))
@@ -159,7 +190,8 @@ class Starboard(Cog):
             star_object = empty_star_object(message)
             res = await self.starboard_coll.insert_one(star_object)
             if not res.acknowledged:
-                raise StarAddError("mongo didn't acknowledge the insert op")
+                raise StarAddError('Insert OP not acknowledged by db')
+
             star = star_object
 
         try:
@@ -193,7 +225,7 @@ class Starboard(Cog):
         if len(star['starrers']) < 1:
             res = await self.starboard_coll.delete_many({'message_id': message.id, 'guild_id': guild_id})
             if res.deleted_count != 1:
-                log.warning(f'Deleted {res.deleted_count} document from 0 stars, different than 1')
+                log.error(f'Deleted {res.deleted_count} document from 0 stars, different than 1')
             return star
 
         await self.starboard_coll.update_one({'message_id': message.id, 'guild_id': guild_id}, {'$set': star})
@@ -205,6 +237,7 @@ class Starboard(Cog):
         star = await self.get_star(guild_id, message.id)
         if star is None:
             raise StarError('Star object not found to be reset')
+
         star['starrers'] = []
         await self.starboard_coll.delete_one({'message_id': message.id, 'guild_id': guild_id})
         return star
