@@ -252,7 +252,7 @@ class Speak(Cog):
 
         try:
             sentence = await self.make_sentence(ctx)
-        except SayException as err:
+        except self.SayException as err:
             return await ctx.send(f'Failed to generate a sentence: `{err.args[0]!r}`')
 
         await ctx.send(sentence)
