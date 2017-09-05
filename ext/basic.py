@@ -155,6 +155,7 @@ class Basic(Cog):
 
     @commands.command()
     async def source(self, ctx):
+        """Source code:tm:"""
         await ctx.send('https://github.com/lnmds/jose')
 
 def setup(bot):

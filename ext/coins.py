@@ -317,7 +317,7 @@ class Coins(Cog):
 
     async def on_message(self, message):
         # fuck bots
-        if message.author.bot:
+        if message.author.bot or message.guild is None:
             return
 
         author_id = message.author.id
