@@ -19,10 +19,13 @@ jcoin_path = 'jcoin/josecoin.db'
 MAGICWORD_PATH = 'db/magicwords.json'
 
 # Tokens 'n' Stuff
-discord_token = 'DISCORD OAUTH2 BOT TOKEN'
+token = 'DISCORD OAUTH2 BOT TOKEN'
+prefix = 'j!' # prefix. duh.
+SPEAK_PREFIX = ['jose ', 'josé']
 soundcloud_id = 'SOUNDCLOUD API ID'
 WOLFRAMALPHA_APP_ID = 'WOLFRAM|ALPHA APP ID' # https://developer.wolframalpha.com/portal/signin.html
 OWM_APIKEY = 'OpenWeatherMap API Key' # https://openweathermap.org/api
+datadog = 'datadog API key'
 ```
 
 ### Running

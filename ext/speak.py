@@ -9,6 +9,7 @@ import markovify
 from discord.ext import commands
 
 from .common import Cog
+import joseconfig
 
 log = logging.getLogger(__name__)
 
@@ -162,7 +163,7 @@ class Speak(Cog):
         channel_id = await self.config.cfg_get(guild, 'speak_channel')
         channel = guild.get_channel(channel_id)
         if channel is None:
-            raise TexterFail('Channel to read messages not found, check the j!speakchan command(j!help speakchan)')
+            raise TexterFail(f'Channel to read messages not found, check the {joseconfig.prefix}speakchan command({joseconfig.prefix} help speakchan)')
 
         self.generating[guild.id] = True
         try:
