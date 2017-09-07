@@ -260,9 +260,10 @@ class Extra(Cog):
         Powered by https://github.com/lnmds/elixir-docsearch.
         """
         await ctx.trigger_typing()
-        base = getattr(self.bot.config, 'elixir_docsearch', None)
-        if base is None:
-            raise self.SayException('No URL for elixir-docsearch is in config.')
+        try:
+            base = self.bot.config.elixir_docsearch
+        except AttributeError:
+            raise self.SayException('No URL for elixir-docsearch found in configuration.')
 
         async with self.bot.session.get(f'http://{base}/search', json={'query': terms}) as r:
             if r.status != 200:
