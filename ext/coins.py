@@ -146,7 +146,12 @@ class Coins(Cog):
         if await self.get_account(ctx.guild.id) is None:
             await self.new_account(ctx.guild.id, 'taxbank')
 
-    async def get_account(self, account_id):
+    async def get_account(self, account_id: int) -> dict:
+        """Get a single account by its ID.
+        
+        This does necessary convertion of the `amount` field
+        to `decimal.Decimal` for actual usage.
+        """
         account = await self.jcoin_coll.find_one({'id': account_id})
         if account is None:
             return None
@@ -160,8 +165,12 @@ class Coins(Cog):
 
         return account
 
-    async def update_accounts(self, accounts):
-        """Update accounts to the jcoin collection."""
+    async def update_accounts(self, accounts: list):
+        """Update accounts to the jcoin collection.
+        
+        This converts `decimal.Decimal` to `str` in the ``amount`` field
+        so we maintain the precision of decimal while fetching/saving.
+        """
         for account in accounts:
             if account['amount'].is_finite():
                 account['amount'] = round(account['amount'], 3)
@@ -251,6 +260,17 @@ class Coins(Cog):
         return sorted(accounts, \
             key=lambda account: float(account[field]), reverse=True)
 
+    async def guild_accounts(self, guild: discord.Guild) -> list:
+        """Fetch all accounts that reference users that are in the guild."""
+        accounts = []
+
+        for member in guild.members:
+            account = await self.get_account(member.id)
+            if account:
+                accounts.append(account)
+
+        return accounts
+
     async def zero(self, user_id: int) -> 'None':
         """Zero an account."""
         account = await self.get_account(user_id)
@@ -259,7 +279,7 @@ class Coins(Cog):
 
         return await self.transfer(user_id, self.bot.user.id, account['amount'])
 
-    async def ranks(self, user_id, guild):
+    async def ranks(self, user_id: int, guild: discord.Guild) -> tuple:
         all_accounts = await self.all_accounts()
 
         all_ids = [account['id'] for account in all_accounts]
@@ -288,7 +308,7 @@ class Coins(Cog):
         except self.TransferError as err:
             raise self.SayException(f'TransferError: `{err.args[0]}`')
 
-    async def get_probability(self, account):
+    async def get_probability(self, account: dict) -> float:
         """Get the coin probability of someone."""
         prob = COIN_BASE_PROBABILITY
         taxpaid = account['taxpaid']

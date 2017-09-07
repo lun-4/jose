@@ -85,14 +85,14 @@ class CoinsExt(Cog):
             await ctx.send('pls no')
             return
 
-        all_accounts = await self.jcoin.all_accounts()
-
         if mode == 'l':
             # TODO: get member list and make account list from that
-            accounts = [account for account in all_accounts if \
-                ctx.guild.get_member(account['id']) is not None][:limit]
+            accounts = await self.jcoin.guild_accounts(ctx.guild)
+            accounts = accounts[:limit]
+
             await self.show(ctx, accounts)
         elif mode == 'g':
+            all_accounts = await self.jcoin.all_accounts()
             accounts = filter(lambda a: a['type'] == 'user', all_accounts)
             accounts = list(accounts)[:limit]
             await self.show(ctx, accounts)
@@ -102,6 +102,7 @@ class CoinsExt(Cog):
             accounts = accounts[:limit]
             await self.show(ctx, accounts, 'taxpaid')
         elif mode == 'b' or mode == '\N{NEGATIVE SQUARED LATIN CAPITAL LETTER B}':
+            all_accounts = await self.jcoin.all_accounts()
             accounts = filter(lambda acc: acc['type'] == 'taxbank', all_accounts)
             accounts = list(accounts)[:limit]
             await self.show(ctx, accounts)
