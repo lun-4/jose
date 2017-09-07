@@ -89,7 +89,7 @@ class CoinsExt(Cog):
             accounts = await self.jcoin.guild_accounts(ctx.guild)
             accounts = accounts[:limit]
 
-            await self.show(ctx, account)
+            await self.show(ctx, accounts)
         elif mode == 'g':
             all_accounts = await self.jcoin.all_accounts()
             accounts = filter(lambda a: a['type'] == 'user', all_accounts)
