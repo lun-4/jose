@@ -260,7 +260,7 @@ class Coins(Cog):
         return sorted(accounts, \
             key=lambda account: float(account[field]), reverse=True)
 
-    async def guild_accounts(self, guild: discord.Guild) -> list:
+    async def guild_accounts(self, guild: discord.Guild, field='amount') -> list:
         """Fetch all accounts that reference users that are in the guild."""
         accounts = []
 
@@ -269,7 +269,8 @@ class Coins(Cog):
             if account:
                 accounts.append(account)
 
-        return accounts
+        return sorted(accounts, \
+            key=lambda account: float(account[field]), reverse=True)
 
     async def zero(self, user_id: int) -> 'None':
         """Zero an account."""
