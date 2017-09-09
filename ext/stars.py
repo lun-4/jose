@@ -440,17 +440,22 @@ class Starboard(Cog):
             return
 
         channel = self.bot.get_channel(channel_id)
+        if not channel:
+            return
+
         cfg = await self.get_starconfig(channel.guild.id)
-        if cfg is None:
+        if not cfg:
             return
 
         message = await channel.get_message(message_id)
+
         try:
             await self.add_star(message, user_id, cfg)
         except (StarError, StarAddError) as err:
             log.warning(f'raw_reaction_add: {err!r}')
         except Exception:
-            log.exception('Error in add_star from raw_reaction_add')
+            log.excpetion('add_star @ reaction_add, %s[cid=%d] %s[gid=%d]', channel.name, \
+                channel.id, channel.guild.name, channel.guild.id)
 
     async def on_raw_reaction_remove(self, emoji_partial, message_id, channel_id, user_id): 
         if emoji_partial.is_custom_emoji():
@@ -460,8 +465,11 @@ class Starboard(Cog):
             return
 
         channel = self.bot.get_channel(channel_id)
+        if not channel:
+            return
+
         cfg = await self.get_starconfig(channel.guild.id)
-        if cfg is None:
+        if not cfg:
             return
 
         message = await channel.get_message(message_id)
@@ -470,13 +478,16 @@ class Starboard(Cog):
         except (StarError, StarRemoveError) as err:
             log.warning(f'raw_reaction_remove: {err!r}')
         except Exception:
-            log.exception('Error in remove_star from raw_reaction_remove')
+            log.excpetion('remove_star @ reaction_remove, %s[cid=%d] %s[gid=%d]', channel.name, \
+                channel.id, channel.guild.name, channel.guild.id)
 
     async def on_raw_reaction_clear(self, message_id, channel_id):
         channel = self.bot.get_channel(channel_id)
-        
+        if not channel:
+            return
+
         cfg = await self.get_starconfig(channel.guild.id)
-        if cfg is None:
+        if not cfg:
             return
         
         message = await channel.get_message(message_id)
@@ -485,7 +496,8 @@ class Starboard(Cog):
         except (StarError, StarRemoveError) as err:
             log.warning(f'raw_reaction_clear: {err!r}')
         except Exception:
-            log.exception('Error in remove_all from raw_reaction_clear')
+            log.excpetion('remove_all @ reaction_clear, %s[cid=%d] %s[gid=%d]', channel.name, \
+                channel.id, channel.guild.name, channel.guild.id)
 
     @commands.command()
     @commands.guild_only()
