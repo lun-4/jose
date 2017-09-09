@@ -40,6 +40,7 @@ class Memes(Cog):
     def __init__(self, bot):
         super().__init__(bot)
         self.memes_coll = self.config.jose_db['memes']
+        self.urban_cache = {}
 
     async def add_meme(self, name, value, author_id, uses=0, nsfw=None):
         """Add a meme to the database."""
@@ -302,6 +303,12 @@ class Memes(Cog):
     @commands.command()
     async def urban(self, ctx, *, term: str):
         """Search for a word in the Urban Dictionary."""
+
+        # cache :DDDDDDDDD
+        if term in self.urban_cache:
+            definition = self.urban_cache[term]
+            return await ctx.send(f'```\n{term!r}:\n{definition}\n```')
+
         await self.jcoin.pricing(ctx, self.prices['API'])
 
         urban_url = f'https://api.urbandictionary.com/v0/define?term={urllib.parse.quote(term)}'
@@ -312,7 +319,10 @@ class Memes(Cog):
         if len(c_list) < 1:
             raise self.SayException('No results found')
 
-        await ctx.send(f'```\n{term!r}:\n{c_list[0]["definition"]}\n```')
+        definition = c_list[0]['definition']
+        self.urban_cache[term] = definition
+
+        await ctx.send(f'```\n{term!r}:\n{definition}\n```')
 
     @commands.command(hidden=True)
     async def ejaculate(self, ctx):
