@@ -159,6 +159,12 @@ class Starboard(Cog):
         # prevent race conditions
         self._locks = collections.defaultdict(asyncio.Lock)
 
+        # janitor
+        #: the janitor semaphore keeps things up and running
+        #  by only allowing 1 janitor task each time.
+        #  a janitor task cleans stuff out of mongo
+        self.janitor_semaphore = asyncio.Semaphore(1)
+
         # collectiones
         self.starboard_coll = self.config.jose_db['starboard']
         self.starconfig_coll = self.config.jose_db['starconfig']
@@ -189,6 +195,22 @@ class Starboard(Cog):
     async def get_star(self, guild_id: int, message_id: int):
         """Get a star object from a guild+message ID pair."""
         return await self.starboard_coll.find_one({'message_id': message_id, 'guild_id': guild_id})
+
+    async def janitor_task(self, guild_id: int):
+        """Deletes all star objects that refer to a specific Guild ID.
+        
+        This will aquire the :attr:`Stars.janitor_semaphore` semaphore,
+        and because of that, it will block the calling coroutine until some other
+        coroutine releases the semaphore.
+        """
+        await self.janitor_semaphore.acquire()
+
+        log.warning('[janitor] deleting star objectss from %d', guild_id)
+        res = await self.starboard_coll.delete_many({'guild_id': guild_id})
+        log.warning('[janitor] Deleted %d star objects from janitoring gid %d', \
+            r.deleted_count, guild_id)
+
+        self.janitor_semaphore.release()
 
     async def raw_add_star(self, config: dict, message: discord.Message, author_id: int) -> dict:
         """Add a star to a message.
