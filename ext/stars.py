@@ -164,7 +164,16 @@ class Starboard(Cog):
         self.starconfig_coll = self.config.jose_db['starconfig']
 
     async def get_starconfig(self, guild_id: int) -> dict:
-        """Get a starboard configuration object for a guild."""
+        """Get a starboard configuration object for a guild.
+        
+        If the guild is blocked, deletes the starboard configuration.
+        """
+
+        if await self.bot.is_blocked_guild(guild_id):
+            r = await self.starconfig_coll.delete_many({'guild_id': guild_id})
+            log.info('Deleted {r.deleted_count} configs for %d because of blocking', guild_id)
+            return
+
         return await self.starconfig_coll.find_one({'guild_id': guild_id})
 
     async def _get_starconfig(self, guild_id: int) -> dict:
@@ -172,8 +181,9 @@ class Starboard(Cog):
         no configuration is found.
         """
         cfg = await self.get_starconfig(guild_id)
-        if cfg is None:
+        if not cfg:
             raise StarError('No starboard configuration was found for this guild')
+
         return cfg
 
     async def get_star(self, guild_id: int, message_id: int):
@@ -189,8 +199,8 @@ class Starboard(Cog):
             Created star object.
         """
         guild_id = config['guild_id']
-
         guild = message.guild
+
         check_nsfw(guild, config, message)
 
         # get if we already have a star or not
