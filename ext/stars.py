@@ -608,14 +608,33 @@ class Starboard(Cog):
         Detaching means José will remove your starboard's configuration.
         And will stop detecting starred/unstarred posts, etc.
 
-        Provide "y" as your confirmation
+        Provide "y" as your confirmation.
+
+        Manage Guild permission is required.
         """
         if confirm != 'y':
-            await ctx.send('Operation not confirmed by user.')
-            return
+            return await ctx.send('Operation not confirmed by user.')
 
         config = await self._get_starconfig(ctx.guild.id)
         await ctx.success(await self.delete_starconfig(config))
+
+    @commands.command()
+    @commands.guild_only()
+    @commands.has_permissions(manage_guild=True)
+    async def stardelete(self, ctx, confirm: str = 'n'):
+        """Completly delete all starboard data from the guild.
+        
+        Follows the same logic as `j!stardetach`, but it
+        deletes all starboard data, not just the configuration.
+        """
+        if confirm != 'y':
+            return await ctx.send('not confirmed')
+
+        config = await self._get_starconfig(ctx.guild.id)
+        await self.delete_starconfig(config)
+
+        self.loop.create_task(self.janitor_task(ctx.guild.id))
+        await ctx.send('Data deletion scheduled.')
 
     @commands.command()
     @commands.guild_only()
