@@ -513,7 +513,7 @@ class Starboard(Cog):
     @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
     async def starboard(self, ctx, channel_name: str):
-        """Creates a starboard channel.
+        """Create a starboard channel.
         
         If the name specifies a NSFW channel, the starboard gets marked as NSFW.
 
@@ -554,6 +554,28 @@ class Starboard(Cog):
             return
 
         await ctx.send('All done, I guess!')
+
+    @commands.command()
+    @commands.guild_only()
+    async def starattach(self, ctx, starboard_chan: discord.TextChannel):
+        """Attach an existing channel as a starboard.
+
+        With this command you can create your starboard
+        without needing José to automatically create the starboard for you
+        """
+        config = await self.get_starconfig(ctx.guild.id)
+        if config is not None:
+            await ctx.send('You already have a starboard config setup.')
+            return
+
+        config = empty_starconfig(ctx.guild)
+        config['starboard_id'] = starboard_chan.id
+        res = await self.starconfig_coll.insert_one(config)
+        if not res.acknowledged:
+            await ctx.send('Failed to create starboard configuration.')
+            return
+
+        await ctx.send('Done!')
 
     @commands.command()
     @commands.guild_only()
@@ -734,28 +756,6 @@ class Starboard(Cog):
 
         title, embed = make_star_embed(star, message)
         await ctx.send(title, embed=embed)
-
-    @commands.command()
-    @commands.guild_only()
-    async def starattach(self, ctx, starboard_chan: discord.TextChannel):
-        """Attach a channel as an starboard.
-
-        With this command you can create your starboard
-        without needing José to automatically create the starboard for you
-        """
-        config = await self.get_starconfig(ctx.guild.id)
-        if config is not None:
-            await ctx.send('You already have a starboard config setup.')
-            return
-
-        config = empty_starconfig(ctx.guild)
-        config['starboard_id'] = starboard_chan.id
-        res = await self.starconfig_coll.insert_one(config)
-        if not res.acknowledged:
-            await ctx.send('Failed to create starboard configuration.')
-            return
-
-        await ctx.send('Done!')
 
     @commands.command()
     @commands.guild_only()
