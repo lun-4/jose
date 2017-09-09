@@ -89,7 +89,7 @@ class Extra(Cog):
             await ctx.send(repr(r))
             await ctx.send(await r.text())
 
-    @commands.command()
+    #@commands.command()
     async def rxkcd(self, ctx, *, terms: str):
         """Get a Relevant XKCD.
         
