@@ -139,7 +139,7 @@ class Memes(Cog):
             return
 
         owner = (await self.bot.application_info()).owner
-        authorized = (meme['author_id'] == ctx.author.id) or (ctx.author == owner)
+        authorized = (meme.get('author_id') == ctx.author.id) or (ctx.author == owner)
         if not authorized:
             await ctx.send('Unauthorized')
             return
@@ -163,7 +163,7 @@ class Memes(Cog):
             return
 
         await self.delete_meme(meme['name'])
-        await self.add_meme(new_name, meme['value'], meme['author_id'], meme['uses'], meme['nsfw'])
+        await self.add_meme(new_name, meme['value'], meme.get('author_id'), meme['uses'], meme['nsfw'])
         await ctx.send(f'Renamed {meme["name"]!r} to {new_name!r}')
 
     @meme.command()
@@ -176,7 +176,7 @@ class Memes(Cog):
             await ctx.send('Meme not found')
             return
 
-        await ctx.send(f'`{name}` was made by {self.get_name(meme["author_id"])}')
+        await ctx.send(f'`{name}` was made by {self.get_name(meme.get("author_id"))}')
 
     @meme.command()
     async def count(self, ctx):
