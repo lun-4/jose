@@ -36,6 +36,7 @@ RI_STR = '🇦🇧🇨🇩🇪🇫🇬🇭🇮🇯🇰🇱🇲🇳🇴🇵🇶�
 RI_TABLE.update({letter:RI_STR[string.ascii_lowercase.find(letter)] for \
     letter in string.ascii_lowercase})
 
+
 class Memes(Cog):
     def __init__(self, bot):
         super().__init__(bot)
@@ -104,7 +105,7 @@ class Memes(Cog):
     @meme.command(name='get')
     async def get(self, ctx, *, name: str):
         """Retrieve a meme.
-        
+
         Doesn't allow NSFW memes(memes created in NSFW channels) to be shown
         in non-NSFW channels
         """
@@ -312,7 +313,7 @@ class Memes(Cog):
         await self.jcoin.pricing(ctx, self.prices['API'])
 
         urban_url = f'https://api.urbandictionary.com/v0/define?term={urllib.parse.quote(term)}'
-        
+
         content = await self.get_json(urban_url)
         c_list = content['list']
 
@@ -339,6 +340,20 @@ class Memes(Cog):
             else:
                 await m.edit(content=f'{text}')
             await asyncio.sleep(2)
+
+    @commands.command()
+    async def neko(self, ctx):
+        """Posts a random neko picture."""
+        api_url = 'http://nekos.life/api/neko'
+
+        response = await self.get_json(api_url)
+        image_url = response['neko']
+
+        embed = discord.Embed(color=discord.Color(0xf84a6e))
+        embed.set_image(url=image_url)
+
+        await ctx.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(Memes(bot))
