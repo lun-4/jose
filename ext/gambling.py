@@ -31,8 +31,8 @@ class Gambling(Cog):
             raise self.SayException('frigger go get some friends you cant do this alone :ccccccccc')
 
         amount = round(amount, 2)
-        if amount > 3:
-            raise self.SayException("Can't duel with more than 3JC.")
+        if amount > 5:
+            raise self.SayException("Can't duel more than 5JC.")
 
         if amount <= 0:
             raise self.SayException('lul')

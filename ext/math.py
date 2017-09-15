@@ -143,25 +143,24 @@ class Math(Cog):
             return
 
         try:
-            amount = float(amount)
+            amount = decimal.Decimal(amount)
         except:
-            await ctx.send("Error parsing `amount`")
-            return
+            raise self.SayException('Error parsing `amount`')
 
         await self.jcoin.pricing(ctx, self.prices['API'])
 
         data = await self.get_json(f'https://api.fixer.io/latest?base={currency_from}')
 
         if 'error' in data:
-            await ctx.send(f'API error: {data["error"]}')
-            return
+            raise self.SayException(f'API error: {data["error"]}')
 
         if currency_to not in data['rates']:
-            await ctx.send(f'Invalid currency to convert to: {currency_to}')
-            return
+            raise self.SayException(f'Invalid currency to convert to: {currency_to}')
 
         rate = data['rates'][currency_to]
+        rate = decimal.Decimal(rate)
         res = amount * rate
+        res = round(res, 7)
 
         await ctx.send(f'{amount} {currency_from} = {res} {currency_to}')
 
