@@ -143,6 +143,9 @@ class Coins(Cog):
 
     async def ensure_taxbank(self, ctx):
         """Ensure a taxbank exists for the guild."""
+        if ctx.guild is None:
+            raise self.SayException("No guild was found to be a taxbank, don't do this command in a DM.")
+
         if await self.get_account(ctx.guild.id) is None:
             await self.new_account(ctx.guild.id, 'taxbank')
 
