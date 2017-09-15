@@ -281,7 +281,7 @@ class Coins(Cog):
             userids = self.acct_cache[guild.id]
             using_cache = True
         else:
-            userids = [m.id for m in gulid.members]
+            userids = [m.id for m in guild.members]
 
         for uid in userids:
             account = await self.get_account(uid)
