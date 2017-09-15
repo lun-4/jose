@@ -1,6 +1,7 @@
 import time
 import decimal
 import logging
+import collections
 
 import discord
 
@@ -55,6 +56,10 @@ class Coins(Cog):
 
         # Reward cooldown dict
         self.reward_env = {}
+
+        #: relates guilds to the accounts that are in the guild
+        #  used by guild_accounts to speed things up
+        self.acct_cache = collections.defaultdict(list)
 
     def get_name(self, user_id, account=None):
         """Get a string representation of a user or guild."""
@@ -133,7 +138,7 @@ class Coins(Cog):
             await self.jcoin_coll.insert_one(account)
             return True
         except:
-            log.error("Error creating account", exc_info=True)
+            log.exception('Error creating a new account')
             return False
 
     async def sane(self):
@@ -264,13 +269,28 @@ class Coins(Cog):
             key=lambda account: float(account[field]), reverse=True)
 
     async def guild_accounts(self, guild: discord.Guild, field='amount') -> list:
-        """Fetch all accounts that reference users that are in the guild."""
-        accounts = []
+        """Fetch all accounts that reference users that are in the guild.
+        
+        Uses caching.
+        """
 
-        for member in guild.members:
-            account = await self.get_account(member.id)
+        accounts = []
+        userids = None
+        using_cache = False
+        if guild.id in self.acct_cache:
+            userids = self.acct_cache[guild.id]
+            using_cache = True
+        else:
+            userids = [m.id for m in gulid.members]
+
+        for uid in userids:
+            account = await self.get_account(uid)
+
             if account:
                 accounts.append(account)
+
+            if not using_cache:
+                self.acct_cache[guild.id].append(uid)
 
         return sorted(accounts, \
             key=lambda account: float(account[field]), reverse=True)
@@ -407,8 +427,18 @@ class Coins(Cog):
 
     @commands.command()
     async def account(self, ctx):
-        """Create a JoséCoin account."""
-        success = await self.new_account(ctx.author.id)
+        """Create a JoséCoin account.
+        
+        Use 'j!help Coins' to find other JoséCoin-related commands.
+        """
+        user = ctx.author
+        success = await self.new_account(user.id)
+
+        if success:
+            mutual_guilds = [g for g in self.bot.guilds if g.get_member(user.id)]
+            for guild in mutual_guilds:
+                self.acct_cache[guild.id].append(user.id)
+
         await ctx.success(success)
 
     @commands.command(name='transfer')
