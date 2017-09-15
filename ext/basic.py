@@ -88,7 +88,7 @@ class Basic(Cog):
 
         em.add_field(name='Memory / CPU usage', value=f'`{mem_mb}MB / {cpu_usage}% CPU`')
 
-        channels = sum([len(g.channels) for g in self.bot.guilds])
+        channels = sum((1 for c in self.bot.get_all_channels()))
 
         em.add_field(name='Guilds', value=f'{len(self.bot.guilds)}')
         em.add_field(name='Channels', value=f'{channels}')
@@ -97,10 +97,13 @@ class Basic(Cog):
         em.add_field(name='Gaynnels', value=gay_chans)
 
         em.add_field(name='Texters', value=f'{len(self.bot.cogs["Speak"].text_generators)}/{len(self.bot.guilds)}')
-        em.add_field(name='Members', value=len(list(self.bot.get_all_members())))
 
-        humans = [m for m in self.bot.get_all_members() if not m.bot]
-        em.add_field(name='human/unique humans', value=f'`{len(humans)}, {len(set(humans))}`')
+        member_count = sum((g.member_count for g in self.bot.guilds))
+        em.add_field(name='Members', value=member_count)
+
+        humans = sum(1 for m in self.bot.get_all_members() if not m.bot)
+        unique_humans = sum(1 for c in self.bot.users)
+        em.add_field(name='human/unique humans', value=f'`{humans}, {unique_humans}`')
 
         await ctx.send(embed=em)
 
