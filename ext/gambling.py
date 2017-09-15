@@ -77,7 +77,9 @@ class Gambling(Cog):
         }
 
         countdown = 3
+
         countdown_msg = await ctx.send(f'First to send a message wins! {countdown}')
+        await asyncio.sleep(1)
 
         for i in reversed(range(1, 4)):
             await countdown_msg.edit(content=f'{i}...')
@@ -94,6 +96,7 @@ class Gambling(Cog):
         try:
             msg = await self.bot.wait_for('message', timeout=5, check=duel_check)
         except asyncio.TimeoutError:
+            del self.duels[challenger]
             raise self.SayException('u guys suck')
 
         winner = msg.author.id
@@ -103,6 +106,7 @@ class Gambling(Cog):
         try:
             await self.jcoin.transfer(loser, winner, amount)
         except self.jcoin.TransferError as err:
+            del self.duels[challenger]
             raise self.SayException(f'Failed to transfer: {err!r}')
 
         await ctx.send(f'<@{winner}> won {amount}JC.')
