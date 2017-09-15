@@ -2,6 +2,7 @@ import logging
 import asyncio
 import random
 import datetime
+import decimal
 
 import discord
 import wolframalpha
