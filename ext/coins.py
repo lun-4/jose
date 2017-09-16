@@ -133,7 +133,11 @@ class Coins(Cog):
                 'loans': {},
             }
 
-    async def new_account(self, account_id, account_type='user', init_amount=3):
+    async def new_account(self, account_id: int, account_type='user', init_amount=3):
+        """Create a new account.
+        
+        Updates the guild to user id list cache.
+        """
         if (await self.get_account(account_id)) is not None:
             return False
 
@@ -147,7 +151,7 @@ class Coins(Cog):
 
     async def sane(self):
         """Ensures that there is an account for José."""
-        if await self.get_account(self.bot.user.id) is None:
+        if not (await self.get_account(self.bot.user.id)):
             await self.new_account(self.bot.user.id, 'user', 'inf')
 
     async def ensure_taxbank(self, ctx):
@@ -199,7 +203,7 @@ class Coins(Cog):
                 pass
             await self.jcoin_coll.update_one({'id': account['id']}, {'$set': account})
 
-    async def transfer(self, id_from, id_to, amount):
+    async def transfer(self, id_from: int, id_to: int, amount):
         """Transfer coins from one account to another.
 
         If the account that is receiving the coins is a taxbank account,
@@ -207,12 +211,13 @@ class Coins(Cog):
 
         Parameters
         -----------
-        id_from: str
+        id_from: int
             ID of the account that is giving the coins.
-        id_to: str
+        id_to: int
             ID of the account that is receiving the coins.
         amount: int, float or ``decimal.Decimal``
             Amount of coins to be transferred.
+            Will be converted to decimal and rounded to 3 decimal places.
 
         Raises
         ------
@@ -310,7 +315,7 @@ class Coins(Cog):
         return sorted(accounts, \
             key=lambda account: float(account[field]), reverse=True)        
 
-    async def zero(self, user_id: int) -> 'None':
+    async def zero(self, user_id: int):
         """Zero an account."""
         account = await self.get_account(user_id)
         if account is None:
