@@ -268,13 +268,16 @@ class CoinsExt(Cog):
             raise self.SayException("One of you don't have a JoséCoin account")
 
         if amount <= .01:
-            raise self.SayException('Minimum amount to steal  needs to be higher than `0.01JC`')
+            raise self.SayException('Minimum amount to steal needs to be higher than `0.01JC`')
 
         if amount <= 0:
             raise self.SayException('haha good one :ok_hand:')
 
         if thief_account['amount'] < 6:
             raise self.SayException("You have less than `6JC`, can't use the steal command")
+
+        if target_account['amount'] < 3:
+            raise self.SayException('Target has less than `3JC`, cannot steal them')
 
         await self.check_cooldowns(ctx)
         await self.check_grace(target)
