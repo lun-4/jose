@@ -289,8 +289,8 @@ class Coins(Cog):
             if account:
                 accounts.append(account)
 
-            if not using_cache:
-                self.acct_cache[guild.id].append(uid)
+                if not using_cache:
+                    self.acct_cache[guild.id].append(uid)
 
         return sorted(accounts, \
             key=lambda account: float(account[field]), reverse=True)
