@@ -61,6 +61,9 @@ class Coins(Cog):
         #  used by guild_accounts to speed things up
         self.acct_cache = collections.defaultdict(list)
 
+        #: Used to prevent race conditions on guild_accounts
+        self.gacct_locks = collections.defaultdict(asyncio.Lock)
+
     def get_name(self, user_id, account=None):
         """Get a string representation of a user or guild."""
         if isinstance(user_id, discord.Guild):
@@ -274,26 +277,37 @@ class Coins(Cog):
         Uses caching.
         """
 
+        lock = self.gaccts_locks[guild.id]
+        await lock
+
         accounts = []
-        userids = None
-        using_cache = False
-        if guild.id in self.acct_cache:
-            userids = self.acct_cache[guild.id]
-            using_cache = True
-        else:
-            userids = [m.id for m in guild.members]
 
-        for uid in userids:
-            account = await self.get_account(uid)
+        try:
+            userids = None
+            using_cache = False
+            if guild.id in self.acct_cache:
+                userids = self.acct_cache[guild.id]
+                using_cache = True
+            else:
+                userids = [m.id for m in guild.members]
 
-            if account:
-                accounts.append(account)
+            for uid in userids:
+                account = await self.get_account(uid)
 
-                if not using_cache:
-                    self.acct_cache[guild.id].append(uid)
+                if account:
+                    accounts.append(account)
+
+                    if not using_cache:
+                        self.acct_cache[guild.id].append(uid)
+        finally:
+            lock.release()
+
+        # sanity check
+        if lock.locked():
+            lock.release()
 
         return sorted(accounts, \
-            key=lambda account: float(account[field]), reverse=True)
+            key=lambda account: float(account[field]), reverse=True)        
 
     async def zero(self, user_id: int) -> 'None':
         """Zero an account."""
