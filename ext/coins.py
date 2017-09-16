@@ -2,6 +2,7 @@ import time
 import decimal
 import logging
 import collections
+import asyncio
 
 import discord
 
