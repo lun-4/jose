@@ -278,7 +278,7 @@ class Coins(Cog):
         Uses caching.
         """
 
-        lock = self.gaccts_locks[guild.id]
+        lock = self.gacct_locks[guild.id]
         await lock
 
         accounts = []
