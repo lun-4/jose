@@ -360,7 +360,14 @@ class Coins(Cog):
 
     @commands.command()
     async def coinprob(self, ctx):
-        """Show your probability of getting JoséCoins."""
+        """Show your probability of getting JoséCoins.
+        
+        The base probability is defined globally across all acounts.
+
+        The more tax you pay, the more your probability to getting coins rises.
+
+        The maximum probability is 4.20%/message.
+        """
         account = await self.get_account(ctx.author.id)
         if account is None:
             raise self.SayException('Account not found.')
