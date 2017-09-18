@@ -76,6 +76,7 @@ class JoinSession:
 
         self.cext = ctx.bot.get_cog('CoinsExt')
         self.coins = ctx.bot.get_cog('Coins')
+        self.SayException = self.coins.SayException
 
         self.target = target
         self.amount = 0
@@ -370,7 +371,14 @@ class Heist(Cog):
                 raise self.SayException('An already existing session exists with the same target')
 
         if target == ctx.guild:
-            return await ctx.send('lol')
+            raise self.SayException('stealing from the same guild? :thinking:')
+        
+        taxbank = self.get_cog('Coins').get_account(target.id)
+        if not taxbank:
+            raise self.SayException('Taxbank account not found')
+
+        if amount > taxbank['amount']:
+            raise self.SayException('You cannot steal more than the guild taxbank currently holds.')
 
         session = self.get_sess(ctx, target, True)
 
