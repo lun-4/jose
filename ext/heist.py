@@ -373,7 +373,7 @@ class Heist(Cog):
         if target == ctx.guild:
             raise self.SayException('stealing from the same guild? :thinking:')
         
-        taxbank = self.get_cog('Coins').get_account(target.id)
+        taxbank = self.bot.get_cog('Coins').get_account(target.id)
         if not taxbank:
             raise self.SayException('Taxbank account not found')
 
