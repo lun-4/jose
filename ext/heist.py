@@ -76,7 +76,7 @@ class JoinSession:
 
         self.cext = ctx.bot.get_cog('CoinsExt')
         self.coins = ctx.bot.get_cog('Coins')
-        self.SayException = self.coins.SayException
+        self.SayException = SayException
 
         self.target = target
         self.amount = 0
