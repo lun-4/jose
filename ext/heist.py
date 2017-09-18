@@ -134,14 +134,14 @@ class JoinSession:
         bot = ctx.bot
         jcoin = bot.get_cog('Coins')
         if not jcoin:
-            raise self.SayException('rip')
+            raise SayException('coins cog not loaded')
 
         target_account = await jcoin.get_account(self.target.id)
         if target_account is None:
-            raise self.SayException('Guild not found')
+            raise SayException('Guild not found')
 
         if target_account['type'] != 'taxbank':
-            raise self.SayException('Account is not a taxbank')
+            raise SayException('Account is not a taxbank')
 
         amnt = target_account['amount']
         increase_people = len(self.users) * INCREASE_PER_PERSON
