@@ -133,6 +133,7 @@ class JoseBot(commands.Bot):
     def clean_content(self, content):
         content = content.replace('`', '\'')
         content = content.replace('@', '@\u200b')
+        content = content.replace('&', '&\u200b')
         content = content.replace('<#', '<#\u200b')
         return content
 

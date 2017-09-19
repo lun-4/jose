@@ -317,10 +317,15 @@ class Speak(Cog):
     @commands.command()
     @commands.guild_only()
     async def madlibs(self, ctx, *, inputstr: str):
-        """Changes any "---" in the input to a 12-letter generated sentence"""
+        """Changes any "---" in the input to a 12-letter generated sentence
+        
+        If you see "None" in the resulting text, it means josé failed to generate
+        a 12-letter sentence, and that can happen by any reason tbh.
+        """
 
-        inputstr = inputstr.replace('@everyone', '@\u200beveryone')
-        inputstr = inputstr.replace('@here', '@\u200bhere')
+        inputstr = inputstr.replace('@e', '@\u200be')
+        inputstr = inputstr.replace('@h', '@\u200bh')
+        inputstr = self.bot.clean_content(inputstr)
 
         splitted = inputstr.split()
         if splitted.count('---') < 1:
@@ -328,7 +333,7 @@ class Speak(Cog):
             return
 
         if splitted.count('---') > 5:
-            await ctx.send("thats a .......... lot")
+            await ctx.send('too much --- pls')
             return
 
         res = []
