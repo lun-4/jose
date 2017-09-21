@@ -240,7 +240,6 @@ class Coins(Cog):
             # update cache
             self.cache[account['id']] = self.convert_account(account)
             account = self.unconvert_account(account)
-            print('updating', account)
 
             res = await self.jcoin_coll.update_one({'id': account['id']}, {'$set': account})
 
@@ -248,8 +247,6 @@ class Coins(Cog):
                 log.warning('Updating more than supposed to')
             else:
                 total += res.modified_count
-
-            print('oop', total)
 
         log.info('[update_accounts] Updated %d documents', total)
 
