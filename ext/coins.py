@@ -522,7 +522,7 @@ class Coins(Cog):
             await self.transfer(ctx.author.id, person.id, amount)
             await ctx.send(f'Transferred {amount!s} {random.choice(TRANSFER_OBJECTS)} from {ctx.author!s} to {person!s}')
         except Exception as err:
-            log.exception()
+            log.exception('Error while transferring')
             await ctx.send(f'error while transferring: `{err!r}`')
 
     @commands.command()
