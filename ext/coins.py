@@ -174,25 +174,30 @@ class Coins(Cog):
         if not account:
             return None
 
-        account['amount'] = decimal.Decimal(account['amount'])
+        new_account = dict(account)
+
+        new_account['amount'] = decimal.Decimal(account['amount'])
 
         try:
-            account['taxpaid'] = decimal.Decimal(account['taxpaid'])
+            new_account['taxpaid'] = decimal.Decimal(account['taxpaid'])
         except KeyError: pass
 
-        return account
+        return new_account
 
     def unconvert_account(self, account: dict) -> dict:
         """Unconvert an account to its str keys."""
         if not account:
             return None
 
-        account['amount'] = str(account['amount'])
+        new_account = dict(account)
+
+        new_account['amount'] = str(account['amount'])
 
         try:
-            account['taxpaid'] = str(account['taxpaid'])
+            new_account['taxpaid'] = str(account['taxpaid'])
         except KeyError: pass
-        return account
+
+        return new_account
 
     async def get_account(self, account_id: int) -> dict:
         """Get a single account by its ID.
@@ -210,9 +215,9 @@ class Coins(Cog):
             self.cache[account_id] = None
             return None
 
-        account = self.convert_account(account)
-        self.cache[account_id] = account
-        return account
+        c_account = self.convert_account(account)
+        self.cache[account_id] = c_account
+        return c_account
 
     async def update_accounts(self, accounts: list):
         """Update accounts to the jcoin collection.
