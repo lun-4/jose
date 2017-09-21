@@ -166,6 +166,20 @@ class Coins(Cog):
         if await self.get_account(ctx.guild.id) is None:
             await self.new_account(ctx.guild.id, 'taxbank')
 
+    def convert_account(account: dict) -> dict:
+        """Converts an account's `amount` and `taxpaid`
+        fields to `decimal.Decimal`.
+        
+        """
+        account['amount'] = decimal.Decimal(account['amount'])
+
+        try:
+            account['taxpaid'] = decimal.Decimal(account['taxpaid'])
+        except:
+            pass
+
+        return account
+
     async def get_account(self, account_id: int) -> dict:
         """Get a single account by its ID.
         
@@ -175,20 +189,14 @@ class Coins(Cog):
         Uses caching.
         """
         if account_id in self.cache:
-            return self.cache[account_id]
+            return self.convert_account(self.cache[account_id])
 
         account = await self.jcoin_coll.find_one({'id': account_id})
         if account is None:
             self.cache[account_id] = None
             return None
 
-        account['amount'] = decimal.Decimal(account['amount'])
-
-        try:
-            account['taxpaid'] = decimal.Decimal(account['taxpaid'])
-        except:
-            pass
-
+        account = self.convert_account(account)
         self.cache[account_id] = account
         return account
 
@@ -209,7 +217,7 @@ class Coins(Cog):
                     pass
 
             # update cache
-            self.cache[account['id']] = account
+            self.cache[account['id']] = self.convert_account(account)
 
             account['amount'] = str(account['amount'])
 
