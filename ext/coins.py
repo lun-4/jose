@@ -65,6 +65,9 @@ class Coins(Cog):
         #: Used to prevent race conditions on guild_accounts
         self.gacct_locks = collections.defaultdict(asyncio.Lock)
 
+        #: proper account cache, used by get_account
+        self.cache = {}
+
     def get_name(self, user_id, account=None):
         """Get a string representation of a user or guild."""
         if isinstance(user_id, discord.Guild):
@@ -167,9 +170,15 @@ class Coins(Cog):
         
         This does necessary convertion of the `amount` field
         to `decimal.Decimal` for actual usage.
+
+        Uses caching.
         """
+        if account_id in self.cache:
+            return self.cache[account_id]
+
         account = await self.jcoin_coll.find_one({'id': account_id})
         if account is None:
+            self.cache[account_id] = None
             return None
 
         account['amount'] = decimal.Decimal(account['amount'])
@@ -179,6 +188,7 @@ class Coins(Cog):
         except:
             pass
 
+        self.cache[account_id] = account
         return account
 
     async def update_accounts(self, accounts: list):
@@ -186,6 +196,8 @@ class Coins(Cog):
         
         This converts `decimal.Decimal` to `str` in the ``amount`` field
         so we maintain the precision of decimal while fetching/saving.
+
+        Updates the cache.
         """
         for account in accounts:
             if account['amount'].is_finite():
@@ -195,12 +207,16 @@ class Coins(Cog):
                 except:
                     pass
 
+            # update cache
+            self.cache[account['id']] = account
+
             account['amount'] = str(account['amount'])
 
             try:
                 account['taxpaid'] = str(account['taxpaid'])
             except:
                 pass
+
             await self.jcoin_coll.update_one({'id': account['id']}, {'$set': account})
 
     async def transfer(self, id_from: int, id_to: int, amount):
