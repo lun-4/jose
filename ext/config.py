@@ -184,25 +184,25 @@ class Config(Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def block(self, ctx, user: discord.User, reason: str=''):
+    async def block(self, ctx, user: discord.User, *, reason: str=''):
         """Block someone from using the bot, globally"""
         await ctx.success(await self.block_one(user.id, 'user_id', reason))
 
     @commands.command()
     @commands.is_owner()
-    async def unblock(self, ctx, user: discord.User, reason: str=''):
+    async def unblock(self, ctx, user: discord.User, *, reason: str=''):
         """Unblock someone from using the bot, globally"""
         await ctx.success(await self.unblock_one(user.id, 'user_id', reason))
     
     @commands.command()
     @commands.is_owner()
-    async def blockguild(self, ctx, guild_id: int, reason: str=''):
+    async def blockguild(self, ctx, guild_id: int, *, reason: str=''):
         """Block an entire guild from using José."""
         await ctx.success(await self.block_one(guild_id, 'guild_id', reason))
 
     @commands.command()
     @commands.is_owner()
-    async def unblockguild(self, ctx, guild_id: int, reason: str=''):
+    async def unblockguild(self, ctx, guild_id: int, *, reason: str=''):
         """Unblock a guild from using José."""
         await ctx.success(await self.unblock_one(guild_id, 'guild_id', reason))
 
