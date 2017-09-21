@@ -166,7 +166,7 @@ class Coins(Cog):
         if await self.get_account(ctx.guild.id) is None:
             await self.new_account(ctx.guild.id, 'taxbank')
 
-    def convert_account(account: dict) -> dict:
+    def convert_account(self, account: dict) -> dict:
         """Converts an account's `amount` and `taxpaid`
         fields to `decimal.Decimal`.
         
