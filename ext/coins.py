@@ -577,7 +577,7 @@ class Coins(Cog):
         delta = round((end - start) * 1000, 2)
 
         account = pprint.pformat(account)
-        await ctx.send('```py\n{account}\nTook {delta}ms.```')
+        await ctx.send(f'```py\n{account}\nTook {delta}ms.```')
 
 def setup(bot):
     bot.add_cog(Coins(bot))
