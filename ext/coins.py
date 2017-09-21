@@ -175,22 +175,17 @@ class Coins(Cog):
             return None
 
         account['amount'] = decimal.Decimal(account['amount'])
-
-        try:
-            account['taxpaid'] = decimal.Decimal(account['taxpaid'])
-        except:
-            pass
+        account['taxpaid'] = decimal.Decimal(account['taxpaid'])
 
         return account
 
     def unconvert_account(self, account: dict) -> dict:
         """Unconvert an account to its str keys."""
-        account['amount'] = str(account['amount'])
+        if not account:
+            return None
 
-        try:
-            account['taxpaid'] = str(account['taxpaid'])
-        except:
-            pass
+        account['amount'] = str(account['amount'])
+        account['taxpaid'] = str(account['taxpaid'])
 
         return account
 
@@ -232,8 +227,8 @@ class Coins(Cog):
 
             # update cache
             self.cache[account['id']] = self.convert_account(account)
-
-            self.unconvert_account(account)
+            account = self.unconvert_account(account)
+            print(account)
             await self.jcoin_coll.update_one({'id': account['id']}, {'$set': account})
 
     async def transfer(self, id_from: int, id_to: int, amount):
