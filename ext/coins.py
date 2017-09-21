@@ -222,6 +222,8 @@ class Coins(Cog):
 
         Updates the cache.
         """
+        total = 0
+
         for account in accounts:
             if account['amount'].is_finite():
                 account['amount'] = round(account['amount'], 3)
@@ -233,8 +235,18 @@ class Coins(Cog):
             # update cache
             self.cache[account['id']] = self.convert_account(account)
             account = self.unconvert_account(account)
-            print(account)
-            await self.jcoin_coll.update_one({'id': account['id']}, {'$set': account})
+            print('updating', account)
+
+            res = await self.jcoin_coll.update_one({'id': account['id']}, {'$set': account})
+
+            if res.updated_count > 1:
+                log.warning('Updating more than supposed to')
+            else:
+                total += res.updated_count
+
+            print('oop', total)
+
+        log.info('[update_accounts] Updated %d documents', total)
 
     async def transfer(self, id_from: int, id_to: int, amount):
         """Transfer coins from one account to another.
@@ -510,7 +522,8 @@ class Coins(Cog):
             await self.transfer(ctx.author.id, person.id, amount)
             await ctx.send(f'Transferred {amount!s} {random.choice(TRANSFER_OBJECTS)} from {ctx.author!s} to {person!s}')
         except Exception as err:
-            await ctx.send(f'rip: `{err!r}`')
+            log.exception()
+            await ctx.send(f'error while transferring: `{err!r}`')
 
     @commands.command()
     async def wallet(self, ctx, person: discord.User = None):
