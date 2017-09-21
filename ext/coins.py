@@ -175,7 +175,10 @@ class Coins(Cog):
             return None
 
         account['amount'] = decimal.Decimal(account['amount'])
-        account['taxpaid'] = decimal.Decimal(account['taxpaid'])
+
+        try:
+            account['taxpaid'] = decimal.Decimal(account['taxpaid'])
+        except KeyError: pass
 
         return account
 
@@ -185,8 +188,10 @@ class Coins(Cog):
             return None
 
         account['amount'] = str(account['amount'])
-        account['taxpaid'] = str(account['taxpaid'])
 
+        try:
+            account['taxpaid'] = str(account['taxpaid'])
+        except KeyError: pass
         return account
 
     async def get_account(self, account_id: int) -> dict:
