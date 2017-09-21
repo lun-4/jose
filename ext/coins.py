@@ -183,6 +183,17 @@ class Coins(Cog):
 
         return account
 
+    def unconvert_account(self, account: dict) -> dict:
+        """Unconvert an account to its str keys."""
+        account['amount'] = str(account['amount'])
+
+        try:
+            account['taxpaid'] = str(account['taxpaid'])
+        except:
+            pass
+
+        return account
+
     async def get_account(self, account_id: int) -> dict:
         """Get a single account by its ID.
         
@@ -222,13 +233,7 @@ class Coins(Cog):
             # update cache
             self.cache[account['id']] = self.convert_account(account)
 
-            account['amount'] = str(account['amount'])
-
-            try:
-                account['taxpaid'] = str(account['taxpaid'])
-            except:
-                pass
-
+            self.unconvert_account(account)
             await self.jcoin_coll.update_one({'id': account['id']}, {'$set': account})
 
     async def transfer(self, id_from: int, id_to: int, amount):
@@ -372,7 +377,7 @@ class Coins(Cog):
         base_tax = decimal.Decimal(base_tax)
         try:
             account = await self.get_account(ctx.author.id)
-            if account is None:
+            if not account:
                 raise self.SayException('No JoséCoin account found to tax')
 
             tax = base_tax + (pow(TAX_CONSTANT, account['amount']) - 1)
