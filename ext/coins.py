@@ -385,7 +385,6 @@ class Coins(Cog):
         prob = COIN_BASE_PROBABILITY
         taxpaid = account['taxpaid']
 
-        print(account)
         if taxpaid < 50:
             return prob
 
