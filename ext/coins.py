@@ -171,6 +171,9 @@ class Coins(Cog):
         fields to `decimal.Decimal`.
         
         """
+        if not account:
+            return None
+
         account['amount'] = decimal.Decimal(account['amount'])
 
         try:
