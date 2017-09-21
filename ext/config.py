@@ -104,8 +104,8 @@ class Config(Cog):
         cfg = await self.ensure_cfg(guild)
         value = cfg.get(key)
 
-        log.info('[cfg:get] %s[gid=%d] k=%r -> v=%r', \
-            guild, guild.id, key, value)
+        #log.info('[cfg:get] %s[gid=%d] k=%r -> v=%r', \
+        #    guild, guild.id, key, value)
 
         return value
 

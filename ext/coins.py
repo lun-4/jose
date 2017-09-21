@@ -195,7 +195,7 @@ class Coins(Cog):
             return self.convert_account(self.cache[account_id])
 
         account = await self.jcoin_coll.find_one({'id': account_id})
-        if account is None:
+        if not account:
             self.cache[account_id] = None
             return None
 
@@ -384,6 +384,8 @@ class Coins(Cog):
         """Get the coin probability of someone."""
         prob = COIN_BASE_PROBABILITY
         taxpaid = account['taxpaid']
+
+        print(account)
         if taxpaid < 50:
             return prob
 
@@ -402,7 +404,7 @@ class Coins(Cog):
         The maximum probability is 4.20%/message.
         """
         account = await self.get_account(ctx.author.id)
-        if account is None:
+        if not account:
             raise self.SayException('Account not found.')
 
         em = discord.Embed(title='Probability Breakdown of JCs per message')
@@ -424,7 +426,7 @@ class Coins(Cog):
             return
 
         account = await self.get_account(author_id)
-        if account is None:
+        if not account:
             return
 
         if await self.bot.is_blocked(author_id):
@@ -455,7 +457,6 @@ class Coins(Cog):
             return
 
         prob = await self.get_probability(account)
-
         if random.random() > prob:
             return
 
@@ -511,14 +512,14 @@ class Coins(Cog):
     async def wallet(self, ctx, person: discord.User = None):
         """See the amount of coins you currently have."""
         acc = None
+
         if person is not None:
             acc = await self.get_account(person.id)
         else:
             acc = await self.get_account(ctx.author.id)
 
-        if acc is None:
-            await ctx.send('Account not found.')
-            return
+        if not acc:
+            return await ctx.send('Account not found.')
 
         await ctx.send(f'{self.get_name(acc["id"])} > `{acc["amount"]}`, paid `{acc["taxpaid"]}JC` as tax.')
 
