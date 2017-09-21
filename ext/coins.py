@@ -239,10 +239,10 @@ class Coins(Cog):
 
             res = await self.jcoin_coll.update_one({'id': account['id']}, {'$set': account})
 
-            if res.updated_count > 1:
+            if res.modified_count > 1:
                 log.warning('Updating more than supposed to')
             else:
-                total += res.updated_count
+                total += res.modified_count
 
             print('oop', total)
 
