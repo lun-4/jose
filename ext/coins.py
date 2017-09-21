@@ -3,6 +3,7 @@ import decimal
 import logging
 import collections
 import asyncio
+import pprint
 
 import discord
 
@@ -557,6 +558,18 @@ class Coins(Cog):
         """Show if you are hiding the coin reaction or not"""
         ex = await self.hidecoin_coll.find_one({'user_id': ctx.author.id})
         await ctx.send(f'Enabled: {bool(ex)}')
+
+    @commands.command(hidden=True)
+    async def jcgetraw(self, ctx):
+        """Get your raw josécoin account"""
+        start = time.monotonic()
+        account = await self.get_account(ctx.author.id)
+        end = time.monotonic()
+        
+        delta = round((end - start) * 1000, 2)
+
+        account = pprint.pformat(account)
+        await ctx.send('```py\n{account}\nTook {delta}ms.```')
 
 def setup(bot):
     bot.add_cog(Coins(bot))
