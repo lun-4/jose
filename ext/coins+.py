@@ -384,5 +384,14 @@ class CoinsExt(Cog):
                             f'- {gr_del.deleted_count} in `graces`'
                 )
 
+    @commands.command()
+    async def deadtxb(self, ctx):
+        """Show dead taxbanks."""
+
+        all_taxbanks = await self.jcoin.get_accounts_type('taxbank')
+        dead_txb = filter(all_taxbanks, lambda acc: self.bot.get_guild(acc['id']))
+
+        await ctx.send(f'There are {len(dead_txb)} dead taxbanks.')
+
 def setup(bot):
     bot.add_cog(CoinsExt(bot))
