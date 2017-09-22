@@ -389,7 +389,7 @@ class CoinsExt(Cog):
         """Show dead taxbanks."""
 
         all_taxbanks = await self.jcoin.get_accounts_type('taxbank')
-        dead_txb = filter(lambda acc: self.bot.get_guild(acc['id']), all_taxbanks)
+        dead_txb = filter(lambda acc: (self.bot.get_guild(acc['id']) is None), all_taxbanks)
         deadtxb_count = sum(1 for a in dead_txb)
 
         await ctx.send(f'There are {deadtxb_count} dead taxbanks.')
