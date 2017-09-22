@@ -390,8 +390,9 @@ class CoinsExt(Cog):
 
         all_taxbanks = await self.jcoin.get_accounts_type('taxbank')
         dead_txb = filter(lambda acc: self.bot.get_guild(acc['id']), all_taxbanks)
+        deadtxb_count = sum(1 for a in dead_txb)
 
-        await ctx.send(f'There are {len(dead_txb)} dead taxbanks.')
+        await ctx.send(f'There are {deadtxb_count} dead taxbanks.')
 
 def setup(bot):
     bot.add_cog(CoinsExt(bot))
