@@ -219,6 +219,20 @@ class Coins(Cog):
         self.cache[account_id] = c_account
         return c_account
 
+    async def get_accounts_type(self, acc_type: str) -> list:
+        """Get all accounts that respect an account type.
+        
+        Doesn't use cache.
+        """
+
+        cur = self.jcoin_coll.find({'type': acc_type})
+
+        accounts = []
+        async for account in cur:
+            accounts.append(self.convert_account(account))
+
+        return accounts
+
     async def update_accounts(self, accounts: list):
         """Update accounts to the jcoin collection.
         
