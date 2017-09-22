@@ -322,7 +322,10 @@ class CoinsExt(Cog):
             if target.id == self.owner.id:
                 grace = 6
 
-            await target.send(f':gun: You got robbed! Thief(`{thief}`) stole `{amount}` from you. {grace}h grace period')
+            try:
+                await target.send(f':gun: You got robbed! Thief(`{thief}`) stole `{amount}` from you. {grace}h grace period')
+            except: pass
+
             await self.add_grace(target, grace)
             await ctx.send(f'`[res: {res} < prob: {chance}]` congrats lol\n{transfer_info}')
         else:
