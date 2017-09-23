@@ -115,6 +115,9 @@ class Gambling(Cog):
     @commands.command()
     async def slots(self, ctx, amount: decimal.Decimal):
         """little slot machine"""
+        if amount > 25:
+            raise self.SayException('You cannot gamble too much.')
+
         await self.jcoin.ensure_taxbank(ctx)
         await self.jcoin.pricing(ctx, amount)
 
