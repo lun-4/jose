@@ -329,8 +329,9 @@ class Coins(Cog):
             if account_to is None:
                 raise TransferError('Account to give funds not found')
 
-            if account_from['amount'] < amount:
-                raise TransferError('Account doesn\'t have enough funds for this transaction')
+            from_amount = account_from['amount']
+            if from_amount < amount:
+                raise TransferError(f'Not enough funds ({from_amount} < {amount})')
 
             log.info(f'{self.get_name(account_from["id"])} > {amount} > {self.get_name(account_to["id"])}')
 
