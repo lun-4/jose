@@ -145,7 +145,7 @@ class Gambling(Cog):
             try:
                 await self.jcoin.transfer(ctx.guild.id, ctx.author.id, applied_amount)
             except self.jcoin.TransferError as err:
-                await ctx.send(f'err: {err!r}')
+                raise self.SayException(f'err(g->a, a): {err!r}')
         else:
             res.append(':peach:')
 
