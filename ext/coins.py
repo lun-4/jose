@@ -69,6 +69,9 @@ class Coins(Cog):
         #: proper account cache, used by get_account
         self.cache = {}
 
+        #: I hate locks
+        self.transfer_lock = asyncio.Lock()
+
     def get_name(self, user_id, account=None):
         """Get a string representation of a user or guild."""
         if isinstance(user_id, discord.Guild):
@@ -295,46 +298,60 @@ class Coins(Cog):
             If any checking or transfer error happens
         """
         await self.sane()
+        await self.transfer_lock
 
-        if id_from == id_to:
-            raise TransferError("Can't transfer from the account to itself.")
-
-        if amount > 200:
-            raise TransferError('Transferring too much.')
+        res = None
 
         try:
-            amount = decimal.Decimal(amount)
-            amount = round(amount, 3)
-        except:
-            raise TransferError('Error converting to decimal.')
+            if id_from == id_to:
+                raise TransferError("Can't transfer from the account to itself.")
 
-        if amount < .0009:
-            raise TransferError('no small transfers kthx')
+            if amount > 200:
+                raise TransferError('Transferring too much.')
 
-        if amount <= 0:
-            raise TransferError('lul not zero')
+            try:
+                amount = decimal.Decimal(amount)
+                amount = round(amount, 3)
+            except:
+                raise TransferError('Error converting to decimal.')
 
-        account_from = await self.get_account(id_from)
-        if account_from is None:
-            raise TransferError('Account to extract funds not found')
+            if amount < .0009:
+                raise TransferError('no small transfers kthx')
 
-        account_to = await self.get_account(id_to)
-        if account_to is None:
-            raise TransferError('Account to give funds not found')
+            if amount <= 0:
+                raise TransferError('lul not zero')
 
-        if account_from['amount'] < amount:
-            raise TransferError('Account doesn\'t have enough funds for this transaction')
+            account_from = await self.get_account(id_from)
+            if account_from is None:
+                raise TransferError('Account to extract funds not found')
 
-        log.info(f'{self.get_name(account_from["id"])} > {amount} > {self.get_name(account_to["id"])}')
+            account_to = await self.get_account(id_to)
+            if account_to is None:
+                raise TransferError('Account to give funds not found')
 
-        if account_to['type'] == 'taxbank':
-            account_from['taxpaid'] += amount
+            if account_from['amount'] < amount:
+                raise TransferError('Account doesn\'t have enough funds for this transaction')
 
-        account_from['amount'] -= amount
-        account_to['amount'] += amount
+            log.info(f'{self.get_name(account_from["id"])} > {amount} > {self.get_name(account_to["id"])}')
 
-        await self.update_accounts([account_from, account_to])
-        return f'{amount} was transferred from {self.get_name(account_from["id"])} to {self.get_name(account_to["id"])}'
+            if account_to['type'] == 'taxbank':
+                account_from['taxpaid'] += amount
+
+            account_from['amount'] -= amount
+            account_to['amount'] += amount
+
+            await self.update_accounts([account_from, account_to])
+            res = f'{amount} was transferred from {self.get_name(account_from["id"])} to {self.get_name(account_to["id"])}'
+        except TransferError as err:
+            self.transfer_lock.release()
+            raise err
+        finally:
+            self.transfer_lock.release()
+
+        # since return can in theory stop
+        # the finally block from executing
+        if res:
+            return res
 
     async def all_accounts(self, field='amount'):
         """Return all accounts in decreasing order of the selected field."""
