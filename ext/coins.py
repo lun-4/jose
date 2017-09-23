@@ -342,9 +342,6 @@ class Coins(Cog):
 
             await self.update_accounts([account_from, account_to])
             res = f'{amount} was transferred from {self.get_name(account_from["id"])} to {self.get_name(account_to["id"])}'
-        except TransferError as err:
-            self.transfer_lock.release()
-            raise err
         finally:
             self.transfer_lock.release()
 
