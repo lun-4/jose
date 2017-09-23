@@ -8,10 +8,11 @@ from discord.ext import commands
 from .common import Cog
 
 
-EMOJI_POOL = ':thinking: :snail: :shrug: :chestnut: :ok_hand: :eggplant:'.split()
+EMOJI_POOL = ':thinking: :snail: :shrug: :chestnut: :ok_hand: :eggplant:'.split() + \
+        ':fire: :green_book: :radioactive: :rage: :new_moon_with_face: :sun_with_face: :bread:'.split()
 BET_MULTIPLIER_EMOJI = ':thinking:'
-X4_EMOJI = [':snail:', ':chestnut:', ':shrug:']
-X6_EMOJI = [':eggplant:', ':ok_hand:']
+X4_EMOJI = [':snail:', ':ok_hand', ':chestnut:']
+X6_EMOJI = [':eggplant:']
 
 class Gambling(Cog):
     """Gambling commands."""
@@ -115,7 +116,7 @@ class Gambling(Cog):
     @commands.command()
     async def slots(self, ctx, amount: decimal.Decimal):
         """little slot machine"""
-        if amount > 25:
+        if amount > 8:
             raise self.SayException('You cannot gamble too much.')
 
         await self.jcoin.ensure_taxbank(ctx)
