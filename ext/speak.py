@@ -169,15 +169,18 @@ class Speak(Cog):
             messages = []
             async for message in channel.history(limit=amount):
                 author = message.author
-                if author == self.bot.user:
+                if author == self.bot.user or author.bot:
                     continue
 
-                if author.bot:
-                    continue
-
+                # remove commands
                 content = message.clean_content
                 if content.startswith('j!'):
                     continue
+
+                # remove messages with speak prefix
+                for prefix in self.bot.config.SPEAK_PREFIXES:
+                    if content.startswith(prefix):
+                        continue
 
                 messages.append(message.clean_content)
 
