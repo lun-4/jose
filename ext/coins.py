@@ -142,7 +142,7 @@ class Coins(Cog):
         
         Updates the guild to user id list cache.
         """
-        if (await self.get_account(account_id)) is not None:
+        if (await self.get_account(account_id, True)) is not None:
             return False
 
         account = self.empty_account(account_id, account_type, init_amount)
@@ -199,15 +199,17 @@ class Coins(Cog):
 
         return new_account
 
-    async def get_account(self, account_id: int) -> dict:
+    async def get_account(self, account_id: int, override_cache: bool=False) -> dict:
         """Get a single account by its ID.
         
         This does necessary convertion of the `amount` field
         to `decimal.Decimal` for actual usage.
 
         Uses caching.
+
+        NOTE: You can override caching calls when setting `override_cache` to True.
         """
-        if account_id in self.cache:
+        if account_id in self.cache and (not override_cache):
             return self.convert_account(self.cache[account_id])
 
         account = await self.jcoin_coll.find_one({'id': account_id})
@@ -216,7 +218,12 @@ class Coins(Cog):
             return None
 
         c_account = self.convert_account(account)
-        self.cache[account_id] = c_account
+
+        # if you don't read from the cache
+        # you shouldn't write to it
+        if not override_cache:
+            self.cache[account_id] = c_account
+
         return c_account
 
     async def get_accounts_type(self, acc_type: str) -> list:
