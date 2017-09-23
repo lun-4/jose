@@ -147,7 +147,9 @@ class Coins(Cog):
 
         account = self.empty_account(account_id, account_type, init_amount)
         try:
-            await self.jcoin_coll.insert_one(account)
+            r = await self.jcoin_coll.insert_one(account)
+            log.info('Created %d documents', r.inserted_count)
+            self.cache[account_id] = account
             return True
         except:
             log.exception('Error creating a new account')
