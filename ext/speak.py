@@ -180,6 +180,7 @@ class Speak(Cog):
                 # remove messages with speak prefix
                 for prefix in self.bot.config.SPEAK_PREFIXES:
                     if content.startswith(prefix):
+                        print(f'contains prefix {prefix} skipping')
                         continue
 
                 messages.append(message.clean_content)
