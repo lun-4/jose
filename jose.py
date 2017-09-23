@@ -184,6 +184,8 @@ class JoseBot(commands.Bot):
             await ctx.send(f'bad argument — {random.choice(BAD_ARG_MESSAGES)} - {error!s}')
         elif isinstance(error, commands.errors.CheckFailure):
             await ctx.send(f'check failed — {random.choice(CHECK_FAILURE_PHRASES)}')
+        elif isinstance(error, commands.errors.CommandOnCooldown):
+            await ctx.send(f'Command on cooldown, wait `{error.retry_after}` seconds')
 
     async def on_message(self, message):
         author_id = message.author.id
