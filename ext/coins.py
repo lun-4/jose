@@ -142,7 +142,7 @@ class Coins(Cog):
 
     async def new_account(self, account_id: int, account_type='user', init_amount=3):
         """Create a new account.
-        
+
         Updates the guild to user id list cache.
         """
         if (await self.get_account(account_id, True)) is not None:
@@ -174,7 +174,7 @@ class Coins(Cog):
     def convert_account(self, account: dict) -> dict:
         """Converts an account's `amount` and `taxpaid`
         fields to `decimal.Decimal`.
-        
+
         """
         if not account:
             return None
@@ -206,7 +206,7 @@ class Coins(Cog):
 
     async def get_account(self, account_id: int, override_cache: bool=False) -> dict:
         """Get a single account by its ID.
-        
+
         This does necessary convertion of the `amount` field
         to `decimal.Decimal` for actual usage.
 
@@ -233,7 +233,7 @@ class Coins(Cog):
 
     async def get_accounts_type(self, acc_type: str) -> list:
         """Get all accounts that respect an account type.
-        
+
         Doesn't use cache.
         """
 
@@ -247,7 +247,7 @@ class Coins(Cog):
 
     async def update_accounts(self, accounts: list):
         """Update accounts to the jcoin collection.
-        
+
         This converts `decimal.Decimal` to `str` in the ``amount`` field
         so we maintain the precision of decimal while fetching/saving.
 
@@ -366,7 +366,7 @@ class Coins(Cog):
 
     async def guild_accounts(self, guild: discord.Guild, field='amount') -> list:
         """Fetch all accounts that reference users that are in the guild.
-        
+
         Uses caching.
         """
 
@@ -400,7 +400,7 @@ class Coins(Cog):
             lock.release()
 
         return sorted(accounts, \
-            key=lambda account: float(account[field]), reverse=True)        
+            key=lambda account: float(account[field]), reverse=True)
 
     async def zero(self, user_id: int):
         """Zero an account."""
@@ -454,7 +454,7 @@ class Coins(Cog):
     @commands.command()
     async def coinprob(self, ctx):
         """Show your probability of getting JoséCoins.
-        
+
         The base probability is defined globally across all acounts.
 
         The more tax you pay, the more your probability to getting coins rises.
@@ -471,7 +471,7 @@ class Coins(Cog):
             em.add_field(name='Increase from tax paid', value=f'{round(pow(PROB_CONSTANT, account["taxpaid"]), 5)}%')
             res = await self.get_probability(account)
             em.add_field(name='Total', value=f'{res * 100}%')
-        
+
         await ctx.send(embed=em)
 
     async def on_message(self, message):
@@ -489,7 +489,7 @@ class Coins(Cog):
 
         if await self.bot.is_blocked(author_id):
             return
-        
+
         if await self.bot.is_blocked_guild(message.guild.id):
             return
 
@@ -521,7 +521,7 @@ class Coins(Cog):
         amount = random.choice(JOSECOIN_REWARDS)
         if amount == 0:
             return
-        
+
         try:
             await self.transfer(self.bot.user.id, author_id, amount)
             self.reward_env[author_id] = time.time() + REWARD_COOLDOWN
@@ -531,7 +531,7 @@ class Coins(Cog):
             hide = await self.hidecoin_coll.find_one({'user_id': author_id})
             if hide:
                 return
-                
+
             try:
                 await message.add_reaction('💰')
             except:
@@ -542,7 +542,7 @@ class Coins(Cog):
     @commands.command()
     async def account(self, ctx):
         """Create a JoséCoin account.
-        
+
         Use 'j!help Coins' to find other JoséCoin-related commands.
         """
         user = ctx.author
@@ -566,6 +566,21 @@ class Coins(Cog):
         except Exception as err:
             log.exception('Error while transferring')
             await ctx.send(f'error while transferring: `{err!r}`')
+
+    @commands.command(hidden=True)
+    @commands.is_owner()
+    async def communism(self, ctx):
+        """FULLY AUTOMATED LUXURY GAY SPACE COMMUNISM"""
+        await ctx.send('FULLY AUTOMATED LUXURY GAY SPACE COMMUNISM BEGINS NOW.')
+        for user in ctx.bot.users:
+            acc = await self.get_account(user.id)
+            if acc:
+                await self.jcoin_coll.update_one({
+                    'id': user.id
+                }, {
+                    '$set': {'amount': float(9999999999999999)}
+                })
+        await ctx.send('DONE.')
 
     @commands.command()
     async def wallet(self, ctx, person: discord.User = None):
@@ -598,7 +613,7 @@ class Coins(Cog):
         account = await self.get_account(person.id)
         if account is None:
             raise self.SayException('account not found you dumbass')
-        
+
         amount = round(amount, 3)
         await self.jcoin_coll.update_one({'id': person.id}, {'$set': {'amount': float(amount)}})
         await ctx.send(f'Set {self.get_name(account["id"])} to {amount}')
@@ -636,7 +651,7 @@ class Coins(Cog):
         start = time.monotonic()
         account = await self.get_account(ctx.author.id)
         end = time.monotonic()
-        
+
         delta = round((end - start) * 1000, 2)
 
         account = pprint.pformat(account)
