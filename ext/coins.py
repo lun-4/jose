@@ -306,8 +306,8 @@ class Coins(Cog):
             if id_from == id_to:
                 raise TransferError("Can't transfer from the account to itself.")
 
-            if amount > 200:
-                raise TransferError('Transferring too much.')
+            # if amount > 200:
+            #     raise TransferError('Transferring too much.')
 
             try:
                 amount = decimal.Decimal(amount)
