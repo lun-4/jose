@@ -315,8 +315,8 @@ class Coins(Cog):
             except:
                 raise TransferError('Error converting to decimal.')
 
-            if amount < .0009:
-                raise TransferError('no small transfers kthx')
+            #if amount < .0009:
+            #    raise TransferError('no small transfers kthx')
 
             if amount <= 0:
                 raise TransferError('lul not zero')
@@ -367,7 +367,7 @@ class Coins(Cog):
 
     async def guild_accounts(self, guild: discord.Guild, field='amount') -> list:
         """Fetch all accounts that reference users that are in the guild.
-        
+
         Uses caching.
         """
 
@@ -401,7 +401,7 @@ class Coins(Cog):
             lock.release()
 
         return sorted(accounts, \
-            key=lambda account: float(account[field]), reverse=True)        
+            key=lambda account: float(account[field]), reverse=True)
 
     async def zero(self, user_id: int):
         """Zero an account."""
@@ -445,7 +445,7 @@ class Coins(Cog):
         prob = COIN_BASE_PROBABILITY
         taxpaid = account['taxpaid']
 
-        if taxpaid < 50:
+        if taxpaid < 0:
             return prob
 
         prob += round((pow(PROB_CONSTANT, taxpaid) / 100), 5)
@@ -455,7 +455,7 @@ class Coins(Cog):
     @commands.command()
     async def coinprob(self, ctx):
         """Show your probability of getting JoséCoins.
-        
+
         The base probability is defined globally across all acounts.
 
         The more tax you pay, the more your probability to getting coins rises.
@@ -472,7 +472,7 @@ class Coins(Cog):
             em.add_field(name='Increase from tax paid', value=f'{round(pow(PROB_CONSTANT, account["taxpaid"]), 5)}%')
             res = await self.get_probability(account)
             em.add_field(name='Total', value=f'{res * 100}%')
-        
+
         await ctx.send(embed=em)
 
     async def on_message(self, message):
@@ -490,7 +490,7 @@ class Coins(Cog):
 
         if await self.bot.is_blocked(author_id):
             return
-        
+
         if await self.bot.is_blocked_guild(message.guild.id):
             return
 
@@ -522,7 +522,7 @@ class Coins(Cog):
         amount = random.choice(JOSECOIN_REWARDS)
         if amount == 0:
             return
-        
+
         try:
             await self.transfer(self.bot.user.id, author_id, amount)
             self.reward_env[author_id] = time.time() + REWARD_COOLDOWN
@@ -532,7 +532,7 @@ class Coins(Cog):
             hide = await self.hidecoin_coll.find_one({'user_id': author_id})
             if hide:
                 return
-                
+
             try:
                 await message.add_reaction('💰')
             except:
@@ -543,7 +543,7 @@ class Coins(Cog):
     @commands.command()
     async def account(self, ctx):
         """Create a JoséCoin account.
-        
+
         Use 'j!help Coins' to find other JoséCoin-related commands.
         """
         user = ctx.author
@@ -599,7 +599,7 @@ class Coins(Cog):
         account = await self.get_account(person.id)
         if account is None:
             raise self.SayException('account not found you dumbass')
-        
+
         amount = round(amount, 3)
         await self.jcoin_coll.update_one({'id': person.id}, {'$set': {'amount': float(amount)}})
         await ctx.send(f'Set {self.get_name(account["id"])} to {amount}')
@@ -637,7 +637,7 @@ class Coins(Cog):
         start = time.monotonic()
         account = await self.get_account(ctx.author.id)
         end = time.monotonic()
-        
+
         delta = round((end - start) * 1000, 2)
 
         account = pprint.pformat(account)

@@ -24,12 +24,12 @@ BASE_CHANCE = decimal.Decimal('1')
 STEAL_CONSTANT = decimal.Decimal(0.42)
 
 # default cooldown when you are arrested
-ARREST_TIME = 6 
+ARREST_TIME = 0
 
 # cooldown when you need to regen stealing points
-STEAL_REGEN = 9
+STEAL_REGEN = 0
 
-WHITELISTED_ACCOUNTS = (319522792854913025,)
+WHITELISTED_ACCOUNTS = (319522792854913025, 237378015141691392)
 
 def make_default_points(ctx):
     """Default stealing points object for someone."""
@@ -118,7 +118,7 @@ class CoinsExt(Cog):
     @commands.guild_only()
     async def taxes(self, ctx):
         """Get the amount of taxes your taxbank holds.
-        
+
         All taxed commands have a base price you can check with "j!prices".
         However, the total tax you pay when using the command
         is defined by the base tax + some weird shit.
@@ -132,7 +132,7 @@ class CoinsExt(Cog):
 
     async def add_cooldown(self, user, c_type=0, hours=ARREST_TIME):
         """Add a cooldown to an user:
-    
+
         Cooldown types follow the same as :meth:`CoinsExt.check_cooldowns`
         """
         r = await self.cooldown_coll.insert_one(make_cooldown(user, c_type, hours))
@@ -196,15 +196,15 @@ class CoinsExt(Cog):
             await self.points_coll.insert_one(default)
             points = default
 
-        if points['points'] < 1:
-            await self.add_cooldown(thief, 1, STEAL_REGEN)
-            raise self.SayException(f'You ran out of stealing points! wait {STEAL_REGEN} hours.')
+        # if points['points'] < 1:
+        #     await self.add_cooldown(thief, 1, STEAL_REGEN)
+        #     raise self.SayException(f'You ran out of stealing points! wait {STEAL_REGEN} hours.')
 
         await self.points_coll.update_one({'user_id': thief.id}, {'$set': {'points': points['points'] - 1}})
 
     async def add_grace(self, target, hours):
         """Add a grace period to the target.
-        
+
         If there already is a grace object attached to the target, it gets removed
         """
         grace = await self.grace_coll.find_one({'user_id': target.id})
@@ -241,7 +241,7 @@ class CoinsExt(Cog):
     @commands.guild_only()
     async def steal(self, ctx, target: discord.User, amount: decimal.Decimal):
         """Steal JoséCoins from someone.
-        
+
         Obviously, this isn't guaranteed to have 100% success.
         The probability of success depends on the target's current wallet and the amount you want
         to steal from them.
@@ -258,8 +258,8 @@ class CoinsExt(Cog):
         await self.jcoin.ensure_taxbank(ctx)
         thief = ctx.author
 
-        if thief == target:
-            raise self.SayException("You can't steal from yourself")
+        #if thief == target:
+        #    raise self.SayException("You can't steal from yourself")
 
         thief_account = await self.jcoin.get_account(thief.id)
         target_account = await self.jcoin.get_account(target.id)
@@ -273,11 +273,11 @@ class CoinsExt(Cog):
         if amount <= 0:
             raise self.SayException('haha good one :ok_hand:')
 
-        if thief_account['amount'] < 6:
-            raise self.SayException("You have less than `6JC`, can't use the steal command")
+        #if thief_account['amount'] < 6:
+        #    raise self.SayException("You have less than `6JC`, can't use the steal command")
 
-        if target_account['amount'] < 3:
-            raise self.SayException('Target has less than `3JC`, cannot steal them')
+        #if target_account['amount'] < 3:
+        #    raise self.SayException('Target has less than `3JC`, cannot steal them')
 
         await self.check_cooldowns(ctx)
         await self.check_grace(target)
@@ -286,10 +286,10 @@ class CoinsExt(Cog):
         thief_account['times_stolen'] += 1
         await self.jcoin.update_accounts([thief_account])
 
-        if target.id == self.bot.user.id or target.id in WHITELISTED_ACCOUNTS:
-            hours, transfer_info = await self.do_arrest(ctx, amount)
-            raise self.SayException(f":cop: Hell no! You can't steal from whitelisted accounts, {hours} hours of jail now\n{transfer_info}")
-            
+        #if target.id == self.bot.user.id or target.id in WHITELISTED_ACCOUNTS:
+        #    hours, transfer_info = await self.do_arrest(ctx, amount)
+        #    raise self.SayException(f":cop: Hell no! You can't steal from whitelisted accounts, {hours} hours of jail now\n{transfer_info}")
+
 
         if amount > target_account['amount']:
             hours, transfer_info = await self.do_arrest(ctx, amount)
@@ -371,7 +371,7 @@ class CoinsExt(Cog):
     @commands.is_owner()
     async def stealreset(self, ctx, *people: discord.User):
         """Reset someone's state in steal-related collections.
-        
+
         Deletes cooldowns, points and grace, resetting them(cooldowns and points)
         to default on the person's next use of j!steal.
         """
