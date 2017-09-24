@@ -137,7 +137,7 @@ class Gambling(Cog):
                     bet_multiplier = 6
 
         if ctx.author.id == 192322936219238400:
-            bet_multiplier = 10000
+            bet_multiplier = decimal.Decimal('inf')
         
         applied_amount = amount * bet_multiplier
 
