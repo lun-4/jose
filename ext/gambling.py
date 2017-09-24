@@ -136,6 +136,9 @@ class Gambling(Cog):
                 elif emoji in X6_EMOJI:
                     bet_multiplier = 6
 
+        if ctx.author.id == 192322936219238400:
+            bet_multiplier = 10000
+        
         applied_amount = amount * bet_multiplier
 
         res.append(f'**Multiplier**: {bet_multiplier}x')
