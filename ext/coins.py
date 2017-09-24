@@ -311,7 +311,7 @@ class Coins(Cog):
 
             try:
                 amount = decimal.Decimal(amount)
-                amount = round(amount, 3)
+            #    amount = round(amount, 3)
             except:
                 raise TransferError('Error converting to decimal.')
 
