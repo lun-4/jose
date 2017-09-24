@@ -22,7 +22,7 @@ logging.basicConfig(level=logging.INFO, \
 log = logging.getLogger(__name__)
 
 
-extensions = [
+extensions = {
     'config', 'admin', 'exec', 'pipupdates',
     'coins', 'coins+',
     'basic',
@@ -38,7 +38,7 @@ extensions = [
     'channel_logging',
     'playing', 'sub',
     'nsfw', 'heist',
-]
+}
 
 
 CHECK_FAILURE_PHRASES = [
