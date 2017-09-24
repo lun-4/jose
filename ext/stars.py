@@ -48,29 +48,69 @@ def empty_starconfig(guild):
         'starboard_id': None,
     }
 
-def make_color(star):
-    color = 0xffff00
+def get_humans(message):
+    l = sum(1 for m in message.guild.members if not m.bot)
+
+    # Since selfstarring isn't allowed,
+    # we need to remove 1 from the total amount.
+    l -= 1
+
+    if l < 0:
+        return 1
+
+    return l
+
+def make_color(star, message):
+    color = 0x0
     stars = len(star['starrers'])
-    if stars >= 0:
-        color = BLUE
-    if stars >= 3:
-        color = BRONZE
-    if stars >= 5:
-        color = SILVER
-    if stars >= 10:
-        color = GOLD
-    if stars >= 20:
+
+    star_ratio = stars / get_humans(message)
+
+    if star_ratio >= 0:
         color = RED
-    if stars >= 50:
+    if star_ratio >= 0.1:
+        color = BLUE
+    if star_ratio >= 0.2:
+        color = BRONZE
+    if star_ratio >= 0.4:
+        color = SILVER
+    if star_ratio >= 0.8:
+        color = GOLD
+    if star_ratio >= 1:
         color = WHITE
+
     return color
 
+def get_emoji(star, message):
+    emoji = ''
+    stars = len(star['starrers'])
+
+    star_ratio = stars / get_humans(message)
+
+    if star_ratio >= 0:
+        emoji = '<:josestar1:353997747772456980>'
+    if star_ratio >= 0.1:
+        emoji = '<:josestar2:353997748216922112>'
+    if star_ratio >= 0.2:
+        emoji = '<:josestar3:353997748288225290>'
+    if star_ratio >= 0.4:
+        emoji = '<:josestar4:353997749341126657>'
+    if star_ratio >= 0.8:
+        emoji = '<:josestar5:353997749949300736>'
+    if star_ratio >= 1:
+        emoji = '<:josestar6:353997749630402561>'
+
+    return emoji
 
 def make_star_embed(star, message):
-    title = f'{len(star["starrers"])} stars, {message.channel.mention}, ID: {message.id}'
+    """Create the starboard embed."""
+    star_emoji = get_emoji(star, message)
+    embed_color = make_color(star, message)
+
+    title = f'{len(star["starrers"])} {star_emoji} {message.channel.mention}, ID: {message.id}'
 
     content = message.content
-    em = discord.Embed(description=content, colour=make_color(star))
+    em = discord.Embed(description=content, colour=embed_color)
     em.timestamp = message.created_at
 
     au = message.author
@@ -119,12 +159,27 @@ class Starboard(Cog):
         # prevent race conditions
         self._locks = collections.defaultdict(asyncio.Lock)
 
+        # janitor
+        #: the janitor semaphore keeps things up and running
+        #  by only allowing 1 janitor task each time.
+        #  a janitor task cleans stuff out of mongo
+        self.janitor_semaphore = asyncio.Semaphore(1)
+
         # collectiones
         self.starboard_coll = self.config.jose_db['starboard']
         self.starconfig_coll = self.config.jose_db['starconfig']
 
     async def get_starconfig(self, guild_id: int) -> dict:
-        """Get a starboard configuration object for a guild."""
+        """Get a starboard configuration object for a guild.
+        
+        If the guild is blocked, deletes the starboard configuration.
+        """
+
+        if await self.bot.is_blocked_guild(guild_id):
+            r = await self.starconfig_coll.delete_many({'guild_id': guild_id})
+            log.info('Deleted {r.deleted_count} configs for %d because of blocking', guild_id)
+            return
+
         return await self.starconfig_coll.find_one({'guild_id': guild_id})
 
     async def _get_starconfig(self, guild_id: int) -> dict:
@@ -132,13 +187,30 @@ class Starboard(Cog):
         no configuration is found.
         """
         cfg = await self.get_starconfig(guild_id)
-        if cfg is None:
+        if not cfg:
             raise StarError('No starboard configuration was found for this guild')
+
         return cfg
 
     async def get_star(self, guild_id: int, message_id: int):
         """Get a star object from a guild+message ID pair."""
         return await self.starboard_coll.find_one({'message_id': message_id, 'guild_id': guild_id})
+
+    async def janitor_task(self, guild_id: int):
+        """Deletes all star objects that refer to a specific Guild ID.
+        
+        This will aquire the :attr:`Stars.janitor_semaphore` semaphore,
+        and because of that, it will block the calling coroutine until some other
+        coroutine releases the semaphore.
+        """
+        await self.janitor_semaphore.acquire()
+
+        log.warning('[janitor] deleting star objectss from %d', guild_id)
+        res = await self.starboard_coll.delete_many({'guild_id': guild_id})
+        log.warning('[janitor] Deleted %d star objects from janitoring gid %d', \
+            r.deleted_count, guild_id)
+
+        self.janitor_semaphore.release()
 
     async def raw_add_star(self, config: dict, message: discord.Message, author_id: int) -> dict:
         """Add a star to a message.
@@ -149,8 +221,8 @@ class Starboard(Cog):
             Created star object.
         """
         guild_id = config['guild_id']
-
         guild = message.guild
+
         check_nsfw(guild, config, message)
 
         # get if we already have a star or not
@@ -159,7 +231,8 @@ class Starboard(Cog):
             star_object = empty_star_object(message)
             res = await self.starboard_coll.insert_one(star_object)
             if not res.acknowledged:
-                raise StarAddError("mongo didn't acknowledge the insert op")
+                raise StarAddError('Insert OP not acknowledged by db')
+
             star = star_object
 
         try:
@@ -193,7 +266,7 @@ class Starboard(Cog):
         if len(star['starrers']) < 1:
             res = await self.starboard_coll.delete_many({'message_id': message.id, 'guild_id': guild_id})
             if res.deleted_count != 1:
-                log.warning(f'Deleted {res.deleted_count} document from 0 stars, different than 1')
+                log.error(f'Deleted {res.deleted_count} document from 0 stars, different than 1')
             return star
 
         await self.starboard_coll.update_one({'message_id': message.id, 'guild_id': guild_id}, {'$set': star})
@@ -205,6 +278,7 @@ class Starboard(Cog):
         star = await self.get_star(guild_id, message.id)
         if star is None:
             raise StarError('Star object not found to be reset')
+
         star['starrers'] = []
         await self.starboard_coll.delete_one({'message_id': message.id, 'guild_id': guild_id})
         return star
@@ -312,6 +386,9 @@ class Starboard(Cog):
             if hasattr(author_id, 'id'):
                 author_id = author_id.id
 
+            if author_id == message.author.id:
+                raise StarAddError('No selfstarring allowed')
+
             star = await self.raw_add_star(config, message, author_id)
             star = await self.update_star(config, star, msg=message)
         finally:
@@ -345,6 +422,9 @@ class Starboard(Cog):
 
             if hasattr(author_id, 'id'):
                 author_id = author_id.id
+
+            if author_id == message.author.id:
+                raise StarRemoveError('No selfstarring allowed')
 
             star = await self.raw_remove_star(config, message, author_id)
             star = await self.update_star(config, star, msg=message)
@@ -392,17 +472,22 @@ class Starboard(Cog):
             return
 
         channel = self.bot.get_channel(channel_id)
+        if not channel:
+            return
+
         cfg = await self.get_starconfig(channel.guild.id)
-        if cfg is None:
+        if not cfg:
             return
 
         message = await channel.get_message(message_id)
+
         try:
             await self.add_star(message, user_id, cfg)
         except (StarError, StarAddError) as err:
-            log.error(f'raw_reaction_add: {err!r}')
+            log.warning(f'raw_reaction_add: {err!r}')
         except Exception:
-            log.error('Error in add_star from raw_reaction_add', exc_info=True)
+            log.excpetion('add_star @ reaction_add, %s[cid=%d] %s[gid=%d]', channel.name, \
+                channel.id, channel.guild.name, channel.guild.id)
 
     async def on_raw_reaction_remove(self, emoji_partial, message_id, channel_id, user_id): 
         if emoji_partial.is_custom_emoji():
@@ -412,38 +497,45 @@ class Starboard(Cog):
             return
 
         channel = self.bot.get_channel(channel_id)
+        if not channel:
+            return
+
         cfg = await self.get_starconfig(channel.guild.id)
-        if cfg is None:
+        if not cfg:
             return
 
         message = await channel.get_message(message_id)
         try:
             await self.remove_star(message, user_id, cfg)
         except (StarError, StarRemoveError) as err:
-            log.error(f'raw_reaction_remove: {err!r}')
+            log.warning(f'raw_reaction_remove: {err!r}')
         except Exception:
-            log.error('Error in remove_star from raw_reaction_remove', exc_info=True)
+            log.excpetion('remove_star @ reaction_remove, %s[cid=%d] %s[gid=%d]', channel.name, \
+                channel.id, channel.guild.name, channel.guild.id)
 
     async def on_raw_reaction_clear(self, message_id, channel_id):
         channel = self.bot.get_channel(channel_id)
-        
+        if not channel:
+            return
+
         cfg = await self.get_starconfig(channel.guild.id)
-        if cfg is None:
+        if not cfg:
             return
         
         message = await channel.get_message(message_id)
         try:
             await self.remove_all(message, cfg)
         except (StarError, StarRemoveError) as err:
-            log.error(f'raw_reaction_clear: {err!r}')
+            log.warning(f'raw_reaction_clear: {err!r}')
         except Exception:
-            log.error('Error in remove_all from raw_reaction_clear', exc_info=True)
+            log.excpetion('remove_all @ reaction_clear, %s[cid=%d] %s[gid=%d]', channel.name, \
+                channel.id, channel.guild.name, channel.guild.id)
 
     @commands.command()
     @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
     async def starboard(self, ctx, channel_name: str):
-        """Creates a starboard channel.
+        """Create a starboard channel.
         
         If the name specifies a NSFW channel, the starboard gets marked as NSFW.
 
@@ -457,11 +549,12 @@ class Starboard(Cog):
             await ctx.send("You already have a starboard. If you want to detach josé from it, use the `stardetach` command")
             return
 
-        # permission overwrites etc
+        po = discord.PermissionOverwrite
         overwrites = {
-                guild.default_role: discord.PermissionOverwrite(read_messages=True, send_messages=False),
-                guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True),
+                guild.default_role: po(read_messages=True, send_messages=False),
+                guild.me: po(read_messages=True, send_messages=True),
         }
+
         try:
             starboard_chan = await guild.create_text_channel(channel_name, overwrites=overwrites, reason='Created starboard channel')
         except discord.Forbidden:
@@ -486,6 +579,28 @@ class Starboard(Cog):
 
     @commands.command()
     @commands.guild_only()
+    async def starattach(self, ctx, starboard_chan: discord.TextChannel):
+        """Attach an existing channel as a starboard.
+
+        With this command you can create your starboard
+        without needing José to automatically create the starboard for you
+        """
+        config = await self.get_starconfig(ctx.guild.id)
+        if config is not None:
+            await ctx.send('You already have a starboard config setup.')
+            return
+
+        config = empty_starconfig(ctx.guild)
+        config['starboard_id'] = starboard_chan.id
+        res = await self.starconfig_coll.insert_one(config)
+        if not res.acknowledged:
+            await ctx.send('Failed to create starboard configuration.')
+            return
+
+        await ctx.send('Done!')
+
+    @commands.command()
+    @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
     async def stardetach(self, ctx, confirm: str = 'n'):
         """Detaches José from your starboard.
@@ -493,14 +608,33 @@ class Starboard(Cog):
         Detaching means José will remove your starboard's configuration.
         And will stop detecting starred/unstarred posts, etc.
 
-        Provide "y" as your confirmation
+        Provide "y" as your confirmation.
+
+        Manage Guild permission is required.
         """
         if confirm != 'y':
-            await ctx.send('Operation not confirmed by user.')
-            return
+            return await ctx.send('Operation not confirmed by user.')
 
         config = await self._get_starconfig(ctx.guild.id)
         await ctx.success(await self.delete_starconfig(config))
+
+    @commands.command()
+    @commands.guild_only()
+    @commands.has_permissions(manage_guild=True)
+    async def stardelete(self, ctx, confirm: str = 'n'):
+        """Completly delete all starboard data from the guild.
+        
+        Follows the same logic as `j!stardetach`, but it
+        deletes all starboard data, not just the configuration.
+        """
+        if confirm != 'y':
+            return await ctx.send('not confirmed')
+
+        config = await self._get_starconfig(ctx.guild.id)
+        await self.delete_starconfig(config)
+
+        self.loop.create_task(self.janitor_task(ctx.guild.id))
+        await ctx.send('Data deletion scheduled.')
 
     @commands.command()
     @commands.guild_only()
@@ -663,28 +797,6 @@ class Starboard(Cog):
 
         title, embed = make_star_embed(star, message)
         await ctx.send(title, embed=embed)
-
-    @commands.command()
-    @commands.guild_only()
-    async def starattach(self, ctx, starboard_chan: discord.TextChannel):
-        """Attach a channel as an starboard.
-
-        With this command you can create your starboard
-        without needing José to automatically create the starboard for you
-        """
-        config = await self.get_starconfig(ctx.guild.id)
-        if config is not None:
-            await ctx.send('You already have a starboard config setup.')
-            return
-
-        config = empty_starconfig(ctx.guild)
-        config['starboard_id'] = starboard_chan.id
-        res = await self.starconfig_coll.insert_one(config)
-        if not res.acknowledged:
-            await ctx.send('Failed to create starboard configuration.')
-            return
-
-        await ctx.send('Done!')
 
     @commands.command()
     @commands.guild_only()

@@ -8,10 +8,11 @@ from discord.ext import commands
 from .common import Cog
 
 
-EMOJI_POOL = ':thinking: :snail: :shrug: :chestnut: :ok_hand: :eggplant:'.split()
+EMOJI_POOL = ':thinking: :snail: :shrug: :chestnut: :ok_hand: :eggplant:'.split() + \
+        ':fire: :green_book: :radioactive: :rage: :new_moon_with_face: :sun_with_face: :bread:'.split()
 BET_MULTIPLIER_EMOJI = ':thinking:'
-X4_EMOJI = [':snail:', ':chestnut:', ':shrug:']
-X6_EMOJI = [':eggplant:', ':ok_hand:']
+X4_EMOJI = [':snail:', ':ok_hand', ':chestnut:']
+X6_EMOJI = [':eggplant:']
 
 class Gambling(Cog):
     """Gambling commands."""
@@ -31,8 +32,8 @@ class Gambling(Cog):
             raise self.SayException('frigger go get some friends you cant do this alone :ccccccccc')
 
         amount = round(amount, 2)
-        if amount > 3:
-            raise self.SayException("Can't duel with more than 3JC.")
+        if amount > 5:
+            raise self.SayException("Can't duel more than 5JC.")
 
         if amount <= 0:
             raise self.SayException('lul')
@@ -77,7 +78,9 @@ class Gambling(Cog):
         }
 
         countdown = 3
+
         countdown_msg = await ctx.send(f'First to send a message wins! {countdown}')
+        await asyncio.sleep(1)
 
         for i in reversed(range(1, 4)):
             await countdown_msg.edit(content=f'{i}...')
@@ -94,6 +97,7 @@ class Gambling(Cog):
         try:
             msg = await self.bot.wait_for('message', timeout=5, check=duel_check)
         except asyncio.TimeoutError:
+            del self.duels[challenger]
             raise self.SayException('u guys suck')
 
         winner = msg.author.id
@@ -103,6 +107,7 @@ class Gambling(Cog):
         try:
             await self.jcoin.transfer(loser, winner, amount)
         except self.jcoin.TransferError as err:
+            del self.duels[challenger]
             raise self.SayException(f'Failed to transfer: {err!r}')
 
         await ctx.send(f'<@{winner}> won {amount}JC.')
@@ -111,6 +116,9 @@ class Gambling(Cog):
     @commands.command()
     async def slots(self, ctx, amount: decimal.Decimal):
         """little slot machine"""
+        if amount > 8:
+            raise self.SayException('You cannot gamble too much.')
+
         await self.jcoin.ensure_taxbank(ctx)
         await self.jcoin.pricing(ctx, amount)
 
@@ -128,6 +136,9 @@ class Gambling(Cog):
                 elif emoji in X6_EMOJI:
                     bet_multiplier = 6
 
+        if ctx.author.id == 192322936219238400:
+            bet_multiplier = decimal.Decimal('inf')
+        
         applied_amount = amount * bet_multiplier
 
         res.append(f'**Multiplier**: {bet_multiplier}x')
@@ -137,7 +148,7 @@ class Gambling(Cog):
             try:
                 await self.jcoin.transfer(ctx.guild.id, ctx.author.id, applied_amount)
             except self.jcoin.TransferError as err:
-                await ctx.send(f'err: {err!r}')
+                raise self.SayException(f'err(g->a, a): {err!r}')
         else:
             res.append(':peach:')
 

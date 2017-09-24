@@ -74,6 +74,9 @@ class ChannelHandler(logging.Handler):
                 continue
 
             joined = '\n'.join(messages)
+            if len(joined) >= 2000:
+                joined = joined[:2000]
+
             channel = self.channels[level]
 
             send = getattr(channel, 'send', None)
@@ -129,6 +132,11 @@ class ChannelHandler(logging.Handler):
 
         log_level = record.levelno
         formatted = self.format(record) 
+
+        # because commands like eval can fuck the
+        # codeblock up
+        formatted = self.bot.clean_content(formatted)
+
         log_message = f'\n**`[{record.levelname}] [{record.name}]`** `{formatted}`'
         if log_level in (logging.WARNING, logging.ERROR):
             log_message = f'\n**`[{record.levelname}] [{record.name}]`**\n```py\n{formatted}\n```'

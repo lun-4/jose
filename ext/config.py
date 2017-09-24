@@ -12,15 +12,15 @@ from .common import Cog
 
 log = logging.getLogger(__name__)
 
-def is_moderator():
-    def _is_moderator(ctx):
-        if ctx.guild is None:
-            return False
+def _is_moderator(ctx):
+    if ctx.guild is None:
+        return False
 
-        member = ctx.guild.get_member(ctx.author.id)
-        perms = ctx.channel.permissions_for(member)
-        return (ctx.author.id == ctx.bot.owner_id) or perms.manage_guild
-    
+    member = ctx.guild.get_member(ctx.author.id)
+    perms = ctx.channel.permissions_for(member)
+    return (ctx.author.id == ctx.bot.owner_id) or perms.manage_guild
+
+def is_moderator():    
     return commands.check(_is_moderator)
 
 class Config(Cog):
@@ -46,26 +46,25 @@ class Config(Cog):
         default = {
             'guild_id': guild_id,
             'botblock': True,
-            'image_channel': None,
             'speak_channel': None,
-            'prefix': 'j!',
+            'prefix': self.bot.config.prefix,
             'autoreply_prob': 0,
             'fullwidth_prob': 0.1,
         }
         return default
 
-    async def block_one(self, user_id, k='user_id'):
+    async def block_one(self, user_id, k='user_id', reason=None):
         if await self.block_coll.find_one({k: user_id}) is not None:
             return False
         
         try:
-            await self.block_coll.insert_one({k: user_id})
+            await self.block_coll.insert_one({k: user_id, 'reason': reason})
             self.bot.block_cache[user_id] = True
             return True
         except:
             return False
 
-    async def unblock_one(self, user_id, k='user_id'):
+    async def unblock_one(self, user_id, k='user_id', reason=''):
         d = await self.block_coll.delete_one({k: user_id})
         self.bot.block_cache[user_id] = False
         return d.deleted_count > 0
@@ -105,8 +104,8 @@ class Config(Cog):
         cfg = await self.ensure_cfg(guild)
         value = cfg.get(key)
 
-        log.info('[cfg:get] %s[gid=%d] k=%r -> v=%r', \
-            guild, guild.id, key, value)
+        #log.info('[cfg:get] %s[gid=%d] k=%r -> v=%r', \
+        #    guild, guild.id, key, value)
 
         return value
 
@@ -185,27 +184,75 @@ class Config(Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def block(self, ctx, user: discord.User):
+    async def block(self, ctx, user: discord.User, *, reason: str=''):
         """Block someone from using the bot, globally"""
-        await ctx.success(await self.block_one(user.id))
+        await ctx.success(await self.block_one(user.id, 'user_id', reason))
 
     @commands.command()
     @commands.is_owner()
-    async def unblock(self, ctx, user: discord.User):
+    async def unblock(self, ctx, user: discord.User, *, reason: str=''):
         """Unblock someone from using the bot, globally"""
-        await ctx.success(await self.unblock_one(user.id))
+        await ctx.success(await self.unblock_one(user.id, 'user_id', reason))
     
     @commands.command()
     @commands.is_owner()
-    async def blockguild(self, ctx, guild_id: int):
+    async def blockguild(self, ctx, guild_id: int, *, reason: str=''):
         """Block an entire guild from using José."""
-        await ctx.success(await self.block_one(guild_id, 'guild_id'))
+        await ctx.success(await self.block_one(guild_id, 'guild_id', reason))
 
     @commands.command()
     @commands.is_owner()
-    async def unblockguild(self, ctx, guild_id: int):
+    async def unblockguild(self, ctx, guild_id: int, *, reason: str=''):
         """Unblock a guild from using José."""
-        await ctx.success(await self.unblock_one(guild_id, 'guild_id'))
+        await ctx.success(await self.unblock_one(guild_id, 'guild_id', reason))
+
+    @commands.command()
+    async def blockreason(self, ctx, anything_id: int):
+        """Get a reason for a block if it exists"""
+        userblock = await self.block_coll.find_one({'user_id': anything_id})
+        if userblock is not None:
+            return await ctx.send(f'User blocked, reason `{userblock.get("reason")}`')
+        
+        guildblock = await self.block_coll.find_one({'guild_id': anything_id})
+        if guildblock is not None:
+            return await ctx.send(f'Guild blocked, reason `{guildblock.get("reason")}`')
+
+        await ctx.send('Block not found')
+
+    @commands.command()
+    @commands.guild_only()
+    @is_moderator()
+    async def prefix(self, ctx, prefix: str=None):
+        """Sets a guild prefix. Returns the prefix if no args are passed."""
+        if not prefix:
+            return await ctx.send('The prefix for this guild is `{}`.'.format(await self.cfg_get(ctx.guild, 'prefix')))
+        
+        if not _is_moderator(ctx):
+            return await ctx.send('Unauthorized to set prefix.')
+
+        if not (1 < len(prefix) < 20):
+            return await ctx.send('Prefixes need to be 1-20 characters long')
+
+        return await ctx.success(await self.cfg_set(ctx.guild, 'prefix', prefix))
+
+    @commands.command()
+    @commands.guild_only()
+    @is_moderator()
+    async def notify(self, ctx, channel: discord.TextChannel):
+        """Make a channel a notification channel.
+        
+        A notification channel will be used bu josé
+        to say when your server/guild is successfully
+        stolen from by another guild.
+
+        José NEEDS TO HAVE "Send Message" permissions upfront
+        for this to work.
+        """
+        perms = channel.permissions_for(ctx.guild.me)
+        if not perms.send_messages:
+            return await ctx.send('Add `Send Messages` permission to josé please')
+
+        return await ctx.success(await self.cfg_set(ctx.guild, 'notify_channel', channel.id))
 
     @commands.command()
     @commands.is_owner()
@@ -221,6 +268,6 @@ class Config(Cog):
         coll_counts = '\n'.join([f'{collname:15} | {count}' for collname, count in counts.most_common()])
         coll_counts = f'```\n{coll_counts}```'
         await ctx.send(coll_counts)
-
+    
 def setup(bot):
     bot.add_cog(Config(bot))

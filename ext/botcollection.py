@@ -13,6 +13,10 @@ WHITELIST = (
     297710090687873024, # Luma's testing server
     319252487280525322, # robert is gay
     340609473439596546, # slice is a furry that plays agario
+    191611344137617408, # dan's 'haha gay pussy party'
+    277919178340565002, # lold - lolbot testing server
+    248143597097058305, # cyn bae's private server we gotta get 69
+    291990349776420865, # em's meme heaven
 )
 
 log = logging.getLogger(__name__)
@@ -35,6 +39,7 @@ class BotCollection(Cog):
 
     async def on_guild_join(self, guild):
         bots, humans, ratio = self.bot_human_ratio(guild)
+        owner = guild.owner
 
         log.info(f'[bh:join] {guild!s} -> ratio {len(bots)} / {len(humans)} = {ratio:.2}')
 
@@ -42,8 +47,19 @@ class BotCollection(Cog):
             return
 
         if ratio > BOT_RATIO_MAX:
-            log.info(f'[bh:leave] leaving {guild!s}')
+            log.info(f'[bh:leave:guild_join] leaving {guild!s}')
             await guild.leave()
+            return
+
+        if await self.bot.is_blocked_guild(guild.id):
+            await owner.send('Sorry. The guild you added José on is blocked. Appeal to the block at the support server(Use the invite provided in `j!invite`).')
+            await guild.leave()
+            return
+
+        await owner.send('Hello, welcome to José!\n'
+                         "Discord's API Terms of Service requires me to tell you I log\n"
+                         'Command usage and errors to a special channel.\n'
+                         '**Only commands and errors are logged, no messages are logged, ever.**')
 
     async def on_member_join(self, member):
         guild = member.guild

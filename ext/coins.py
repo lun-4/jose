@@ -1,6 +1,9 @@
 import time
 import decimal
 import logging
+import collections
+import asyncio
+import pprint
 
 import discord
 
@@ -38,7 +41,7 @@ TRANSFER_OBJECTS = [
     'memes',
     'cats',
     'coins',
-    'paitings',
+    'paintings',
 ]
 
 
@@ -55,6 +58,19 @@ class Coins(Cog):
 
         # Reward cooldown dict
         self.reward_env = {}
+
+        #: relates guilds to the accounts that are in the guild
+        #  used by guild_accounts to speed things up
+        self.acct_cache = collections.defaultdict(list)
+
+        #: Used to prevent race conditions on guild_accounts
+        self.gacct_locks = collections.defaultdict(asyncio.Lock)
+
+        #: proper account cache, used by get_account
+        self.cache = {}
+
+        #: I hate locks
+        self.transfer_lock = asyncio.Lock()
 
     def get_name(self, user_id, account=None):
         """Get a string representation of a user or guild."""
@@ -124,44 +140,121 @@ class Coins(Cog):
                 'loans': {},
             }
 
-    async def new_account(self, account_id, account_type='user', init_amount=3):
-        if (await self.get_account(account_id)) is not None:
+    async def new_account(self, account_id: int, account_type='user', init_amount=3):
+        """Create a new account.
+        
+        Updates the guild to user id list cache.
+        """
+        if (await self.get_account(account_id, True)) is not None:
             return False
 
         account = self.empty_account(account_id, account_type, init_amount)
         try:
-            await self.jcoin_coll.insert_one(account)
+            r = await self.jcoin_coll.insert_one(account)
+            log.info('ACK insert: %s', r.acknowledged)
+            self.cache[account_id] = account
             return True
         except:
-            log.error("Error creating account", exc_info=True)
+            log.exception('Error creating a new account')
             return False
 
     async def sane(self):
         """Ensures that there is an account for José."""
-        if await self.get_account(self.bot.user.id) is None:
+        if not (await self.get_account(self.bot.user.id)):
             await self.new_account(self.bot.user.id, 'user', 'inf')
 
     async def ensure_taxbank(self, ctx):
         """Ensure a taxbank exists for the guild."""
+        if ctx.guild is None:
+            raise self.SayException("No guild was found to be a taxbank, don't do this command in a DM.")
+
         if await self.get_account(ctx.guild.id) is None:
             await self.new_account(ctx.guild.id, 'taxbank')
 
-    async def get_account(self, account_id):
-        account = await self.jcoin_coll.find_one({'id': account_id})
-        if account is None:
+    def convert_account(self, account: dict) -> dict:
+        """Converts an account's `amount` and `taxpaid`
+        fields to `decimal.Decimal`.
+        
+        """
+        if not account:
             return None
 
-        account['amount'] = decimal.Decimal(account['amount'])
+        new_account = dict(account)
+
+        new_account['amount'] = decimal.Decimal(account['amount'])
 
         try:
-            account['taxpaid'] = decimal.Decimal(account['taxpaid'])
-        except:
-            pass
+            new_account['taxpaid'] = decimal.Decimal(account['taxpaid'])
+        except KeyError: pass
 
-        return account
+        return new_account
 
-    async def update_accounts(self, accounts):
-        """Update accounts to the jcoin collection."""
+    def unconvert_account(self, account: dict) -> dict:
+        """Unconvert an account to its str keys."""
+        if not account:
+            return None
+
+        new_account = dict(account)
+
+        new_account['amount'] = str(account['amount'])
+
+        try:
+            new_account['taxpaid'] = str(account['taxpaid'])
+        except KeyError: pass
+
+        return new_account
+
+    async def get_account(self, account_id: int, override_cache: bool=False) -> dict:
+        """Get a single account by its ID.
+        
+        This does necessary convertion of the `amount` field
+        to `decimal.Decimal` for actual usage.
+
+        Uses caching.
+
+        NOTE: You can override caching calls when setting `override_cache` to True.
+        """
+        if account_id in self.cache and (not override_cache):
+            return self.convert_account(self.cache[account_id])
+
+        account = await self.jcoin_coll.find_one({'id': account_id})
+        if not account:
+            self.cache[account_id] = None
+            return None
+
+        c_account = self.convert_account(account)
+
+        # if you don't read from the cache
+        # you shouldn't write to it
+        if not override_cache:
+            self.cache[account_id] = c_account
+
+        return c_account
+
+    async def get_accounts_type(self, acc_type: str) -> list:
+        """Get all accounts that respect an account type.
+        
+        Doesn't use cache.
+        """
+
+        cur = self.jcoin_coll.find({'type': acc_type})
+
+        accounts = []
+        async for account in cur:
+            accounts.append(self.convert_account(account))
+
+        return accounts
+
+    async def update_accounts(self, accounts: list):
+        """Update accounts to the jcoin collection.
+        
+        This converts `decimal.Decimal` to `str` in the ``amount`` field
+        so we maintain the precision of decimal while fetching/saving.
+
+        Updates the cache.
+        """
+        total = 0
+
         for account in accounts:
             if account['amount'].is_finite():
                 account['amount'] = round(account['amount'], 3)
@@ -170,15 +263,20 @@ class Coins(Cog):
                 except:
                     pass
 
-            account['amount'] = str(account['amount'])
+            # update cache
+            self.cache[account['id']] = self.convert_account(account)
+            account = self.unconvert_account(account)
 
-            try:
-                account['taxpaid'] = str(account['taxpaid'])
-            except:
-                pass
-            await self.jcoin_coll.update_one({'id': account['id']}, {'$set': account})
+            res = await self.jcoin_coll.update_one({'id': account['id']}, {'$set': account})
 
-    async def transfer(self, id_from, id_to, amount):
+            if res.modified_count > 1:
+                log.warning('Updating more than supposed to')
+            else:
+                total += res.modified_count
+
+        log.info('[update_accounts] Updated %d documents', total)
+
+    async def transfer(self, id_from: int, id_to: int, amount):
         """Transfer coins from one account to another.
 
         If the account that is receiving the coins is a taxbank account,
@@ -186,12 +284,13 @@ class Coins(Cog):
 
         Parameters
         -----------
-        id_from: str
+        id_from: int
             ID of the account that is giving the coins.
-        id_to: str
+        id_to: int
             ID of the account that is receiving the coins.
         amount: int, float or ``decimal.Decimal``
             Amount of coins to be transferred.
+            Will be converted to decimal and rounded to 3 decimal places.
 
         Raises
         ------
@@ -199,46 +298,58 @@ class Coins(Cog):
             If any checking or transfer error happens
         """
         await self.sane()
+        await self.transfer_lock
 
-        if id_from == id_to:
-            raise TransferError("Can't transfer from the account to itself.")
-
-        if amount > 200:
-            raise TransferError('Transferring too much.')
+        res = None
 
         try:
-            amount = decimal.Decimal(amount)
-            amount = round(amount, 3)
-        except:
-            raise TransferError('Error converting to decimal.')
+            if id_from == id_to:
+                raise TransferError("Can't transfer from the account to itself.")
 
-        if amount < .001:
-            raise TransferError('no small transfers kthx')
+            # if amount > 200:
+            #     raise TransferError('Transferring too much.')
 
-        if amount <= 0:
-            raise TransferError('lul not zero')
+            try:
+                amount = decimal.Decimal(amount)
+                amount = round(amount, 3)
+            except:
+                raise TransferError('Error converting to decimal.')
 
-        account_from = await self.get_account(id_from)
-        if account_from is None:
-            raise TransferError('Account to extract funds not found')
+            if amount < .0009:
+                raise TransferError('no small transfers kthx')
 
-        account_to = await self.get_account(id_to)
-        if account_to is None:
-            raise TransferError('Account to give funds not found')
+            if amount <= 0:
+                raise TransferError('lul not zero')
 
-        if account_from['amount'] < amount:
-            raise TransferError('Account doesn\'t have enough funds for this transaction')
+            account_from = await self.get_account(id_from)
+            if account_from is None:
+                raise TransferError('Account to extract funds not found')
 
-        log.info(f'{self.get_name(account_from["id"])} > {amount} > {self.get_name(account_to["id"])}')
+            account_to = await self.get_account(id_to)
+            if account_to is None:
+                raise TransferError('Account to give funds not found')
 
-        if account_to['type'] == 'taxbank':
-            account_from['taxpaid'] += amount
+            from_amount = account_from['amount']
+            if from_amount < amount:
+                raise TransferError(f'Not enough funds ({from_amount} < {amount})')
 
-        account_from['amount'] -= amount
-        account_to['amount'] += amount
+            log.info(f'{self.get_name(account_from["id"])} > {amount} > {self.get_name(account_to["id"])}')
 
-        await self.update_accounts([account_from, account_to])
-        return f'{amount} was transferred from {self.get_name(account_from["id"])} to {self.get_name(account_to["id"])}'
+            if account_to['type'] == 'taxbank':
+                account_from['taxpaid'] += amount
+
+            account_from['amount'] -= amount
+            account_to['amount'] += amount
+
+            await self.update_accounts([account_from, account_to])
+            res = f'{amount} was transferred from {self.get_name(account_from["id"])} to {self.get_name(account_to["id"])}'
+        finally:
+            self.transfer_lock.release()
+
+        # since return can in theory stop
+        # the finally block from executing
+        if res:
+            return res
 
     async def all_accounts(self, field='amount'):
         """Return all accounts in decreasing order of the selected field."""
@@ -251,7 +362,53 @@ class Coins(Cog):
         return sorted(accounts, \
             key=lambda account: float(account[field]), reverse=True)
 
-    async def ranks(self, user_id, guild):
+    async def guild_accounts(self, guild: discord.Guild, field='amount') -> list:
+        """Fetch all accounts that reference users that are in the guild.
+        
+        Uses caching.
+        """
+
+        lock = self.gacct_locks[guild.id]
+        await lock
+
+        accounts = []
+
+        try:
+            userids = None
+            using_cache = False
+            if guild.id in self.acct_cache:
+                userids = self.acct_cache[guild.id]
+                using_cache = True
+            else:
+                userids = [m.id for m in guild.members]
+
+            for uid in userids:
+                account = await self.get_account(uid)
+
+                if account:
+                    accounts.append(account)
+
+                    if not using_cache:
+                        self.acct_cache[guild.id].append(uid)
+        finally:
+            lock.release()
+
+        # sanity check
+        if lock.locked():
+            lock.release()
+
+        return sorted(accounts, \
+            key=lambda account: float(account[field]), reverse=True)        
+
+    async def zero(self, user_id: int):
+        """Zero an account."""
+        account = await self.get_account(user_id)
+        if account is None:
+            return
+
+        return await self.transfer(user_id, self.bot.user.id, account['amount'])
+
+    async def ranks(self, user_id: int, guild: discord.Guild) -> tuple:
         all_accounts = await self.all_accounts()
 
         all_ids = [account['id'] for account in all_accounts]
@@ -272,7 +429,7 @@ class Coins(Cog):
         base_tax = decimal.Decimal(base_tax)
         try:
             account = await self.get_account(ctx.author.id)
-            if account is None:
+            if not account:
                 raise self.SayException('No JoséCoin account found to tax')
 
             tax = base_tax + (pow(TAX_CONSTANT, account['amount']) - 1)
@@ -280,10 +437,11 @@ class Coins(Cog):
         except self.TransferError as err:
             raise self.SayException(f'TransferError: `{err.args[0]}`')
 
-    async def get_probability(self, account):
+    async def get_probability(self, account: dict) -> float:
         """Get the coin probability of someone."""
         prob = COIN_BASE_PROBABILITY
         taxpaid = account['taxpaid']
+
         if taxpaid < 50:
             return prob
 
@@ -293,9 +451,16 @@ class Coins(Cog):
 
     @commands.command()
     async def coinprob(self, ctx):
-        """Show your probability of getting JoséCoins."""
+        """Show your probability of getting JoséCoins.
+        
+        The base probability is defined globally across all acounts.
+
+        The more tax you pay, the more your probability to getting coins rises.
+
+        The maximum probability is 4.20%/message.
+        """
         account = await self.get_account(ctx.author.id)
-        if account is None:
+        if not account:
             raise self.SayException('Account not found.')
 
         em = discord.Embed(title='Probability Breakdown of JCs per message')
@@ -309,7 +474,7 @@ class Coins(Cog):
 
     async def on_message(self, message):
         # fuck bots
-        if message.author.bot:
+        if message.author.bot or message.guild is None:
             return
 
         author_id = message.author.id
@@ -317,7 +482,7 @@ class Coins(Cog):
             return
 
         account = await self.get_account(author_id)
-        if account is None:
+        if not account:
             return
 
         if await self.bot.is_blocked(author_id):
@@ -348,7 +513,6 @@ class Coins(Cog):
             return
 
         prob = await self.get_probability(account)
-
         if random.random() > prob:
             return
 
@@ -375,8 +539,18 @@ class Coins(Cog):
 
     @commands.command()
     async def account(self, ctx):
-        """Create a JoséCoin account."""
-        success = await self.new_account(ctx.author.id)
+        """Create a JoséCoin account.
+        
+        Use 'j!help Coins' to find other JoséCoin-related commands.
+        """
+        user = ctx.author
+        success = await self.new_account(user.id)
+
+        if success:
+            mutual_guilds = [g for g in self.bot.guilds if g.get_member(user.id)]
+            for guild in mutual_guilds:
+                self.acct_cache[guild.id].append(user.id)
+
         await ctx.success(success)
 
     @commands.command(name='transfer')
@@ -388,20 +562,21 @@ class Coins(Cog):
             await self.transfer(ctx.author.id, person.id, amount)
             await ctx.send(f'Transferred {amount!s} {random.choice(TRANSFER_OBJECTS)} from {ctx.author!s} to {person!s}')
         except Exception as err:
-            await ctx.send(f'rip: `{err!r}`')
+            log.exception('Error while transferring')
+            await ctx.send(f'error while transferring: `{err!r}`')
 
     @commands.command()
     async def wallet(self, ctx, person: discord.User = None):
         """See the amount of coins you currently have."""
         acc = None
+
         if person is not None:
             acc = await self.get_account(person.id)
         else:
             acc = await self.get_account(ctx.author.id)
 
-        if acc is None:
-            await ctx.send('Account not found.')
-            return
+        if not acc:
+            return await ctx.send('Account not found.')
 
         await ctx.send(f'{self.get_name(acc["id"])} > `{acc["amount"]}`, paid `{acc["taxpaid"]}JC` as tax.')
 
@@ -452,6 +627,18 @@ class Coins(Cog):
         """Show if you are hiding the coin reaction or not"""
         ex = await self.hidecoin_coll.find_one({'user_id': ctx.author.id})
         await ctx.send(f'Enabled: {bool(ex)}')
+
+    @commands.command(hidden=True)
+    async def jcgetraw(self, ctx):
+        """Get your raw josécoin account"""
+        start = time.monotonic()
+        account = await self.get_account(ctx.author.id)
+        end = time.monotonic()
+        
+        delta = round((end - start) * 1000, 2)
+
+        account = pprint.pformat(account)
+        await ctx.send(f'```py\n{account}\nTook {delta}ms.```')
 
 def setup(bot):
     bot.add_cog(Coins(bot))

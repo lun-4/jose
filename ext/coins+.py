@@ -74,25 +74,24 @@ class CoinsExt(Cog):
         """Shows top 10 of accounts.
 
         Available modes:
-         - g: global, all accounts in José's database.
-         - l: local, all accounts in this server/guild.
-         - t: tax, all accounts in José's database, ordered
+        - g: global, all accounts in José's database.
+        - l: local, all accounts in this server/guild.
+        - t: tax, all accounts in José's database, ordered
             by the amount of tax they paid.
-         - b: taxbanks, all taxbanks, globally
+        - b: taxbanks, all taxbanks, globally
         """
 
         if limit > 20:
             await ctx.send('pls no')
             return
 
-        all_accounts = await self.jcoin.all_accounts()
-
         if mode == 'l':
-            # TODO: get member list and make account list from that
-            accounts = [account for account in all_accounts if \
-                ctx.guild.get_member(account['id']) is not None][:limit]
+            accounts = await self.jcoin.guild_accounts(ctx.guild)
+            accounts = accounts[:limit]
+
             await self.show(ctx, accounts)
         elif mode == 'g':
+            all_accounts = await self.jcoin.all_accounts()
             accounts = filter(lambda a: a['type'] == 'user', all_accounts)
             accounts = list(accounts)[:limit]
             await self.show(ctx, accounts)
@@ -102,6 +101,7 @@ class CoinsExt(Cog):
             accounts = accounts[:limit]
             await self.show(ctx, accounts, 'taxpaid')
         elif mode == 'b' or mode == '\N{NEGATIVE SQUARED LATIN CAPITAL LETTER B}':
+            all_accounts = await self.jcoin.all_accounts()
             accounts = filter(lambda acc: acc['type'] == 'taxbank', all_accounts)
             accounts = list(accounts)[:limit]
             await self.show(ctx, accounts)
@@ -135,7 +135,10 @@ class CoinsExt(Cog):
     
         Cooldown types follow the same as :meth:`CoinsExt.check_cooldowns`
         """
-        return await self.cooldown_coll.insert_one(make_cooldown(user, c_type, hours))
+        r = await self.cooldown_coll.insert_one(make_cooldown(user, c_type, hours))
+        if not r.acknowledged:
+            raise RuntimeError('mongo did a dumb')
+        return hours
 
     async def remove_cooldown(self, cooldown):
         """Removes a cooldown and resets the stealing points entry if cooldown type is 1."""
@@ -143,15 +146,13 @@ class CoinsExt(Cog):
         if cooldown['type'] == 1:
             await self.points_coll.update_one({'user_id': cooldown['user_id']}, {'$set': {'points': 3}})
 
-    async def check_cooldowns(self, ctx, target):
+    async def check_cooldowns(self, ctx):
         """Check if any cooldowns are applied to the thief.
         Removes them if the cooldowns are expired, sends a message if it isn't.
-        
-        This also checks if the target is in grace period, raises `SayException` if it is.
 
         Cooldown types:
-         - 0: prison cooldown
-         - 1: stealing points regen
+        - 0: prison cooldown
+        - 1: stealing points regen
         """
 
         thief = ctx.author
@@ -218,20 +219,23 @@ class CoinsExt(Cog):
     async def do_arrest(self, ctx, amount):
         thief = ctx.author
         fee = amount / 2
+        hours = 0
+
         taxbank = await self.jcoin.get_account(ctx.guild.id)
         try:
             transfer_info = await self.jcoin.transfer(thief.id, ctx.guild.id, fee)
-            await self.add_cooldown(thief)
+            hours = await self.add_cooldown(thief)
         except self.jcoin.TransferError as err:
             # oh you are so fucked
-            if 'funds' not in err.args[0]:
+            if 'enough' not in err.args[0]:
                 raise self.SayException(f'wtf how did this happen {err!r}')
 
             thief_account = await self.jcoin.get_account(thief.id)
-            transfer_info = await self.jcoin.transfer(thief.id, ctx.guild.id, thief_account['amount'])
-            await self.add_cooldown(thief)
+            amnt = thief_account['amount']
+            transfer_info = await self.jcoin.transfer(thief.id, ctx.guild.id, amnt)
+            hours = await self.add_cooldown(thief, 0, ARREST_TIME + int(amnt))
 
-        return ARREST_TIME, transfer_info
+        return hours, transfer_info
 
     @commands.command()
     @commands.guild_only()
@@ -243,17 +247,17 @@ class CoinsExt(Cog):
         to steal from them.
 
         There are other restrictions to stealing:
-         - You can't steal less than 0.01JC
-         - You can't steal if you have less than 6JC
-         - You can't steal from targets who are in grace period.
-         - You have 3 "stealing points", you lose one every time you use the steal command
+            - You can't steal less than 0.01JC
+            - You can't steal if you have less than 6JC
+            - You can't steal from targets who are in grace period.
+            - You have 3 "stealing points", you lose one every time you use the steal command
             successfully
-         - You can't steal from José(lol).
-         - You are automatically arrested if you try to steal more than the target's wallet
+            - You can't steal from José(lol).
+            - You are automatically arrested if you try to steal more than the target's wallet
         """
         await self.jcoin.ensure_taxbank(ctx)
         thief = ctx.author
-    
+
         if thief == target:
             raise self.SayException("You can't steal from yourself")
 
@@ -264,7 +268,7 @@ class CoinsExt(Cog):
             raise self.SayException("One of you don't have a JoséCoin account")
 
         if amount <= .01:
-            raise self.SayException('Minimum amount to steal  needs to be higher than `0.01JC`')
+            raise self.SayException('Minimum amount to steal needs to be higher than `0.01JC`')
 
         if amount <= 0:
             raise self.SayException('haha good one :ok_hand:')
@@ -272,11 +276,15 @@ class CoinsExt(Cog):
         if thief_account['amount'] < 6:
             raise self.SayException("You have less than `6JC`, can't use the steal command")
 
-        await self.check_cooldowns(ctx, target)
+        if target_account['amount'] < 3:
+            raise self.SayException('Target has less than `3JC`, cannot steal them')
+
+        await self.check_cooldowns(ctx)
         await self.check_grace(target)
         await self.steal_points(ctx)
 
         thief_account['times_stolen'] += 1
+        await self.jcoin.update_accounts([thief_account])
 
         if target.id == self.bot.user.id or target.id in WHITELISTED_ACCOUNTS:
             hours, transfer_info = await self.do_arrest(ctx, amount)
@@ -299,6 +307,10 @@ class CoinsExt(Cog):
 
         if res < chance:
             # successful steal
+            thief_account = await self.jcoin.get_account(thief.id)
+            thief_account['success_steal'] += 1
+            await self.jcoin.update_accounts([thief_account])
+
             transfer_info = await self.jcoin.transfer(target.id, thief.id, amount)
 
             # add grace period
@@ -310,8 +322,10 @@ class CoinsExt(Cog):
             if target.id == self.owner.id:
                 grace = 6
 
-            thief_account['success_steal'] += 1
-            await target.send(f':gun: You got robbed! Thief(`{thief}`) stole `{amount}` from you. {grace}h grace period')
+            try:
+                await target.send(f':gun: You got robbed! Thief(`{thief}`) stole `{amount}` from you. {grace}h grace period')
+            except: pass
+
             await self.add_grace(target, grace)
             await ctx.send(f'`[res: {res} < prob: {chance}]` congrats lol\n{transfer_info}')
         else:
@@ -355,22 +369,33 @@ class CoinsExt(Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def stealreset(self, ctx, person: discord.User):
+    async def stealreset(self, ctx, *people: discord.User):
         """Reset someone's state in steal-related collections.
         
         Deletes cooldowns, points and grace, resetting them(cooldowns and points)
         to default on the person's next use of j!steal.
         """
-        # don't repeat stuff lol
-        uobj = {'user_id': person.id}
-        cd_del = await self.cooldown_coll.delete_one(uobj)
-        pt_del = await self.points_coll.delete_one(uobj)
-        gr_del = await self.grace_coll.delete_one(uobj)
+        for person in people:
+            # don't repeat stuff lol
+            uobj = {'user_id': person.id}
+            cd_del = await self.cooldown_coll.delete_one(uobj)
+            pt_del = await self.points_coll.delete_one(uobj)
+            gr_del = await self.grace_coll.delete_one(uobj)
 
-        await ctx.send(f'Deleted {cd_del.deleted_count} documents in `cooldown`\n'
-                        f'- {pt_del.deleted_count} in `points`\n'
-                        f'- {gr_del.deleted_count} in `graces`'
-            )
+            await ctx.send(f'Deleted {cd_del.deleted_count} documents in `cooldown`\n'
+                            f'- {pt_del.deleted_count} in `points`\n'
+                            f'- {gr_del.deleted_count} in `graces`'
+                )
+
+    @commands.command()
+    async def deadtxb(self, ctx):
+        """Show dead taxbanks."""
+
+        all_taxbanks = await self.jcoin.get_accounts_type('taxbank')
+        dead_txb = filter(lambda acc: (self.bot.get_guild(acc['id']) is None), all_taxbanks)
+        deadtxb_count = sum(1 for a in dead_txb)
+
+        await ctx.send(f'There are {deadtxb_count} dead taxbanks.')
 
 def setup(bot):
     bot.add_cog(CoinsExt(bot))

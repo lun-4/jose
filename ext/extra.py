@@ -84,13 +84,21 @@ class Extra(Cog):
 
             await ctx.send(embed=em)
 
-    @commands.command()
+    async def _do_rxkcd_debug(self, ctx):
+        async with self.bot.session.post(RXKCD_ENDPOINT, json={'search': 'standards'}) as r:
+            await ctx.send(repr(r))
+            await ctx.send(await r.text())
+
+    #@commands.command()
     async def rxkcd(self, ctx, *, terms: str):
         """Get a Relevant XKCD.
         
         Made with https://github.com/adtac/relevant-xkcd
         """
         try:
+            if '-debug' in terms:
+                return await self._do_rxkcd_debug(ctx)
+
             async with ctx.typing():
                 await self._do_rxkcd(ctx, terms)
         except Exception as err:
@@ -190,7 +198,7 @@ class Extra(Cog):
 
             try:
                 ratio = account['success_steal'] / account['times_stolen']
-                ratio = round(ratio, 2)
+                ratio = round((ratio * 100), 3)
 
                 em.add_field(name='Stealing', value='{} tries, {} success, ratio of success: {}/steal'.format( \
                     account['times_stolen'], account['success_steal'], ratio))
@@ -252,9 +260,10 @@ class Extra(Cog):
         Powered by https://github.com/lnmds/elixir-docsearch.
         """
         await ctx.trigger_typing()
-        base = getattr(self.bot.config, 'elixir_docsearch', None)
-        if base is None:
-            raise self.SayException('No URL for elixir-docsearch is in config.')
+        try:
+            base = self.bot.config.elixir_docsearch
+        except AttributeError:
+            raise self.SayException('No URL for elixir-docsearch found in configuration.')
 
         async with self.bot.session.get(f'http://{base}/search', json={'query': terms}) as r:
             if r.status != 200:

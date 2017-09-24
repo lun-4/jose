@@ -1,8 +1,10 @@
 import random
 import string
 import urllib.parse
+import asyncio
 
 import discord
+import pymongo
 
 from discord.ext import commands
 from .common import Cog, WIDE_MAP
@@ -34,10 +36,12 @@ RI_STR = '🇦🇧🇨🇩🇪🇫🇬🇭🇮🇯🇰🇱🇲🇳🇴🇵🇶�
 RI_TABLE.update({letter:RI_STR[string.ascii_lowercase.find(letter)] for \
     letter in string.ascii_lowercase})
 
+
 class Memes(Cog):
     def __init__(self, bot):
         super().__init__(bot)
         self.memes_coll = self.config.jose_db['memes']
+        self.urban_cache = {}
 
     async def add_meme(self, name, value, author_id, uses=0, nsfw=None):
         """Add a meme to the database."""
@@ -101,7 +105,7 @@ class Memes(Cog):
     @meme.command(name='get')
     async def get(self, ctx, *, name: str):
         """Retrieve a meme.
-        
+
         Doesn't allow NSFW memes(memes created in NSFW channels) to be shown
         in non-NSFW channels
         """
@@ -136,7 +140,7 @@ class Memes(Cog):
             return
 
         owner = (await self.bot.application_info()).owner
-        authorized = (meme['author_id'] == ctx.author.id) or (ctx.author == owner)
+        authorized = (meme.get('author_id') == ctx.author.id) or (ctx.author == owner)
         if not authorized:
             await ctx.send('Unauthorized')
             return
@@ -160,7 +164,7 @@ class Memes(Cog):
             return
 
         await self.delete_meme(meme['name'])
-        await self.add_meme(new_name, meme['value'], meme['author_id'], meme['uses'], meme['nsfw'])
+        await self.add_meme(new_name, meme['value'], meme.get('author_id'), meme['uses'], meme['nsfw'])
         await ctx.send(f'Renamed {meme["name"]!r} to {new_name!r}')
 
     @meme.command()
@@ -173,7 +177,7 @@ class Memes(Cog):
             await ctx.send('Meme not found')
             return
 
-        await ctx.send(f'`{name}` was made by {self.get_name(meme["author_id"])}')
+        await ctx.send(f'`{name}` was made by {self.get_name(meme.get("author_id"))}')
 
     @meme.command()
     async def count(self, ctx):
@@ -185,8 +189,8 @@ class Memes(Cog):
     async def top(self, ctx):
         """Shows the top 15 most used memes."""
         res = []
+        cur = self.memes_coll.find({}).sort('uses', pymongo.DESCENDING)
 
-        cur = self.memes_coll.find({}).sort('uses')
         for (idx, meme) in enumerate(await cur.to_list(length=15)):
             res.append(f'[{idx}] {meme["name"]} used {meme["uses"]} times')
 
@@ -300,22 +304,56 @@ class Memes(Cog):
     @commands.command()
     async def urban(self, ctx, *, term: str):
         """Search for a word in the Urban Dictionary."""
+
+        # cache :DDDDDDDDD
+        if term in self.urban_cache:
+            definition = self.urban_cache[term]
+            return await ctx.send(f'```\n{term!r}:\n{definition}\n```')
+
         await self.jcoin.pricing(ctx, self.prices['API'])
 
         urban_url = f'https://api.urbandictionary.com/v0/define?term={urllib.parse.quote(term)}'
-        
+
         content = await self.get_json(urban_url)
         c_list = content['list']
 
         if len(c_list) < 1:
             raise self.SayException('No results found')
 
-        await ctx.send(f'```\n{term!r}:\n{c_list[0]["definition"]}\n```')
+        definition = c_list[0]['definition']
+        self.urban_cache[term] = definition
+
+        await ctx.send(f'```\n{term!r}:\n{definition}\n```')
 
     @commands.command(hidden=True)
     async def ejaculate(self, ctx):
         """PUMPE THE MOOSCLES YIIIS"""
         await ctx.send('https://www.youtube.com/watch?v=S6UqgjaBt4w')
+
+    @commands.command()
+    @commands.is_owner()
+    async def blink(self, ctx, *, text: str):
+        m = await ctx.send(text)
+        for i in range(10):
+            if i % 2 == 0:
+                await m.edit(content=f'**{text}**')
+            else:
+                await m.edit(content=f'{text}')
+            await asyncio.sleep(2)
+
+    @commands.command()
+    async def neko(self, ctx):
+        """Posts a random neko picture."""
+        api_url = 'http://nekos.life/api/neko'
+
+        response = await self.get_json(api_url)
+        image_url = response['neko']
+
+        embed = discord.Embed(color=discord.Color(0xf84a6e))
+        embed.set_image(url=image_url)
+
+        await ctx.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(Memes(bot))

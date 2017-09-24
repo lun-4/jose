@@ -2,6 +2,7 @@ import logging
 import asyncio
 import random
 import datetime
+import decimal
 
 import discord
 import wolframalpha
@@ -35,40 +36,6 @@ OWM_ICONS = {
     '50d': W_MIST,
 }
 
-W_API_ICONS = {
-    'tornado': ':cloud_tornado:',
-    'tropical-storm': ':cyclone:',
-    'thunderstorm': ':thunder_cloud_rain:',
-    'rain-snow': ':cloud_rain: :snowflake:',
-    'rain-hail': ':cloud_rain: *(hail)*',
-    'freezing-drizzle': ':cloud_rain: *(freezing)*',
-    'scattered-showers': ':white_sun_rain_cloud:',
-    'rain': ':cloud_rain:',
-    'flurries': ':cloud_snow:',
-    'snow': ':cloud_snow:',
-    'blowing-snow': ':cloud_snow: :dash:',
-    'hail': '*(hail)*',
-    'fog': ':fog: *(fog)*',
-    'wind': ':dash:',
-    'cloudy': ':cloud:',
-    'mostly-cloudy-night': ':partly_sunny:',
-    'mostly-cloudy': ':partly_sunny:',
-    'partly-cloudy-night': ':white_sun_small_cloud:',
-    'partly-cloudy': ':white_sun_small_cloud:',
-    'clear-night': ':full_moon:',
-    'sunny': ':sunny:',
-    'mostly-clear-night': ':full_moon: :cloud: *(partly cloudy)*',
-    'mostly-sunny': ':white_sun_small_cloud:',
-    'isolated-thunderstorms': ':thunder_cloud_rain:',
-    'scattered-thunderstorms': ':thunder_cloud_rain:',
-    'heavy-rain': ':cloud_rain: *(heavy)*',
-    'scattered-snow': ':cloud_snow: *(scattered)*',
-    'heavy-snow': ':cloud_snow: *(heavy)*',
-    'na': ':no_entry_sign: *(na)*',
-    'scattered-showers-night': ':white_sun_rain_cloud:',
-    'scattered-snow-night': ':cloud_snow: *(scattered)*',
-    'scattered-thunderstorms-night': ':thunder_cloud_rain:'
-}
 
 class Math(Cog):
     """Math related commands."""
@@ -77,16 +44,7 @@ class Math(Cog):
 
         self.wac = wolframalpha.Client(self.bot.config.WOLFRAMALPHA_APP_ID)
         self.owm = pyowm.OWM(self.bot.config.OWM_APIKEY)
-        self.w_config = getattr(self.bot.config, 'WEATHER_API', None)
         
-        if self.w_config is not None:
-            self.w_api_base_url = self.w_config['base_url']
-            self.w_api_base_payload = {
-                'key': self.w_config['key'],
-                'secret': self.w_config['secret'],
-            }
-
-
     @commands.command(aliases=['wa'])
     async def wolframalpha(self, ctx, *, term: str):
         """Query Wolfram|Alpha"""
@@ -125,7 +83,10 @@ class Math(Cog):
                 text = pod.text
             elif pod.get('subpod', False):
                 subpod = pod['subpod']
-                text = subpod['img']['@src']
+                if isinstance(subpod, dict):
+                    text = subpod['img']['@src']
+                else:
+                    text = subpod 
             else:
                 text = None
 
@@ -138,7 +99,7 @@ class Math(Cog):
             await ctx.send(f'{ctx.author.mention}, :cyclone: No answer :cyclone:')
             return
 
-    #@commands.command(aliases=['temperature'])
+    @commands.command(aliases=['owm'])
     async def weather(self, ctx, location: str):
         """Get weather data for a location."""
 
@@ -159,11 +120,15 @@ class Math(Cog):
         icon = OWM_ICONS.get(_icon, '*<no icon>*')
         status = w.get_detailed_status()
 
-        res = [f'{location}']
-        res.append(f' - Status: `{status}` : {icon}')
-        res.append(f' - `{_wg("celsius")} °C, {_wg("fahrenheit")} °F, {_wg("kelvin")} °K`')
+        em = discord.Embed(title=f"Weather for '{location}'")
 
-        await ctx.send('\n'.join(res))
+        o_location = observation.get_location()
+
+        em.add_field(name='Location', value=f'{o_location.get_name()}')
+        em.add_field(name='Situation', value=f'{status} {icon}')
+        em.add_field(name='Temperature', value=f'`{_wg("celsius")} °C, {_wg("fahrenheit")} °F, {_wg("kelvin")} °K`')
+
+        await ctx.send(embed=em)
 
     @commands.command()
     async def money(self, ctx, amount: str, currency_from: str = '', currency_to: str = ''):
@@ -179,25 +144,24 @@ class Math(Cog):
             return
 
         try:
-            amount = float(amount)
+            amount = decimal.Decimal(amount)
         except:
-            await ctx.send("Error parsing `amount`")
-            return
+            raise self.SayException('Error parsing `amount`')
 
         await self.jcoin.pricing(ctx, self.prices['API'])
 
         data = await self.get_json(f'https://api.fixer.io/latest?base={currency_from}')
 
         if 'error' in data:
-            await ctx.send(f'API error: {data["error"]}')
-            return
+            raise self.SayException(f'API error: {data["error"]}')
 
         if currency_to not in data['rates']:
-            await ctx.send(f'Invalid currency to convert to: {currency_to}')
-            return
+            raise self.SayException(f'Invalid currency to convert to: {currency_to}')
 
         rate = data['rates'][currency_to]
+        rate = decimal.Decimal(rate)
         res = amount * rate
+        res = round(res, 7)
 
         await ctx.send(f'{amount} {currency_from} = {res} {currency_to}')
 
@@ -243,67 +207,6 @@ class Math(Cog):
 
         joined = ', '.join(str(r) for r in dices)
         await ctx.send(f'{dicestr} : `{joined}` => {sum(dices)}')
-
-    async def w_api_post(self, route, payload):
-        payload_send = {**self.w_api_base_payload, **payload}
-        base_url = self.w_api_base_url
-
-        async with self.bot.session.post(f'{base_url}{route}', json=payload_send) as resp:
-            try:
-                data = await resp.json()
-            except Exception:
-                data = {}
-            
-            status = data.get('status')
-
-            if resp.status != 200:
-                if resp.status == 500:
-                    log.error(f'```<@116693403147698181>```api shitted itself {status!r}')
-                    raise self.SayException(f'x_x 500. `{status["decrypted"]}`')
-                else:
-                    raise self.SayException(f'Failed to retrieve weather data, code {resp.status}')
-
-
-            return data
-
-    @commands.command(aliases=['temperature', 'therm'])
-    async def weather(self, ctx, *, querylocation: str):
-        """Query temperature data.
-        
-        Uses data from The Weather Channel
-        """
-        if self.w_config is None:
-            raise self.SayException('No weather API data found in config file')
-
-        await self.jcoin.pricing(ctx, self.prices['API'])
-        async with ctx.typing():
-            _locations = await self.w_api_post('location', {'query': querylocation})
-            locations = _locations['locations']
-            if len(locations) < 1:
-                raise self.SayException('No locations found')
-
-            location_found = locations[0]
-
-            _weather_data = await self.w_api_post('weather', {'location': location_found['id']})
-
-        current = _weather_data['current']
-        location = _weather_data['location']
-
-        for field in current:
-            try:
-                current[field] = round(current[field], 2)
-            except: pass
-
-        location_time = datetime.datetime.fromtimestamp(int(current['time']))
-
-        em = discord.Embed(title=f"Weather for '{querylocation}'")
-        em.description = f"Time of observation (GMT+0): {location_time}"
-
-        em.add_field(name='Location', value=f'{location["city"]}, {location["stateName"]}, {location["country"]}')
-        em.add_field(name='Situation', value=f'{current["text"]} {W_API_ICONS[current["condition"]]}')
-        em.add_field(name='Temperature', value=f'`{current["tempC"]} °C, {current["temp"]} °F, {current["tempK"]} °K`')
-
-        await ctx.send(embed=em)
 
 
 def setup(bot):

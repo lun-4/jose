@@ -77,7 +77,7 @@ class PipUpdates(Cog):
         if len(res) <= 0:
             return
 
-        owner = (await self.bot.application_info()).user
+        owner = (await self.bot.application_info()).owner
         res.insert(0, ':alarm_clock: You have package updates :alarm_clock:')
         await owner.send('\n'.join(res))
 

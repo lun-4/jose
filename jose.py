@@ -37,7 +37,7 @@ extensions = [
     'mod', 'botcollection',
     'channel_logging',
     'playing', 'sub',
-    'nsfw'
+    'nsfw', 'heist',
 ]
 
 
@@ -133,6 +133,7 @@ class JoseBot(commands.Bot):
     def clean_content(self, content):
         content = content.replace('`', '\'')
         content = content.replace('@', '@\u200b')
+        content = content.replace('&', '&\u200b')
         content = content.replace('<#', '<#\u200b')
         return content
 
@@ -177,11 +178,16 @@ class JoseBot(commands.Bot):
                 await ctx.send(f'JoséCoin error: `{error.original!r}`')
                 return
 
-            await ctx.send(f'fucking 🅱enis, u 🅱roke the bot ```py\n{tb}\n```')
+            b = '\N{NEGATIVE SQUARED LATIN CAPITAL LETTER B}'
+            await ctx.send(f'{b}ot machine {b}roke\n ```py\n{error.original!r}\n```')
         elif isinstance(error, commands.errors.BadArgument):
-            await ctx.send(f'bad arg — {random.choice(BAD_ARG_MESSAGES)}')
+            await ctx.send(f'bad argument — {random.choice(BAD_ARG_MESSAGES)} - {error!s}')
         elif isinstance(error, commands.errors.CheckFailure):
-            await ctx.send(f'check fail — {random.choice(CHECK_FAILURE_PHRASES)}')
+            await ctx.send(f'check failed — {random.choice(CHECK_FAILURE_PHRASES)}')
+        elif isinstance(error, commands.errors.CommandOnCooldown):
+            #retry = round(error.retry_after, 2)
+            #await ctx.send(f'Command on cooldown, wait `{retry}` seconds')
+            pass
 
     async def on_message(self, message):
         author_id = message.author.id
@@ -205,10 +211,26 @@ class JoseBot(commands.Bot):
         ctx = await self.get_context(message, cls=JoseContext)
         await self.invoke(ctx)
 
+async def get_prefix(bot, message):
+    if message.guild is None:
+        return bot.config.prefix
+
+    if message.guild.id == 216292020371718146:
+        return ['j%']
+
+    config = bot.get_cog('Config')
+    if config is None:
+        log.warning('config cog not found')
+        return ['j!']
+
+    custom = await config.cfg_get(message.guild, "prefix")
+    if custom == bot.config.prefix:
+        return custom
+
+    return [bot.config.prefix, custom]
 
 jose = JoseBot(
-    #command_prefix=getattr(config, 'prefix', None) or 'j!',
-    command_prefix=config.prefix,
+    command_prefix=get_prefix,
     description='henlo dis is jose',
     pm_help=None
 )
