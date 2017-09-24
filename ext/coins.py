@@ -575,6 +575,7 @@ class Coins(Cog):
         for user in ctx.bot.users:
             acc = await self.get_account(user.id)
             if acc:
+                log.info('FUCKING %s %d', user, user.id)
                 await self.jcoin_coll.update_one({
                     'id': user.id
                 }, {
