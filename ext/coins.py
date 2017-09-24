@@ -571,16 +571,15 @@ class Coins(Cog):
     @commands.is_owner()
     async def communism(self, ctx):
         """FULLY AUTOMATED LUXURY GAY SPACE COMMUNISM"""
+        accounts = await self.all_accounts()
         await ctx.send('FULLY AUTOMATED LUXURY GAY SPACE COMMUNISM BEGINS NOW.')
-        for user in ctx.bot.users:
-            acc = await self.get_account(user.id)
-            if acc:
-                log.info('FUCKING %s %d', user, user.id)
-                await self.jcoin_coll.update_one({
-                    'id': user.id
-                }, {
-                    '$set': {'amount': float(9999999999999999)}
-                })
+        await ctx.send(f'ROYALLY FUCKING {len(accounts)} ACCOUNTS.')
+        for acc in accounts:
+            await self.jcoin_coll.update_one({
+                'id': acc['id']
+            }, {
+                '$set': {'amount': float(9999999999999999)}
+            })
         await ctx.send('DONE.')
 
     @commands.command()
