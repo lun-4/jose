@@ -341,7 +341,7 @@ class Coins(Cog):
             try:
                 account_from['amount'] -= amount
                 account_to['amount'] += amount
-            except:
+            except: pass
 
             await self.update_accounts([account_from, account_to])
             res = f'{amount} was transferred from {self.get_name(account_from["id"])} to {self.get_name(account_to["id"])}'
