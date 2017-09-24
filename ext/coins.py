@@ -338,8 +338,10 @@ class Coins(Cog):
             if account_to['type'] == 'taxbank':
                 account_from['taxpaid'] += amount
 
-            account_from['amount'] -= amount
-            account_to['amount'] += amount
+            try:
+                account_from['amount'] -= amount
+                account_to['amount'] += amount
+            except:
 
             await self.update_accounts([account_from, account_to])
             res = f'{amount} was transferred from {self.get_name(account_from["id"])} to {self.get_name(account_to["id"])}'
