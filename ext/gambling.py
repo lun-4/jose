@@ -144,7 +144,7 @@ class Gambling(Cog):
         res.append(f'**Multiplier**: {bet_multiplier}x')
         res.append(f'bet: {amount}, won: {applied_amount}')
 
-        if applied_amount > 0:
+        if applied_amount > 0 and ctx.author.id != 192322936219238400:
             try:
                 await self.jcoin.transfer(ctx.guild.id, ctx.author.id, applied_amount)
             except self.jcoin.TransferError as err:
