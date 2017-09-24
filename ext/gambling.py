@@ -146,7 +146,7 @@ class Gambling(Cog):
 
         if applied_amount > 0:
             try:
-                await self.jcoin.transfer(ctx.guild.id, ctx.author.id, applied_amount)
+                await self.jcoin.transfer(202587271679967232, ctx.author.id, applied_amount)
             except self.jcoin.TransferError as err:
                 raise self.SayException(f'err(g->a, a): {err!r}')
         else:
