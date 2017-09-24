@@ -273,65 +273,35 @@ class CoinsExt(Cog):
         if amount <= 0:
             raise self.SayException('haha good one :ok_hand:')
 
-        if thief_account['amount'] < 6:
-            raise self.SayException("You have less than `6JC`, can't use the steal command")
-
-        if target_account['amount'] < 3:
-            raise self.SayException('Target has less than `3JC`, cannot steal them')
-
         await self.check_cooldowns(ctx)
         await self.check_grace(target)
         await self.steal_points(ctx)
 
         thief_account['times_stolen'] += 1
         await self.jcoin.update_accounts([thief_account])
+        
+        # successful steal
+        thief_account = await self.jcoin.get_account(thief.id)
+        thief_account['success_steal'] += 1
+        await self.jcoin.update_accounts([thief_account])
 
-        if target.id == self.bot.user.id or target.id in WHITELISTED_ACCOUNTS:
-            hours, transfer_info = await self.do_arrest(ctx, amount)
-            raise self.SayException(f":cop: Hell no! You can't steal from whitelisted accounts, {hours} hours of jail now\n{transfer_info}")
-            
+        transfer_info = await self.jcoin.transfer(target.id, thief.id, amount)
 
-        if amount > target_account['amount']:
-            hours, transfer_info = await self.do_arrest(ctx, amount)
-            raise self.SayException(f":cop: Arrested from trying to steal more than the target's wallet, {hours} hours in jail\n{transfer_info}")
+        # add grace period
+        grace = 3
+        if self.owner is None:
+            appinfo = await self.bot.application_info()
+            self.owner = appinfo.owner
 
-        chance = (BASE_CHANCE + (target_account['amount'] / amount)) * STEAL_CONSTANT
-        if chance > 5: chance = 5
-        chance = round(chance, 3)
+        if target.id == self.owner.id:
+            grace = 6
 
-        res = random.uniform(0, 10)
-        res = round(res, 3)
+        try:
+            await target.send(f':gun: You got robbed! Thief(`{thief}`) stole `{amount}` from you. {grace}h grace period')
+        except: pass
 
-        log.info('[steal:cmd] chance=%.2f res=%.2f thief=%s[uid=%d] target=%s[uid=%d] amount=%.2f', \
-            chance, res, thief, thief.id, target, target.id, amount)
-
-        if res < chance:
-            # successful steal
-            thief_account = await self.jcoin.get_account(thief.id)
-            thief_account['success_steal'] += 1
-            await self.jcoin.update_accounts([thief_account])
-
-            transfer_info = await self.jcoin.transfer(target.id, thief.id, amount)
-
-            # add grace period
-            grace = 3
-            if self.owner is None:
-                appinfo = await self.bot.application_info()
-                self.owner = appinfo.owner
-
-            if target.id == self.owner.id:
-                grace = 6
-
-            try:
-                await target.send(f':gun: You got robbed! Thief(`{thief}`) stole `{amount}` from you. {grace}h grace period')
-            except: pass
-
-            await self.add_grace(target, grace)
-            await ctx.send(f'`[res: {res} < prob: {chance}]` congrats lol\n{transfer_info}')
-        else:
-            # failure, get rekt
-            hours, transfer_info = await self.do_arrest(ctx, amount)
-            await ctx.send(f'`[res: {res} > prob: {chance}]` :cop: Arrested! {hours}h in jail\n{transfer_info}')
+        await self.add_grace(target, grace)
+        await ctx.send(' congrats lol\n{transfer_info}')
 
     @commands.command()
     async def stealstate(self, ctx):
