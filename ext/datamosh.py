@@ -1,17 +1,19 @@
-#!/usr/bin/env python3
-
 import io
+from random import randint
 
 import discord
 import aiohttp
-
-from random import randint
 from discord.ext import commands
 from PIL import Image
+
 from .common import Cog
 
 
 async def get_data(url):
+    """Read data from an URL and return
+    a `io.BytesIO` instance of the data gathered
+    in that URL.
+    """
     data = io.BytesIO()
     with aiohttp.ClientSession() as session:
         async with session.get(url) as resp:
@@ -22,6 +24,7 @@ async def get_data(url):
 
 
 def read_chunks(fh):
+    """Split a file handler into 4 kilobyte chunks."""
     while True:
         chunk = fh.read(4096)
         if not chunk:
@@ -29,7 +32,12 @@ def read_chunks(fh):
         yield chunk
 
 
-def datamosh_jpg(source_image, iterations):
+def datamosh_jpg(source_image: 'io.BytesIO', iterations: int) -> 'io.BytesIO':
+    """Datamosh a JPG file.
+
+    This changes random blocks in the file
+    to generate a datamoshed image.
+    """
     output_image = io.BytesIO()
     for chunk in read_chunks(source_image):
         output_image.write(chunk)
@@ -73,18 +81,18 @@ def datamosh_jpg(source_image, iterations):
 
 
 class Datamosh(Cog):
-    """Datamosh command(s)."""
+    """Datamosh command"""
     @commands.command()
-    async def datamosh(self, ctx, url: str, iterations: int = 10):
+    async def datamosh(self, ctx, url: str, iterations: int=10):
         """Datamosh an image.
 
-        Sometimes the result given by `j!datamosh` doesn't have any visualization,
-        that means it broke the file and you need to try again.
+        Sometimes the result given by `j!datamosh` doesn't have any thumbnail,
+        that means it actually broke the file and you need to try again(and
+        hope it doesn't break the file again).
         """
 
         if iterations > 129:
-            await ctx.send('lul')
-            return
+            return await ctx.send('too much lul')
 
         await self.jcoin.pricing(ctx, self.prices['OPR'])
 
@@ -94,8 +102,7 @@ class Datamosh(Cog):
         try:
             img = Image.open(data)
         except Exception as err:
-            await ctx.send(f'Error opening image with Pillow({err!r})')
-            return
+            raise self.SayException(f'Error opening image with Pillow(`{err!r}`)')
 
         if img.format in ['JPEG', 'JPEG 2000']:
             # read the image, copy into a buffer for manipulation
@@ -117,11 +124,11 @@ class Datamosh(Cog):
             # done
             output_image.close()
         elif img.format in ['PNG']:
-            await ctx.send("*no PNG support*")
+            await ctx.send('no support for png')
         elif img.format in ['GIF']:
-            await ctx.send("*no GIF support*")
+            await ctx.send('no support for gif')
         else:
-            await ctx.send("Formato %s: desconhecido", (img.format,))
+            await ctx.send(f'Unknown format: `{img.format}`')
 
 def setup(bot):
     bot.add_cog(Datamosh(bot))
