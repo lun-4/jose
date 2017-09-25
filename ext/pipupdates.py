@@ -89,7 +89,9 @@ class PipUpdates(Cog):
             res = await self.checkupdates()
 
             if len(res) <= 0:
-                await ctx.send("`No updates found.`")
+                return await ctx.send("`No updates found.`")
+
+            await ctx.send('Updates were found and should be sent to the bot owner!')
 
 def setup(bot):
     bot.add_cog(PipUpdates(bot))
