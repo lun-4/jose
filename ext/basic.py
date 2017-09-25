@@ -116,10 +116,12 @@ class Basic(Cog):
 
         appinfo = await self.bot.application_info()
         owner = appinfo.owner
-        em.set_field(name='Owner', value=f'{owner.mention}, {owner}, (`{owner.id}`)')
+        em.add_field(name='Owner', value=f'{owner.mention}, {owner}, (`{owner.id}`)')
 
-        em.set_field(name='Guilds', value=f'{len(self.bot.guilds)}')
+        em.add_field(name='Guilds', value=f'{len(self.bot.guilds)}')
 
+        await ctx.send(embed=em)
+        
     @commands.command()
     async def feedback(self, ctx, *, feedback: str):
         """Sends feedback to a special channel."""
