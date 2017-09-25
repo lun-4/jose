@@ -330,7 +330,7 @@ class Moderation(Cog):
         except discord.Forbidden:
             raise self.SayException("can't kick >:c")
         except discord.HTTPException as err:
-            raise self.SayException('wtf is happening discord `{err!r}`')
+            raise self.SayException(f'wtf is happening discord `{err!r}`')
 
         _reason = {'reason': reason, 'moderator': ctx.author}
         await self.modlog(Actions.KICK, ctx.guild, member, reason=_reason, modconfig=modconfig)
@@ -347,7 +347,7 @@ class Moderation(Cog):
         except discord.Forbidden:
             raise self.SayException("can't ban u suck ass >:c")
         except discord.HTTPException as err:
-            raise self.SayException('wtf is happening discord `{err!r}`')
+            raise self.SayException(f'wtf is happening discord `{err!r}`')
 
         #_reason = {'reason': reason, 'moderator': ctx.author}
         #await self.modlog(Actions.BAN, ctx.guild, member, reason=_reason, modconfig=modconfig)
