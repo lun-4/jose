@@ -28,23 +28,4 @@ env/bin/python3.6 jose.py
 
 Example config file
 ============
-You need a config to run José. Here, have one:
-```python
-# discord stuff
-token = 'discord token'
-prefix = 'j!'
-
-# api stuff
-WOLFRAMALPHA_APP_ID = 'app id for wolframalpha'
-OWM_APIKEY = 'api key for OpenWeatherMap'
-
-# set those to whatever
-SPEAK_PREFIXES = ['josé ', 'José ', 'jose ', 'Jose ']
-
-# enable/disable datadog reporting
-datadog = False
-
-# https://github.com/lnmds/elixir-docsearch
-# fill in the address of the server
-elixir_docsearch = 'localhost:6969'
-```
+You need a config to run José. There is a example config in `example_config.py`. copy that to `joseconfig.py` and fill it in. 
