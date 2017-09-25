@@ -2,10 +2,12 @@
 
 import subprocess
 import asyncio
+import logging
 
 from .common import Cog
 from discord.ext import commands
 
+log = logging.getLogger(__name__)
 
 def pip_freeze():
     out = subprocess.check_output('pip freeze', shell=True)
