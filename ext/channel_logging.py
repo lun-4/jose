@@ -7,18 +7,12 @@ import zlib
 from discord.ext import commands
 
 from .common import Cog
+from joseconfig import PACKET_CHANNEL, LEVELS
 
 log = logging.getLogger(__name__)
 
 
 LOGGING_PERIOD = 5 
-PACKET_CHANNEL = 319540379495956490
-
-LEVELS = {
-    logging.INFO: 326388782829928448,
-    logging.WARNING: 326388923116945408,
-    logging.ERROR: 332260027916353538,
-}
 
 LOGGERS_TO_ATTACH = [
     'discord',
