@@ -126,9 +126,9 @@ class Moderation(Cog):
     def modlog_fmt(self, data):
         user = data['user']
         fmt = (f'**{ACTION_AS_AUDITLOG[data["action"]].capitalize()}** | Case {data["action_id"]}\n'
-                f'**User**: {str(user)} ({user.id})\n'
-                f'**Reason**: {data["reason"].get("reason") or "No reason provided"}\n'
-                f'**Responsible Moderator**: {str(data.get("reason", {}).get("moderator", None))}\n') 
+               f'**User**: {user} ({user.id})\n'
+               f'**Reason**: {data["reason"].get("reason") or "No reason provided"}\n'
+               f'**Responsible Moderator**: {data.get("reason", {}).get("moderator", None)}\n')
         return fmt
 
     async def add_mod_entry(self, modcfg, data):
@@ -280,8 +280,8 @@ class Moderation(Cog):
             user.name = 'fake user'
             user.id = -1
 
-        log.info('[modlog:handle] a=%d g=%r[gid=%d], u=%r[uid=%d] r=%r', \
-            action, guild.name, guild.id, user.name, user.id, reason)
+        log.info('[modlog:handle] a=%d g=%r[gid=%d], u=%r[uid=%d] r=%r',
+                 action, guild.name, guild.id, user.name, user.id, reason)
 
         await handler(modconfig, guild, user, reason, **kwargs)
 
@@ -300,7 +300,7 @@ class Moderation(Cog):
             'last_action_id': 0,
         }
 
-        log.info('[modlog:attach] Creating a modcfg @ g=%s[gid=%d]', \
+        log.info('[modlog:attach] Creating a modcfg @ g=%s[gid=%d]',
             ctx.guild.name, ctx.guild.id)
 
         res = await self.modcfg_coll.insert_one(modconfig)
