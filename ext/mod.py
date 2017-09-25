@@ -97,11 +97,16 @@ class Moderation(Cog):
 
         em.set_footer(text='Created')
         em.set_author(name=str(member), icon_url=member.avatar_url or member.default_avatar_url)
-        
-        em.add_field(name='ID', value=member.id)
-        em.add_field(name='Account age', value=f'`{self.account_age(member.created_at)}`')
-        em.add_field(name='Server age', value=f'`{self.account_age(member.joined_at)}`')
 
+        fields = {
+            'ID': member.id,
+            'Account age': f'`{self.account_age(member.created_at)}`',
+            'Server age': f'`{self.account_age(member.joined_at)}`'
+        }
+
+        for name, value in fields.items():
+            em.add_field(name=name, value=value)
+        
         await logchannel.send(embed=em)
 
     async def on_member_ban(self, guild, user):
