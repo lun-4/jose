@@ -66,7 +66,11 @@ class PipUpdates(Cog):
                 pkgdata = await self.get_json(f'http://pypi.python.org/pypi/{pkgname}/json')
 
                 new_version = pkgdata['info']['version']
+                log.info('[pip] checking current=%s against latest=%s', \
+                         cur_version, new_version)
+
                 if new_version != cur_version:
+                    log.info('[pip] New update for %s', pkgname)
                     res.append(" * `%r` needs update from %s to %s" % \
                         (pkgname, cur_version, new_version))
 
