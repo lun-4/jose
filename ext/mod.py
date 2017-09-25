@@ -97,11 +97,16 @@ class Moderation(Cog):
 
         em.set_footer(text='Created')
         em.set_author(name=str(member), icon_url=member.avatar_url or member.default_avatar_url)
-        
-        em.add_field(name='ID', value=member.id)
-        em.add_field(name='Account age', value=f'`{self.account_age(member.created_at)}`')
-        em.add_field(name='Server age', value=f'`{self.account_age(member.joined_at)}`')
 
+        fields = {
+            'ID': member.id,
+            'Account age': f'`{self.account_age(member.created_at)}`',
+            'Server age': f'`{self.account_age(member.joined_at)}`'
+        }
+
+        for name, value in fields.items():
+            em.add_field(name=name, value=value)
+        
         await logchannel.send(embed=em)
 
     async def on_member_ban(self, guild, user):
@@ -121,9 +126,9 @@ class Moderation(Cog):
     def modlog_fmt(self, data):
         user = data['user']
         fmt = (f'**{ACTION_AS_AUDITLOG[data["action"]].capitalize()}** | Case {data["action_id"]}\n'
-                f'**User**: {str(user)} ({user.id})\n'
-                f'**Reason**: {data["reason"].get("reason") or "No reason provided"}\n'
-                f'**Responsible Moderator**: {str(data.get("reason", {}).get("moderator", None))}\n') 
+               f'**User**: {user} ({user.id})\n'
+               f'**Reason**: {data["reason"].get("reason") or "No reason provided"}\n'
+               f'**Responsible Moderator**: {data.get("reason", {}).get("moderator", None)}\n')
         return fmt
 
     async def add_mod_entry(self, modcfg, data):
@@ -275,8 +280,8 @@ class Moderation(Cog):
             user.name = 'fake user'
             user.id = -1
 
-        log.info('[modlog:handle] a=%d g=%r[gid=%d], u=%r[uid=%d] r=%r', \
-            action, guild.name, guild.id, user.name, user.id, reason)
+        log.info('[modlog:handle] a=%d g=%r[gid=%d], u=%r[uid=%d] r=%r',
+                 action, guild.name, guild.id, user.name, user.id, reason)
 
         await handler(modconfig, guild, user, reason, **kwargs)
 
@@ -295,7 +300,7 @@ class Moderation(Cog):
             'last_action_id': 0,
         }
 
-        log.info('[modlog:attach] Creating a modcfg @ g=%s[gid=%d]', \
+        log.info('[modlog:attach] Creating a modcfg @ g=%s[gid=%d]',
             ctx.guild.name, ctx.guild.id)
 
         res = await self.modcfg_coll.insert_one(modconfig)
@@ -325,7 +330,7 @@ class Moderation(Cog):
         except discord.Forbidden:
             raise self.SayException("can't kick >:c")
         except discord.HTTPException as err:
-            raise self.SayException('wtf is happening discord `{err!r}`')
+            raise self.SayException(f'wtf is happening discord `{err!r}`')
 
         _reason = {'reason': reason, 'moderator': ctx.author}
         await self.modlog(Actions.KICK, ctx.guild, member, reason=_reason, modconfig=modconfig)
@@ -342,7 +347,7 @@ class Moderation(Cog):
         except discord.Forbidden:
             raise self.SayException("can't ban u suck ass >:c")
         except discord.HTTPException as err:
-            raise self.SayException('wtf is happening discord `{err!r}`')
+            raise self.SayException(f'wtf is happening discord `{err!r}`')
 
         #_reason = {'reason': reason, 'moderator': ctx.author}
         #await self.modlog(Actions.BAN, ctx.guild, member, reason=_reason, modconfig=modconfig)
