@@ -599,7 +599,7 @@ class Coins(Cog):
         
         amount = round(amount, 3)
 
-        await self.jcoin_coll.update_one({'id': person.id}, {'$set': {'amount': amount}})
+        await self.jcoin_coll.update_one({'id': person.id}, {'$set': {'amount': str(amount)}})
         self.cache[person.id]['amount'] = amount
 
         await ctx.send(f'Set {self.get_name(account["id"])} to {amount}')
