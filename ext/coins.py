@@ -598,7 +598,10 @@ class Coins(Cog):
             raise self.SayException('account not found you dumbass')
         
         amount = round(amount, 3)
-        await self.jcoin_coll.update_one({'id': person.id}, {'$set': {'amount': float(amount)}})
+
+        await self.jcoin_coll.update_one({'id': person.id}, {'$set': {'amount': amount}})
+        self.cache[person.id]['amount'] = amount
+
         await ctx.send(f'Set {self.get_name(account["id"])} to {amount}')
 
     @commands.command()
