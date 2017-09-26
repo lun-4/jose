@@ -9,6 +9,8 @@ from .common import Cog
 
 log = logging.getLogger(__name__)
 
+class BooruError(Exception):
+    pass
 
 class BooruProvider:
     url = ''
@@ -22,6 +24,11 @@ class BooruProvider:
         tags = urllib.parse.quote(' '.join(tags), safe='')
         async with bot.session.get(f'{cls.url}?limit={limit}&tags={tags}') as resp:
             results = await resp.json()
+
+            # e621 sets this to false
+            # when the request fails
+            if not results.get('success', True):
+                raise BooruError(results.get('reason'))
 
             # transform file url
             for post in results:
@@ -76,6 +83,8 @@ class NSFW(Cog):
 
             # send
             await ctx.send(embed=embed)
+        except BooruError as err:
+            await ctx.send(f'Error while fetching posts: `{err!r}`')
         except aiohttp.ClientError:
             await ctx.send('Something went wrong. Sorry!')
 
