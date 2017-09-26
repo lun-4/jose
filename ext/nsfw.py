@@ -25,10 +25,18 @@ class BooruProvider:
         async with bot.session.get(f'{cls.url}?limit={limit}&tags={tags}') as resp:
             results = await resp.json()
 
-            # e621 sets this to false
-            # when the request fails
-            if not results.get('success', True):
-                raise BooruError(results.get('reason'))
+            try:
+                # e621 sets this to false
+                # when the request fails
+                if not results.get('success', True):
+                    raise BooruError(results.get('reason'))
+            except AttributeError:
+                # when the thing actually worked and
+                # its a list of posts and not a fucking
+                # dictionary
+
+                # where am I gonna see good porn APIs?
+                pass
 
             # transform file url
             for post in results:
