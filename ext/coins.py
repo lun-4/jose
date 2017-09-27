@@ -140,7 +140,7 @@ class Coins(Cog):
                 'loans': {},
             }
 
-    async def new_account(self, account_id: int, account_type='user', init_amount=3):
+    async def new_account(self, account_id: int, account_type: str='user', init_amount: int=0):
         """Create a new account.
         
         Updates the guild to user id list cache.
