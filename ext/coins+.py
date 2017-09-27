@@ -398,7 +398,11 @@ class CoinsExt(Cog):
 
     @commands.command()
     async def deadtxb(self, ctx):
-        """Show dead taxbanks."""
+        """Show dead taxbanks.
+        
+        Dead taxbanks are taxbanks that refer to
+        non-existent servers/guilds.
+        """
 
         all_taxbanks = await self.jcoin.get_accounts_type('taxbank')
         dead_txb = filter(lambda acc: (self.bot.get_guild(acc['id']) is None), all_taxbanks)
