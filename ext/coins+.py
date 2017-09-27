@@ -59,12 +59,18 @@ class CoinsExt(Cog):
     async def show(self, ctx, accounts, field='amount'):
         res = []
 
+        filtered = []
+
         for (idx, account) in enumerate(accounts):
             name = self.jcoin.get_name(account['id'], account=account)
             if 'Unfindable' in name:
                 continue
-
-            res.append(f'{idx:3d}. {name:30s} -> {account[field]}')
+            else:
+                account['_name'] = name
+                filtered.append(account)
+        
+        for (idx, account) in enumerate(filtered):
+            res.append(f'{idx:3d}. {account["_name"]:30s} -> {account[field]}')
 
         joined = '\n'.join(res)
         if len(joined) > 1950:
