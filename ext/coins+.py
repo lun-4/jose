@@ -61,6 +61,9 @@ class CoinsExt(Cog):
 
         for (idx, account) in enumerate(accounts):
             name = self.jcoin.get_name(account['id'], account=account)
+            if 'Unfindable' in name:
+                continue
+
             res.append(f'{idx:3d}. {name:30s} -> {account[field]}')
 
         joined = '\n'.join(res)
