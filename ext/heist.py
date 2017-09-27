@@ -426,20 +426,22 @@ class Heist(Cog):
         """Get your current heist join session."""
         session = self.get_sess(ctx)
 
-        res = [f'Guild being attacked: `{session.target!s}`', 
-            f'Amount: `{session.amount!s}i`',
-            'Current users in the session:'
-        ]
+        em = discord.Embed(title='Current heist status')
 
+        em.add_field(name='Guild being attacked', value=f'`{session.target!s}` [{session.target.id}]')
+        em.add_field(name='Amount being heisted', value=f'`{session.amount!s}`JC')
+
+        users_in_heist = []
         for user_id in session.users:
-            res.append(f'\t<@{user_id}>')
+            users_in_heist.append(f'<@{user_id}>')
 
-        res = '\n'.join(res)
-        await ctx.send(f'{res}')
+        em.add_field(name='Current users in the heist', value=' '.join(users_in_heist))
+            
+        await ctx.send(embed=em)
 
     @heist.command(name='raid')
     async def heist_force(self, ctx):
-        """Force a current heist join session to be finish already."""
+        """Force a current heist join session to finish already."""
         session = self.get_sess(ctx)
         await session.process_heist(await session.force_finish())
 
