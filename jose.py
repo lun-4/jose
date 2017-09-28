@@ -30,7 +30,6 @@ extensions = [
     'speak',
     'math',
     'datamosh',
-    'memes',
     'extra',
     'stars',
     'stats',
