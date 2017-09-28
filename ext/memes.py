@@ -307,13 +307,13 @@ class Memes(Cog):
 
         # cache :DDDDDDDDD
         if term in self.urban_cache:
-            definition = self.urban_cache[term]
-            return await ctx.send(f'```\n{term!r}:\n{definition}\n```')
+            definition = self.urban_cache[term][0]
+            example = self.urban_cache[term][1]
+            return await ctx.send(f'```\n{term!r}:\n{definition}\n{example}```')
 
         await self.jcoin.pricing(ctx, self.prices['API'])
 
         urban_url = f'https://api.urbandictionary.com/v0/define?term={urllib.parse.quote(term)}'
-
         content = await self.get_json(urban_url)
         c_list = content['list']
 
@@ -321,9 +321,13 @@ class Memes(Cog):
             raise self.SayException('No results found')
 
         definition = c_list[0]['definition']
-        self.urban_cache[term] = definition
+        example = ''
+        if definition < 1940:
+            example = c_list[0]['example']
 
-        await ctx.send(f'```\n{term!r}:\n{definition}\n```')
+        self.urban_cache[term] = [definition, example]
+        
+        await ctx.send(f'```\n{term!r}:\n{definition}\n{example}```')
 
     @commands.command(hidden=True)
     async def ejaculate(self, ctx):
