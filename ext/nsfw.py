@@ -114,7 +114,7 @@ class NSFW(Cog):
     @commands.is_nsfw()
     async def penis(self, ctx):
         """get penis from e621 bb"""
-        await ctx.invoke(self.bot.get_command('e621'), tags='penis')
+        await ctx.invoke(self.bot.get_command('e621'), 'penis')
 
 def setup(bot):
     bot.add_cog(NSFW(bot))
