@@ -322,7 +322,7 @@ class Memes(Cog):
 
         definition = c_list[0]['definition']
         example = ''
-        if definition < 1940:
+        if len(definition) < 1940:
             example = c_list[0]['example']
 
         self.urban_cache[term] = [definition, example]
