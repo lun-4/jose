@@ -110,6 +110,11 @@ class NSFW(Cog):
         async with ctx.typing():
             await self.booru(ctx, HypnohubBooru, tags)
 
+    @commands.command()
+    @commands.is_nsfw()
+    async def penis(self, ctx):
+        """get penis from e621 bb"""
+        await ctx.invoke(self.bot.get_command('e621'), tags='penis')
 
 def setup(bot):
     bot.add_cog(NSFW(bot))
