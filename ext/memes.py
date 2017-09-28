@@ -357,3 +357,4 @@ class Memes(Cog):
 
 def setup(bot):
     bot.add_cog(Memes(bot))
+    bot.remove_command('meme')
