@@ -552,7 +552,15 @@ class Coins(Cog):
         if success:
             mutual_guilds = [g for g in self.bot.guilds if g.get_member(user.id)]
             for guild in mutual_guilds:
-                self.acct_cache[guild.id].append(user.id)
+                # The length check is required
+                # since if a guild doesn't have its account cache
+                # loaded and someone creates an account,
+                # the guild account cache becomes a list with only 1 account
+                # (the one being created)
+                # and that won't change because of the guild_accounts god damn cache check
+                cache = self.acct_cache[guild.id]
+                if len(cache) > 0:
+                    self.acct_cache[guild.id].append(user.id)
 
         await ctx.success(success)
 
