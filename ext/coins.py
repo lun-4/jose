@@ -231,6 +231,13 @@ class Coins(Cog):
 
         return c_account
 
+    def cache_invalidate(self, user_id: int) -> 'NoneType':
+        """Invalidate an account from the account cache."""
+        try:
+            self.cache.pop(user_id)
+        except KeyError:
+            pass
+
     async def get_accounts_type(self, acc_type: str) -> list:
         """Get all accounts that respect an account type.
         
@@ -608,7 +615,7 @@ class Coins(Cog):
         amount = round(amount, 3)
 
         await self.jcoin_coll.update_one({'id': person.id}, {'$set': {'amount': str(amount)}})
-        self.cache[person.id]['amount'] = amount
+        self.cache_invalidate(person.id)
 
         await ctx.send(f'Set {self.get_name(account["id"])} to {amount}')
 
