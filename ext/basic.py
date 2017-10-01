@@ -148,6 +148,22 @@ class Basic(Cog):
         await feedback_channel.send(embed=em)
         await ctx.ok()
 
+    @commands.command(name='feedback-reply', aliases=['freply'])
+    @commands.is_owner()
+    async def feedback_reply(self, ctx, channel_id: int, *, message: str):
+        """Sends a feedback reply to a specified channel."""
+        channel = self.bot.get_channel(channel_id)
+        if channel is None:
+            return await ctx.send('Can\'t find specified channel! Please try again.')
+
+        embed = discord.Embed(colour=discord.Color.magenta(), description=message)
+        embed.set_author(name=str(ctx.author), icon_url=ctx.author.avatar_url)
+
+        embed.timestamp = datetime.datetime.utcnow()
+        embed.set_footer(text='Feedback reply')
+
+        await channel.send(embed=embed)
+
     @commands.command()
     async def clist(self, ctx, cog_name: str):
         """Search for all commands that were declared by a cog.
