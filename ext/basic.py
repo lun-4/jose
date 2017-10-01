@@ -7,15 +7,16 @@ import datetime
 
 import psutil
 import discord
-
 from discord.ext import commands
 
-from .common import Cog
+from .common import Cog, shell
+
 
 FEEDBACK_CHANNEL_ID = 290244095820038144
 
 OAUTH_URL = 'https://discordapp.com/oauth2/authorize?permissions=379968&scope=bot&client_id=202586824013643777'
 SUPPORT_SERVER = 'https://discord.gg/5ASwg4C'
+
 
 class Basic(Cog):
     """Basic commands."""
@@ -58,9 +59,8 @@ class Basic(Cog):
     async def version(self, ctx):
         """Show current josé version"""
         pyver = '%d.%d.%d' % (sys.version_info[:3])
-        do = lambda cmd: subprocess.check_output(cmd, shell=True).decode('utf-8').strip()
-        head_id = do('git rev-parse --short HEAD')
-        branch = do('git rev-parse --abbrev-ref HEAD')
+        head_id = await shell('git rev-parse --short HEAD')
+        branch = await shell('git rev-parse --abbrev-ref HEAD')
 
         await ctx.send(f'`José v{self.JOSE_VERSION} git:{branch}-{head_id} py:{pyver} d.py:{discord.__version__}`')
 
@@ -192,6 +192,7 @@ class Basic(Cog):
     async def source(self, ctx):
         """Source code:tm:"""
         await ctx.send('https://github.com/lnmds/jose')
+
 
 def setup(bot):
     bot.add_cog(Basic(bot))
