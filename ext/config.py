@@ -143,8 +143,9 @@ class Config(Cog):
     @commands.command(aliases=['speakchan'])
     @commands.guild_only()
     @is_moderator()
-    async def speakchannel(self, ctx, channel: discord.TextChannel):
+    async def speakchannel(self, ctx, channel: discord.TextChannel=None):
         """Set the channel José will gather messages to feed to his markov generator."""
+        channel = channel or ctx.channel
         success = await self.cfg_set(ctx.guild, 'speak_channel', channel.id)
         await ctx.success(success)
 
@@ -238,7 +239,7 @@ class Config(Cog):
     @commands.command()
     @commands.guild_only()
     @is_moderator()
-    async def notify(self, ctx, channel: discord.TextChannel):
+    async def notify(self, ctx, channel: discord.TextChannel=None):
         """Make a channel a notification channel.
         
         A notification channel will be used bu josé
@@ -248,6 +249,7 @@ class Config(Cog):
         José NEEDS TO HAVE "Send Message" permissions upfront
         for this to work.
         """
+        channel = channel or ctx.channel
         perms = channel.permissions_for(ctx.guild.me)
         if not perms.send_messages:
             return await ctx.send('Add `Send Messages` permission to josé please')
