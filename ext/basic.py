@@ -160,9 +160,10 @@ class Basic(Cog):
         embed.set_author(name=str(ctx.author), icon_url=ctx.author.avatar_url)
 
         embed.timestamp = datetime.datetime.utcnow()
-        embed.set_footer(text='Feedback reply')
+        embed.set_footer(text='Feedback Reply')
 
         await channel.send(embed=embed)
+        await ctx.ok()
 
     @commands.command()
     async def clist(self, ctx, cog_name: str):
