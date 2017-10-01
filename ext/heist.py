@@ -374,6 +374,13 @@ class Heist(Cog):
         if amount > 200:
             return await ctx.send('Cannot heist more than 200JC.')
 
+        account = await self.bot.get_cog('Coins').get_account(ctx.author.id)
+        if not account:
+            raise self.SayException('You dont have a josecoin wallet')
+
+        if amount > account['amount']:
+            raise self.SayException('You cant heist more than what you currently hold.')
+
         for session in self.sessions.values():
             if session.target.id == target.id:
                 raise self.SayException('An already existing session exists with the same target')
