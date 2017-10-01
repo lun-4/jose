@@ -226,15 +226,20 @@ class JoinSession:
             self.heist.sessions.pop(self.id)
             return await self.jail(res)
 
+        log.info('Heist success')
+
         for user_id in self.users:
             user = self.bot.get_user(user_id)
             if user is None:
+                log.debug('Ignoring uid %d', user_id)
                 continue
 
             try:
                 await self.coins.transfer(self.target.id, user_id, self.fine)
-            except self.coins.TransferError:
+            except self.coins.TransferError as err:
+                log.warning(f'transfer failed {err!r}')
                 pass
+
             await self.cext.add_cooldown(user, 1, 7)
 
         self.heist.sessions.pop(self.id)
@@ -257,7 +262,7 @@ class JoinSession:
             If no task is provided to the session.
         """
         guild = self.ctx.guild
-        log.info('Forcing a finish at {guild!s}[{guild.id}]')
+        log.info(f'Forcing a finish at {guild!s}[{guild.id}]')
         self.finish.set()
 
         if self.task is None:
@@ -366,6 +371,9 @@ class Heist(Cog):
          - If your heist succeedes, you get a type 1 cooldown of 7 hours.
            it will show you are "regenerating your steal points".
         """
+        if amount > 200:
+            return await ctx.send('Cannot heist more than 200JC.')
+
         for session in self.sessions.values():
             if session.target.id == target.id:
                 raise self.SayException('An already existing session exists with the same target')
