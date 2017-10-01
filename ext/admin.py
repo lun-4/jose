@@ -4,7 +4,7 @@ import logging
 
 from discord.ext import commands
 
-from .common import Cog
+from .common import Cog, shell
 
 
 log = logging.getLogger(__name__)
@@ -57,14 +57,7 @@ class Admin(Cog):
     async def shell(self, ctx, *, command: str):
         """Execute shell commands."""
         with ctx.typing():
-            p = await asyncio.create_subprocess_shell(command,
-                stderr=asyncio.subprocess.PIPE,
-                stdout=asyncio.subprocess.PIPE,
-            )
-
-            out, err = map(lambda s: s.decode('utf-8'), await p.communicate())
-
-        result = f'{out}{err}' 
+            result = await shell(command)
         await ctx.send(f"`{command}`: ```{result}```\n")
 
     @commands.command()

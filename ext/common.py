@@ -1,3 +1,5 @@
+import asyncio
+
 import discord
 
 JOSE_VERSION = '2.3'
@@ -42,3 +44,14 @@ class Cog:
     @property
     def jcoin(self):
         return self.bot.cogs.get('Coins')
+
+
+async def shell(command: str):
+    process = await asyncio.create_subprocess_shell(
+        command,
+        stderr=asyncio.subprocess.PIPE,
+        stdout=asyncio.subprocess.PIPE,
+    )
+
+    out, err = map(lambda s: s.decode('utf-8'), await process.communicate())
+    return f'{out}{err}'.strip()
