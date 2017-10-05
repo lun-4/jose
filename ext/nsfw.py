@@ -22,7 +22,7 @@ class BooruProvider:
     @classmethod
     async def get_posts(cls, bot, tags, *, limit=5):
         tags = urllib.parse.quote(' '.join(tags), safe='')
-        async with bot.session.get(f'{cls.url}?limit={limit}&tags={tags}') as resp:
+        async with bot.session.get(f'{cls.url}limit={limit}&tags={tags}') as resp:
             results = await resp.json()
 
             try:
@@ -46,12 +46,12 @@ class BooruProvider:
 
 
 class E621Booru(BooruProvider):
-    url = 'https://e621.net/post/index.json'
+    url = 'https://e621.net/post/index.json?'
     url_post = 'https://e621.net/post/show/{0}'
 
 
 class HypnohubBooru(BooruProvider):
-    url = 'http://hypnohub.net/post/index.json'
+    url = 'http://hypnohub.net/post/index.json?'
     url_post = 'https://hypnohub.net/post/show/{0}'
 
     @classmethod
