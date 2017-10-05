@@ -60,7 +60,7 @@ class HypnohubBooru(BooruProvider):
 
 
 class GelBooru(BooruProvider):
-    url = 'https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1'
+    url = 'https://gelbooru.com/index.php?page=dapi&s=post&json=1&q=index'
     url_post = 'https://gelbooru.com/index.php?page=post&s=view&id={0}'
 
 
