@@ -100,7 +100,7 @@ class Math(Cog):
             return
 
     @commands.command(aliases=['owm'])
-    async def weather(self, ctx, location: str):
+    async def weather(self, ctx, *, location: str):
         """Get weather data for a location."""
 
         await self.jcoin.pricing(ctx, self.prices['API'])
