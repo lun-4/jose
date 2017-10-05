@@ -100,8 +100,8 @@ class NSFW(Cog):
             await ctx.send(embed=embed)
         except BooruError as err:
             await ctx.send(f'Error while fetching posts: `{err!r}`')
-        except aiohttp.ClientError:
-            await ctx.send('Something went wrong. Sorry!')
+        except aiohttp.ClientError as err:
+            raise self.SayException(f'Something went wrong. Sorry! `{err!r}`')
 
     @commands.command()
     @commands.is_nsfw()
