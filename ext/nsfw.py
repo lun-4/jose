@@ -28,6 +28,8 @@ class BooruProvider:
         tags = urllib.parse.quote(' '.join(tags), safe='')
         async with bot.session.get(f'{cls.url}&limit={limit}&tags={tags}') as resp:
             results = await resp.json()
+            if not results:
+                return []
 
             try:
                 # e621 sets this to false
