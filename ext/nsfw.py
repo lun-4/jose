@@ -22,7 +22,7 @@ class BooruProvider:
     @classmethod
     async def get_posts(cls, bot, tags, *, limit=5):
         tags = urllib.parse.quote(' '.join(tags), safe='')
-        async with bot.session.get(f'{cls.url}limit={limit}&tags={tags}') as resp:
+        async with bot.session.get(f'{cls.url}&limit={limit}&tags={tags}') as resp:
             results = await resp.json()
 
             try:
