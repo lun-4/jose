@@ -59,6 +59,11 @@ class HypnohubBooru(BooruProvider):
         return 'https:' + url.replace('.net//', '.net/')
 
 
+class GelBooru(BooruProvider):
+    url = 'https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1'
+    url_post = 'https://gelbooru.com/index.php?page=post&s=view&id={0}'
+
+
 class NSFW(Cog):
     async def booru(self, ctx, booru, tags):
         # taxxx
@@ -75,7 +80,8 @@ class NSFW(Cog):
             post = random.choice(posts)
             post_id = post.get('id')
 
-            log.info('%d posts from %s, chose %d', len(posts), booru.__name__, post_id)
+            log.info('%d posts from %s, chose %d', len(posts),
+                     booru.__name__, post_id)
 
             tags = (post['tags'].replace('_', '\\_'))[:500]
 
@@ -87,7 +93,8 @@ class NSFW(Cog):
 
             # hypnohub doesn't have this
             if 'fav_count' in post and 'score' in post:
-                embed.add_field(name='Votes/Favorites', value=f"{post['score']} votes, {post['fav_count']} favorites")
+                embed.add_field(name='Votes/Favorites',
+                                value=f"{post['score']} votes, {post['fav_count']} favorites")
 
             # send
             await ctx.send(embed=embed)
@@ -112,9 +119,15 @@ class NSFW(Cog):
 
     @commands.command()
     @commands.is_nsfw()
+    async def gelbooru(self, ctx, *tags):
+        await self.booru(ctx, GelBooru, tags)
+
+    @commands.command()
+    @commands.is_nsfw()
     async def penis(self, ctx):
         """get penis from e621 bb"""
         await ctx.invoke(self.bot.get_command('e621'), 'penis')
+
 
 def setup(bot):
     bot.add_cog(NSFW(bot))
