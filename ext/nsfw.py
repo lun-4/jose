@@ -20,6 +20,10 @@ class BooruProvider:
         return url
 
     @classmethod
+    def get_author(cls, post):
+        return post['author']
+
+    @classmethod
     async def get_posts(cls, bot, tags, *, limit=5):
         tags = urllib.parse.quote(' '.join(tags), safe='')
         async with bot.session.get(f'{cls.url}&limit={limit}&tags={tags}') as resp:
@@ -63,6 +67,10 @@ class GelBooru(BooruProvider):
     url = 'https://gelbooru.com/index.php?page=dapi&s=post&json=1&q=index'
     url_post = 'https://gelbooru.com/index.php?page=post&s=view&id={0}'
 
+    @classmethod
+    def get_author(cls, post):
+        return post['owner']
+
 
 class NSFW(Cog):
     async def booru(self, ctx, booru, tags):
@@ -79,6 +87,7 @@ class NSFW(Cog):
             # grab random post
             post = random.choice(posts)
             post_id = post.get('id')
+            post_author = booru.get_author(post)
 
             log.info('%d posts from %s, chose %d', len(posts),
                      booru.__name__, post_id)
@@ -86,7 +95,7 @@ class NSFW(Cog):
             tags = (post['tags'].replace('_', '\\_'))[:500]
 
             # add stuffs
-            embed = discord.Embed(title=f'Posted by {post["author"]}')
+            embed = discord.Embed(title=f'Posted by {post_author}')
             embed.set_image(url=post['file_url'])
             embed.add_field(name='Tags', value=tags)
             embed.add_field(name='URL', value=booru.url_post.format(post_id))
