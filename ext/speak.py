@@ -32,8 +32,8 @@ class Texter:
 
     This class holds information about a markov chain generator.
     """
-    __slots__ = ('loop', 'id', 'refcount', 'chain_length', \
-        'model', 'wordcount', 'linecount', 'time_taken')
+    __slots__ = ('loop', 'id', 'refcount', 'chain_length',
+                 'model', 'wordcount', 'linecount', 'time_taken')
 
     def __init__(self, texter_id, chain_length=1, loop=None):
         if loop is None:
@@ -58,7 +58,9 @@ class Texter:
         """Fill a texter with its text model."""
         t_start = time.monotonic()
 
-        future_textmodel = self.loop.run_in_executor(None, make_textmodel, self, data)
+        future_textmodel = self.loop.run_in_executor(None,
+                                                     make_textmodel,
+                                                     self, data)
         await future_textmodel
 
         self.wordcount = data.count(' ') + 1
@@ -67,7 +69,8 @@ class Texter:
         delta = round((time.monotonic() - t_start) * 1000, 2)
         self.time_taken = delta
 
-        log.info(f"Texter.fill: {self.linecount} lines, {self.wordcount} words, {delta}ms")
+        log.info(f"Texter.fill: {self.linecount} lines, "
+                 f"{self.wordcount} words, {delta}ms")
 
     def _sentence(self, char_limit):
         """Get a sentence from a initialized texter."""
@@ -88,8 +91,11 @@ class Texter:
         res = None
         count = 0
         while res is None:
-            if count > 3: break
-            future_sentence = self.loop.run_in_executor(None, self._sentence, char_limit)
+            if count > 3:
+                break
+            future_sentence = self.loop.run_in_executor(None,
+                                                        self._sentence,
+                                                        char_limit)
             res = await future_sentence
             count += 1
 
@@ -162,7 +168,8 @@ class Speak(Cog):
         channel_id = await self.config.cfg_get(guild, 'speak_channel')
         channel = guild.get_channel(channel_id)
         if channel is None:
-            raise TexterFail('Channel to read messages not found, check the j!speakchan command(j!help speakchan)')
+            raise TexterFail('Channel to read messages not found, check '
+                             'the j!speakchan command(j!help speakchan)')
 
         self.generating[guild.id] = True
         try:
@@ -189,7 +196,8 @@ class Speak(Cog):
         except discord.Forbidden:
             log.info(f'[get_messages] Forbidden from {guild.name}[{guild.id}]')
             self.generating[guild.id] = False
-            raise TexterFail("Can't read from the channel, setup your permissions!")
+            raise TexterFail("Can't read from the channel, "
+                             "setup your permissions!")
 
     async def get_messages_str(self, guild, amount=2000):
         m = await self.get_messages(guild, amount)
@@ -215,7 +223,8 @@ class Speak(Cog):
             try:
                 texter = await self.get_texter(ctx.guild)
             except TexterFail as err:
-                raise self.SayException(f'Failed to generate a texter: `{err.args[0]!r}`')
+                raise self.SayException('Failed to generate a '
+                                        f'texter: `{err.args[0]!r}`')
 
         sentence = await texter.sentence(char_limit)
         return sentence
@@ -241,6 +250,7 @@ class Speak(Cog):
 
         nick = ctx.me.nick
         if nick is not None:
+            nick = f'{nick} '
             prefixes = self.bot.config.SPEAK_PREFIXES + [nick, nick.lower()]
         else:
             prefixes = self.bot.config.SPEAK_PREFIXES
@@ -251,7 +261,8 @@ class Speak(Cog):
         else:
             log.info(
                 '[autoreply:speak_prefix] %s(%d), %s(%d) - %r',
-                message.guild, message.guild.id, message.author, message.author.id, message.content
+                message.guild, message.guild.id, message.author,
+                message.author.id, message.content
             )
 
         if self.generating.get(ctx.guild.id):
@@ -260,7 +271,8 @@ class Speak(Cog):
         try:
             sentence = await self.make_sentence(ctx)
         except self.SayException as err:
-            return await ctx.send(f'Failed to generate a sentence: `{err.args[0]!r}`')
+            return await ctx.send('Failed to generate a '
+                                  f'sentence: `{err.args[0]!r}`')
 
         await ctx.send(sentence)
 
@@ -278,7 +290,8 @@ class Speak(Cog):
         t_end = time.monotonic()
 
         delta = round((t_end - t_start) * 1000, 2)
-        await ctx.send(f"`{before} => {after}, cleaned {before-after}, took {delta}ms`")
+        await ctx.send(f"`{before} => {after}, cleaned "
+                       f"{before-after}, took {delta}ms`")
 
     @commands.command()
     @commands.is_owner()
@@ -300,7 +313,7 @@ class Speak(Cog):
     @commands.cooldown(2, 5, commands.BucketType.guild)
     async def speaktrigger(self, ctx):
         """Force your Texter to say a sentence.
-        
+
         If the texter is still being generated, this command
         does nothing while it isn't completly generated.
         """
@@ -326,9 +339,10 @@ class Speak(Cog):
     @commands.guild_only()
     async def madlibs(self, ctx, *, inputstr: str):
         """Changes any "---" in the input to a 12-letter generated sentence
-        
-        If you see "None" in the resulting text, it means josé failed to generate
-        a 12-letter sentence, and that can happen by any reason tbh.
+
+        If you see "None" in the resulting text, it means josé
+        failed to generate a 12-letter sentence,
+        and that can happen by any reason tbh.
         """
 
         inputstr = inputstr.replace('@e', '@\u200be')
@@ -337,7 +351,8 @@ class Speak(Cog):
 
         splitted = inputstr.split()
         if splitted.count('---') < 1:
-            await ctx.send(":no_entry_sign: you can't just make josé say whatever you want! :no_entry_sign:")
+            await ctx.send(":no_entry_sign: you can't just make "
+                           "josé say whatever you want! :no_entry_sign:")
             return
 
         if splitted.count('---') > 5:
@@ -383,8 +398,10 @@ class Speak(Cog):
         res = ['refcount | texters']
         res += [f'{r}        | {txc}' for (r, txc) in refcounts.most_common()]
 
-        res += [f'avg tx gen: {self.st_gen_totalms / self.st_gen_count} ms/generated']
-        res += [f'avg txc run: {self.st_txc_totalms / self.st_txc_runs} ms/runs']
+        res += [f'avg tx gen: {self.st_gen_totalms / self.st_gen_count}'
+                ' ms/generated']
+        res += [f'avg txc run: {self.st_txc_totalms / self.st_txc_runs}'
+                ' ms/runs']
 
         res = '\n'.join(res)
         await ctx.send(f'```{res}```')
@@ -397,7 +414,7 @@ class Speak(Cog):
         em.description = ''
         for guild_id, tx in self.text_generators.items():
             guild = self.bot.get_guild(guild_id)
-            em.description += f'**{guild!s}**, gid={guild_id} - `refcount={tx.refcount}, words={tx.wordcount} lines={tx.linecount}`\n'
+            em.description += f'**{guild!s}**, gid={guild_id} - refcount={tx.refcount}, words={tx.wordcount} lines={tx.linecount}`\n'
 
         await ctx.send(embed=em)
 
@@ -412,9 +429,8 @@ class Speak(Cog):
             return await ctx.send('No texter loaded for this guild')
 
         lines = (f'Refcount: {tx.refcount}\n',
-                f'Words: {tx.wordcount}\n',
-                f'Lines: {tx.linecount}\n',
-        )
+                 f'Words: {tx.wordcount}\n',
+                 f'Lines: {tx.linecount}\n')
         await ctx.send(''.join(lines))
 
 def setup(bot):
