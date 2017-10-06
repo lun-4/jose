@@ -239,16 +239,20 @@ class Speak(Cog):
             log.warning('[autoreply] how can autoreply_prob be none??')
             return
 
-        force = False
-        for prefix in self.bot.config.SPEAK_PREFIXES:
-            if message.content.startswith(prefix):
-                log.info('[autoreply:speak_prefix] %s(%d), %s(%d) - %r', \
-                    message.guild, message.guild.id, message.author, message.author.id, message.content)
-                force = True
+        nick = ctx.me.nick
+        if nick is not None:
+            prefixes = self.bot.config.SPEAK_PREFIXES + [nick, nick.lower()]
+        else:
+            prefixes = self.bot.config.SPEAK_PREFIXES
 
-        if not force:
+        if not any(message.content.startswith(prefix) for prefix in prefixes):
             if random.random() > prob:
                 return
+        else:
+            log.info(
+                '[autoreply:speak_prefix] %s(%d), %s(%d) - %r',
+                message.guild, message.guild.id, message.author, message.author.id, message.content
+            )
 
         if self.generating.get(ctx.guild.id):
             return
