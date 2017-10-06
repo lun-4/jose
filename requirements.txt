@@ -7,3 +7,4 @@ pyowm==2.7.1
 motor==1.1
 Pillow==4.3.0
 datadog==0.16.0
+midiutil==1.1.3
