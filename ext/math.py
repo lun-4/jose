@@ -97,7 +97,7 @@ class Math(Cog):
     async def wolframalpha(self, ctx, *, term: str):
         """Query Wolfram|Alpha"""
         if len(term) < 1:
-            await ctx.send('haha no')
+            await ctx.send('Haha, no.')
             return
 
         await self.jcoin.pricing(ctx, self.prices['API'])
