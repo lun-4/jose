@@ -1,4 +1,3 @@
-import subprocess
 import time
 import random
 import sys
@@ -62,7 +61,8 @@ class Basic(Cog):
         head_id = await shell('git rev-parse --short HEAD')
         branch = await shell('git rev-parse --abbrev-ref HEAD')
 
-        await ctx.send(f'`José v{self.JOSE_VERSION} git:{branch}-{head_id} py:{pyver} d.py:{discord.__version__}`')
+        await ctx.send(f'`José v{self.JOSE_VERSION} git:{branch}-{head_id} '
+                       f'py:{pyver} d.py:{discord.__version__}`')
 
     @commands.command()
     async def uptime(self, ctx):
@@ -73,7 +73,8 @@ class Basic(Cog):
         h, m = divmod(m, 60)
         d, h = divmod(h, 24)
 
-        await ctx.send(f'Uptime: **`{d} days, {h} hours, {m} minutes, {s} seconds`**')
+        await ctx.send(f'Uptime: **`{d} days, {h} hours, '
+                       f'{m} minutes, {s} seconds`**')
 
     @commands.command()
     async def stats(self, ctx):
@@ -86,24 +87,29 @@ class Basic(Cog):
 
         cpu_usage = round(self.process.cpu_percent() / psutil.cpu_count(), 2)
 
-        em.add_field(name='Memory / CPU usage', value=f'`{mem_mb}MB / {cpu_usage}% CPU`')
+        em.add_field(name='Memory / CPU usage',
+                     value=f'`{mem_mb}MB / {cpu_usage}% CPU`')
 
         channels = sum((1 for c in self.bot.get_all_channels()))
 
         em.add_field(name='Guilds', value=f'{len(self.bot.guilds)}')
         em.add_field(name='Channels', value=f'{channels}')
 
-        gay_chans = sum(1 for c in self.bot.get_all_channels() if 'gay' in c.name.lower())
+        gay_chans = sum(1 for c in self.bot.get_all_channels()
+                        if 'gay' in c.name.lower())
         em.add_field(name='Gaynnels', value=gay_chans)
 
-        em.add_field(name='Texters', value=f'{len(self.bot.cogs["Speak"].text_generators)}/{len(self.bot.guilds)}')
+        em.add_field(name='Texters',
+                     value=f'{len(self.bot.cogs["Speak"].text_generators)}/'
+                     f'{len(self.bot.guilds)}')
 
         member_count = sum((g.member_count for g in self.bot.guilds))
         em.add_field(name='Members', value=member_count)
 
         humans = sum(1 for m in self.bot.get_all_members() if not m.bot)
         unique_humans = sum(1 for c in self.bot.users)
-        em.add_field(name='human/unique humans', value=f'`{humans}, {unique_humans}`')
+        em.add_field(name='human/unique humans',
+                     value=f'`{humans}, {unique_humans}`')
 
         await ctx.send(embed=em)
 
@@ -112,19 +118,28 @@ class Basic(Cog):
         """Show stuff."""
 
         em = discord.Embed(title='José')
-        em.add_field(name='About', value='José is a generic-purpose bot (with some complicated features)')
+        em.add_field(name='About', value='José is a generic-purpose '
+                     'bot (with some complicated features)')
 
         appinfo = await self.bot.application_info()
         owner = appinfo.owner
-        em.add_field(name='Owner', value=f'{owner.mention}, {owner}, (`{owner.id}`)')
+        em.add_field(name='Owner',
+                     value=f'{owner.mention}, {owner}, (`{owner.id}`)')
 
-        em.add_field(name='Guilds', value=f'{len(self.bot.guilds)}')
+        em.add_field(name='Guilds',
+                     value=f'{len(self.bot.guilds)}')
 
         await ctx.send(embed=em)
-        
+
     @commands.command()
     async def feedback(self, ctx, *, feedback: str):
-        """Sends feedback to a special channel."""
+        """Sends feedback to a special channel.
+
+        Feedback replies will be sent to the
+        same channel you used the command on.
+
+        Replies can take any time.
+        """
 
         author = ctx.author
         channel = ctx.channel
@@ -133,8 +148,8 @@ class Basic(Cog):
         em = discord.Embed(title='', colour=discord.Colour.magenta())
         em.timestamp = datetime.datetime.now()
         em.set_footer(text='Feedback Report')
-        em.set_author(name=str(author), icon_url=author.avatar_url or \
-            author.default_avatar_url)
+        em.set_author(name=str(author), icon_url=author.avatar_url or
+                      author.default_avatar_url)
 
         em.add_field(name="Feedback", value=feedback)
         em.add_field(name="Guild", value=f'{guild.name} [{guild.id}]')
@@ -154,9 +169,11 @@ class Basic(Cog):
         """Sends a feedback reply to a specified channel."""
         channel = self.bot.get_channel(channel_id)
         if channel is None:
-            return await ctx.send('Can\'t find specified channel! Please try again.')
+            return await ctx.send("Can't find specified "
+                                  "channel! Please try again.")
 
-        embed = discord.Embed(colour=discord.Color.magenta(), description=message)
+        embed = discord.Embed(colour=discord.Color.magenta(),
+                              description=message)
         embed.set_author(name=str(ctx.author), icon_url=ctx.author.avatar_url)
 
         embed.timestamp = datetime.datetime.utcnow()
@@ -168,10 +185,11 @@ class Basic(Cog):
     @commands.command()
     async def clist(self, ctx, cog_name: str):
         """Search for all commands that were declared by a cog.
-        
+
         This is case sensitive.
-        """ 
-        matched = [cmd.name for cmd in self.bot.commands if cmd.cog_name == cog_name]
+        """
+        matched = [cmd.name for cmd in self.bot.commands
+                   if cmd.cog_name == cog_name]
 
         if len(matched) < 1:
             await ctx.send('No commands found')
