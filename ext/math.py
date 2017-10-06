@@ -107,6 +107,7 @@ class Math(Cog):
         future = self.loop.run_in_executor(None, self.wac.query, term)
         res = None
 
+        # run the thingy
         async with ctx.typing():
             try:
                 res = await asyncio.wait_for(future, 13)
@@ -125,51 +126,29 @@ class Math(Cog):
             await ctx.send("\N{CRYING FACE} Wolfram|Alpha failed.")
             return
 
-        pods = list(res.pods)
-
-        import pprint
-        print('results')
-        pprint.pprint(pods)
-
-        if not pods:
+        if not getattr(res, 'pods', False):
+            # no pods were returned by wa
             await ctx.send("\N{CYCLONE} No answer. \N{CYCLONE}")
             return
 
+        pods = list(res.pods)
+
+        # run algo on pod list
         pod = pod_finder(pods)
 
         def subpod_simplify(subpod):
+            """Simplifies a subpod into its image or plaintext equivalent."""
             if subpod.get('img'):
+                # use image over text
                 return subpod['img']['@src']
             return subpod['plaintext']
 
         if isinstance(pod['subpod'], dict):
+            # just a single pod!
             await ctx.send(subpod_simplify(pod['subpod']))
         else:
+            # multiple pods...choose the first one.
             await ctx.send(subpod_simplify(pod['subpod'][0]))
-
-        # if getattr(res, 'results', False):
-        #     pods = (pod for pod in res.pods)
-        #     pod = next(pods)
-        #     while pod.title == 'Input interpretation':
-        #         pod = next(pods)
-        #     text = None
-
-        #     if getattr(pod, 'text', False):
-        #         text = pod.text
-        #     elif pod.get('subpod', False):
-        #         subpod = pod['subpod']
-        #         if isinstance(subpod, dict):
-        #             text = subpod['img']['@src']
-        #         else:
-        #             text = subpod
-        #     else:
-        #         text = None
-
-        #     if text is not None:
-        #         await ctx.send(f'{term}:\n{text}')
-        #     else:
-        #         await ctx.send(f':poop: `{pod!r}`')
-        #     return
 
     @commands.command(aliases=['owm'])
     async def weather(self, ctx, *, location: str):
