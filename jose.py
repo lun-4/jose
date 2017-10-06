@@ -37,7 +37,7 @@ extensions = [
     'mod', 'botcollection',
     'channel_logging',
     'playing', 'sub',
-    'nsfw', 'heist',
+    'nsfw', 'heist', 'midi',
 ]
 
 
