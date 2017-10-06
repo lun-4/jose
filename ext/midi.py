@@ -80,7 +80,7 @@ LETTER_PITCH_MAP = {
 log = logging.getLogger(__name__)
 
 
-async def get_duration(letter):
+def get_duration(letter):
     return {
         ' ': 2,
         ',': 3,
@@ -105,7 +105,7 @@ class MIDI(Cog):
             # modifiers are characters before the actual
             # letter note that modify the note's duration
             try:
-                duration = await get_duration(data[index - 1])
+                duration = get_duration(data[index - 1])
             except IndexError:
                 duration = 1
 
