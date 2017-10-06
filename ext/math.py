@@ -36,6 +36,53 @@ OWM_ICONS = {
     '50d': W_MIST,
 }
 
+RESULT_PODS = {
+    'Result', 'Plot', 'Plots', 'Solution'
+}
+
+
+def pod_finder(pod_list):
+    """Finds a probable pod."""
+    log.info('pod_finder: going to score %d pods', len(pod_list))
+    pod_scores = {}
+
+    for pod in pod_list:
+        # convert pod to dict
+        pod = dict(pod)
+
+        if pod.get('@title') in RESULT_PODS:
+            log.info('pod_finder: found result pod! %s', pod)
+            return pod
+
+        score = 0
+
+        # meh pods
+        if pod.get('@title') in {'Input'}:
+            score -= 100
+
+        if isinstance(pod['subpod'], list):
+            # subpod has an image
+            score += 10 + (len(pod['subpod']) * 10)
+        else:
+            # subpod is singular
+
+            # plain text
+            if pod['subpod'].get('plaintext'):
+                score += 50
+
+            # image
+            if pod['subpod'].get('img'):
+                score += 30
+
+        pod_scores[pod['@id']] = score
+
+    log.info('pod_finder: got %d pods', len(pod_scores))
+    log.info('pod_finder scores: %s', pod_scores)
+
+    # return pod with highest score
+    best_id = max(pod_scores, key=pod_scores.get)
+    return discord.utils.find(lambda pod: pod['@id'] == best_id, pod_list)
+
 
 class Math(Cog):
     """Math related commands."""
@@ -44,12 +91,12 @@ class Math(Cog):
 
         self.wac = wolframalpha.Client(self.bot.config.WOLFRAMALPHA_APP_ID)
         self.owm = pyowm.OWM(self.bot.config.OWM_APIKEY)
-        
+
     @commands.command(aliases=['wa'])
     async def wolframalpha(self, ctx, *, term: str):
         """Query Wolfram|Alpha"""
         if len(term) < 1:
-            await ctx.send("haha no")
+            await ctx.send('haha no')
             return
 
         await self.jcoin.pricing(ctx, self.prices['API'])
@@ -63,41 +110,65 @@ class Math(Cog):
             try:
                 res = await asyncio.wait_for(future, 13)
             except asyncio.TimeoutError:
-                await ctx.send('⏳ Timeout reached')
+                await ctx.send('\N{HOURGLASS WITH FLOWING SAND} Timeout reached.')
                 return
             except Exception as err:
-                await ctx.send(f':cry: {err!r}')
+                await ctx.send(f'\N{CRYING FACE} Error: `{err!r}`')
                 return
 
         if res is None:
+            await ctx.send("\N{THINKING FACE} Wolfram|Alpha didn't reply.")
             return
 
-        if getattr(res, 'results', False):
-            pods = (pod for pod in res.pods)
-            pod = next(pods)
-            while pod.title == 'Input interpretation':
-                pod = next(pods)
-            text = None
-
-            if getattr(pod, 'text', False):
-                text = pod.text
-            elif pod.get('subpod', False):
-                subpod = pod['subpod']
-                if isinstance(subpod, dict):
-                    text = subpod['img']['@src']
-                else:
-                    text = subpod 
-            else:
-                text = None
-
-            if text is not None:
-                await ctx.send(f'{term}:\n{text}')
-            else:
-                await ctx.send(f':poop: `{pod!r}`')
+        if not res.success:
+            await ctx.send("\N{CRYING FACE} Wolfram|Alpha failed.")
             return
+
+        pods = list(res.pods)
+
+        import pprint
+        print('results')
+        pprint.pprint(pods)
+
+        if not pods:
+            await ctx.send("\N{CYCLONE} No answer. \N{CYCLONE}")
+            return
+
+        pod = pod_finder(pods)
+
+        def subpod_simplify(subpod):
+            if subpod.get('img'):
+                return subpod['img']['@src']
+            return subpod['plaintext']
+
+        if isinstance(pod['subpod'], dict):
+            await ctx.send(subpod_simplify(pod['subpod']))
         else:
-            await ctx.send(f'{ctx.author.mention}, :cyclone: No answer :cyclone:')
-            return
+            await ctx.send(subpod_simplify(pod['subpod'][0]))
+
+        # if getattr(res, 'results', False):
+        #     pods = (pod for pod in res.pods)
+        #     pod = next(pods)
+        #     while pod.title == 'Input interpretation':
+        #         pod = next(pods)
+        #     text = None
+
+        #     if getattr(pod, 'text', False):
+        #         text = pod.text
+        #     elif pod.get('subpod', False):
+        #         subpod = pod['subpod']
+        #         if isinstance(subpod, dict):
+        #             text = subpod['img']['@src']
+        #         else:
+        #             text = subpod
+        #     else:
+        #         text = None
+
+        #     if text is not None:
+        #         await ctx.send(f'{term}:\n{text}')
+        #     else:
+        #         await ctx.send(f':poop: `{pod!r}`')
+        #     return
 
     @commands.command(aliases=['owm'])
     async def weather(self, ctx, *, location: str):
@@ -167,7 +238,7 @@ class Math(Cog):
 
     @commands.command()
     async def roll(self, ctx, dicestr: str):
-        """Roll fucking dice. 
+        """Roll fucking dice.
         format is <amount>d<sides>
         """
 
