@@ -40,6 +40,10 @@ RESULT_PODS = {
     'Result', 'Plot', 'Plots', 'Solution'
 }
 
+UNECESSARY_PODS = {
+    'Input', 'Input interpretation'
+}
+
 
 def pod_finder(pod_list):
     """Finds a probable pod."""
@@ -57,7 +61,7 @@ def pod_finder(pod_list):
         score = 0
 
         # meh pods
-        if pod.get('@title') in {'Input'}:
+        if pod.get('@title') in UNECESSARY_PODS:
             score -= 100
 
         if isinstance(pod['subpod'], list):
