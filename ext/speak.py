@@ -251,7 +251,9 @@ class Speak(Cog):
         nick = ctx.me.nick
         if nick is not None:
             nick = f'{nick} '
-            prefixes = self.bot.config.SPEAK_PREFIXES + [nick, nick.lower()]
+            prefixes = self.bot.config.SPEAK_PREFIXES + [nick,
+                                                         nick.lower(),
+                                                         nick.capitalize()]
         else:
             prefixes = self.bot.config.SPEAK_PREFIXES
 
