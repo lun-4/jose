@@ -37,7 +37,7 @@ OWM_ICONS = {
 }
 
 RESULT_PODS = {
-    'Result', 'Plot', 'Plots', 'Solution'
+    'Result', 'Plot', 'Plots', 'Solution', 'Derivative'
 }
 
 UNECESSARY_PODS = {
