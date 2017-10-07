@@ -56,7 +56,7 @@ class CoinsExt(Cog):
         self.grace_coll = self.config.jose_db['steal_grace']
         self.owner = None
 
-    async def show(self, ctx, accounts, field='amount'):
+    async def show(self, ctx, accounts, *, field='amount', limit=10):
         res = []
 
         filtered = []
@@ -68,9 +68,11 @@ class CoinsExt(Cog):
             else:
                 account['_name'] = name
                 filtered.append(account)
-        
+
+        filtered = filtered[:limit]
+
         for (idx, account) in enumerate(filtered):
-            res.append(f'{idx:3d}. {account["_name"]:30s} -> {account[field]}')
+            res.append(f'{idx + 1:3d}. {account["_name"]:30s} -> {account[field]}')
 
         joined = '\n'.join(res)
         if len(joined) > 1950:
@@ -96,24 +98,21 @@ class CoinsExt(Cog):
 
         if mode == 'l':
             accounts = await self.jcoin.guild_accounts(ctx.guild)
-            accounts = accounts[:limit]
+            await self.show(ctx, accounts, limit=limit)
 
-            await self.show(ctx, accounts)
         elif mode == 'g':
             all_accounts = await self.jcoin.all_accounts()
             accounts = filter(lambda a: a['type'] == 'user', all_accounts)
-            accounts = list(accounts)[:limit]
-            await self.show(ctx, accounts)
+            await self.show(ctx, accounts, limit=limit)
 
         elif mode == 't':
             accounts = await self.jcoin.all_accounts('taxpaid')
-            accounts = accounts[:limit]
-            await self.show(ctx, accounts, 'taxpaid')
+            await self.show(ctx, accounts, field='taxpaid', limit=limit)
+
         elif mode == 'b' or mode == '\N{NEGATIVE SQUARED LATIN CAPITAL LETTER B}':
             all_accounts = await self.jcoin.all_accounts()
             accounts = filter(lambda acc: acc['type'] == 'taxbank', all_accounts)
-            accounts = list(accounts)[:limit]
-            await self.show(ctx, accounts)
+            await self.show(ctx, accounts, limit=limit)
         else:
             raise self.SayException('mode not found')
 
