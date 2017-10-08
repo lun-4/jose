@@ -85,39 +85,38 @@ def get_duration(letter):
         ' ': 2,
         ',': 3,
         '.': 4,
-        '^': 6,
-        '\'': 8,
-        '$': 12,
-        '"': 16
     }.get(letter, 1)
 
 
 class MIDI(Cog):
     async def make_midi(self, tempo: int, data: str) -> MIDIFile:
         midi_file = MIDIFile(1)
-
+        
+        channels = data.split("|")
+        
         midi_file.addTrackName(0, 0, 'beep boop')
         midi_file.addTempo(0, 0, tempo)
+        
+        for c in range(len(channels)):
+            log.info(f'creating MIDI channel out of "{data}"')
 
-        log.info(f'creating MIDI out of "{data}"')
+            for index, letter in enumerate(data):
+                note = LETTER_PITCH_MAP.get(letter)
+                if note is None:
+                    continue
 
-        for index, letter in enumerate(data):
-            note = LETTER_PITCH_MAP.get(letter)
-            if note is None:
-                continue
+                # modifiers are characters before the actual
+                # letter note that modify the note's duration
+                try:
+                    duration = get_duration(data[index - 1])
+                except IndexError:
+                    duration = 1
 
-            # modifiers are characters before the actual
-            # letter note that modify the note's duration
-            try:
-                duration = get_duration(data[index - 1])
-            except IndexError:
-                duration = 1
+                await self.loop.run_in_executor(
+                    None, midi_file.addNote, 0, c, note, index, duration, 100
+                )
 
-            await self.loop.run_in_executor(
-                None, midi_file.addNote, 0, 0, note, index, duration, 100
-            )
-
-        log.info('successfully created MIDI')
+            log.info('successfully created MIDI channel')
         return midi_file
 
     @commands.command()
