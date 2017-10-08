@@ -85,6 +85,8 @@ def get_duration(letter):
         ' ': 2,
         ',': 3,
         '.': 4,
+        '\'': 8,
+        '"': 16
     }.get(letter, 1)
 
 
