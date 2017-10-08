@@ -92,7 +92,7 @@ class MIDI(Cog):
     async def make_midi(self, tempo: int, data: str) -> MIDIFile:
         midi_file = MIDIFile(1)
         
-        channels = data.split("|")
+        channels = data.split('|')
         
         midi_file.addTrackName(0, 0, 'beep boop')
         midi_file.addTempo(0, 0, tempo)
@@ -100,7 +100,7 @@ class MIDI(Cog):
         for c in range(len(channels)):
             log.info(f'creating MIDI channel out of "{data}"')
 
-            for index, letter in enumerate(data):
+            for index, letter in enumerate(channels[c]):
                 note = LETTER_PITCH_MAP.get(letter)
                 if note is None:
                     continue
@@ -108,7 +108,7 @@ class MIDI(Cog):
                 # modifiers are characters before the actual
                 # letter note that modify the note's duration
                 try:
-                    duration = get_duration(data[index - 1])
+                    duration = get_duration(channels[c][index - 1])
                 except IndexError:
                     duration = 1
 
