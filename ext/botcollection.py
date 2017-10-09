@@ -7,16 +7,17 @@ from .common import Cog
 BOT_RATIO_MAX = 1.1
 
 WHITELIST = (
-    273863625590964224, # José's server
-    295341979800436736, # Memework
-    319540379495956490, # v2 testing serv
-    297710090687873024, # Luma's testing server
-    319252487280525322, # robert is gay
-    340609473439596546, # slice is a furry that plays agario
-    191611344137617408, # dan's 'haha gay pussy party'
-    277919178340565002, # lold - lolbot testing server
-    248143597097058305, # cyn bae's private server we gotta get 69
-    291990349776420865, # em's meme heaven
+    273863625590964224,  # José's server
+    295341979800436736,  # Memework
+    319540379495956490,  # v2 testing serv
+    297710090687873024,  # Luma's testing server
+    319252487280525322,  # robert is gay
+    340609473439596546,  # slice is a furry that plays agario
+    191611344137617408,  # dan's 'haha gay pussy party'
+    277919178340565002,  # lold - lolbot testing server
+    248143597097058305,  # cyn bae's private server we gotta get 69
+    291990349776420865,  # em's meme heaven
+    366513799404060672,  # dan's another gay guild
 )
 
 log = logging.getLogger(__name__)
@@ -52,7 +53,9 @@ class BotCollection(Cog):
             return
 
         if await self.bot.is_blocked_guild(guild.id):
-            await owner.send('Sorry. The guild you added José on is blocked. Appeal to the block at the support server(Use the invite provided in `j!invite`).')
+            await owner.send('Sorry. The guild you added José on is blocked. '
+                             'Appeal to the block at the support server'
+                             '(Use the invite provided in `j!invite`).')
             await guild.leave()
             return
 
