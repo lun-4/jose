@@ -49,7 +49,7 @@ class Gambling(Cog):
         challenger = ctx.author.id
         challenged = challenged_user.id
 
-        if await self.bot.is_blocked(challenger):
+        if await self.bot.is_blocked(challenged):
             raise self.SayException('Challenged person is blocked from José'
                                     '(use `j!blockreason`)')
 
