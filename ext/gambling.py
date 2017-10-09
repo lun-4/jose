@@ -113,7 +113,7 @@ class Gambling(Cog):
             await asyncio.sleep(1)
 
         await asyncio.sleep(random.randint(2, 7))
-        await ctx.send('**GO!**')
+        await countdown_msg.edit(content='**GO!**')
 
         duelists = [challenged, challenger]
 
