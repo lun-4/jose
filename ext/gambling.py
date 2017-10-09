@@ -1,6 +1,7 @@
 import asyncio
 import decimal
 import random
+import collections
 
 import discord
 
@@ -19,6 +20,7 @@ class Gambling(Cog):
     def __init__(self, bot):
         super().__init__(bot)
         self.duels = {}
+        self.free = collections.defaultdict(bool)
 
     @commands.command()
     async def duel(self, ctx, challenged_user: discord.User,
@@ -47,6 +49,13 @@ class Gambling(Cog):
         challenger = ctx.author.id
         challenged = challenged_user.id
 
+        if await self.bot.is_blocked(challenger):
+            raise self.SayException('Challenged person is blocked from José'
+                                    '(use `j!blockreason`)')
+
+        if self.locked[challenged]:
+            raise self.SayException('Challenged person is locked to new duels')
+
         if challenger in self.duels:
             raise self.SayException('You are already in a duel')
 
@@ -65,28 +74,38 @@ class Gambling(Cog):
             raise self.SayException("One of you don't have enough"
                                     " funds to make the duel.")
 
-        await ctx.send(f'{challenged_user}, you got challenged for a duel :gun: by {challenger_user} with a total of {amount}JC, accept it? (y/n)')
+        self.locked[challenged] = True
+        try:
+            await ctx.send(f'{challenged_user}, you got challenged for a duel'
+                           f' :gun: by {challenger_user} with a total of'
+                           f' {amount}JC, accept it? (y/n)')
+        except:
+            pass
 
         def yn_check(msg):
             return msg.author.id == challenged and msg.channel == ctx.channel
 
         try:
-            msg = await self.bot.wait_for('message', timeout=10, check=yn_check)
+            msg = await self.bot.wait_for('message',
+                                          timeout=10, check=yn_check)
         except asyncio.TimeoutError:
-            await ctx.send('timeout reached')
-            return
+            self.locked[challenged] = False
+            raise self.SayException('timeout reached')
 
         if msg.content != 'y':
-            raise self.SayException("Challenged person didn't say a lowercase `y`.")
+            self.locked[challenged] = False
+            raise self.SayException("Challenged person didn't"
+                                    " say a lowercase `y`.")
 
+        self.locked[challenged] = False
         self.duels[challenger] = {
             'challenged': challenged,
             'amount': amount,
         }
 
         countdown = 3
-
-        countdown_msg = await ctx.send(f'First to send a message wins! {countdown}')
+        countdown_msg = await ctx.send('First to send a '
+                                       f'message wins! {countdown}')
         await asyncio.sleep(1)
 
         for i in reversed(range(1, 4)):
@@ -102,7 +121,8 @@ class Gambling(Cog):
             return msg.channel == ctx.channel and msg.author.id in duelists
 
         try:
-            msg = await self.bot.wait_for('message', timeout=5, check=duel_check)
+            msg = await self.bot.wait_for('message',
+                                          timeout=5, check=duel_check)
         except asyncio.TimeoutError:
             del self.duels[challenger]
             raise self.SayException('u guys suck')
