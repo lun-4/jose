@@ -20,7 +20,7 @@ class Gambling(Cog):
     def __init__(self, bot):
         super().__init__(bot)
         self.duels = {}
-        self.free = collections.defaultdict(bool)
+        self.locked = collections.defaultdict(bool)
 
     @commands.command()
     async def duel(self, ctx, challenged_user: discord.User,
