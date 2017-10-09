@@ -21,15 +21,20 @@ class Gambling(Cog):
         self.duels = {}
 
     @commands.command()
-    async def duel(self, ctx, challenged_user: discord.User, amount: decimal.Decimal):
+    async def duel(self, ctx, challenged_user: discord.User,
+                   amount: decimal.Decimal):
         """Duel a user for coins.
-        
+
         The winner of the duel is the person that sends a message first as soon
         as josé says "GO".
         """
-    
+
         if challenged_user == ctx.author:
-            raise self.SayException('frigger go get some friends you cant do this alone :ccccccccc')
+            raise self.SayException('frigger go get some friends '
+                                    'you cant do this alone :ccccccccc')
+
+        if challenged_user.bot:
+            raise self.SayException('You cannot duel bots.')
 
         amount = round(amount, 2)
         if amount > 5:
@@ -55,8 +60,10 @@ class Gambling(Cog):
         if challenged_acc is None:
             raise self.SayException("Challenged person doesn't have a wallet.")
 
-        if amount > challenger_acc['amount'] or amount > challenged_acc['amount']:
-            raise self.SayException("One of you don't have enough funds to make the duel.")
+        if amount > challenger_acc['amount'] or \
+           amount > challenged_acc['amount']:
+            raise self.SayException("One of you don't have enough"
+                                    " funds to make the duel.")
 
         await ctx.send(f'{challenged_user}, you got challenged for a duel :gun: by {challenger_user} with a total of {amount}JC, accept it? (y/n)')
 
