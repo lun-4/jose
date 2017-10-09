@@ -98,10 +98,6 @@ class Gambling(Cog):
                                     " say a lowercase `y`.")
 
         self.locked[challenged] = False
-        self.duels[challenger] = {
-            'challenged': challenged,
-            'amount': amount,
-        }
 
         countdown = 3
         countdown_msg = await ctx.send('First to send a '
@@ -114,6 +110,11 @@ class Gambling(Cog):
 
         await asyncio.sleep(random.randint(2, 7))
         await countdown_msg.edit(content='**GO!**')
+
+        self.duels[challenger] = {
+            'challenged': challenged,
+            'amount': amount,
+        }
 
         duelists = [challenged, challenger]
 
