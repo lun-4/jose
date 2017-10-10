@@ -126,13 +126,36 @@ class MIDI(Cog):
         log.info('successfully created MIDI')
         return midi_file
 
-    @commands.command()
-    async def midi(self, ctx: commands.Context, tempo: int=120, *, data: str):
-        """
-        Convert text to MIDI.
+    async def download_data(self, message: discord.Message) -> str:
+        """Checks if an attachment is viable to be used as MIDI input and downloads it."""
+        if not message.attachments:
+            raise self.SayException('You did not attach a file to use as MIDI input!')
 
-        The actual letter-to-note map? idk :shrug:
+        attachment = message.attachments[0]
+
+        if not attachment.filename.endswith('.txt'):
+            raise self.SayException('File must be a .txt!')
+
+        # see if the file is bigger than 20 KiB as we don't want to download huge files
+        if attachment.size >= 20 * 1024:
+            raise self.SayException(f'File is too large. Your file may only be 20KiB big.')
+
+        log.info(f'downloading file to use as MIDI input. {attachment.size}bytes large.')
+        buffer = io.BytesIO()
+        await attachment.save(buffer)
+
+        return buffer.getvalue().decode('utf-8')
+
+    @commands.command()
+    async def midi(self, ctx: commands.Context, tempo: int=120, *, data: str=None):
         """
+        Convert text to MIDI. Multiple channels can be used by splitting text with |.
+
+        To give longer input than a discord message allows you may upload a .txt file of up to 20 KiB.
+        """
+        if data is None:
+            data = await self.download_data(ctx.message)
+
         before = time.monotonic()
         midi_file = await self.make_midi(tempo, data)
         duration = (time.monotonic() - before) * 1000
