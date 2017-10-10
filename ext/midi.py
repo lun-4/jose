@@ -10,7 +10,10 @@ from midiutil import MIDIFile
 from .common import Cog
 
 
-LETTER_PITCH_MAP = {
+LETTER_PITCH_MAP = {    
+    " ": 0,
+    "-": 0,
+
     "a": 34,
     "A": 35,
     "b": 36,
