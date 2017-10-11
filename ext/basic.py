@@ -132,6 +132,21 @@ class Basic(Cog):
         await ctx.send(embed=em)
 
     @commands.command()
+    async def about(self, ctx):
+        """Show stuff."""
+
+        em = discord.Embed(title='José')
+        em.add_field(name='About', value='José is a generic-purpose bot (with some complicated features)')
+
+        appinfo = await self.bot.application_info()
+        owner = appinfo.owner
+        em.add_field(name='Owner', value=f'{owner.mention}, {owner}, (`{owner.id}`)')
+
+        em.add_field(name='Guilds', value=f'{len(self.bot.guilds)}')
+
+        await ctx.send(embed=em)
+
+    @commands.command()
     async def feedback(self, ctx, *, feedback: str):
         """Sends feedback to a special channel.
 
@@ -171,9 +186,7 @@ class Basic(Cog):
         if channel is None:
             return await ctx.send("Can't find specified "
                                   "channel! Please try again.")
-
-        embed = discord.Embed(colour=discord.Color.magenta(),
-                              description=message)
+        embed = discord.Embed(colour=discord.Color.magenta(), description=message)
         embed.set_author(name=str(ctx.author), icon_url=ctx.author.avatar_url)
 
         embed.timestamp = datetime.datetime.utcnow()
