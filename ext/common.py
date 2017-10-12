@@ -45,6 +45,10 @@ class Cog:
     def jcoin(self):
         return self.bot.cogs.get('Coins')
 
+    @property
+    def coins(self):
+        return self.bot.cogs.get('Coins')
+
 
 async def shell(command: str):
     process = await asyncio.create_subprocess_shell(
