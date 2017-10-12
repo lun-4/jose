@@ -73,7 +73,7 @@ class Coins(Cog):
         self.transfer_lock = asyncio.Lock()
 
         #: I hate locks even more
-        self.locked_accounts = {}
+        self.locked_accounts = []
 
     def get_name(self, user_id, account=None):
         """Get a string representation of a user or guild."""
@@ -143,9 +143,10 @@ class Coins(Cog):
                 'loans': {},
             }
 
-    async def new_account(self, account_id: int, account_type: str='user', init_amount: int=0):
+    async def new_account(self, account_id: int, account_type: str='user',
+                          init_amount: int=0):
         """Create a new account.
-        
+
         Updates the guild to user id list cache.
         """
         if (await self.get_account(account_id, True)) is not None:
@@ -258,6 +259,20 @@ class Coins(Cog):
             accounts.append(self.convert_account(account))
 
         return accounts
+
+    def lock_account(self, account_id: int):
+        """Lock an account from transferring."""
+        try:
+            self.locked_accounts.index(account_id)
+        except ValueError:
+            self.locked_accounts.append(account_id)
+
+    def unlock_account(self, account_id: int):
+        """Unlock an account."""
+        try:
+            self.locked_accounts.remove(account_id)
+        except ValueError:
+            pass
 
     async def update_accounts(self, accounts: list):
         """Update accounts to the jcoin collection.
