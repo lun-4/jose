@@ -86,8 +86,10 @@ class Gambling(Cog):
                 pass
 
             def yn_check(msg):
+                cnt = msg.content
                 return msg.author.id == challenged and \
-                    msg.channel == ctx.channel
+                    msg.channel == ctx.channel and \
+                    any(x in cnt for x in ['y', 'n', 'Y', 'N'])
 
             try:
                 msg = await self.bot.wait_for('message',
