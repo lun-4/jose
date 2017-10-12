@@ -133,6 +133,8 @@ class Gambling(Cog):
             duelists.remove(winner)
             loser = duelists[0]
 
+            self.coins.unlock_account(challenger)
+            self.coins.unlock_account(challenged)
             try:
                 await self.jcoin.transfer(loser, winner, amount)
             except self.jcoin.TransferError as err:
