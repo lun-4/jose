@@ -15,6 +15,7 @@ BET_MULTIPLIER_EMOJI = ':thinking:'
 X4_EMOJI = [':snail:', ':ok_hand', ':chestnut:']
 X6_EMOJI = [':eggplant:']
 
+
 class Gambling(Cog):
     """Gambling commands."""
     def __init__(self, bot):
@@ -51,7 +52,7 @@ class Gambling(Cog):
 
         if await self.bot.is_blocked(challenged):
             raise self.SayException('Challenged person is blocked from José'
-                                    '(use `j!blockreason`)')
+                                    '(use `j!blockreason <their user id>`)')
 
         if self.locked[challenged]:
             raise self.SayException('Challenged person is locked to new duels')
@@ -60,13 +61,11 @@ class Gambling(Cog):
             raise self.SayException('You are already in a duel')
 
         challenger_acc = await self.jcoin.get_account(challenger)
-
-        if challenger_acc is None:
+        if not challenger_acc:
             raise self.SayException("You don't have a wallet.")
 
         challenged_acc = await self.jcoin.get_account(challenged)
-
-        if challenged_acc is None:
+        if not challenged_acc:
             raise self.SayException("Challenged person doesn't have a wallet.")
 
         if amount > challenger_acc['amount'] or \
@@ -74,73 +73,79 @@ class Gambling(Cog):
             raise self.SayException("One of you don't have enough"
                                     " funds to make the duel.")
 
-        self.locked[challenged] = True
         try:
-            await ctx.send(f'{challenged_user}, you got challenged for a duel'
-                           f' :gun: by {challenger_user} with a total of'
-                           f' {amount}JC, accept it? (y/n)')
-        except:
-            pass
+            self.coins.lock_account(challenger)
+            self.coins.lock_account(challenged)
 
-        def yn_check(msg):
-            return msg.author.id == challenged and msg.channel == ctx.channel
+            self.locked[challenged] = True
+            try:
+                await ctx.send(f'{challenged_user}, you got challenged '
+                               f'for a duel :gun: by {challenger_user} '
+                               f'with a total of {amount}JC, accept it? (y/n)')
+            except:
+                pass
 
-        try:
-            msg = await self.bot.wait_for('message',
-                                          timeout=10, check=yn_check)
-        except asyncio.TimeoutError:
+            def yn_check(msg):
+                return msg.author.id == challenged and \
+                    msg.channel == ctx.channel
+
+            try:
+                msg = await self.bot.wait_for('message',
+                                              timeout=10, check=yn_check)
+            except asyncio.TimeoutError:
+                raise self.SayException('timeout reached')
+
+            if msg.content != 'y':
+                raise self.SayException("Challenged person didn't"
+                                        " say a lowercase `y`.")
+
             self.locked[challenged] = False
-            raise self.SayException('timeout reached')
 
-        if msg.content != 'y':
-            self.locked[challenged] = False
-            raise self.SayException("Challenged person didn't"
-                                    " say a lowercase `y`.")
-
-        self.locked[challenged] = False
-
-        countdown = 3
-        countdown_msg = await ctx.send('First to send a '
-                                       f'message wins! {countdown}')
-        await asyncio.sleep(1)
-
-        for i in reversed(range(1, 4)):
-            await countdown_msg.edit(content=f'{i}...')
+            countdown = 3
+            countdown_msg = await ctx.send('First to send a '
+                                           f'message wins! {countdown}')
             await asyncio.sleep(1)
 
-        await asyncio.sleep(random.randint(2, 7))
-        await countdown_msg.edit(content='**GO!**')
+            for i in reversed(range(1, 4)):
+                await countdown_msg.edit(content=f'{i}...')
+                await asyncio.sleep(1)
 
-        self.duels[challenger] = {
-            'challenged': challenged,
-            'amount': amount,
-        }
+            await asyncio.sleep(random.randint(2, 7))
+            await countdown_msg.edit(content='**GO!**')
 
-        duelists = [challenged, challenger]
+            self.duels[challenger] = {
+                'challenged': challenged,
+                'amount': amount,
+            }
 
-        def duel_check(msg):
-            return msg.channel == ctx.channel and msg.author.id in duelists
+            duelists = [challenged, challenger]
 
-        try:
-            msg = await self.bot.wait_for('message',
-                                          timeout=5, check=duel_check)
-        except asyncio.TimeoutError:
-            del self.duels[challenger]
-            raise self.SayException('u guys suck')
+            def duel_check(msg):
+                return msg.channel == ctx.channel and msg.author.id in duelists
 
-        winner = msg.author.id
-        duelists.remove(winner)
-        loser = duelists[0]
+            try:
+                msg = await self.bot.wait_for('message',
+                                              timeout=5, check=duel_check)
+            except asyncio.TimeoutError:
+                raise self.SayException('u guys suck')
 
-        try:
-            await self.jcoin.transfer(loser, winner, amount)
-        except self.jcoin.TransferError as err:
-            del self.duels[challenger]
-            raise self.SayException(f'Failed to transfer: {err!r}')
+            winner = msg.author.id
+            duelists.remove(winner)
+            loser = duelists[0]
 
-        await ctx.send(f'<@{winner}> won {amount}JC.')
-        del self.duels[challenger]
-    
+            try:
+                await self.jcoin.transfer(loser, winner, amount)
+            except self.jcoin.TransferError as err:
+                raise self.SayException(f'Failed to transfer: {err!r}')
+
+            await ctx.send(f'<@{winner}> won {amount}JC.')
+        finally:
+            self.locked[challenged] = False
+            if challenger in self.duels:
+                del self.duels[challenger]
+            self.coins.unlock_account(challenger)
+            self.coins.unlock_account(challenged)
+
     @commands.command()
     async def slots(self, ctx, amount: decimal.Decimal):
         """little slot machine"""
