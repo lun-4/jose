@@ -274,6 +274,13 @@ class Coins(Cog):
         except ValueError:
             pass
 
+    def is_locked(self, account_id: int) -> bool:
+        try:
+            self.locked_accounts.index(account_id)
+            return True
+        except ValueError:
+            return False
+
     async def update_accounts(self, accounts: list):
         """Update accounts to the jcoin collection.
 
@@ -352,6 +359,12 @@ class Coins(Cog):
 
             if amount <= 0:
                 raise TransferError('lul not zero')
+
+            if self.is_locked(id_from):
+                raise TransferError('Account to transfer from is locked')
+
+            if self.is_locked(id_to):
+                raise TransferError('Account to transfer to is locked')
 
             account_from = await self.get_account(id_from)
             if account_from is None:
