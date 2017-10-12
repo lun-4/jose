@@ -23,7 +23,7 @@ class Gambling(Cog):
         self.duels = {}
         self.locked = collections.defaultdict(bool)
 
-    #@commands.command()
+    @commands.command()
     async def duel(self, ctx, challenged_user: discord.User,
                    amount: decimal.Decimal):
         """Duel a user for coins.
