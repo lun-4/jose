@@ -452,9 +452,9 @@ class CoinsExt(Cog):
         """Show global JoséCoin statistics."""
         em = discord.Embed()
 
-        total_accs = await self.jcoin_coll.count()
-        total_users = await self.jcoin_coll.count({'type': 'user'})
-        total_txb = await self.jcoin_coll.count({'type': 'taxbank'})
+        total_accs = await self.coins.jcoin_coll.count()
+        total_users = await self.coins.jcoin_coll.count({'type': 'user'})
+        total_txb = await self.coins.jcoin_coll.count({'type': 'taxbank'})
 
         em.add_field(name='Total accounts', value=total_accs)
         em.add_field(name='Total user accounts', value=total_users)
