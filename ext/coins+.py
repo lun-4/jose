@@ -447,6 +447,20 @@ class CoinsExt(Cog):
 
         await ctx.send(f'There are {deadtxb_count} dead taxbanks.')
 
+    @commands.command()
+    async def jcstats(self, ctx):
+        """Show global JoséCoin statistics."""
+        em = discord.Embed()
+
+        total_accs = await self.jcoin_coll.count()
+        total_users = await self.jcoin_coll.count({'type': 'user'})
+        total_txb = await self.jcoin_coll.count({'type': 'taxbank'})
+
+        em.add_field(name='Total accounts', value=total_accs)
+        em.add_field(name='Total user accounts', value=total_users)
+        em.add_field(name='Total taxbanks', value=total_txb)
+
+        await ctx.send(embed=em)
 
 def setup(bot):
     bot.add_cog(CoinsExt(bot))
