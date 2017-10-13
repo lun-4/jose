@@ -187,7 +187,7 @@ class Exec(Cog):
         stream = stdout.getvalue()
 
         try:
-            await ctx.message.add_reaction(ctx.tick('green', raw=True))
+            await ctx.ok()
         except (discord.HTTPException, discord.Forbidden):
             # couldn't add the reaction, ignore
             pass
