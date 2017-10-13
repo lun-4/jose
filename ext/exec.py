@@ -17,13 +17,30 @@ from typing import List
 import aiohttp
 import discord
 from discord.ext import commands
-from discord.ext.commands import command, Converter
+from discord.ext.commands import command, \
+    is_owner, Converter
 
-from dog import Cog
-from dog.core.checks import is_bot_admin
-from dog.core.context import DogbotContext
-from dog.core.utils import codeblock
-from dog.haste import haste
+from .common import Cog
+
+is_bot_admin = is_owner
+
+
+def codeblock(text: str, *, lang: str = '') -> str:
+    """
+    Formats a codeblock.
+    Parameters
+    ----------
+    text
+        The text to be inside of the codeblock.
+    lang
+        The language to use.
+    Returns
+    -------
+    str
+        The formatted message.
+    """
+    return f'```{lang}\n{text}\n```'
+
 
 log = logging.getLogger(__name__)
 
@@ -54,7 +71,7 @@ class Code(Converter):
         self.indent_width = indent_width
         self.implicit_return = implicit_return
 
-    async def convert(self, ctx: DogbotContext, arg: str) -> str:
+    async def convert(self, ctx, arg: str) -> str:
         result = arg
 
         if self.strip_ticks:
