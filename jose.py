@@ -9,18 +9,18 @@ import discord
 import aiohttp
 
 import uvloop
-asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 from discord.ext import commands
 
 import joseconfig as config
 from ext.common import SayException
 
-logging.basicConfig(level=logging.INFO, \
-    format='[%(levelname)7s] [%(name)s] %(message)s')
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+
+logging.basicConfig(level=logging.INFO,
+                    format='[%(levelname)7s] [%(name)s] %(message)s')
 
 log = logging.getLogger(__name__)
-
 
 extensions = [
     'config', 'admin', 'exec', 'pipupdates',
@@ -38,8 +38,8 @@ extensions = [
     'channel_logging',
     'playing', 'sub',
     'nsfw', 'heist', 'midi',
+    'lottery',
 ]
-
 
 CHECK_FAILURE_PHRASES = [
     'br?',
@@ -48,7 +48,6 @@ CHECK_FAILURE_PHRASES = [
     'not enough permissions lul',
     'you sure you can run this?',
 ]
-
 
 BAD_ARG_MESSAGES = [
     'dude give me the right thing',
@@ -145,9 +144,11 @@ class JoseBot(commands.Bot):
         author = ctx.message.author
         guild = ctx.guild
         checks = [c.__qualname__.split('.')[0] for c in ctx.command.checks]
-        location = '[DM]' if isinstance(ctx.channel, discord.DMChannel) else f'[Guild {guild.name} {guild.id}]'
-        log.info('%s [cmd] %s(%d) "%s" checks=%s', location, author, author.id, content,
-                 ','.join(checks) or '(none)')
+        location = '[DM]' if isinstance(ctx.channel, discord.DMChannel) else \
+                   f'[Guild {guild.name} {guild.id}]'
+
+        log.info('%s [cmd] %s(%d) "%s" checks=%s', location, author,
+                 author.id, content, ','.join(checks) or '(none)')
 
     async def on_command_error(self, ctx, error):
         message = ctx.message
@@ -157,9 +158,8 @@ class JoseBot(commands.Bot):
             orig = error.original
             if isinstance(orig, SayException):
                 arg0 = orig.args[0]
-
-                log.warning('SayException: %s[%d] %s %r => %r', ctx.guild, \
-                    ctx.guild.id, ctx.author, content, arg0)
+                log.warning('SayException: %s[%d] %s %r => %r', ctx.guild,
+                            ctx.guild.id, ctx.author, content, arg0)
 
                 await ctx.send(arg0)
                 return
@@ -170,7 +170,8 @@ class JoseBot(commands.Bot):
             ))
 
             if isinstance(orig, tuple(self.simple_exc)):
-                log.error(f'Errored at {content!r} from {ctx.author!s}\n{orig!r}')
+                log.error(f'Errored at {content!r}'
+                          f' from {ctx.author!s}\n{orig!r}')
             else:
                 log.error(f'Errored at {content!r} from {ctx.author!s}\n{tb}')
 
@@ -179,14 +180,17 @@ class JoseBot(commands.Bot):
                 return
 
             b = '\N{NEGATIVE SQUARED LATIN CAPITAL LETTER B}'
-            await ctx.send(f'{b}ot machine {b}roke\n ```py\n{error.original!r}\n```')
+            await ctx.send(f'{b}ot machine {b}roke\n '
+                           f'```py\n{error.original!r}\n```')
         elif isinstance(error, commands.errors.BadArgument):
-            await ctx.send(f'bad argument — {random.choice(BAD_ARG_MESSAGES)} - {error!s}')
+            await ctx.send('bad argument — '
+                           f'{random.choice(BAD_ARG_MESSAGES)} - {error!s}')
         elif isinstance(error, commands.errors.CheckFailure):
-            await ctx.send(f'check failed — {random.choice(CHECK_FAILURE_PHRASES)}')
+            await ctx.send('check failed — '
+                           f'{random.choice(CHECK_FAILURE_PHRASES)}')
         elif isinstance(error, commands.errors.CommandOnCooldown):
-            #retry = round(error.retry_after, 2)
-            #await ctx.send(f'Command on cooldown, wait `{retry}` seconds')
+            # retry = round(error.retry_after, 2)
+            # await ctx.send(f'Command on cooldown, wait `{retry}` seconds')
             pass
 
     async def on_message(self, message):
