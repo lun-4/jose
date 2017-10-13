@@ -175,7 +175,7 @@ class Exec(Cog):
         except Exception:
             # something went wrong :(
             try:
-                await ctx.message.add_reaction(ctx.tick('red', raw=True))
+                await ctx.not_ok()
             except (discord.HTTPException, discord.Forbidden):
                 # failed to add failure tick, hmm.
                 pass
@@ -204,14 +204,13 @@ class Exec(Cog):
             # too long
             try:
                 # send meat to hastebin
-                url = await haste(ctx.bot.session, meat)
-                await ctx.send(await ctx._('cmd.eval.long', url))
+                await ctx.send('fuck ass')
             except KeyError:
                 # failed to upload, probably too big.
-                await ctx.send(await ctx._('cmd.eval.huge'))
+                await ctx.send('2big')
             except aiohttp.ClientError:
                 # pastebin is probably down.
-                await ctx.send(await ctx._('cmd.eval.pastebin_down'))
+                await ctx.send('haste is dead')
         else:
             # message was under 2k chars, just send!
             await ctx.send(message)
