@@ -10,6 +10,7 @@ from .common import Cog
 
 log = logging.getLogger(__name__)
 
+
 def empty_stats(c_name):
     return {
         'name': c_name,
