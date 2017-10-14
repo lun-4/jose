@@ -63,6 +63,7 @@ class Lottery(Cog):
         # Pay 20jc to jose
         # put user in ticket collection
         # send message to #lottery-log
+        pass
 
 
 def setup(bot):
