@@ -18,7 +18,7 @@ TICKET_PRICE = 15
 class Lottery(Cog):
     """Weekly lottery.
 
-    The lottery works with you buying a 20JC lottery ticket.
+    The lottery works with you buying a 15JC lottery ticket.
     Every Saturday, a winner is chosen from the people
     who bought a ticket.
 
