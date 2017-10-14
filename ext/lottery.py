@@ -11,7 +11,7 @@ from .common import Cog
 random = SystemRandom()
 log = logging.getLogger(__name__)
 
-PERCENTAGE_PER_TAXBANK = decimal.Decimal(0.22 / 100)
+PERCENTAGE_PER_TAXBANK = decimal.Decimal(0.26 / 100)
 TICKET_PRICE = 15
 
 
