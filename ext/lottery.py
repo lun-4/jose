@@ -88,6 +88,9 @@ class Lottery(Cog):
             amount = PERCENTAGE_PER_TAXBANK * \
                      decimal.Decimal(account['amount'])
 
+            if amount < 0.1:
+                continue
+
             try:
                 await self.jcoin.transfer(account['id'], winner_id, amount)
                 total += amount
