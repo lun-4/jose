@@ -2,6 +2,8 @@ import logging
 
 # discord stuff
 token = 'token goes here'
+
+# default prefix for josé
 prefix = 'j!'
 
 # api stuff
@@ -27,3 +29,7 @@ LEVELS = {
     logging.WARNING: 361685197852508173,
     logging.ERROR: 361685197852508173
 }
+
+# lottery configuration
+JOSE_GUILD = 273863625590964224
+LOTTERY_LOG = 368509920632373258

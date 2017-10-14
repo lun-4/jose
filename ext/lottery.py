@@ -61,10 +61,32 @@ class Lottery(Cog):
         You will pay 20JC for a ticket.
         """
         # Check if the user is in jose guild
+        joseguild = self.bot.get_guild(self.bot.config.JOSE_GUILD)
+        if not joseguild:
+            raise self.SayException('`config error`: José guild not found.')
+
+        lottery_log = self.bot.get_channel(self.bot.config.LOTTERY_LOG)
+        if not lottery_log:
+            raise self.SayException('`config error`: log channel not found.')
+
+        if ctx.author not in joseguild.members:
+            raise self.SayException("You are not in José's server."
+                                    'For means of transparency, it is'
+                                    'recommended to join it, use '
+                                    f'`{ctx.prefix}invite`')
+
+        ticket = await self.ticket_coll.find_one({'user_id':
+                                                  ctx.author.id})
+        if ticket:
+            raise self.SayException('You already bought a ticket.')
+
         # Pay 20jc to jose
-        # put user in ticket collection
-        # send message to #lottery-log
-        pass
+        await self.coins.transfer(ctx.author.id,
+                                  self.bot.user.id, TICKET_PRICE)
+
+        await self.ticket_coll.insert_one({'user_id': ctx.author.id})
+        await lottery_log.send('In lottery: `{ctx.author!s}, {ctx.author.id}`')
+        await ctx.ok()
 
 
 def setup(bot):
