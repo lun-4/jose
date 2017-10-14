@@ -11,7 +11,7 @@ from .common import Cog
 random = SystemRandom()
 log = logging.getLogger(__name__)
 
-PERCENTAGE_PER_TAXBANK = decimal.Decimal(0.26 / 100)
+PERCENTAGE_PER_TAXBANK = decimal.Decimal(0.275 / 100)
 TICKET_PRICE = 15
 
 
@@ -19,10 +19,10 @@ class Lottery(Cog):
     """Weekly lottery.
 
     The lottery works with you buying a 15JC lottery ticket.
-    Every Saturday, a winner is chosen from the people
+    From time to time(maximum a week) a winner is chosen from the people
     who bought a ticket.
 
-    The winner gets 0.2% of money from all taxbanks.
+    The winner gets 0.275% of money from all taxbanks.
     """
     def __init__(self, bot):
         super().__init__(bot)
@@ -39,7 +39,7 @@ class Lottery(Cog):
             amount += PERCENTAGE_PER_TAXBANK * \
                       decimal.Decimal(account['amount'])
 
-        await ctx.send('Next saturday you have a chance to win: '
+        await ctx.send('Calculation of the big money for lottery: '
                        f'`{amount:.2}JC`')
 
     @lottery.command()
