@@ -12,7 +12,7 @@ random = SystemRandom()
 log = logging.getLogger(__name__)
 
 PERCENTAGE_PER_TAXBANK = decimal.Decimal(0.22 / 100)
-TICKET_PRICE = 20
+TICKET_PRICE = 15
 
 
 class Lottery(Cog):
@@ -67,6 +67,10 @@ class Lottery(Cog):
         if not joseguild:
             raise self.SayException('`config error`: José guild not found.')
 
+        lottery_log = self.bot.get_channel(self.bot.config.LOTTERY_LOG)
+        if not lottery_log:
+            raise self.SayException('`config error`: log channel not found.')
+
         cur = self.ticket_coll.find()
 
         # !!! bad code !!!
@@ -79,6 +83,9 @@ class Lottery(Cog):
         if not any(m.id == ctx.author.id for m in joseguild.members):
             raise self.SayException(f'selected winner, <@{winner_id}> '
                                     'is not in jose guild. ignoring!')
+
+        u_winner = self.bot.get_user(winner_id)
+        await lottery_log.send(f'**Winner!** `{u_winner!s}, {u_winner.id}`')
 
         await ctx.send(f'Winner: <@{winner_id}>, transferring will take time')
 
@@ -99,7 +106,10 @@ class Lottery(Cog):
 
             await asyncio.sleep(0.2)
 
-        await ctx.send(f'Sent a total of `{total}` to the winner')
+        await ctx.send(f'Sent a total of `{total:.2}` to the winner')
+
+        r = await self.ticket_coll.delete_many({})
+        await ctx.send(f'Deleted {r.deleted_count} tickets')
 
     @lottery.command()
     async def enter(self, ctx):
