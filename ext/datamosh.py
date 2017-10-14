@@ -102,18 +102,20 @@ class Datamosh(Cog):
         try:
             img = Image.open(data)
         except Exception as err:
-            raise self.SayException(f'Error opening image with Pillow(`{err!r}`)')
+            raise self.SayException('Error opening image with'
+                                    f' Pillow(`{err!r}`)')
 
         if img.format in ['JPEG', 'JPEG 2000']:
             # read the image, copy into a buffer for manipulation
             width, height = img.size
 
             if width > 4096 or height > 2048:
-                await ctx.send("High resolution to work on(4096x2048 is the hard limit)")
+                await ctx.send("High resolution to work on"
+                               "(4096x2048 is the hard limit)")
                 return
 
-            future = self.bot.loop.run_in_executor(None, datamosh_jpg, \
-                source_image, iterations)
+            future = self.bot.loop.run_in_executor(None, datamosh_jpg,
+                                                   source_image, iterations)
 
             output_image = await future
 
@@ -129,6 +131,7 @@ class Datamosh(Cog):
             await ctx.send('no support for gif')
         else:
             await ctx.send(f'Unknown format: `{img.format}`')
+
 
 def setup(bot):
     bot.add_cog(Datamosh(bot))

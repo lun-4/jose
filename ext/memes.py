@@ -32,9 +32,8 @@ RI_TABLE = {
 
 # implement letters
 RI_STR = '🇦🇧🇨🇩🇪🇫🇬🇭🇮🇯🇰🇱🇲🇳🇴🇵🇶🇷🇸🇹🇺🇻🇼🇽🇾🇿'
-
-RI_TABLE.update({letter:RI_STR[string.ascii_lowercase.find(letter)] for \
-    letter in string.ascii_lowercase})
+RI_TABLE.update({letter: RI_STR[string.ascii_lowercase.find(letter)] for
+                 letter in string.ascii_lowercase})
 
 
 class Memes(Cog):
@@ -67,10 +66,12 @@ class Memes(Cog):
     async def update_meme(self, new_meme):
         """Update a new meme into the database."""
 
-        await self.memes_coll.update_one({'name': new_meme['name']}, {'$set': new_meme})
+        await self.memes_coll.update_one({'name': new_meme['name']},
+                                         {'$set': new_meme})
 
     async def search_memes(self, name):
-        """Get a list of memes that have names that are close to the name given."""
+        """Get a list of memes that have names that are close to
+        the name given."""
 
         cur = self.memes_coll.find({
             'name': {
@@ -99,7 +100,8 @@ class Memes(Cog):
             await ctx.send('meme already exists')
             return
 
-        await self.add_meme(name, value, ctx.author.id, 0, ctx.channel.is_nsfw())
+        await self.add_meme(name, value, ctx.author.id, 0,
+                            ctx.channel.is_nsfw())
         await ctx.ok()
 
     @meme.command(name='get')
@@ -140,7 +142,8 @@ class Memes(Cog):
             return
 
         owner = (await self.bot.application_info()).owner
-        authorized = (meme.get('author_id') == ctx.author.id) or (ctx.author == owner)
+        authorized = (meme.get('author_id') == ctx.author.id) or \
+                     (ctx.author == owner)
         if not authorized:
             await ctx.send('Unauthorized')
             return
@@ -164,7 +167,8 @@ class Memes(Cog):
             return
 
         await self.delete_meme(meme['name'])
-        await self.add_meme(new_name, meme['value'], meme.get('author_id'), meme['uses'], meme['nsfw'])
+        await self.add_meme(new_name, meme['value'], meme.get('author_id'),
+                            meme['uses'], meme['nsfw'])
         await ctx.send(f'Renamed {meme["name"]!r} to {new_name!r}')
 
     @meme.command()
@@ -177,7 +181,8 @@ class Memes(Cog):
             await ctx.send('Meme not found')
             return
 
-        await ctx.send(f'`{name}` was made by {self.get_name(meme.get("author_id"))}')
+        await ctx.send(f'`{name}` was made by '
+                       f'{self.get_name(meme.get("author_id"))}')
 
     @meme.command()
     async def count(self, ctx):
@@ -309,7 +314,8 @@ class Memes(Cog):
         if term in self.urban_cache:
             definition = self.urban_cache[term][0]
             example = self.urban_cache[term][1]
-            return await ctx.send(f'```\n{term!r}:\n{definition}\n{example}```')
+            return await ctx.send(f'```\n{term!r}:\n'
+                                  f'{definition}\n{example}```')
 
         await self.jcoin.pricing(ctx, self.prices['API'])
 
@@ -326,7 +332,6 @@ class Memes(Cog):
             example = c_list[0]['example']
 
         self.urban_cache[term] = [definition, example]
-        
         await ctx.send(f'```\n{term!r}:\n{definition}\n{example}```')
 
     @commands.command(hidden=True)
@@ -358,7 +363,6 @@ class Memes(Cog):
 
         await ctx.send(embed=embed)
 
-        
 
 def setup(bot):
     bot.add_cog(Memes(bot))

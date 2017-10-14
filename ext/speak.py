@@ -104,6 +104,7 @@ class Texter:
     def clear(self):
         del self.model, self.refcount, self.chain_length, self.loop
 
+
 class Speak(Cog):
     def __init__(self, bot):
         super().__init__(bot)
@@ -381,8 +382,12 @@ class Speak(Cog):
                 return await self.new_texter(guild)
             except TexterFail:
                 await ctx.send(f'Failed for `{guild!s}[{guild.id}]`')
+                return None
+
+        txs = []
         for guild in self.bot.guilds:
-            await create_tx(guild)
+            txs.append(await create_tx(guild))
+
         t2 = time.monotonic()
 
         delta = round((t2 - t1), 2)
@@ -416,7 +421,7 @@ class Speak(Cog):
         em.description = ''
         for guild_id, tx in self.text_generators.items():
             guild = self.bot.get_guild(guild_id)
-            em.description += f'**{guild!s}**, gid={guild_id} - refcount={tx.refcount}, words={tx.wordcount} lines={tx.linecount}`\n'
+            em.description += f'**{guild!s}**, gid={guild_id} - refcount={tx.refcount}, words={tx.wordcount} lines={tx.linecount}` \n'
 
         await ctx.send(embed=em)
 
@@ -434,6 +439,7 @@ class Speak(Cog):
                  f'Words: {tx.wordcount}\n',
                  f'Lines: {tx.linecount}\n')
         await ctx.send(''.join(lines))
+
 
 def setup(bot):
     bot.add_cog(Speak(bot))

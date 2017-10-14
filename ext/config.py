@@ -12,6 +12,7 @@ from .common import Cog
 
 log = logging.getLogger(__name__)
 
+
 def _is_moderator(ctx):
     if ctx.guild is None:
         return False
@@ -20,8 +21,10 @@ def _is_moderator(ctx):
     perms = ctx.channel.permissions_for(member)
     return (ctx.author.id == ctx.bot.owner_id) or perms.manage_guild
 
-def is_moderator():    
+
+def is_moderator():
     return commands.check(_is_moderator)
+
 
 class Config(Cog):
     def __init__(self, bot):
@@ -38,7 +41,7 @@ class Config(Cog):
 
         # querying the db every time is not worth it
         self.config_cache = collections.defaultdict(dict)
-        
+
         # used to check if cache has all defined objects in it
         self.default_keys = None
 
@@ -56,7 +59,7 @@ class Config(Cog):
     async def block_one(self, user_id, k='user_id', reason=None):
         if await self.block_coll.find_one({k: user_id}) is not None:
             return False
-        
+
         try:
             await self.block_coll.insert_one({k: user_id, 'reason': reason})
             self.bot.block_cache[user_id] = True
@@ -72,7 +75,7 @@ class Config(Cog):
     async def ensure_cfg(self, guild, query=False):
         """Get a configuration object for a guild.
         If `query` is `False`, it checks for a configuration object in cache
-        
+
         Parameters
         ----------
         guild: discord.Guild
@@ -85,7 +88,8 @@ class Config(Cog):
         if not query and self.default_keys is not None:
             # check if the cached object satisfies all configuration keys
             satisfies = all([field in cached for field in self.default_keys])
-            if satisfies: return cached
+            if satisfies:
+                return cached
 
         cfg = await self.config_coll.find_one({'guild_id': guild.id})
         if cfg is None:
@@ -104,20 +108,18 @@ class Config(Cog):
         cfg = await self.ensure_cfg(guild)
         value = cfg.get(key)
 
-        #log.info('[cfg:get] %s[gid=%d] k=%r -> v=%r', \
+        # log.info('[cfg:get] %s[gid=%d] k=%r -> v=%r', \
         #    guild, guild.id, key, value)
 
         return value
 
     async def cfg_set(self, guild, key, value):
-        cfg = await self.ensure_cfg(guild)
+        await self.ensure_cfg(guild)
+        res = await self.config_coll.update_one({'guild_id': guild.id},
+                                                {'$set': {key: value}})
 
-        res = await self.config_coll.update_one({'guild_id': guild.id}, {'$set': {
-            key: value
-        }})
-
-        log.info('[cfg:set] %s[gid=%d] k=%r <- v=%r', \
-            guild, guild.id, key, value)
+        log.info('[cfg:set] %s[gid=%d] k=%r <- v=%r',
+                 guild, guild.id, key, value)
 
         self.config_cache[guild.id][key] = value
 
@@ -144,7 +146,8 @@ class Config(Cog):
     @commands.guild_only()
     @is_moderator()
     async def speakchannel(self, ctx, channel: discord.TextChannel=None):
-        """Set the channel José will gather messages to feed to his markov generator."""
+        """Set the channel José will gather messages to feed
+        to his markov generator."""
         channel = channel or ctx.channel
         success = await self.cfg_set(ctx.guild, 'speak_channel', channel.id)
         await ctx.success(success)
@@ -194,7 +197,7 @@ class Config(Cog):
     async def unblock(self, ctx, user: discord.User, *, reason: str=''):
         """Unblock someone from using the bot, globally"""
         await ctx.success(await self.unblock_one(user.id, 'user_id', reason))
-    
+
     @commands.command()
     @commands.is_owner()
     async def blockguild(self, ctx, guild_id: int, *, reason: str=''):
@@ -212,36 +215,40 @@ class Config(Cog):
         """Get a reason for a block if it exists"""
         userblock = await self.block_coll.find_one({'user_id': anything_id})
         if userblock is not None:
-            return await ctx.send(f'User blocked, reason `{userblock.get("reason")}`')
-        
+            return await ctx.send('User blocked, reason '
+                                  f'`{userblock.get("reason")}`')
+
         guildblock = await self.block_coll.find_one({'guild_id': anything_id})
         if guildblock is not None:
-            return await ctx.send(f'Guild blocked, reason `{guildblock.get("reason")}`')
+            return await ctx.send(f'Guild blocked, reason '
+                                  f'`{guildblock.get("reason")}`')
 
         await ctx.send('Block not found')
 
     @commands.command()
     @commands.guild_only()
-    @is_moderator()
+    # @is_moderator()
     async def prefix(self, ctx, prefix: str=None):
         """Sets a guild prefix. Returns the prefix if no args are passed."""
         if not prefix:
-            return await ctx.send('The prefix for this guild is `{}`.'.format(await self.cfg_get(ctx.guild, 'prefix')))
-        
+            prefix = await self.cfg_get(ctx.guild, 'prefix')
+            return await ctx.send(f'The prefix is `{prefix}`')
+
         if not _is_moderator(ctx):
             return await ctx.send('Unauthorized to set prefix.')
 
         if not (1 < len(prefix) < 20):
             return await ctx.send('Prefixes need to be 1-20 characters long')
 
-        return await ctx.success(await self.cfg_set(ctx.guild, 'prefix', prefix))
+        return await ctx.success(await self.cfg_set(ctx.guild,
+                                                    'prefix', prefix))
 
     @commands.command()
     @commands.guild_only()
     @is_moderator()
     async def notify(self, ctx, channel: discord.TextChannel=None):
         """Make a channel a notification channel.
-        
+
         A notification channel will be used bu josé
         to say when your server/guild is successfully
         stolen from by another guild.
@@ -252,9 +259,12 @@ class Config(Cog):
         channel = channel or ctx.channel
         perms = channel.permissions_for(ctx.guild.me)
         if not perms.send_messages:
-            return await ctx.send('Add `Send Messages` permission to josé please')
+            return await ctx.send('Add `Send Messages` '
+                                  'permission to josé please')
 
-        return await ctx.success(await self.cfg_set(ctx.guild, 'notify_channel', channel.id))
+        return await ctx.success(await self.cfg_set(ctx.guild,
+                                                    'notify_channel',
+                                                    channel.id))
 
     @commands.command()
     @commands.is_owner()
@@ -267,9 +277,11 @@ class Config(Cog):
             coll = self.jose_db[coll_name]
             counts[coll_name] = await coll.count()
 
-        coll_counts = '\n'.join([f'{collname:15} | {count}' for collname, count in counts.most_common()])
+        coll_counts = '\n'.join([f'{collname:15} | {count}'
+                                 for collname, count in counts.most_common()])
         coll_counts = f'```\n{coll_counts}```'
         await ctx.send(coll_counts)
-    
+
+
 def setup(bot):
     bot.add_cog(Config(bot))

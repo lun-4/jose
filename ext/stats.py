@@ -50,7 +50,8 @@ class Statistics(Cog):
     async def basic_measures(self):
         await self.gauge('jose.guilds', len(self.bot.guilds))
         await self.gauge('jose.users', len(self.bot.users))
-        await self.gauge('jose.channels', sum(1 for c in self.bot.get_all_channels()))
+        await self.gauge('jose.channels', sum(1 for c
+                                              in self.bot.get_all_channels()))
 
     async def starboard_stats(self):
         """Pushes starboard statistics to datadog."""
@@ -104,8 +105,10 @@ class Statistics(Cog):
             return
 
         await self.gauge('jose.tx.count', len(speak.text_generators))
-        await self.gauge('jose.tx.avg_gen', speak.st_gen_totalms / speak.st_gen_count)
-        await self.gauge('jose.tx.txc_avg_run', speak.st_txc_totalms / speak.st_txc_runs)
+        await self.gauge('jose.tx.avg_gen',
+                         speak.st_gen_totalms / speak.st_gen_count)
+        await self.gauge('jose.tx.txc_avg_run',
+                         speak.st_txc_totalms / speak.st_txc_runs)
 
     async def querystats(self):
         try:
@@ -128,17 +131,19 @@ class Statistics(Cog):
         stats = await self.cstats_coll.find_one({'name': c_name})
         if stats is None:
             await self.cstats_coll.insert_one(empty_stats(c_name))
-        
+
         if self.bot.config.datadog:
             statsd.increment('jose.complete_commands')
-        await self.cstats_coll.update_one({'name': c_name}, {'$inc': {'uses': 1}})
+        await self.cstats_coll.update_one({'name': c_name},
+                                          {'$inc': {'uses': 1}})
 
     async def on_message(self, message):
         if self.bot.config.datadog:
             statsd.increment('jose.recv_messages')
 
     async def on_guild_remove(self, guild):
-        log.info(f'Left guild {guild.name} {guild.id}, {guild.member_count} members')
+        log.info(f'Left guild {guild.name} {guild.id},'
+                 f' {guild.member_count} members')
 
     @commands.command(aliases=['cstats'])
     async def command_stats(self, ctx, limit: int = 10):
@@ -166,6 +171,7 @@ class Statistics(Cog):
             raise self.SayException('Command not found')
 
         await ctx.send(f'`{command}: {stat["uses"]} uses`')
+
 
 def setup(bot):
     bot.add_cog(Statistics(bot))

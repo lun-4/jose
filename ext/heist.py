@@ -1,4 +1,3 @@
-import collections
 import asyncio
 import logging
 import discord
@@ -16,6 +15,7 @@ BASE_HEIST_CHANCE = decimal.Decimal('1')
 HEIST_CONSTANT = decimal.Decimal('0.32')
 INCREASE_PER_PERSON = decimal.Decimal('0.3')
 
+
 class HeistSessionError(Exception):
     pass
 
@@ -32,8 +32,9 @@ class GuildConverter(commands.Converter):
         try:
             guild_id = int(arg)
         except ValueError:
-            f = lambda g: arg.lower() == g.name.lower()
-            guild = discord.utils.find(f, bot.guilds)
+            def is_guild(g):
+                return arg.lower() == g.name.lower()
+            guild = discord.utils.find(is_guild, bot.guilds)
 
             if guild is None:
                 raise commands.BadArgument('Guild not found')
@@ -47,7 +48,7 @@ class GuildConverter(commands.Converter):
 
 class JoinSession:
     """Heist join session class
-    
+
     This managers all the users in the session and
     does the actual "heisting", the "j!heist" subcommands
     are just a frontend for this :^)
@@ -66,8 +67,9 @@ class JoinSession:
         Task for :meth:`JoinSession.do_heist`
     """
 
-    __slots__ = ('id', 'ctx', 'bot', 'heist', 'cext', 'coins', 'target', 'amount', \
-        'users', 'started', 'finish', 'task')
+    __slots__ = ('id', 'ctx', 'bot', 'heist', 'cext', 'coins', 'target',
+                 'amount', 'users', 'started', 'finish', 'task')
+
     def __init__(self, ctx, target):
         self.ctx = ctx
         self.bot = ctx.bot
@@ -76,7 +78,7 @@ class JoinSession:
 
         self.cext = ctx.bot.get_cog('CoinsExt')
         self.coins = ctx.bot.get_cog('Coins')
-        #self.SayException = SayException
+        # self.SayException = SayException
 
         self.target = target
         self.amount = 0
@@ -192,22 +194,24 @@ class JoinSession:
 
         await ctx.send(self.fmt_res(res))
 
-        jailed_mentions = ' '.join([f'<@{jailed}>' for jailed in res['jailed']])
+        jailed_mentions = ' '.join([f'<@{jailed}>'
+                                    for jailed in res['jailed']])
         await ctx.send(f'In jail: {jailed_mentions}')
 
-        saved_mentions = ' '.join([f'<@{saved}>' for saved in res['saved']])
+        saved_mentions = ' '.join([f'<@{saved}>'
+                                   for saved in res['saved']])
         await ctx.send(f'Not in Jail: {saved_mentions}')
 
     async def target_send(self, msg):
         """Send a message to the target guild.
-        
+
         This:
          - Checks the configuration for a notification channel
           - If it exists, but it is None, nothing is done
           - If it exists, the message is sent
         """
         config = self.heist.config
-        
+
         chan_id = await config.cfg_get(self.target, 'notify_channel')
         if chan_id is None:
             return
@@ -249,7 +253,7 @@ class JoinSession:
     async def force_finish(self) -> 'any':
         """Force the join session to finish
         and the heist to start.
-        
+
         Returns
         any
             Anything
@@ -280,7 +284,7 @@ class JoinSession:
 
         if err is not None:
             raise err
-        
+
         log.info('returning result')
         return self.task.result()
 
@@ -290,7 +294,7 @@ class JoinSession:
 
 class Heist(Cog):
     """Heist system
-    
+
     Heisting works by stealing taxbanks(see "j!help taxes" for a quick
     explanation on them) of other guilds/servers.
     """
@@ -309,7 +313,7 @@ class Heist(Cog):
 
     def get_sess(self, ctx, target=None, clean=False):
         """Get a join session.
-        
+
         Parameters
         ----------
         ctx: `context`
@@ -349,15 +353,18 @@ class Heist(Cog):
         await cext.check_cooldowns(ctx)
         acc = await coins.get_account(ctx.author.id)
         if acc['amount'] < 10:
-            raise self.SayException("You don't have more than `10JC` to join the session.")
+            raise self.SayException("You don't have more than"
+                                    " `10JC` to join the session.")
 
         if acc['amount'] < session.fine:
-            raise self.SayException(f"You can't pay the fine(`{session.fine}JC`)")
+            raise self.SayException("You can't pay the fine"
+                                    f"(`{session.fine}JC`)")
 
     @commands.group(invoke_without_command=True)
-    async def heist(self, ctx, amount: decimal.Decimal, *, target: GuildConverter):
+    async def heist(self, ctx,
+                    amount: decimal.Decimal, *, target: GuildConverter):
         """Heist a server.
-        
+
         This works better if you have more people joining in your heist.
 
          - As soon as you use this command, a heist join session will start.
@@ -379,21 +386,24 @@ class Heist(Cog):
             raise self.SayException('You dont have a josecoin wallet')
 
         if amount > account['amount']:
-            raise self.SayException('You cant heist more than what you currently hold.')
+            raise self.SayException('You cant heist more than'
+                                    ' what you currently hold.')
 
         for session in self.sessions.values():
             if session.target.id == target.id:
-                raise self.SayException('An already existing session exists with the same target')
+                raise self.SayException('An already existing session '
+                                        'exists with the same target')
 
         if target == ctx.guild:
             raise self.SayException('stealing from the same guild? :thinking:')
-        
+
         taxbank = await self.bot.get_cog('Coins').get_account(target.id)
         if not taxbank:
             raise self.SayException('Taxbank account not found')
 
         if amount > taxbank['amount']:
-            raise self.SayException('You cannot steal more than the guild taxbank currently holds.')
+            raise self.SayException('You cannot steal more than the '
+                                    'guild taxbank currently holds.')
 
         session = self.get_sess(ctx, target, True)
 
@@ -428,7 +438,8 @@ class Heist(Cog):
 
         for session in self.sessions.values():
             if ctx.author.id in session.users:
-                raise self.SayException(f'You are already in a join session at `{session.ctx.guild!s}`')
+                raise self.SayException('You are already in a join session '
+                                        f'at `{session.ctx.guild!s}`')
         
         session = self.get_sess(ctx)
         await self.check_user(ctx, session)
@@ -443,15 +454,18 @@ class Heist(Cog):
 
         em = discord.Embed(title='Current heist status')
 
-        em.add_field(name='Guild being attacked', value=f'`{session.target!s}` [{session.target.id}]')
-        em.add_field(name='Amount being heisted', value=f'`{session.amount!s}`JC')
+        em.add_field(name='Guild being attacked',
+                     value=f'`{session.target!s}` [{session.target.id}]')
+        em.add_field(name='Amount being heisted',
+                     value=f'`{session.amount!s}`JC')
 
         users_in_heist = []
         for user_id in session.users:
             users_in_heist.append(f'<@{user_id}>')
 
-        em.add_field(name='Current users in the heist', value=' '.join(users_in_heist))
-            
+        em.add_field(name='Current users in the heist',
+                     value=' '.join(users_in_heist))
+
         await ctx.send(embed=em)
 
     @heist.command(name='raid')
@@ -460,6 +474,6 @@ class Heist(Cog):
         session = self.get_sess(ctx)
         await session.process_heist(await session.force_finish())
 
+
 def setup(bot):
     bot.add_cog(Heist(bot))
-

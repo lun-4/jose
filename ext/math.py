@@ -1,7 +1,6 @@
 import logging
 import asyncio
 import random
-import datetime
 import decimal
 
 import discord
@@ -14,15 +13,15 @@ from .common import Cog
 
 log = logging.getLogger(__name__)
 
-W_CLEAR_SKY =           ':sunny:'
-W_FEW_CLOUDS =          ':white_sun_small_cloud:'
-W_SCATTERED_CLOUDS =    ':partly_sunny:'
-W_BROKEN_CLOUDS =       ':cloud:'
-W_SHOWER_RAIN =         ':cloud_rain:'
-W_RAIN =                ':cloud_rain:'
-W_THUNDERSTORM =        ':thunder_cloud_rain:'
-W_SNOW =                ':snowflake:'
-W_MIST =                ':foggy:'
+W_CLEAR_SKY = ':sunny:'
+W_FEW_CLOUDS = ':white_sun_small_cloud:'
+W_SCATTERED_CLOUDS = ':partly_sunny:'
+W_BROKEN_CLOUDS = ':cloud:'
+W_SHOWER_RAIN = ':cloud_rain:'
+W_RAIN = ':cloud_rain:'
+W_THUNDERSTORM = ':thunder_cloud_rain:'
+W_SNOW = ':snowflake:'
+W_MIST = ':foggy:'
 
 OWM_ICONS = {
     '01d': W_CLEAR_SKY,
@@ -161,15 +160,18 @@ class Math(Cog):
         await self.jcoin.pricing(ctx, self.prices['API'])
 
         try:
-            future = self.loop.run_in_executor(None, \
-                self.owm.weather_at_place, location)
+            future = self.loop.run_in_executor(None,
+                                               self.owm.weather_at_place,
+                                               location)
             observation = await future
         except:
             await ctx.send('Error retrieving weather data')
             return
 
         w = observation.get_weather()
-        _wg = lambda t: w.get_temperature(t)['temp']
+
+        def _wg(t):
+            return w.get_temperature(t)['temp']
 
         _icon = w.get_weather_icon_name()
         icon = OWM_ICONS.get(_icon, '*<no icon>*')
@@ -179,14 +181,18 @@ class Math(Cog):
 
         o_location = observation.get_location()
 
-        em.add_field(name='Location', value=f'{o_location.get_name()}')
-        em.add_field(name='Situation', value=f'{status} {icon}')
-        em.add_field(name='Temperature', value=f'`{_wg("celsius")} °C, {_wg("fahrenheit")} °F, {_wg("kelvin")} °K`')
+        em.add_field(name='Location',
+                     value=f'{o_location.get_name()}')
+        em.add_field(name='Situation',
+                     value=f'{status} {icon}')
+        em.add_field(name='Temperature',
+                     value=f'`{_wg("celsius")} °C, {_wg("fahrenheit")} °F, {_wg("kelvin")} °K`')
 
         await ctx.send(embed=em)
 
     @commands.command()
-    async def money(self, ctx, amount: str, currency_from: str = '', currency_to: str = ''):
+    async def money(self, ctx, amount: str,
+                    currency_from: str = '', currency_to: str = ''):
         """Convert currencies."""
 
         currency_from = currency_from.upper()
@@ -205,13 +211,15 @@ class Math(Cog):
 
         await self.jcoin.pricing(ctx, self.prices['API'])
 
-        data = await self.get_json(f'https://api.fixer.io/latest?base={currency_from}')
+        data = await self.get_json('https://api.fixer.io/'
+                                   f'latest?base={currency_from}')
 
         if 'error' in data:
             raise self.SayException(f'API error: {data["error"]}')
 
         if currency_to not in data['rates']:
-            raise self.SayException(f'Invalid currency to convert to: {currency_to}')
+            raise self.SayException('Invalid currency to convert to: '
+                                    f'{currency_to}')
 
         rate = data['rates'][currency_to]
         rate = decimal.Decimal(rate)

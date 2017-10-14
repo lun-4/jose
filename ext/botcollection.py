@@ -22,6 +22,7 @@ WHITELIST = (
 
 log = logging.getLogger(__name__)
 
+
 class BotCollection(Cog):
     """Bot collection commands."""
     def bot_human_ratio(self, guild):
@@ -42,7 +43,8 @@ class BotCollection(Cog):
         bots, humans, ratio = self.bot_human_ratio(guild)
         owner = guild.owner
 
-        log.info(f'[bh:join] {guild!s} -> ratio {len(bots)} / {len(humans)} = {ratio:.2}')
+        log.info(f'[bh:join] {guild!s} -> ratio {len(bots)}b / {len(humans)}h '
+                 f'= {ratio:.2}')
 
         if guild.id in WHITELIST:
             return
@@ -72,7 +74,8 @@ class BotCollection(Cog):
             return
 
         if ratio > BOT_RATIO_MAX:
-            log.info(f'[bh:leave:member_join] leaving {guild!r} {guild.id}, {len(bots)}/{len(humans)} = {ratio}')
+            log.info(f'[bh:leave:member_join] leaving {guild!r} {guild.id},'
+                     f' {len(bots)}/{len(humans)} = {ratio}')
             await guild.leave()
 
     @commands.command()
@@ -83,7 +86,9 @@ class BotCollection(Cog):
         bots, humans, ratio = self.bot_human_ratio(ctx.guild)
         _, _, global_ratio = self.bhratio_global()
 
-        await ctx.send(f'{len(bots)} bots / {len(humans)} humans => `{ratio:.2}b/h`, global is `{global_ratio:.2}`')
+        await ctx.send(f'{len(bots)} bots / {len(humans)} humans => '
+                       f'`{ratio:.2}b/h`, global is `{global_ratio:.2}`')
+
 
 def setup(bot):
     bot.add_cog(BotCollection(bot))

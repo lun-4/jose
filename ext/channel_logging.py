@@ -12,7 +12,7 @@ from joseconfig import PACKET_CHANNEL, LEVELS
 log = logging.getLogger(__name__)
 
 
-LOGGING_PERIOD = 5 
+LOGGING_PERIOD = 5
 
 LOGGERS_TO_ATTACH = [
     'discord',
@@ -20,10 +20,12 @@ LOGGERS_TO_ATTACH = [
     '__main__',
 ]
 
+
 class ChannelHandler(logging.Handler):
     """Log handler for discord channels.
-    
-    This logging handler will setup logging so that your bot's logs go to a discord channel.
+
+    This logging handler will setup logging so that your bot's logs go
+    to a discord channel.
 
     Edit LEVELS to match your preferred channel IDs.
 
@@ -48,8 +50,7 @@ class ChannelHandler(logging.Handler):
         log.info('[channel_handler] Starting...')
         self.bot = bot
         self.loop = bot.loop
-        
-        self.channels = {} 
+        self.channels = {}
         self.dumper_task = None
         self.queue = collections.defaultdict(list)
 
@@ -57,10 +58,9 @@ class ChannelHandler(logging.Handler):
 
         self._special_packet_channel = None
 
-    
     def dump(self):
         """Dump all queued log messages into their respective channels."""
-        if len(self.queue) < 1: 
+        if len(self.queue) < 1:
             return
 
         for level, messages in self.queue.items():
@@ -166,9 +166,11 @@ class Logging(Cog):
         op = j['op']
         t = j['t']
         if op == 0:
-            if t in ('WEBHOOKS_UPDATE','PRESENCES_REPLACE'):
+            if t in ('WEBHOOKS_UPDATE', 'PRESENCES_REPLACE'):
                 log.info('GOT A WANTED PACKET!!')
-                await self._special_packet_channel.send(f'HELLO I GOT A GOOD PACKET PLS SEE ```py\n{j}\n```')
+                await self._special_packet_channel.send('HELLO I GOT A GOOD'
+                                                        ' PACKET PLS SEE '
+                                                        f'```py\n{j}\n```')
 
     @commands.command()
     @commands.is_owner()
@@ -188,6 +190,7 @@ class Logging(Cog):
     async def err(self, ctx):
         raise Exception('THIS IS A TEST ERROR!!!!!')
 
+
 def setup(bot):
     bot.add_cog(Logging(bot))
 
@@ -196,5 +199,4 @@ def setup(bot):
         bot.channel_handler.detach()
 
     bot.channel_handler = ChannelHandler(bot)
-    #bot.loop.create_task(bot.channel_handler.ready())
-
+    # bot.loop.create_task(bot.channel_handler.ready())

@@ -366,7 +366,8 @@ class CoinsExt(Cog):
                 await target.send(f':gun: You got robbed! Thief(`{thief}`) '
                                   f'stole `{amount}` from you. '
                                   f'{grace}h grace period')
-            except: pass
+            except:
+                pass
 
             await self.add_grace(target, grace)
             await ctx.send(f'`[res: {res} < prob: {chance}]` congrats lol'
@@ -418,8 +419,9 @@ class CoinsExt(Cog):
     async def stealreset(self, ctx, *people: discord.User):
         """Reset someone's state in steal-related collections.
 
-        Deletes cooldowns, points and grace, resetting them(cooldowns and points)
-        to default on the person's next use of j!steal.
+        Deletes cooldowns, points and grace, resetting them
+        (cooldowns and points) to default on the person's
+        next use of j!steal.
         """
         for person in people:
             # don't repeat stuff lol
@@ -461,6 +463,7 @@ class CoinsExt(Cog):
         em.add_field(name='Total taxbanks', value=total_txb)
 
         await ctx.send(embed=em)
+
 
 def setup(bot):
     bot.add_cog(CoinsExt(bot))

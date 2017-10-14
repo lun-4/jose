@@ -8,14 +8,15 @@ JOSE_SERVER = 273863625590964224
 ROLE_ID = 332410139762098178
 
 # test
-#JOSE_SERVER = 319540379495956490
-#ROLE_ID = 332410900600324097
+# JOSE_SERVER = 319540379495956490
+# ROLE_ID = 332410900600324097
+
 
 class Subscribe(Cog):
     """Subscribe to a role and participate in José's development!"""
     def __init__(self, bot):
         super().__init__(bot)
-    
+
     def __local_check(self, ctx):
         if not ctx.guild:
             return False
@@ -49,6 +50,6 @@ class Subscribe(Cog):
         await ctx.send(f'{role.mention} {msg}')
         await role.edit(mentionable=False)
 
+
 def setup(bot):
     bot.add_cog(Subscribe(bot))
-

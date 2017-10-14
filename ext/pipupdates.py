@@ -9,6 +9,7 @@ from discord.ext import commands
 
 log = logging.getLogger(__name__)
 
+
 def pip_freeze():
     out = subprocess.check_output('env/bin/python -m pip freeze', shell=True)
     return out
@@ -62,12 +63,13 @@ class PipUpdates(Cog):
             if pkgname in self.requirements:
                 cur_version = self.requirements[pkgname]
 
-                pkgdata = await self.get_json(f'http://pypi.python.org/pypi/{pkgname}/json')
+                pkgdata = await self.get_json('http://pypi.python.org/'
+                                              f'pypi/{pkgname}/json')
                 new_version = pkgdata['info']['version']
 
                 if new_version != cur_version:
-                    res.append(" * `%r` needs update from %s to %s" % \
-                        (pkgname, cur_version, new_version))
+                    res.append(" * `%r` needs update from %s to %s" %
+                               (pkgname, cur_version, new_version))
 
         await self.say_results(res)
         return res
@@ -90,7 +92,9 @@ class PipUpdates(Cog):
             if len(res) <= 0:
                 return await ctx.send("`No updates found.`")
 
-            await ctx.send('Updates were found and should be sent to the bot owner!')
+            await ctx.send('Updates were found and should be '
+                           'sent to the bot owner!')
+
 
 def setup(bot):
     bot.add_cog(PipUpdates(bot))

@@ -1,5 +1,4 @@
 import traceback
-import asyncio
 import logging
 
 from discord.ext import commands
@@ -16,16 +15,16 @@ class Admin(Cog):
     async def shutdown(self, ctx):
         log.info('Logging out! %s', ctx.author)
         await ctx.send("dude rip")
-        #await self.bot.session.close()        
+        # await self.bot.session.close()
         await self.bot.logout()
 
     @commands.command(hidden=True)
     @commands.is_owner()
-    async def load(self, ctx, extension_name : str):
+    async def load(self, ctx, extension_name: str):
         """Loads an extension."""
         try:
             self.bot.load_extension("ext." + extension_name)
-        except Exception as e: 
+        except Exception as e:
             await ctx.send(f'```py\n{traceback.format_exc()}\n```')
             return
         log.info(f'Loaded {extension_name}')
@@ -33,7 +32,7 @@ class Admin(Cog):
 
     @commands.command(hidden=True)
     @commands.is_owner()
-    async def unload(self, ctx, extension_name : str):
+    async def unload(self, ctx, extension_name: str):
         """Unloads an extension."""
         self.bot.unload_extension('ext.' + extension_name)
         log.info(f'Unloaded {extension_name}')
@@ -41,7 +40,7 @@ class Admin(Cog):
 
     @commands.command(hidden=True)
     @commands.is_owner()
-    async def reload(self, ctx, extension_name : str):
+    async def reload(self, ctx, extension_name: str):
         """Reloads an extension"""
         try:
             self.bot.unload_extension('ext.' + extension_name)

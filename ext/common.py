@@ -1,14 +1,14 @@
 import asyncio
 
-import discord
-
 JOSE_VERSION = '2.3'
 
 WIDE_MAP = dict((i, i + 0xFEE0) for i in range(0x21, 0x7F))
 WIDE_MAP[0x20] = 0x3000
 
+
 class SayException(Exception):
     pass
+
 
 class Cog:
     def __init__(self, bot):
