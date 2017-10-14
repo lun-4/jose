@@ -85,7 +85,7 @@ class Lottery(Cog):
                                   self.bot.user.id, TICKET_PRICE)
 
         await self.ticket_coll.insert_one({'user_id': ctx.author.id})
-        await lottery_log.send('In lottery: `{ctx.author!s}, {ctx.author.id}`')
+        await lottery_log.send(f'In lottery: `{ctx.author!s}, {ctx.author.id}`')
         await ctx.ok()
 
 
