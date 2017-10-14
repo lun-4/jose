@@ -1,5 +1,6 @@
 import logging
 import decimal
+import asyncio
 from random import SystemRandom
 
 import discord
@@ -10,7 +11,7 @@ from .common import Cog
 random = SystemRandom()
 log = logging.getLogger(__name__)
 
-PERCENTAGE_PER_TAXBANK = decimal.Decimal(0.2 / 100)
+PERCENTAGE_PER_TAXBANK = decimal.Decimal(0.22 / 100)
 TICKET_PRICE = 20
 
 
@@ -51,7 +52,7 @@ class Lottery(Cog):
             users.append(f'<@{ticket["user_id"]}>')
 
         if users:
-            em.add_field(name='Users', value='\n'.join(users))
+            em.add_field(name='Users', value=' '.join(users))
         else:
             em.description = 'No users in the current lottery'
 
@@ -60,7 +61,11 @@ class Lottery(Cog):
     @lottery.command()
     @commands.is_owner()
     async def roll(self, ctx):
-        """Roll a random user from the pool"""
+        """Roll a winner from the pool"""
+
+        joseguild = self.bot.get_guild(self.bot.config.JOSE_GUILD)
+        if not joseguild:
+            raise self.SayException('`config error`: José guild not found.')
 
         cur = self.ticket_coll.find()
 
@@ -69,7 +74,29 @@ class Lottery(Cog):
         all_users = await cur.to_list(length=None)
 
         winner = random.choice(all_users)
-        await ctx.send(f'Winner: <@{winner["user_id"]}>')
+        winner_id = winner['user_id']
+
+        if not any(m.id == ctx.author.id for m in joseguild.members):
+            raise self.SayException(f'selected winner, <@{winner_id}> '
+                                    'is not in jose guild. ignoring!')
+
+        await ctx.send(f'Winner: <@{winner_id}>, transferring will take time')
+
+        # business logic is here
+        total = decimal.Decimal(0)
+        async for account in self.jcoin.jcoin_coll.find({'type': 'taxbank'}):
+            amount = PERCENTAGE_PER_TAXBANK * \
+                     decimal.Decimal(account['amount'])
+
+            try:
+                await self.jcoin.transfer(account['id'], winner_id, amount)
+                total += amount
+            except Exception as err:
+                await ctx.send(f'err: {err}')
+
+            await asyncio.sleep(0.2)
+
+        await ctx.send(f'Sent a total of `{total}` to the winner')
 
     @lottery.command()
     async def enter(self, ctx):
