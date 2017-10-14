@@ -1,11 +1,13 @@
 import logging
 import decimal
+from random import SystemRandom
 
 import discord
 from discord.ext import commands
 
 from .common import Cog
 
+random = SystemRandom()
 log = logging.getLogger(__name__)
 
 PERCENTAGE_PER_TAXBANK = decimal.Decimal(0.2 / 100)
@@ -54,6 +56,20 @@ class Lottery(Cog):
             em.description = 'No users in the current lottery'
 
         await ctx.send(embed=em)
+
+    @lottery.command()
+    @commands.is_owner()
+    async def roll(self, ctx):
+        """Roll a random user from the pool"""
+
+        cur = self.ticket_coll.find()
+
+        # !!! bad code !!!
+        # this is not WEBSCALE
+        all_users = await cur.to_list(length=None)
+
+        winner = random.choice(all_users)
+        await ctx.send(f'Winner: <@{winner["user_id"]}>')
 
     @lottery.command()
     async def enter(self, ctx):
