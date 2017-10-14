@@ -33,7 +33,8 @@ class Lottery(Cog):
         """
         amount = decimal.Decimal(0)
         async for account in self.jcoin.jcoin_coll.find({'type': 'taxbank'}):
-            amount += PERCENTAGE_PER_TAXBANK * account['amount']
+            amount += PERCENTAGE_PER_TAXBANK * \
+                      decimal.Decimal(account['amount'])
 
         await ctx.send('Next saturday you have a chance to win: '
                        f'`{amount:.2}JC`')
