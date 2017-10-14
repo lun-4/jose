@@ -8,7 +8,7 @@ from .common import Cog
 
 log = logging.getLogger(__name__)
 
-PERCENTAGE_PER_TAXBANK = (0.2 / 100)
+PERCENTAGE_PER_TAXBANK = decimal.Decimal(0.2 / 100)
 TICKET_PRICE = 20
 
 
