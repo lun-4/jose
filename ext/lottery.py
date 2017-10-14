@@ -1,5 +1,5 @@
-import decimal
 import logging
+import decimal
 
 import discord
 from discord.ext import commands
@@ -29,10 +29,10 @@ class Lottery(Cog):
     async def lottery(self, ctx):
         """Show current lottery state.
 
-        A read 'j!help Lottery' is highly recommended.
+        A read on 'j!help Lottery' is highly recommended.
         """
         amount = decimal.Decimal(0)
-        async for account in self.jcoin.all_accounts('taxbank'):
+        async for account in self.jcoin.jcoin_coll.find({'type': 'taxbank'}):
             amount += PERCENTAGE_PER_TAXBANK * account['amount']
 
         await ctx.send('Next saturday you have a chance to win: '
@@ -47,13 +47,18 @@ class Lottery(Cog):
         async for ticket in self.ticket_coll.find():
             users.append(f'<@{ticket["user_id"]}>')
 
-        em.add_field(name='Users', value='\n'.join(users))
+        if users:
+            em.add_field(name='Users', value='\n'.join(users))
+        else:
+            em.description = 'No users in the current lottery'
+
         await ctx.send(embed=em)
 
     @lottery.command()
-    async def enter(self, ctx, amount: decimal.Decimal):
-        """Enter the weekly lottery."""
-        await ctx.send('not implemented yet')
+    async def enter(self, ctx):
+        """Enter the weekly lottery.
+        You will pay 20JC for a ticket.
+        """
         # Check if the user is in jose guild
         # Pay 20jc to jose
         # put user in ticket collection

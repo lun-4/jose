@@ -446,7 +446,7 @@ class Coins(Cog):
             lock.release()
 
         return sorted(accounts, key=lambda account: float(account[field]),
-                      reverse=True)        
+                      reverse=True)
 
     async def zero(self, user_id: int):
         """Zero an account."""
@@ -601,7 +601,8 @@ class Coins(Cog):
         success = await self.new_account(user.id)
 
         if success:
-            mutual_guilds = [g for g in self.bot.guilds if g.get_member(user.id)]
+            mutual_guilds = [g for g in self.bot.guilds
+                             if g.get_member(user.id)]
             for guild in mutual_guilds:
                 # The length check is required
                 # since if a guild doesn't have its account cache
