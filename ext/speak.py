@@ -421,7 +421,7 @@ class Speak(Cog):
         em.description = ''
         for guild_id, tx in self.text_generators.items():
             guild = self.bot.get_guild(guild_id)
-            em.description += f'**{guild!s}**, gid={guild_id} - refcount={tx.refcount}, words={tx.wordcount} lines={tx.linecount}` \n'
+            em.description += f'**{guild!s}**, `gid={guild_id} - refcount={tx.refcount}, words={tx.wordcount} lines={tx.linecount}` \n'
 
         await ctx.send(embed=em)
 
