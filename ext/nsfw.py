@@ -134,6 +134,7 @@ class NSFW(Cog):
     @commands.command()
     @commands.is_nsfw()
     async def gelbooru(self, ctx, *tags):
+        """Randomly searches Gelbooru for posts."""
         await self.booru(ctx, GelBooru, tags)
 
     @commands.command()
