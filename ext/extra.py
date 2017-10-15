@@ -233,7 +233,10 @@ class Extra(Cog):
         if len(description) < 1:
             raise self.SayException('pls put something')
 
-        if len(description) > 300:
+        if description.count('\n') > 10:
+            raise self.SayException('too many newlines')
+
+        if len(description) > 160:
             raise self.SayException('3 long 5 me pls bring it down dud')
 
         await self.set_description(ctx.author.id, description)
