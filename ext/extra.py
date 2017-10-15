@@ -173,10 +173,9 @@ class Extra(Cog):
         if user is None:
             user = ctx.author
 
-        if not isinstance(user, discord.Member):
-            maybe_member = ctx.guild.get_member(user.id)
-            if maybe_member:
-                user = maybe_member
+        maybe_member = ctx.guild.get_member(user.id)
+        if maybe_member:
+            user = maybe_member
 
         em = discord.Embed(title='Profile card',
                            colour=self.mkcolor(user.name))
