@@ -168,12 +168,15 @@ class Extra(Cog):
             return f'{days:.2f} days'
 
     @commands.command()
-    async def profile(self, ctx, user: discord.Member = None):
+    async def profile(self, ctx, user: discord.User = None):
         """Get profile cards."""
         if user is None:
             user = ctx.author
 
-        await ctx.trigger_typing()
+        if not isinstance(user, discord.Member):
+            maybe_member = ctx.guild.get_member(user.id)
+            if maybe_member:
+                user = maybe_member
 
         em = discord.Embed(title='Profile card',
                            colour=self.mkcolor(user.name))
@@ -183,17 +186,20 @@ class Extra(Cog):
 
         em.set_footer(text=f'User ID: {user.id}')
 
-        if user.nick is not None:
-            em.add_field(name='Name', value=f'{user.nick} ({user.name})')
+        if isinstance(user, discord.Member) and (user.nick is not None):
+            em.add_field(name='Name',
+                         value=f'{user.nick} ({user.name})')
         else:
-            em.add_field(name='Name', value=user.name)
+            em.add_field(name='Name',
+                         value=user.name)
 
         description = await self.get_description(user.id)
         if description is not None:
             em.add_field(name='Description', value=description)
 
         delta = datetime.datetime.now() - user.created_at
-        em.add_field(name='Account age', value=f'{self.delta_str(delta)}')
+        em.add_field(name='Account age',
+                     value=f'{self.delta_str(delta)}')
 
         account = await self.jcoin.get_account(user.id)
         if account is not None:
@@ -213,8 +219,9 @@ class Extra(Cog):
                 ratio = round((ratio * 100), 3)
 
                 em.add_field(name='Stealing',
-                             value='{} tries, {} success, ratio of success: {}/steal'.format( \
-                    account['times_stolen'], account['success_steal'], ratio))
+                             value=f'{account["times_stolen"]} tries, '
+                             f'{account["success_steal"]} success, '
+                             f'ratio of success: {ratio}/steal')
             except ZeroDivisionError:
                 pass
 
