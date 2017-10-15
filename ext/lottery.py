@@ -13,6 +13,7 @@ log = logging.getLogger(__name__)
 
 PERCENTAGE_PER_TAXBANK = decimal.Decimal(0.275 / 100)
 TICKET_PRICE = 15
+TICKET_INCREASE = decimal.Decimal(35 / 100)
 
 
 class Lottery(Cog):
@@ -23,6 +24,7 @@ class Lottery(Cog):
     who bought a ticket.
 
     The winner gets 0.275% of money from all taxbanks.
+    This amount also increases with more people buying tickets.
     """
     def __init__(self, bot):
         super().__init__(bot)
@@ -38,6 +40,9 @@ class Lottery(Cog):
         async for account in self.jcoin.jcoin_coll.find({'type': 'taxbank'}):
             amount += PERCENTAGE_PER_TAXBANK * \
                       decimal.Decimal(account['amount'])
+
+        amount_people = await self.ticket_coll.count()
+        amount += TICKET_INCREASE * amount_people
 
         await ctx.send('Calculation of the big money for lottery: '
                        f'`{amount:.2}JC`')
