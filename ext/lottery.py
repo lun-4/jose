@@ -44,8 +44,9 @@ class Lottery(Cog):
         amount_people = await self.ticket_coll.count()
         amount += TICKET_INCREASE * amount_people * TICKET_PRICE
 
+        amount = round(amount, 2)
         await ctx.send('Calculation of the big money for lottery: '
-                       f'`{amount:.2}JC`')
+                       f'`{amount}JC`')
 
     @lottery.command()
     async def users(self, ctx):
