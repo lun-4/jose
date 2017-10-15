@@ -168,7 +168,7 @@ class Extra(Cog):
             return f'{days:.2f} days'
 
     @commands.command()
-    async def profile(self, ctx, user: discord.User = None):
+    async def profile(self, ctx, *, user: discord.User = None):
         """Get profile cards."""
         if user is None:
             user = ctx.author

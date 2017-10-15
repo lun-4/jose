@@ -466,7 +466,11 @@ class Coins(Cog):
         guild_ids = [account['id'] for account in all_accounts if
                      guild.get_member(account['id']) is not None]
 
-        guildrank = guild_ids.index(user_id) + 1
+        try:
+            guildrank = guild_ids.index(user_id) + 1
+        except:
+            guildrank = -20
+
         globalrank = all_ids.index(user_id) + 1
 
         return guildrank, globalrank, len(guild_ids), len(all_ids)
