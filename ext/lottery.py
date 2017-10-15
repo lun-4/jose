@@ -42,7 +42,7 @@ class Lottery(Cog):
                       decimal.Decimal(account['amount'])
 
         amount_people = await self.ticket_coll.count()
-        amount += TICKET_INCREASE * amount_people
+        amount += TICKET_INCREASE * amount_people * TICKET_PRICE
 
         await ctx.send('Calculation of the big money for lottery: '
                        f'`{amount:.2}JC`')
@@ -110,6 +110,12 @@ class Lottery(Cog):
                 await ctx.send(f'err: {err}')
 
             await asyncio.sleep(0.2)
+
+        amount_people = await self.ticket_coll.count()
+        amount_from_ticket = TICKET_INCREASE * amount_people * TICKET_PRICE
+        await self.jcoin.transfer(self.bot.user.id,
+                                  winner_id, amount_from_ticket)
+        total += amount_from_ticket
 
         await ctx.send(f'Sent a total of `{total:.2}` to the winner')
 
