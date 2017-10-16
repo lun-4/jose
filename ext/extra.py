@@ -226,7 +226,7 @@ class Extra(Cog):
 
         await ctx.send(embed=em)
 
-    @commands.command()
+    # @commands.command()
     async def setdesc(self, ctx, *, description: str = ''):
         """Set your profile card description."""
         description = description.strip()
