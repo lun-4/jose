@@ -278,6 +278,7 @@ class Extra(Cog):
         await ctx.send(f'status: `{status}`, game: `{game_name}`')
 
     @commands.command()
+    @commands.is_owner()
     async def elixir(self, ctx, *, terms: str):
         """Search through the Elixir documentation.
 
