@@ -381,6 +381,9 @@ class Heist(Cog):
         if amount > 200:
             return await ctx.send('Cannot heist more than 200JC.')
 
+        if amount < 0.1:
+            return await ctx.send('no')
+
         account = await self.bot.get_cog('Coins').get_account(ctx.author.id)
         if not account:
             raise self.SayException('You dont have a josecoin wallet')
