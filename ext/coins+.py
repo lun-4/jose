@@ -94,7 +94,7 @@ class CoinsExt(Cog):
         """
 
         b = '\N{NEGATIVE SQUARED LATIN CAPITAL LETTER B}'
-        if limit > 20:
+        if limit > 20 or limit < 1:
             await ctx.send('pls no')
             return
 
