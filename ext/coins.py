@@ -717,6 +717,39 @@ class Coins(Cog):
         account = pprint.pformat(account)
         await ctx.send(f'```py\n{account}\nTook {delta}ms.```')
 
+    @commands.command()
+    async def deleteaccount(self, ctx, confirm: str = ''):
+        """Delete your josecoin account.
+
+        There is no going back from this operation.
+        """
+        if confirm not in ('y', 'Y'):
+            return await ctx.send('Please confirm your choice to '
+                                  'delete your josecoin account with `y`.')
+
+        user_id = ctx.author.id
+        log.warning('DELETING ACCOUNT : %r', ctx.author)
+
+        await self.zero(user_id)
+        res = await self.jcoin_coll.delete_many({'id': user_id})
+        count = res.deleted_count
+
+        log.info('deleted %d accounts', count)
+        if count > 1:
+            log.error('HELP, WE DELETED %d ACCOUNTS BY ACCIDENT', count)
+            raise self.SayException('Deleted more than one account, aborting.')
+
+        self.cache.pop(user_id)
+        mutual_guilds = [g for g in self.bot.guilds
+                         if g.get_member(user_id)]
+        for guild in mutual_guilds:
+            try:
+                self.acct_cache[guild.id].remove(user_id)
+            except ValueError:
+                pass
+
+        await ctx.send('Account deleted.')
+
 
 def setup(bot):
     bot.add_cog(Coins(bot))
