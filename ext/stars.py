@@ -579,6 +579,7 @@ class Starboard(Cog):
 
     @commands.command()
     @commands.guild_only()
+    @commands.has_permissions(manage_guild=True)
     async def starattach(self, ctx, starboard_chan: discord.TextChannel):
         """Attach an existing channel as a starboard.
 
