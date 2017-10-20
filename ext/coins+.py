@@ -354,7 +354,7 @@ class CoinsExt(Cog):
                                                       thief.id, amount)
 
             # add grace period
-            grace = 3
+            grace = 5
             if self.owner is None:
                 appinfo = await self.bot.application_info()
                 self.owner = appinfo.owner
