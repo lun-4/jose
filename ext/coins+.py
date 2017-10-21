@@ -28,7 +28,8 @@ ARREST_TIME = 6
 # cooldown when you need to regen stealing points
 STEAL_REGEN = 9
 
-WHITELISTED_ACCOUNTS = (319522792854913025,)
+WHITELISTED_ACCOUNTS = (319522792854913025,
+                        202587271679967232)
 
 
 def make_default_points(ctx):
