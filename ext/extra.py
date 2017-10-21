@@ -28,7 +28,7 @@ class Extra(Cog):
 
         self.socket_stats = collections.Counter()
         self.sock_start = time.monotonic()
-        self.description_regex = re.compile('([a-zA-z]|\d)+')
+        self.description_regex = re.compile('([a-zA-z]|\d)')
 
     async def on_socket_response(self, data):
         self.socket_stats[data.get('t')] += 1
