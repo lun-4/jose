@@ -153,6 +153,11 @@ class Gambling(Cog):
     @commands.command()
     async def slots(self, ctx, amount: decimal.Decimal):
         """little slot machine"""
+        try:
+            amount = round(amount, 3)
+        except:
+            return await ctx.send('Error rounding.')
+
         if amount > 8:
             raise self.SayException('You cannot gamble too much.')
 
