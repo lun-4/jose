@@ -454,6 +454,9 @@ class Coins(Cog):
         if account is None:
             return
 
+        if account['amount'] < 0.0009:
+            return True
+
         return await self.transfer(user_id,
                                    self.bot.user.id,
                                    account['amount'])
@@ -730,7 +733,10 @@ class Coins(Cog):
         user_id = ctx.author.id
         log.warning('DELETING ACCOUNT : %r', ctx.author)
 
-        await self.zero(user_id)
+        transfer = await self.zero(user_id)
+        if not transfer:
+            return await ctx.send('Account not found to delete.')
+
         res = await self.jcoin_coll.delete_many({'id': user_id})
         count = res.deleted_count
 
