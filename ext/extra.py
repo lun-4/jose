@@ -231,17 +231,19 @@ class Extra(Cog):
     async def setdesc(self, ctx, *, description: str = ''):
         """Set your profile card description."""
         description = description.strip()
-        matches = re.findall(self.description_regex, description)
-        description = ''.join(matches)
+
+        if len(description) > 80:
+            raise self.SayException('3 long 5 me pls bring it down dud')
+
+        notmatch = re.sub(self.description_regex, '', description)
+        if len(notmatch) > 0:
+            raise self.SayException('there are non-allowed characters.')
 
         if len(description) < 1:
             raise self.SayException('pls put something')
 
         if description.count('\n') > 10:
             raise self.SayException('too many newlines')
-
-        if len(description) > 160:
-            raise self.SayException('3 long 5 me pls bring it down dud')
 
         await self.set_description(ctx.author.id, description)
         await ctx.ok()
