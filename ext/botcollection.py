@@ -1,5 +1,6 @@
 import logging
 
+import discord
 from discord.ext import commands
 
 from .common import Cog
@@ -76,10 +77,13 @@ class BotCollection(Cog):
         if ratio > BOT_RATIO_MAX:
             log.info(f'[bh:leave:member_join] leaving {guild!r} {guild.id},'
                      f' {len(bots)}/{len(humans)} = {ratio}')
-            await guild.owner.send('Your guild was classified as a bot'
-                                   'collection, josé automatically left.'
-                                   f'{len(bots)} bots, {len(humans)} humans, '
-                                   f'{ratio}b/h, ratio is over {BOT_RATIO_MAX}')
+            try:
+                await guild.owner.send('Your guild was classified as a bot'
+                                       'collection, josé automatically left.'
+                                       f'{len(bots)} bots, {len(humans)} humans, '
+                                       f'{ratio}b/h, ratio is over {BOT_RATIO_MAX}')
+            except discord.HTTPException:
+                pass
             await guild.leave()
 
     @commands.command()
