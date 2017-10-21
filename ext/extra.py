@@ -28,6 +28,7 @@ class Extra(Cog):
 
         self.socket_stats = collections.Counter()
         self.sock_start = time.monotonic()
+        self.description_regex = re.compile('([a-zA-z]|\d)+')
 
     async def on_socket_response(self, data):
         self.socket_stats[data.get('t')] += 1
@@ -226,10 +227,13 @@ class Extra(Cog):
 
         await ctx.send(embed=em)
 
-    # @commands.command()
+    @commands.command()
     async def setdesc(self, ctx, *, description: str = ''):
         """Set your profile card description."""
         description = description.strip()
+        matches = re.findall(self.description_regex, description)
+        description = ''.join(matches)
+
         if len(description) < 1:
             raise self.SayException('pls put something')
 
