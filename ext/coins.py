@@ -71,6 +71,7 @@ class Coins(Cog):
 
         #: I hate locks
         self.transfer_lock = asyncio.Lock()
+        self.delete_lock = asyncio.Lock()
 
         #: I hate locks even more
         self.locked_accounts = []
@@ -730,6 +731,8 @@ class Coins(Cog):
             return await ctx.send('Please confirm your choice to '
                                   'delete your josecoin account with `y`.')
 
+        await self.delete_lock
+
         user_id = ctx.author.id
         log.warning('DELETING ACCOUNT : %r', ctx.author)
 
@@ -737,24 +740,29 @@ class Coins(Cog):
         if not transfer:
             return await ctx.send('Account not found to delete.')
 
-        res = await self.jcoin_coll.delete_many({'id': user_id})
-        count = res.deleted_count
+        self.lock_account(user_id)
+        try:
+            res = await self.jcoin_coll.delete_many({'id': user_id})
+            count = res.deleted_count
 
-        log.info('deleted %d accounts', count)
-        if count > 1:
-            log.error('HELP, WE DELETED %d ACCOUNTS BY ACCIDENT', count)
-            raise self.SayException('Deleted more than one account, aborting.')
+            log.info('deleted %d accounts', count)
+            if count > 1:
+                log.error('HELP, WE DELETED %d ACCOUNTS BY ACCIDENT', count)
+                raise self.SayException('Deleted more than one account, aborting.')
 
-        self.cache.pop(user_id)
-        mutual_guilds = [g for g in self.bot.guilds
-                         if g.get_member(user_id)]
-        for guild in mutual_guilds:
-            try:
-                self.acct_cache[guild.id].remove(user_id)
-            except ValueError:
-                pass
+            self.cache.pop(user_id)
+            mutual_guilds = [g for g in self.bot.guilds
+                             if g.get_member(user_id)]
+            for guild in mutual_guilds:
+                try:
+                    self.acct_cache[guild.id].remove(user_id)
+                except ValueError:
+                    pass
 
-        await ctx.send('Account deleted.')
+            await ctx.send('Account deleted.')
+        finally:
+            self.unlock_account(user_id)
+            self.delete_lock.release()
 
 
 def setup(bot):
