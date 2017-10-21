@@ -28,7 +28,9 @@ class Extra(Cog):
 
         self.socket_stats = collections.Counter()
         self.sock_start = time.monotonic()
-        self.description_regex = r'([a-zA-Z0-9]| |\')'
+
+        p1 = '([a-zA-Z0-9]| |\'|\"|\!|\%|\<|\>|\:|\.|\,|\;|\*|\~|\n)'
+        self.description_regex = re.compile(p1)
 
     async def on_socket_response(self, data):
         self.socket_stats[data.get('t')] += 1
