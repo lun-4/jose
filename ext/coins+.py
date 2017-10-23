@@ -463,6 +463,32 @@ class CoinsExt(Cog):
         em.add_field(name='Total user accounts', value=total_users)
         em.add_field(name='Total taxbanks', value=total_txb)
 
+        coll = self.coins.jcoin_coll
+        steals, success = 0, 0
+        usermoney, taxmoney = decimal.Decimal(0), decimal.Decimal(0)
+
+        async for account in coll.find():
+            if account['type'] == 'taxbank':
+                taxmoney += account['amount']
+            else:
+                usermoney += account['amount']
+                steals += account['times_stolen']
+                success += account['success_steal']
+
+        usermoney = round(usermoney, 3)
+        taxmoney = round(taxmoney, 3)
+
+        em.add_field(name='Steals',
+                     value=f'{steals} steals, {success} successes')
+
+        em.add_field(name='Total user money',
+                     value=f'`{usermoney}JC`')
+
+        em.add_field(name='Total tax money',
+                     value=f'`{taxmoney}JC`')
+
+        em.add_field(name='Total money',
+                     value=f'`{usermoney + taxmoney}JC`')
         await ctx.send(embed=em)
 
 
