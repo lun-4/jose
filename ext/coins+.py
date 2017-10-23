@@ -468,6 +468,9 @@ class CoinsExt(Cog):
         usermoney, taxmoney = decimal.Decimal(0), decimal.Decimal(0)
 
         async for account in coll.find():
+            if account['id'] == self.bot.user.id:
+                continue
+
             if account['type'] == 'taxbank':
                 taxmoney += decimal.Decimal(account['amount'])
             else:
