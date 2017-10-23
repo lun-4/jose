@@ -119,6 +119,8 @@ class Speak(Cog):
         self.st_txc_totalms = 1
         self.st_txc_runs = 1
 
+        self.txstress_semaphore = asyncio.Semaphore(5)
+
     def __unload(self):
         """Remove all texters from memory"""
         to_del = []
@@ -212,6 +214,7 @@ class Speak(Cog):
         self.st_gen_count += 1
 
         self.text_generators[guild.id] = new_texter
+        return new_texter
 
     async def get_texter(self, guild):
         if guild.id not in self.text_generators:
@@ -372,26 +375,31 @@ class Speak(Cog):
 
         await ctx.send(' '.join(res))
 
+    async def stress_one(self, ctx, guild):
+        await self.txstress_semaphore.acquire()
+
+        try:
+            texter = await self.new_texter(guild)
+            texter.refcount = 5
+            await ctx.send(f'Success for `{guild!r}[{guild.id}]`')
+        except TexterFail:
+            await ctx.send(f'Failed for `{guild!r}[{guild.id}]`')
+        finally:
+            self.txstress_semaphore.release()
+
     @commands.command()
     @commands.is_owner()
     async def txstress(self, ctx):
         """Stress test texters LUL"""
         t1 = time.monotonic()
-        async def create_tx(guild):
-            try:
-                return await self.new_texter(guild)
-            except TexterFail:
-                await ctx.send(f'Failed for `{guild!s}[{guild.id}]`')
-                return None
 
-        txs = []
         for guild in self.bot.guilds:
-            txs.append(await create_tx(guild))
+            self.loop.create_task(self.stress_one(ctx, guild))
 
         t2 = time.monotonic()
-
         delta = round((t2 - t1), 2)
-        await ctx.send(f'Generated {len(txs)} texters in {delta} seconds')
+
+        await ctx.send(f'Spawned {len(self.bot.guilds)} tasks in {delta} seconds')
 
     @commands.command()
     async def txstat(self, ctx):
