@@ -469,9 +469,9 @@ class CoinsExt(Cog):
 
         async for account in coll.find():
             if account['type'] == 'taxbank':
-                taxmoney += account['amount']
+                taxmoney += decimal.Decimal(account['amount'])
             else:
-                usermoney += account['amount']
+                usermoney += decimal.Decimal(account['amount'])
                 steals += account['times_stolen']
                 success += account['success_steal']
 
