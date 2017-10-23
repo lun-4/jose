@@ -166,7 +166,7 @@ class Logging(Cog):
         op = j['op']
         t = j['t']
         if op == 0:
-            if t in ('WEBHOOKS_UPDATE', 'PRESENCES_REPLACE', 'GUILD_INTEGRATIONS_UPDATE'):
+            if t in ('WEBHOOKS_UPDATE', 'PRESENCES_REPLACE'):
                 log.info('GOT A WANTED PACKET!!')
                 await self._special_packet_channel.send('HELLO I GOT A GOOD'
                                                         ' PACKET PLS SEE '
