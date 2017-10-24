@@ -39,6 +39,7 @@ extensions = [
     'playing', 'sub',
     'nsfw', 'heist', 'midi',
     'lottery',
+    'birb'
 ]
 
 CHECK_FAILURE_PHRASES = [
@@ -189,8 +190,8 @@ class JoseBot(commands.Bot):
             await ctx.send('check failed — '
                            f'{random.choice(CHECK_FAILURE_PHRASES)}')
         elif isinstance(error, commands.errors.CommandOnCooldown):
-            # retry = round(error.retry_after, 2)
-            # await ctx.send(f'Command on cooldown, wait `{retry}` seconds')
+            retry = round(error.retry_after, 2)
+            await ctx.send(f'Command on cooldown, wait `{retry}` seconds')
             pass
 
     async def on_message(self, message):
