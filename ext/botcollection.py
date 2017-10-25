@@ -19,6 +19,7 @@ WHITELIST = (
     248143597097058305,  # cyn bae's private server we gotta get 69
     291990349776420865,  # em's meme heaven
     366513799404060672,  # dan's another gay guild
+    322885030806421509,  # heating's gay guild
 )
 
 log = logging.getLogger(__name__)
