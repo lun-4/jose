@@ -312,72 +312,80 @@ class CoinsExt(Cog):
             raise self.SayException('Target has less than `3JC`, '
                                     'cannot steal them')
 
-        await self.check_cooldowns(ctx)
-        await self.check_grace(target)
-        await self.steal_points(ctx)
+        try:
+            self.coins.lock_account(thief.id)
+            self.coins.lock_account(target.id)
 
-        thief_account['times_stolen'] += 1
-        await self.jcoin.update_accounts([thief_account])
+            await self.check_cooldowns(ctx)
+            await self.check_grace(target)
+            await self.steal_points(ctx)
 
-        if target.id == self.bot.user.id or target.id in WHITELISTED_ACCOUNTS:
-            hours, transfer_info = await self.do_arrest(ctx, amount)
-            raise self.SayException(":cop: Hell no! You can't steal "
-                                    "from whitelisted accounts, "
-                                    f"{hours} hours of jail now\n"
-                                    f"{transfer_info}")
-
-        if amount > target_account['amount']:
-            hours, transfer_info = await self.do_arrest(ctx, amount)
-            raise self.SayException(f":cop: Arrested from trying to steal "
-                                    "more than the target's wallet, "
-                                    f"{hours} hours in jail\n{transfer_info}")
-
-        t_amnt = target_account['amount']
-        chance = (BASE_CHANCE + (t_amnt / amount)) * STEAL_CONSTANT
-        if chance > 5:
-            chance = 5
-        chance = round(chance, 3)
-
-        res = random.uniform(0, 10)
-        res = round(res, 3)
-
-        log.info('[steal:cmd] chance=%.2f res=%.2f thief=%s[uid=%d]'
-                 ' target=%s[uid=%d] amount=%.2f',
-                 chance, res, thief, thief.id, target, target.id, amount)
-
-        if res < chance:
-            # successful steal
-            thief_account = await self.jcoin.get_account(thief.id)
-            thief_account['success_steal'] += 1
+            thief_account['times_stolen'] += 1
             await self.jcoin.update_accounts([thief_account])
 
-            transfer_info = await self.jcoin.transfer(target.id,
-                                                      thief.id, amount)
+            if target.id == self.bot.user.id or \
+               target.id in WHITELISTED_ACCOUNTS:
+                hours, transfer_info = await self.do_arrest(ctx, amount)
+                raise self.SayException(":cop: Hell no! You can't steal "
+                                        "from whitelisted accounts, "
+                                        f"{hours} hours of jail now\n"
+                                        f"{transfer_info}")
 
-            # add grace period
-            grace = 5
-            if self.owner is None:
-                appinfo = await self.bot.application_info()
-                self.owner = appinfo.owner
+            if amount > target_account['amount']:
+                hours, transfer_info = await self.do_arrest(ctx, amount)
+                raise self.SayException(f":cop: Arrested from trying to steal "
+                                        "more than the target's wallet, "
+                                        f"{hours} hours in jail\n{transfer_info}")
 
-            if target.id == self.owner.id:
-                grace = 6
+            t_amnt = target_account['amount']
+            chance = (BASE_CHANCE + (t_amnt / amount)) * STEAL_CONSTANT
+            if chance > 5:
+                chance = 5
+            chance = round(chance, 3)
 
-            try:
-                await target.send(f':gun: You got robbed! Thief(`{thief}`) '
-                                  f'stole `{amount}` from you. '
-                                  f'{grace}h grace period')
-            except:
-                pass
+            res = random.uniform(0, 10)
+            res = round(res, 3)
 
-            await self.add_grace(target, grace)
-            await ctx.send(f'`[res: {res} < prob: {chance}]` congrats lol'
-                           f'\n{transfer_info}')
-        else:
-            # failure, get rekt
-            hours, transfer_info = await self.do_arrest(ctx, amount)
-            await ctx.send(f'`[res: {res} > prob: {chance}]` :cop: '
-                           f'Arrested! {hours}h in jail\n{transfer_info}')
+            log.info('[steal:cmd] chance=%.2f res=%.2f thief=%s[uid=%d]'
+                     ' target=%s[uid=%d] amount=%.2f',
+                     chance, res, thief, thief.id, target, target.id, amount)
+
+            if res < chance:
+                # successful steal
+                thief_account = await self.jcoin.get_account(thief.id)
+                thief_account['success_steal'] += 1
+                await self.jcoin.update_accounts([thief_account])
+
+                transfer_info = await self.jcoin.transfer(target.id,
+                                                          thief.id, amount)
+
+                # add grace period
+                grace = 5
+                if self.owner is None:
+                    appinfo = await self.bot.application_info()
+                    self.owner = appinfo.owner
+
+                if target.id == self.owner.id:
+                    grace = 6
+
+                try:
+                    await target.send(f':gun: You got robbed! Thief(`{thief}`) '
+                                      f'stole `{amount}` from you. '
+                                      f'{grace}h grace period')
+                except:
+                    pass
+
+                await self.add_grace(target, grace)
+                await ctx.send(f'`[res: {res} < prob: {chance}]` congrats lol'
+                               f'\n{transfer_info}')
+            else:
+                # failure, get rekt
+                hours, transfer_info = await self.do_arrest(ctx, amount)
+                await ctx.send(f'`[res: {res} > prob: {chance}]` :cop: '
+                               f'Arrested! {hours}h in jail\n{transfer_info}')
+        finally:
+            self.coins.unlock_account(thief.id)
+            self.coins.unlock_account(target.id)
 
     @commands.command()
     async def stealstate(self, ctx):
