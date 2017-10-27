@@ -20,11 +20,6 @@ class SayException(Exception):
 class GuildConverter(commands.Converter):
     """Convert the name of a guild to
     a Guild object."""
-    async def guild_name_lookup(self, ctx, arg):
-        def f(guild):
-            return arg == guild.name.lower()
-        return discord.utils.find(f, ctx.bot.guilds)
-
     async def convert(self, ctx, arg):
         bot = ctx.bot
 
