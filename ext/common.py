@@ -46,18 +46,18 @@ class CoinConverter(commands.Converter):
     Also checks if the user has an account
     """
     async def convert(self, ctx, argument):
-        cf = commands.CheckFailure
+        ba = commands.BadArgument
 
         value = decimal.Decimal(argument)
         if value <= ZERO:
-            raise cf("You can't input values lower or equal to 0.")
+            raise ba("You can't input values lower or equal to 0.")
         elif value >= INF:
-            raise cf("You can't input values lower of equal to infinity.")
+            raise ba("You can't input values lower of equal to infinity.")
 
         try:
             value = round(value, 3)
         except:
-            raise cf('Rounding failed.')
+            raise ba('Rounding failed.')
 
         coins = ctx.bot.get_cog('Coins')
         if not coins:
@@ -68,7 +68,7 @@ class CoinConverter(commands.Converter):
 
         account = await coins.get_account(ctx.author.id)
         if not account:
-            raise cf("You don't have a JoséCoin account, "
+            raise ba("You don't have a JoséCoin account, "
                      "make one with `{ctx.bot.prefix}account`")
 
         return value
