@@ -231,7 +231,8 @@ async def get_prefix(bot, message):
     if custom == bot.config.prefix:
         return custom
 
-    return [bot.config.prefix, custom]
+    # sort backwards due to the command parser taking the first match
+    return sorted([bot.config.prefix, custom], reverse=True)
 
 jose = JoseBot(
     command_prefix=get_prefix,
