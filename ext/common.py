@@ -1,6 +1,12 @@
 import asyncio
+import decimal
+
+from discord.ext import commands
 
 JOSE_VERSION = '2.3'
+
+ZERO = decimal.Decimal(0)
+INF = decimal.Decimal('inf')
 
 WIDE_MAP = dict((i, i + 0xFEE0) for i in range(0x21, 0x7F))
 WIDE_MAP[0x20] = 0x3000
@@ -8,6 +14,32 @@ WIDE_MAP[0x20] = 0x3000
 
 class SayException(Exception):
     pass
+
+
+class CoinConverter(commands.Converter):
+    """Does simple checks to the value being given.
+
+    Also checks if the user has an account
+    """
+    async def convert(self, ctx, argument):
+        cf = commands.CheckFailure
+
+        value = decimal.Decimal(argument)
+        if value < ZERO:
+            raise cf("You can't input values lower than 0.")
+        elif value > INF:
+            raise cf("You can't input infinity.")
+
+        coins = ctx.bot.get_cog('Coins')
+        if not coins:
+            return value
+
+        account = await coins.get_account(ctx.author.id)
+        if not account:
+            raise cf("You don't have a JoséCoin account, "
+                     "make one with `{ctx.bot.prefix}account`")
+
+        return value
 
 
 class Cog:
