@@ -350,6 +350,8 @@ class CoinsExt(Cog):
                      ' target=%s[uid=%d] amount=%.2f',
                      chance, res, thief, thief.id, target, target.id, amount)
 
+            self.coins.unlock_account(thief.id)
+            self.coins.unlock_account(target.id)
             if res < chance:
                 # successful steal
                 thief_account = await self.jcoin.get_account(thief.id)
