@@ -153,6 +153,9 @@ class Gambling(Cog):
     @commands.command()
     async def slots(self, ctx, amount: decimal.Decimal):
         """little slot machine"""
+        if amount < 0:
+            return await ctx.send('nonono')
+
         try:
             amount = round(amount, 3)
         except:
