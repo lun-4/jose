@@ -355,13 +355,7 @@ class Heist(Cog):
         if amount > 200:
             return await ctx.send('Cannot heist more than 200JC.')
 
-        if amount < 0.1:
-            return await ctx.send('no')
-
-        account = await self.bot.get_cog('Coins').get_account(ctx.author.id)
-        if not account:
-            raise self.SayException('You dont have a josecoin wallet')
-
+        account = await self.coins.get_account(ctx.author.id)
         if amount > account['amount']:
             raise self.SayException('You cant heist more than'
                                     ' what you currently hold.')
@@ -374,16 +368,15 @@ class Heist(Cog):
         if target == ctx.guild:
             raise self.SayException('stealing from the same guild? :thinking:')
 
-        taxbank = await self.bot.get_cog('Coins').get_account(target.id)
+        taxbank = await self.coins.get_account(target.id)
         if not taxbank:
-            raise self.SayException('Taxbank account not found')
+            raise self.SayException('Guild taxbank account not found')
 
         if amount > taxbank['amount']:
             raise self.SayException('You cannot steal more than the '
                                     'guild taxbank currently holds.')
 
         session = self.get_sess(ctx, target, True)
-
         try:
             await self.check_user(ctx, session)
         except self.SayException as err:
@@ -417,7 +410,7 @@ class Heist(Cog):
             if ctx.author.id in session.users:
                 raise self.SayException('You are already in a join session '
                                         f'at `{session.ctx.guild!s}`')
-        
+
         session = self.get_sess(ctx)
         await self.check_user(ctx, session)
 
