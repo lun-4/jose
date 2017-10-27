@@ -267,7 +267,7 @@ class CoinsExt(Cog):
 
     @commands.command()
     @commands.guild_only()
-    async def steal(self, ctx, amount: CoinConverter, *, target: discord.User):
+    async def steal(self, ctx, target: discord.User, *, amount: CoinConverter):
         """Steal JoséCoins from someone.
 
         Obviously, this isn't guaranteed to have 100% success.
