@@ -6,7 +6,7 @@ import collections
 import discord
 
 from discord.ext import commands
-from .common import Cog
+from .common import Cog, CoinConverter
 
 
 EMOJI_POOL = ':thinking: :snail: :shrug: :chestnut: :ok_hand: :eggplant:'.split() + \
@@ -25,26 +25,20 @@ class Gambling(Cog):
 
     @commands.command()
     async def duel(self, ctx, challenged_user: discord.User,
-                   amount: decimal.Decimal):
+                   amount: CoinConverter):
         """Duel a user for coins.
 
         The winner of the duel is the person that sends a message first as soon
         as josé says "GO".
         """
-
         if challenged_user == ctx.author:
-            raise self.SayException('frigger go get some friends '
-                                    'you cant do this alone :ccccccccc')
+            raise self.SayException("You can't do this alone.")
 
         if challenged_user.bot:
             raise self.SayException('You cannot duel bots.')
 
-        amount = round(amount, 2)
         if amount > 5:
             raise self.SayException("Can't duel more than 5JC.")
-
-        if amount <= 0:
-            raise self.SayException('lul')
 
         challenger_user = ctx.author
         challenger = ctx.author.id
@@ -151,24 +145,14 @@ class Gambling(Cog):
             self.coins.unlock_account(challenged)
 
     @commands.command()
-    async def slots(self, ctx, amount: decimal.Decimal):
+    async def slots(self, ctx, amount: CoinConverter):
         """little slot machine"""
-        if amount < 0:
-            return await ctx.send('nonono')
-
-        try:
-            amount = round(amount, 3)
-        except:
-            return await ctx.send('Error rounding.')
-
         if amount > 8:
             raise self.SayException('You cannot gamble too much.')
 
-        await self.jcoin.ensure_taxbank(ctx)
         await self.jcoin.pricing(ctx, amount)
 
         res = []
-
         slots = [random.choice(EMOJI_POOL) for i in range(3)]
 
         res.append(' '.join(slots))

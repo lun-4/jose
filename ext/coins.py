@@ -9,7 +9,8 @@ import discord
 
 from random import SystemRandom
 from discord.ext import commands
-from .common import Cog
+
+from .common import Cog, CoinConverter
 
 log = logging.getLogger(__name__)
 random = SystemRandom()
@@ -627,10 +628,8 @@ class Coins(Cog):
 
     @commands.command(name='transfer')
     async def _transfer(self, ctx, person: discord.User,
-                        amount: decimal.Decimal):
+                        amount: CoinConverter):
         """Transfer coins to another person."""
-        amount = round(decimal.Decimal(amount), 3)
-
         try:
             await self.transfer(ctx.author.id, person.id, amount)
             await ctx.send(f'Transferred {amount!s} '
@@ -657,11 +656,8 @@ class Coins(Cog):
                        f'`{acc["amount"]}`, paid `{acc["taxpaid"]}JC` as tax.')
 
     @commands.command()
-    async def donate(self, ctx, amount: decimal.Decimal):
+    async def donate(self, ctx, amount: CoinConverter):
         """Donate to your server's taxbank."""
-        await self.ensure_taxbank(ctx)
-        amount = round(decimal.Decimal(amount), 3)
-
         await self.transfer(ctx.author.id, ctx.guild.id, amount)
         await ctx.send(f'Transferred {amount!s} '
                        f'from {ctx.author!s} to {self.get_name(ctx.guild)}')
@@ -669,7 +665,10 @@ class Coins(Cog):
     @commands.command()
     @commands.is_owner()
     async def write(self, ctx, person: discord.User, amount: decimal.Decimal):
-        """Overwrite someone's wallet."""
+        """Overwrite someone's wallet.
+
+        This command does not check for incorrect values (like -2 or infinity).
+        """
         account = await self.get_account(person.id)
         if account is None:
             raise self.SayException('account not found you dumbass')

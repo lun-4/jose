@@ -6,7 +6,7 @@ from random import SystemRandom
 import discord
 from discord.ext import commands
 
-from .common import Cog
+from .common import Cog, CoinConverter
 
 random = SystemRandom()
 log = logging.getLogger(__name__)
@@ -267,7 +267,7 @@ class CoinsExt(Cog):
 
     @commands.command()
     @commands.guild_only()
-    async def steal(self, ctx, target: discord.User, amount: decimal.Decimal):
+    async def steal(self, ctx, amount: CoinConverter, *, target: discord.User):
         """Steal JoséCoins from someone.
 
         Obviously, this isn't guaranteed to have 100% success.

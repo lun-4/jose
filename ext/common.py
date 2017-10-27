@@ -1,6 +1,7 @@
 import asyncio
 import decimal
 
+import discord
 from discord.ext import commands
 
 JOSE_VERSION = '2.3'
@@ -16,6 +17,34 @@ class SayException(Exception):
     pass
 
 
+class GuildConverter(commands.Converter):
+    """Convert the name of a guild to
+    a Guild object."""
+    async def guild_name_lookup(self, ctx, arg):
+        def f(guild):
+            return arg == guild.name.lower()
+        return discord.utils.find(f, ctx.bot.guilds)
+
+    async def convert(self, ctx, arg):
+        bot = ctx.bot
+
+        try:
+            guild_id = int(arg)
+        except ValueError:
+            def is_guild(g):
+                return arg.lower() == g.name.lower()
+            guild = discord.utils.find(is_guild, bot.guilds)
+
+            if guild is None:
+                raise commands.BadArgument('Guild not found')
+            return guild
+
+        guild = bot.get_guild(guild_id)
+        if guild is None:
+            raise commands.BadArgument('Guild not found')
+        return guild
+
+
 class CoinConverter(commands.Converter):
     """Does simple checks to the value being given.
 
@@ -25,14 +54,22 @@ class CoinConverter(commands.Converter):
         cf = commands.CheckFailure
 
         value = decimal.Decimal(argument)
-        if value < ZERO:
-            raise cf("You can't input values lower than 0.")
-        elif value > INF:
-            raise cf("You can't input infinity.")
+        if value <= ZERO:
+            raise cf("You can't input values lower or equal to 0.")
+        elif value >= INF:
+            raise cf("You can't input values lower of equal to infinity.")
+
+        try:
+            value = round(value, 3)
+        except:
+            raise cf('Rounding failed.')
 
         coins = ctx.bot.get_cog('Coins')
         if not coins:
             return value
+
+        # Ensure a taxbank account tied to the guild exists
+        await coins.ensure_taxbank(ctx)
 
         account = await coins.get_account(ctx.author.id)
         if not account:

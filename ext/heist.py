@@ -6,7 +6,7 @@ from random import SystemRandom
 
 from discord.ext import commands
 
-from .common import Cog, SayException
+from .common import Cog, SayException, CoinConverter, GuildConverter
 
 random = SystemRandom()
 log = logging.getLogger(__name__)
@@ -18,32 +18,6 @@ INCREASE_PER_PERSON = decimal.Decimal('0.3')
 
 class HeistSessionError(Exception):
     pass
-
-
-class GuildConverter(commands.Converter):
-    async def guild_name_lookup(self, ctx, arg):
-        def f(guild):
-            return arg == guild.name.lower()
-        return discord.utils.find(f, ctx.bot.guilds)
-
-    async def convert(self, ctx, arg):
-        bot = ctx.bot
-
-        try:
-            guild_id = int(arg)
-        except ValueError:
-            def is_guild(g):
-                return arg.lower() == g.name.lower()
-            guild = discord.utils.find(is_guild, bot.guilds)
-
-            if guild is None:
-                raise commands.BadArgument('Guild not found')
-            return guild
-
-        guild = bot.get_guild(guild_id)
-        if guild is None:
-            raise commands.BadArgument('Guild not found')
-        return guild
 
 
 class JoinSession:
@@ -362,7 +336,7 @@ class Heist(Cog):
 
     @commands.group(invoke_without_command=True)
     async def heist(self, ctx,
-                    amount: decimal.Decimal, *, target: GuildConverter):
+                    amount: CoinConverter, *, target: GuildConverter):
         """Heist a server.
 
         This works better if you have more people joining in your heist.
