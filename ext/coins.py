@@ -53,6 +53,7 @@ class Coins(Cog):
         self.hidecoin_coll = self.config.jose_db['jcoin-hidecoin']
 
         self.BASE_PROBABILITY = COIN_BASE_PROBABILITY
+        self.INF = decimal.Decimal('inf')
 
         self.TransferError = TransferError
         self.bot.simple_exc.append(TransferError)

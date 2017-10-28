@@ -323,8 +323,7 @@ class CoinsExt(Cog):
             thief_account['times_stolen'] += 1
             await self.jcoin.update_accounts([thief_account])
 
-            if target.id == self.bot.user.id or \
-               target.id in WHITELISTED_ACCOUNTS:
+            if target_account['amount'] == self.coins.INF:
                 hours, transfer_info = await self.do_arrest(ctx, amount)
                 raise self.SayException(":cop: Hell no! You can't steal "
                                         "from whitelisted accounts, "
@@ -335,7 +334,8 @@ class CoinsExt(Cog):
                 hours, transfer_info = await self.do_arrest(ctx, amount)
                 raise self.SayException(f":cop: Arrested from trying to steal "
                                         "more than the target's wallet, "
-                                        f"{hours} hours in jail\n{transfer_info}")
+                                        f"{hours} hours in jail\n"
+                                        f"{transfer_info}")
 
             t_amnt = target_account['amount']
             chance = (BASE_CHANCE + (t_amnt / amount)) * STEAL_CONSTANT
