@@ -367,13 +367,6 @@ class Speak(Cog):
         """covfefe."""
         await ctx.send("Despite the constant negative press covfefe.")
 
-    @commands.command(aliases=['jw'])
-    @commands.guild_only()
-    async def jwormhole(self, ctx):
-        """lul wormhole"""
-        res = await self.make_sentence(ctx)
-        await ctx.send(f'<@127296623779774464> wormhole send {res}')
-
     @commands.command()
     @commands.guild_only()
     async def madlibs(self, ctx, *, inputstr: str):
