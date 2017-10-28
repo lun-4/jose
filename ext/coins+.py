@@ -323,6 +323,9 @@ class CoinsExt(Cog):
             thief_account['times_stolen'] += 1
             await self.jcoin.update_accounts([thief_account])
 
+            self.coins.unlock_account(thief.id)
+            self.coins.unlock_account(target.id)
+
             if target_account['amount'] == self.coins.INF:
                 hours, transfer_info = await self.do_arrest(ctx, amount)
                 raise self.SayException(":cop: Hell no! You can't steal "
@@ -350,8 +353,6 @@ class CoinsExt(Cog):
                      ' target=%s[uid=%d] amount=%.2f',
                      chance, res, thief, thief.id, target, target.id, amount)
 
-            self.coins.unlock_account(thief.id)
-            self.coins.unlock_account(target.id)
             if res < chance:
                 # successful steal
                 thief_account = await self.jcoin.get_account(thief.id)
