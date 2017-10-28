@@ -39,6 +39,7 @@ extensions = [
     'playing', 'sub',
     'nsfw', 'heist', 'midi',
     'lottery',
+    'chatbot',
 ]
 
 CHECK_FAILURE_PHRASES = [

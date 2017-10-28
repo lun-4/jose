@@ -128,3 +128,6 @@ markov-database.json
 
 # backup file
 jose-backup*
+
+# chatterbot
+db.sqlite3
