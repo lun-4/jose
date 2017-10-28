@@ -225,6 +225,10 @@ class CoinsExt(Cog):
                                           {'$set':
                                            {'points': points['points'] - 1}})
 
+        # Automatically put a cooldown when points reaches 0
+        if (points['points'] - 1) < 1:
+            await self.add_cooldown(thief, 1, STEAL_REGEN)
+
     async def add_grace(self, target, hours):
         """Add a grace period to the target.
 

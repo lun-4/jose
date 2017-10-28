@@ -69,7 +69,7 @@ class CoinConverter(commands.Converter):
         account = await coins.get_account(ctx.author.id)
         if not account:
             raise ba("You don't have a JoséCoin account, "
-                     "make one with `{ctx.bot.prefix}account`")
+                     f"make one with `{ctx.bot.prefix}account`")
 
         return value
 
