@@ -11,6 +11,7 @@ from discord.ext import commands
 from .common import Cog
 
 log = logging.getLogger(__name__)
+SENTENCE_PRICE = '0.05'
 
 
 def make_textmodel(texter, data):
@@ -222,6 +223,37 @@ class Speak(Cog):
 
         return self.text_generators[guild.id]
 
+    async def sentence_tax(self, ctx, mode='user'):
+        """Tax someone when they request a sentence.
+
+        Catches transfer errors, logs them, but
+        it doesn't raise to the upper scope(calling function).
+
+        Parameters
+        ----------
+        ctx: context
+            Command context
+        mode: str
+            can be ``"user"`` or ``"txb"``
+
+        Returns
+        -------
+        None
+        """
+        account = None
+        if mode == 'user':
+            account = await self.coins.get_account(ctx.author.id)
+        elif mode == 'txb':
+            account = await self.coins.get_account(ctx.guild.id)
+        else:
+            raise RuntimeError('Sentence tax type not found')
+
+        if account:
+            try:
+                await self.coins.sink(ctx.author.id, SENTENCE_PRICE)
+            except self.coins.TransferError as err:
+                log.exception('Ignoring error on sentence paying')
+
     async def make_sentence(self, ctx, char_limit=None):
         with ctx.typing():
             try:
@@ -230,6 +262,7 @@ class Speak(Cog):
                 raise self.SayException('Failed to generate a '
                                         f'texter: `{err.args[0]!r}`')
 
+        await self.sentence_tax(ctx, 'txb' if not ctx.command else 'user')
         sentence = await texter.sentence(char_limit)
         return sentence
 

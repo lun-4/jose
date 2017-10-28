@@ -463,6 +463,16 @@ class Coins(Cog):
                                    self.bot.user.id,
                                    account['amount'])
 
+    async def sink(self, user_id: int, amount: decimal.Decimal):
+        """Transfer money back to josé."""
+        try:
+            amount = decimal.Decimal(amount)
+        except:
+            log.exception('Error on sink')
+            return
+
+        return await self.transfer(user_id, self.bot.user.id, amount)
+
     async def ranks(self, user_id: int, guild: discord.Guild) -> tuple:
         all_accounts = await self.all_accounts()
 
