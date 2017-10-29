@@ -193,6 +193,8 @@ class JoseBot(commands.Bot):
             # retry = round(error.retry_after, 2)
             # await ctx.send(f'Command on cooldown, wait `{retry}` seconds')
             pass
+        elif isinstance(error, commands.errors.MissingRequiredArgument):
+            await ctx.send(f'missing argument: `{error.param}`')
 
     async def on_message(self, message):
         author_id = message.author.id

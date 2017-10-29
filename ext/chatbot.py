@@ -175,6 +175,13 @@ class JoseChat(Cog):
         response = await future
         await ctx.send(response)
 
+    @chat.error
+    async def error_handler(self, ctx, error):
+        if isinstance(error, commands.errors.CommandOnCooldown):
+            await ctx.send('You are being ratelimited.'
+                           'http://bust.com/images/myblog/35408/'
+                           '53f777c9cf02d.jpg')
+
 
 def setup(bot):
     bot.add_cog(JoseChat(bot))
