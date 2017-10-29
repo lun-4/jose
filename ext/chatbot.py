@@ -1,4 +1,5 @@
 import logging
+import discord
 
 from chatterbot import ChatBot
 from discord.ext import commands
@@ -182,9 +183,14 @@ class JoseChat(Cog):
     @chat.error
     async def error_handler(self, ctx, error):
         if isinstance(error, commands.errors.CommandOnCooldown):
-            await ctx.send('You are being ratelimited.'
-                           'http://bust.com/images/myblog/35408/'
-                           '53f777c9cf02d.jpg')
+            em = discord.Embed()
+
+            em.description = 'You are being ratelimited'
+            em.set_image('https://cdn.discordapp.com/attachments'
+                         '/110373943822540800/183257679324643329'
+                         '/b1nzybuddy.png')
+
+            await ctx.send(embed=em)
 
 
 def setup(bot):
