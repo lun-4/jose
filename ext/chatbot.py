@@ -173,7 +173,17 @@ class JoseChat(Cog):
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.default)
     async def chat(self, ctx, *, user_input: str):
-        """Talk to the chatbot"""
+        """Talk to the chatbot.
+
+        This is completly separated from José's markov feature,
+        the one you use through 'j!spt' and 'jose thing' messages.
+
+        It is not "mixing words and sentences" together like
+        markov did. This is Machine Learning and it will use
+        previous inputs to it as-is.
+
+        Powered by Chatterbot, kudos to them.
+        """
         future = self.loop.run_in_executor(None,
                                            self.chatbot.get_response,
                                            user_input)
