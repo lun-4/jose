@@ -146,7 +146,6 @@ class JoseChat(Cog):
             logic_adapters=[
                 'chatterbot.logic.BestMatch',
                 'chatterbot.logic.MathematicalEvaluation',
-                'chatterbot.logic.TimeLogicAdapter',
                 {
                     'import_path': 'chatterbot.logic.LowConfidenceAdapter',
                     'threshold': 0.2,
