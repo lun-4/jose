@@ -184,11 +184,12 @@ class JoseChat(Cog):
 
         Powered by Chatterbot, kudos to them.
         """
-        future = self.loop.run_in_executor(None,
-                                           self.chatbot.get_response,
-                                           user_input)
-        response = await future
-        await ctx.send(response)
+        with ctx.typing():
+            future = self.loop.run_in_executor(None,
+                                               self.chatbot.get_response,
+                                               user_input)
+            response = await future
+            await ctx.send(response)
 
     @chat.error
     async def error_handler(self, ctx, error):
