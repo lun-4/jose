@@ -1,7 +1,8 @@
-import collections
 import asyncio
 import logging
 import decimal
+
+import pymongo
 
 from datadog import statsd
 from discord.ext import commands
@@ -25,13 +26,15 @@ class Statistics(Cog):
 
         self.cstats_coll = self.config.jose_db['command_stats']
 
+        self.stats_task = None
         if self.bot.config.datadog:
             self.stats_task = bot.loop.create_task(self.querystats())
         else:
             log.warning('Datadog is disabled!')
 
     def __unload(self):
-        self.stats_task.cancel()
+        if self.stats_task:
+            self.stats_task.cancel()
 
     async def datadog(self, method_str, *args):
         method = getattr(statsd, method_str)
@@ -146,20 +149,20 @@ class Statistics(Cog):
                  f' {guild.member_count} members')
 
     @commands.command(aliases=['cstats'])
-    async def command_stats(self, ctx, limit: int = 10):
-        """Shows the most used commands"""
+    async def command_stats(self, ctx, limit: int=10):
+        """Show most used commands."""
         if limit > 20 or limit < 1:
             await ctx.send('no')
             return
 
-        cur = self.cstats_coll.find()
-        cnt = collections.Counter()
+        cur = self.cstats_coll.find().sort('uses',
+                                           direction=pymongo.DESCENDING)\
+                                     .limit(limit)
+        res = []
+        async for single in cur:
+            name, uses = single['name'], single['uses']
+            res.append(f'{name}: used {uses} times')
 
-        for stat in await cur.to_list(length=limit):
-            cnt[stat['name']] = stat['uses']
-
-        most_used = cnt.most_common(limit)
-        res = [f'{name}: used {uses} times' for (name, uses) in most_used]
         _res = '\n'.join(res)
         await ctx.send(f'```\n{_res}\n```')
 

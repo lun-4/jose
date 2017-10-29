@@ -21,8 +21,108 @@ TRAINING = (
         'Talking to you.',
     ],
     [
-        'succ',
-        'No.',
+        'hi',
+        'go away',
+        'ok',
+        'bye loser',
+    ],
+    [
+        'José',
+        "What's good meme boy?",
+        "I'm feeling fresh as fuck",
+        "That's good to hear"
+    ],
+    [
+        'lit',
+        "What's lit lmao",
+        'you',
+        "Aww that's kind"
+    ],
+    [
+        "Somebody once told me the world is gonna roll me",
+        "I ain't the sharpest tool in the shed",
+        "She was looking kind of dumb with her finger and her thumb",
+        "In the shape of an \"L\" on her forehead",
+        "Well the years start coming and they don't stop coming",
+        "Fed to the rules and I hit the ground running",
+        "Didn't make sense not to live for fun",
+        "Your brain gets smart but your head gets dumb",
+        "So much to do, so much to see",
+        "So what's wrong with taking the back streets?",
+        "You'll never know if you don't go",
+        "You'll never shine if you don't glow",
+        "Hey now, you're an all-star, get your game on, go play",
+        "Hey now, you're a rock star, get the show on, get paid",
+        "And all that glitters is gold",
+        "Only shooting stars break the mold",
+        "It's a cool place and they say it gets colder",
+        "You're bundled up now, wait till you get older",
+        "But the meteor men beg to differ",
+        "Judging by the hole in the satellite picture",
+        "The ice we skate is getting pretty thin",
+        "The water's getting warm so you might as well swim",
+        "My world's on fire, how about yours?",
+        "That's the way I like it and I never get bored",
+    ],
+    [
+        'Tell me a joke',
+        "I'm not just here for your entertainment, I have feelings you know"
+    ],
+    [
+        'Say something funny',
+        "I'm not just here for your entertainment, I have feelings you know"
+    ],
+    [
+        'Say something funny',
+
+        "Idk how to make you laugh since you've "
+        "already seen the funniest joke ever",
+
+        'What?',
+        'You HAHA REKT'
+    ],
+    [
+        "I'm gay lol",
+        "Tatsu is just a side hoe"
+    ],
+    [
+        'Communism'
+
+        'Death is a preferable alternative to communism. '
+        'Capitalism all the way baby'
+    ],
+    [
+        'Capitalism is great',
+        'Communism is better!',
+        'Wrong! Joseism is better'
+    ],
+    [
+        'Who is your creator?',
+        'Luna'
+    ],
+    [
+        'Say something',
+        'idk my dude'
+    ],
+    [
+        'Good night',
+        'Sweet dreams'
+    ],
+    [
+        'Good morning',
+        'Hello'
+    ],
+    [
+        'You were already José',
+        'Nani!?'
+    ],
+    [
+        'Omae wa moe José',
+        'Nani?!'
+    ],
+    [
+        'What?',
+        "I don't know my dude",
     ],
 )
 
@@ -45,7 +145,7 @@ class JoseChat(Cog):
                 'chatterbot.logic.TimeLogicAdapter',
                 {
                     'import_path': 'chatterbot.logic.LowConfidenceAdapter',
-                    'threshold': 0.6,
+                    'threshold': 0.2,
                     'default_response': 'I do not understand.'
                 }
             ],
@@ -63,7 +163,7 @@ class JoseChat(Cog):
         await ctx.send(f'Trained {len(TRAINING)} Conversations.')
 
     @commands.command()
-    @commands.cooldown(2, 5, commands.BucketType.default)
+    @commands.cooldown(1, 5, commands.BucketType.default)
     async def chat(self, ctx, *, user_input: str):
         """Talk to the chatbot"""
         future = self.loop.run_in_executor(None,
