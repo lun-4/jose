@@ -146,31 +146,21 @@ class Logging(Cog):
     async def on_ready(self):
         self._special_packet_channel = self.bot.get_channel(PACKET_CHANNEL)
 
-    async def on_socket_raw_receive(self, msg):
+    async def on_socket_response(self, payload):
         """Convert msg to JSON and check for specific
         OP codes"""
         if self._special_packet_channel is None:
             return
 
-        # thanks danno
-        if isinstance(msg, bytes):
-            msg = zlib.decompress(msg, 15, 10490000)
-            msg = msg.decode('utf-8')
-
-        try:
-            j = json.loads(msg)
-        except json.JSONDecodeError as e:
-            log.warning('Failed to get JSON from WS_RECEIVE: %r', e)
+        op, t = payload['op'], payload['t']
+        if op != 0:
             return
 
-        op = j['op']
-        t = j['t']
-        if op == 0:
-            if t in ('WEBHOOKS_UPDATE', 'PRESENCES_REPLACE'):
-                log.info('GOT A WANTED PACKET!!')
-                await self._special_packet_channel.send('HELLO I GOT A GOOD'
-                                                        ' PACKET PLS SEE '
-                                                        f'```py\n{j}\n```')
+        if t in ('WEBHOOKS_UPDATE', 'PRESENCES_REPLACE'):
+            log.info('GOT A WANTED PACKET!!')
+            await self._special_packet_channel.send('HELLO I GOT A GOOD'
+                                                    ' PACKET PLS SEE '
+                                                    f'```py\n{j}\n```')
 
     @commands.command()
     @commands.is_owner()

@@ -124,6 +124,10 @@ TRAINING = (
         'What?',
         "I don't know my dude",
     ],
+    [
+        'We are one',
+        'We are legion'
+    ],
 )
 
 
