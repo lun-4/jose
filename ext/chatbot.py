@@ -128,6 +128,10 @@ TRAINING = (
         'We are one',
         'We are legion'
     ],
+    [
+        "You're a big guy",
+        'For you',
+    ],
 )
 
 
