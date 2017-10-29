@@ -186,7 +186,7 @@ class JoseChat(Cog):
             em = discord.Embed()
 
             em.description = 'You are being ratelimited'
-            em.set_image('https://cdn.discordapp.com/attachments'
+            em.set_image(url='https://cdn.discordapp.com/attachments'
                          '/110373943822540800/183257679324643329'
                          '/b1nzybuddy.png')
 
