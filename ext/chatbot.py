@@ -197,7 +197,7 @@ class JoseChat(Cog):
             em = discord.Embed()
 
             em.description = 'You are being ratelimited, please retry in ' + \
-                             f'`{error.retry_after}` seconds'
+                             f'`{error.retry_after:.2}` seconds'
             em.set_image(url='https://cdn.discordapp.com/attachments'
                          '/110373943822540800/183257679324643329'
                          '/b1nzybuddy.png')
