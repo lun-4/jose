@@ -196,7 +196,8 @@ class JoseChat(Cog):
         if isinstance(error, commands.errors.CommandOnCooldown):
             em = discord.Embed()
 
-            em.description = 'You are being ratelimited'
+            em.description = 'You are being ratelimited, please retry in ' + \
+                             f'`{error.retry_after}` seconds'
             em.set_image(url='https://cdn.discordapp.com/attachments'
                          '/110373943822540800/183257679324643329'
                          '/b1nzybuddy.png')
