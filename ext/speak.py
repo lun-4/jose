@@ -191,9 +191,14 @@ class Speak(Cog):
                     continue
 
                 # remove messages with speak prefix
+                starts_prefix = False
+
                 for prefix in self.bot.config.SPEAK_PREFIXES:
                     if content.startswith(prefix):
-                        continue
+                        starts_prefix = True
+
+                if starts_prefix:
+                    continue
 
                 messages.append(message.clean_content)
 
