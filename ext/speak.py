@@ -211,7 +211,7 @@ class Speak(Cog):
 
     async def new_texter(self, guild):
         guild_messages = await self.get_messages_str(guild)
-        new_texter = await make_texter(guild_messages, guild.id)
+        new_texter = await make_texter(guild.id, guild_messages)
 
         self.st_gen_totalms += new_texter.time_taken
         self.st_gen_count += 1
