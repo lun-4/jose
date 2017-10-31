@@ -252,7 +252,8 @@ class Speak(Cog):
             try:
                 await self.coins.sink(ctx.author.id, SENTENCE_PRICE)
             except self.coins.TransferError as err:
-                log.exception('Ignoring error on sentence paying')
+                if 'not found' not in repr(err):
+                    log.warning('Ignoring error on sentence paying', exc_info=True)
 
     async def make_sentence(self, ctx, char_limit=None):
         with ctx.typing():
