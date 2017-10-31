@@ -42,18 +42,17 @@ class Texter:
         if not self.loop:
             self.loop = asyncio.get_event_loop()
 
+        self.chain_length = kwargs.pop('chain_length', 1)
         self.id = texter_id
+
+        #: internal things
         self.refcount = 1
         self.wordcount = 0
         self.linecount = 0
+        self.time_taken = 0
 
-        self.chain_length = kwargs.pop('chain_length', 1)
-        self.loop = loop
         self.model = None
         self.model_kwargs = kwargs
-
-        #: Time taken to make this texter
-        self.time_taken = 0
 
     def __repr__(self):
         return f'<Texter refcount={self.refcount} wordcount={self.wordcount}>'
