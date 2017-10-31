@@ -38,7 +38,7 @@ class Texter:
                  'model_kwargs')
 
     def __init__(self, texter_id, **kwargs):
-        self.loop = kwargs.pop('loop')
+        self.loop = kwargs.pop('loop', None)
         if not self.loop:
             self.loop = asyncio.get_event_loop()
 
