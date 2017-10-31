@@ -209,9 +209,9 @@ class Speak(Cog):
         m = await self.get_messages(guild, amount)
         return '\n'.join(m)
 
-    async def new_texter(self, guild):
+    async def new_texter(self, guild, **kwargs):
         guild_messages = await self.get_messages_str(guild)
-        new_texter = await make_texter(guild.id, guild_messages)
+        new_texter = await make_texter(guild.id, guild_messages, **kwargs)
 
         self.st_gen_totalms += new_texter.time_taken
         self.st_gen_count += 1
