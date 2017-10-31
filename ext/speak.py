@@ -15,11 +15,11 @@ SENTENCE_PRICE = '0.05'
 
 
 def make_textmodel(texter, data):
-    texter.model = markovify.NewlineText(data, texter.chain_length)
+    texter.model = markovify.NewlineText(data, texter.chain_length, **texter.model_kwargs)
 
 
-async def make_texter(chain_length, data, texter_id):
-    texter = Texter(texter_id, chain_length)
+async def make_texter(texter_id, data, **kwargs):
+    texter = Texter(texter_id, **kwargs)
     await texter.fill(data)
     return texter
 
@@ -34,20 +34,23 @@ class Texter:
     This class holds information about a markov chain generator.
     """
     __slots__ = ('loop', 'id', 'refcount', 'chain_length',
-                 'model', 'wordcount', 'linecount', 'time_taken')
+                 'model', 'wordcount', 'linecount', 'time_taken', 
+                 'model_kwargs')
 
-    def __init__(self, texter_id, chain_length=1, loop=None):
-        if loop is None:
-            loop = asyncio.get_event_loop()
+    def __init__(self, texter_id, **kwargs):
+        self.loop = kwargs.pop('loop')
+        if not self.loop:
+            self.loop = asyncio.get_event_loop()
 
         self.id = texter_id
         self.refcount = 1
         self.wordcount = 0
         self.linecount = 0
 
-        self.chain_length = chain_length
+        self.chain_length = kwargs.pop('chain_length', 1)
         self.loop = loop
         self.model = None
+        self.model_kwargs = kwargs
 
         #: Time taken to make this texter
         self.time_taken = 0
@@ -209,7 +212,7 @@ class Speak(Cog):
 
     async def new_texter(self, guild):
         guild_messages = await self.get_messages_str(guild)
-        new_texter = await make_texter(1, guild_messages, guild.id)
+        new_texter = await make_texter(guild_messages, guild.id)
 
         self.st_gen_totalms += new_texter.time_taken
         self.st_gen_count += 1
