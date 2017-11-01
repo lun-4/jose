@@ -37,6 +37,9 @@ class Statistics(Cog):
             self.stats_task.cancel()
 
     async def datadog(self, method_str, *args):
+        if not self.bot.config.datadog:
+            return
+
         method = getattr(statsd, method_str)
         saviour = self.loop.run_in_executor(None, method, *args)
         return await saviour
@@ -116,19 +119,27 @@ class Statistics(Cog):
         await self.gauge('jose.tx.txc_avg_run',
                          speak.st_txc_totalms / speak.st_txc_runs)
 
+    async def single_stats(self, task=False):
+        if not self.bot.config.datadog and not task:
+            log.warning('Datadog not configurated')
+            return
+
+        await self.basic_measures()
+        await self.starboard_stats()
+        await self.jcoin_stats()
+        await self.texter_stats()
+
     async def querystats(self):
         try:
             while True:
-                await self.basic_measures()
-                await self.starboard_stats()
-                await self.jcoin_stats()
-                await self.texter_stats()
-
-                await asyncio.sleep(120)
+                await self.single_stats(True)
+                await asyncio.sleep(60)
         except asyncio.CancelledError:
-            log.info('[statsd] stats machine broke')
-        except Exception:
-            log.error('[statsd] we had shit', exc_info=True)
+            log.info('[statsd] stats machine cancelled')
+        except:
+            log.exception('[statsd] MACHINE BROKE')
+        finally:
+            log.warning('[stats] finishing')
 
     async def on_command(self, ctx):
         command = ctx.command
@@ -138,14 +149,12 @@ class Statistics(Cog):
         if stats is None:
             await self.cstats_coll.insert_one(empty_stats(c_name))
 
-        if self.bot.config.datadog:
-            statsd.increment('jose.complete_commands')
+        await self.increment('jose.complete_commands')
         await self.cstats_coll.update_one({'name': c_name},
                                           {'$inc': {'uses': 1}})
 
     async def on_message(self, message):
-        if self.bot.config.datadog:
-            statsd.increment('jose.recv_messages')
+        await self.increment('jose.recv_messages')
 
     async def on_guild_remove(self, guild):
         log.info(f'Left guild {guild.name} {guild.id},'
