@@ -198,17 +198,17 @@ class JoseChat(Cog):
             await ctx.send(response)
 
     @commands.is_owner()
-    @commands.group(aliases=['wl'])
-    async def whitelist(self, ctx):
+    @commands.group(name='whitelist', aliases=['wl'])
+    async def whitelist_cmd(self, ctx):
         pass
 
-    @whitelist.command(aliases=['add'])
+    @whitelist_cmd.command(name='add')
     async def whitelist_add(self, ctx, person: discord.User):
         obj = {'user_id': person.id}
         r = await self.whitelist.insert_one(obj)
         await ctx.send(f'Inserted {r.inserted_count} documents')
 
-    @whitelist.command(aliases=['remove'])
+    @whitelist_cmd.command(name='remove')
     async def whitelist_remove(self, ctx, person: discord.User):
         obj = {'user_id': person.id}
         r = await self.whitelist.delete_many(obj)
