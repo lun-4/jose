@@ -220,6 +220,10 @@ class JoseChat(Cog):
 
     @chat.error
     async def error_handler(self, ctx, error):
+        ok = await self.whitelist.find_one({'user_id': ctx.author.id})
+        if not ok:
+            return
+
         if isinstance(error, commands.errors.CommandOnCooldown):
             em = discord.Embed()
 
