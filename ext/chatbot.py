@@ -139,6 +139,8 @@ TRAINING = (
 class JoseChat(Cog):
     def __init__(self, bot):
         super().__init__(bot)
+        self.whitelist = self.config.jose_db['chatbot_whitelist']
+
         self.chatbot = ChatBot(
             'José',
             trainer='chatterbot.trainers.ListTrainer',
@@ -184,12 +186,33 @@ class JoseChat(Cog):
 
         Powered by Chatterbot, kudos to them.
         """
+        ok = await self.whitelist.find_one({'user_id': ctx.author.id})
+        if not ok:
+            raise self.SayException('You cannot use the chatbot.')
+
         with ctx.typing():
             future = self.loop.run_in_executor(None,
                                                self.chatbot.get_response,
                                                user_input)
             response = await future
             await ctx.send(response)
+
+    @commands.group(aliases=['wl'])
+    @commands.is_owner()
+    async def whitelist(self, ctx):
+        pass
+
+    @whitelist.command(aliases=['add'])
+    async def whitelist_add(self, ctx, person: discord.User):
+        obj = {'user_id': person.id}
+        r = await self.whitelist.insert_one(obj)
+        await ctx.send(f'Inserted {r.inserted_count} documents')
+
+    @whitelist.command(aliases=['remove'])
+    async def whitelist_remove(self, ctx, person: discord.User):
+        obj = {'user_id': person.id}
+        r = await self.whitelist.delete_many(obj)
+        await ctx.send(f'Deleted {r.deleted_count} documents')
 
     @chat.error
     async def error_handler(self, ctx, error):
