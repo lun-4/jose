@@ -197,8 +197,8 @@ class JoseChat(Cog):
             response = await future
             await ctx.send(response)
 
-    @commands.group(aliases=['wl'])
     @commands.is_owner()
+    @commands.group(aliases=['wl'])
     async def whitelist(self, ctx):
         pass
 
