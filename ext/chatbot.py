@@ -206,7 +206,7 @@ class JoseChat(Cog):
     async def whitelist_add(self, ctx, person: discord.User):
         obj = {'user_id': person.id}
         r = await self.whitelist.insert_one(obj)
-        await ctx.send(f'Mongo ACK: {r}')
+        await ctx.send(f'Mongo ACK: {r.acknowledged}')
 
     @whitelist_cmd.command(name='remove')
     async def whitelist_remove(self, ctx, person: discord.User):
