@@ -200,16 +200,19 @@ class JoseChat(Cog):
     @commands.is_owner()
     @commands.group(name='whitelist', aliases=['wl'])
     async def whitelist_cmd(self, ctx):
+        """Add or remove someone from the j!chat whitelist."""
         pass
 
     @whitelist_cmd.command(name='add')
     async def whitelist_add(self, ctx, person: discord.User):
+        """Add someone to the j!chat whitelist."""
         obj = {'user_id': person.id}
         r = await self.whitelist.insert_one(obj)
         await ctx.send(f'Mongo ACK: {r.acknowledged}')
 
     @whitelist_cmd.command(name='remove')
     async def whitelist_remove(self, ctx, person: discord.User):
+        """Remove someone from the j!chat whitelist."""
         obj = {'user_id': person.id}
         r = await self.whitelist.delete_many(obj)
         await ctx.send(f'Deleted {r.deleted_count} documents')
