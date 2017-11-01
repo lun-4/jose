@@ -97,8 +97,11 @@ class Statistics(Cog):
             elif acctype == 'taxbank':
                 total_coins[1] += account['amount']
 
-        await self.gauge('jose.coin.usercoins', int(total_coins[0]))
-        await self.gauge('jose.coin.taxcoins', int(total_coins[1]))
+        uc, tc = int(total_coins[0]), int(total_coins[1])
+        await self.gauge('jose.coin.usercoins', uc)
+        await self.gauge('jose.coin.taxcoins', tc)
+
+        await self.gauge('jose.coin.totalcoins', uc + tc)
 
     async def texter_stats(self):
         """Report Texter statistics to datadog."""
