@@ -188,7 +188,8 @@ class JoseChat(Cog):
         """
         ok = await self.whitelist.find_one({'user_id': ctx.author.id})
         if not ok:
-            raise self.SayException('You cannot use the chatbot.')
+            raise self.SayException('You are not in the whitelist'
+                                    ' to use the chatbot.')
 
         with ctx.typing():
             future = self.loop.run_in_executor(None,
