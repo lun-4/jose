@@ -187,6 +187,12 @@ class Statistics(Cog):
 
         await ctx.send(f'`{command}: {stat["uses"]} uses`')
 
+    @commands.command()
+    @commands.is_owner()
+    async def statspost(self, ctx):
+        await self.single_stats()
+        await ctx.ok()
+
 
 def setup(bot):
     bot.add_cog(Statistics(bot))
