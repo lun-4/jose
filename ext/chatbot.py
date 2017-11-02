@@ -218,6 +218,14 @@ class JoseChat(Cog):
         r = await self.whitelist.delete_many(obj)
         await ctx.send(f'Deleted {r.deleted_count} documents')
 
+    @whitelist_cmd.command(name='list')
+    async def whitelist_list(self, ctx):
+        """List users in the whitelist"""
+        em = discord.Embed()
+        async for whitelist in self.whitelist.find():
+            em.description += f'<@{whitelist["user_id"]}> '
+        await ctx.send(embed=em)
+
     @chat.error
     async def error_handler(self, ctx, error):
         ok = await self.whitelist.find_one({'user_id': ctx.author.id})
