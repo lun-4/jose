@@ -221,7 +221,7 @@ class JoseChat(Cog):
     @whitelist_cmd.command(name='list')
     async def whitelist_list(self, ctx):
         """List users in the whitelist"""
-        em = discord.Embed()
+        em = discord.Embed(description='', title='People in whitelist')
         async for whitelist in self.whitelist.find():
             em.description += f'<@{whitelist["user_id"]}> '
         await ctx.send(embed=em)
