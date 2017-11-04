@@ -24,7 +24,7 @@ REWARD_COOLDOWN = 1800
 
 # Tax constant: used for tax increase calculation
 # Probability constant: used for probability increase with your paid tax
-TAX_CONSTANT = decimal.Decimal('1.0048')
+TAX_CONSTANT = decimal.Decimal('1.0065')
 PROB_CONSTANT = decimal.Decimal('1.003384590736')
 
 # 1.2%
