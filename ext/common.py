@@ -83,8 +83,8 @@ class Cog:
         # so it becomes available for all cogs without needing to import shit
         self.SayException = SayException
         self.prices = {
-            'OPR': 0.8,
-            'API': 0.6,
+            'OPR': 0.9,
+            'API': 0.65,
         }
 
     def get_name(self, user_id):
