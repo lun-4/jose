@@ -20,6 +20,7 @@ WHITELIST = (
     291990349776420865,  # em's meme heaven
     366513799404060672,  # dan's another gay guild
     322885030806421509,  # heating's gay guild
+    350752456554184704,  # eric's gay guild
 )
 
 log = logging.getLogger(__name__)
