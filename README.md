@@ -11,7 +11,7 @@ Installation
 ============
 You can just copy and paste this probably:
 ```bash
-git clone https://github.com/lnmnds/jose.git
+git clone https://github.com/lnmds/jose.git
 
 cd jose
 
