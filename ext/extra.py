@@ -186,7 +186,11 @@ class Extra(Cog):
         if len(user.avatar_url) > 0:
             em.set_thumbnail(url=user.avatar_url)
 
-        em.set_footer(text=f'User ID: {user.id}')
+        raw_repr = await self.get_json('https://api.getdango.com/api/'
+                                       f'emoji?q={user.name}')
+
+        emoji_repr = ''.join(emoji['text'] for emoji in raw_repr['results'])
+        em.set_footer(text=f'{emoji_repr} | User ID: {user.id}')
 
         if isinstance(user, discord.Member) and (user.nick is not None):
             em.add_field(name='Name',
