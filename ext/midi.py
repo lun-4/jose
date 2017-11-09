@@ -134,7 +134,7 @@ class MIDI(Cog):
         MIDI input and downloads it."""
         if not message.attachments:
             raise self.SayException('You did not attach a file to '
-                                    'use as MIDI input!')
+                                    'use as MIDI input!, `j!help midi`')
 
         attachment = message.attachments[0]
 
@@ -148,7 +148,7 @@ class MIDI(Cog):
                                     'Your file may only be 20KiB big.')
 
         log.info('downloading file to use as MIDI input. '
-                 f'{attachment.size}bytes large.')
+                 f'{attachment.size} bytes large.')
         buffer = io.BytesIO()
         await attachment.save(buffer)
 
@@ -159,11 +159,21 @@ class MIDI(Cog):
                    tempo: int=120, *, data: str=None):
         """
         Convert text to MIDI. Multiple channels can be used by splitting text with |.
+        Letters are converted to their pitch values using a mapping.
+
+        Full documentation about it is not provided, read the code at
+        https://github.com/lnmds/jose/blob/master/ext/midi.py
 
         To give longer input than a discord message allows you may upload a .txt file of up to 20 KiB.
         """
         if data is None:
-            data = await self.download_data(ctx.message)
+            try:
+                data = await self.download_data(ctx.message)
+            except Exception as err:
+                log.exception('error downloading file at midi')
+                raise self.SayException('We had an error while downloading '
+                                        'the file, are you sure it is text?'
+                                        f' `{err!r}`')
 
         before = time.monotonic()
         midi_file = await self.make_midi(tempo, data)
