@@ -172,8 +172,7 @@ class MIDI(Cog):
             except Exception as err:
                 log.exception('error downloading file at midi')
                 raise self.SayException('We had an error while downloading '
-                                        'the file, are you sure it is text?'
-                                        f' `{err!r}`')
+                                        'the file, are you sure it is text?')
 
         before = time.monotonic()
         midi_file = await self.make_midi(tempo, data)
