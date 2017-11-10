@@ -4,6 +4,7 @@ import logging
 import collections
 import asyncio
 import pprint
+import math
 
 import discord
 
@@ -29,6 +30,9 @@ PROB_CONSTANT = decimal.Decimal('1.003384590736')
 
 # 1.2%
 COIN_BASE_PROBABILITY = decimal.Decimal('0.012')
+
+
+TAX_MULTIPLIER = decimal.Decimal('1.42')
 
 
 class TransferError(Exception):
@@ -77,6 +81,7 @@ class Coins(Cog):
 
         #: I hate locks even more
         self.locked_accounts = []
+        self.gdp = None
 
     def get_name(self, user_id, account=None):
         """Get a string representation of a user or guild."""
@@ -497,18 +502,39 @@ class Coins(Cog):
 
         return guildrank, globalrank, len(guild_ids), len(all_ids)
 
+    async def get_gdp(self):
+        """Get the current GDP.
+
+        This will calculate the GDP, if it isn't available.
+        """
+        if not self.gdp:
+            gdp = decimal.Decimal(0)
+            async for account in self.jcoin_coll.find():
+                acc_amount = decimal.Decimal(account['amount'])
+                if acc_amount == self.INF:
+                    continue
+
+                gdp += decimal.Decimal(account['amount'])
+
+            self.gdp = gdp
+        return self.gdp
+
     async def pricing(self, ctx, base_tax):
         """Tax someone. [insert evil laugh of capitalism]"""
         await self.ensure_taxbank(ctx)
 
-        # yes ugly
         base_tax = decimal.Decimal(base_tax)
         try:
             account = await self.get_account(ctx.author.id)
             if not account:
                 raise self.SayException('No JoséCoin account found to tax')
 
-            tax = base_tax + (pow(TAX_CONSTANT, account['amount']) - 1)
+            # tax = base_tax + (pow(TAX_CONSTANT, account['amount']) - 1)
+            amount = account['amount']
+
+            gdp = await self.get_gdp()
+            gdp_sqrt = decimal.Decimal(math.sqrt(gdp))
+            tax = base_tax + pow((amount / gdp_sqrt) * TAX_MULTIPLIER, 2)
             await self.transfer(ctx.author.id, ctx.guild.id, tax)
         except self.TransferError as err:
             raise self.SayException(f'TransferError: `{err.args[0]}`')
