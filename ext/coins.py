@@ -396,6 +396,9 @@ class Coins(Cog):
             account_from['amount'] -= amount
             account_to['amount'] += amount
 
+            if account_from['amount'] == self.INF and self.gdp:
+                self.gdp += amount
+
             await self.update_accounts([account_from, account_to])
             res = f'{amount} was transferred from {self.get_name(account_from["id"])} to {self.get_name(account_to["id"])}'
         finally:
