@@ -123,9 +123,9 @@ class JoinSession:
         increase_people = len(self.users) * INCREASE_PER_PERSON
         chance = BASE_HEIST_CHANCE + ((amnt / self.amount) + increase_people) * HEIST_CONSTANT
 
-        # trim it to 50% success
-        if chance > 5:
-            chance = 5
+        # trim it to 60% success
+        if chance > 6:
+            chance = 6
 
         result = random.uniform(0, 10)
 
