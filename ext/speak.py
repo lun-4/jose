@@ -11,7 +11,7 @@ from discord.ext import commands
 from .common import Cog
 
 log = logging.getLogger(__name__)
-SENTENCE_PRICE = '0.05'
+SENTENCE_PRICE = '0.08'
 
 
 def make_textmodel(texter, data):
