@@ -399,6 +399,12 @@ class Coins(Cog):
         # since return can in theory stop
         # the finally block from executing
         if res:
+            if self.bot.config.transfer_webhook:
+                data = {
+                    'content': f'`{res}`'
+                }
+                await self.bot.session.post(self.bot.config.transfer_webhook,
+                                            json=data)
             return res
 
     async def all_accounts(self, field='amount'):
