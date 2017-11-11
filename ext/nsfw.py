@@ -4,6 +4,8 @@ import urllib.parse
 
 import aiohttp
 import discord
+import motor.motor_asnycio
+
 from discord.ext import commands
 from .common import Cog
 
@@ -183,6 +185,20 @@ class NSFW(Cog):
         await ctx.send(f'**{ctx.author}** whipped **{person}** '
                        f'They have been whipped {whip["whips"] + 1} times.')
 
+    @commands.command()
+    async def whipboard(self, ctx):
+        """Whip leaderboard."""
+        e = discord.Embed(title='Whip leaderboard')
+        data = []
+        cur = self.whip_coll.find().sort('whips',
+                                         motor.pymongo.DESCENDING)
+
+        async for whip in cur:
+            u = self.bot.get_user(whip['user_id'])
+            data.append(f'{u} with {whip["whips"]}')
+
+        e.description = '\n'.join(data)
+        await ctx.send(embed=e)
 
 def setup(bot):
     bot.add_cog(NSFW(bot))
