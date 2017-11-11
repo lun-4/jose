@@ -149,7 +149,7 @@ class NSFW(Cog):
 
     @commands.command()
     @commands.cooldown(5, 1800, commands.BucketType.user)
-    async def whip(self, ctx, person: discord.Member=None):
+    async def whip(self, ctx, *, person: discord.Member=None):
         """Whip someone.
 
         If no arguments provided, shows how many whips you
