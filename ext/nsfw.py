@@ -148,20 +148,22 @@ class NSFW(Cog):
         await ctx.invoke(self.bot.get_command('e621'), 'penis')
 
     @commands.command()
-    @commands.cooldown(2, 1800, commands.BucketType.user)
+    @commands.cooldown(5, 1800, commands.BucketType.user)
     async def whip(self, ctx, person: discord.User=None):
         """Whip someone.
 
         If no arguments provided, shows how many whips you
         received.
 
-        The command has a 2/1800 cooldown per-user
+        The command has a 5/1800s cooldown per-user
         """
         if not person:
             whip = await self.whip_coll.find_one({'user_id': ctx.author.id})
             if not whip:
                 return await ctx.send(f'**{ctx.author}** was never whipped')
-            return await ctx.send(f'**{ctx.author}** was whipped {whip["whips"]} times')
+
+            return await ctx.send(f'**{ctx.author}** was whipped'
+                                  f' {whip["whips"]} times')
 
         if person == ctx.author:
             return await ctx.send('no')
