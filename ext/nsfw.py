@@ -148,7 +148,7 @@ class NSFW(Cog):
         await ctx.invoke(self.bot.get_command('e621'), 'penis')
 
     @commands.command()
-    @commands.ratelimit(2, 1800, commands.BucketType.user)
+    @commands.cooldown(2, 1800, commands.BucketType.user)
     async def whip(self, ctx, person: discord.User):
         """Whip someone"""
         uid = person.id
