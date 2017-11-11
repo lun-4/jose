@@ -160,6 +160,9 @@ class NSFW(Cog):
                 return await ctx.send(f'**{ctx.author}** was never whipped')
             return await ctx.send(f'**{ctx.author}** was whipped {whip["whips"]} times')
 
+        if person == ctx.author:
+            return await ctx.send('no')
+
         uid = person.id
         whip = await self.whip_coll.find_one({'user_id': uid})
         if not whip:
