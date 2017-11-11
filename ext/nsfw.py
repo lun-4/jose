@@ -153,7 +153,10 @@ class NSFW(Cog):
         """Whip someone.
 
         If no arguments provided, shows how many whips you
-        received."""
+        received.
+
+        The command has a 2/1800 cooldown per-user
+        """
         if not person:
             whip = await self.whip_coll.find_one({'user_id': ctx.author.id})
             if not whip:
