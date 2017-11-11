@@ -149,8 +149,17 @@ class NSFW(Cog):
 
     @commands.command()
     @commands.cooldown(2, 1800, commands.BucketType.user)
-    async def whip(self, ctx, person: discord.User):
-        """Whip someone"""
+    async def whip(self, ctx, person: discord.User=None):
+        """Whip someone.
+
+        If no arguments provided, shows how many whips you
+        received."""
+        if not person:
+            whip = await self.whip_coll.find_one({'user_id': ctx.author.id})
+            if not whip:
+                return await ctx.send(f'**{ctx.author}** was never whipped')
+            return await ctx.send(f'**{ctx.author}** was whipped {whip["whips"]} times')
+
         uid = person.id
         whip = await self.whip_coll.find_one({'user_id': uid})
         if not whip:
