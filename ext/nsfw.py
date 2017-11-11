@@ -148,6 +148,7 @@ class NSFW(Cog):
         await ctx.invoke(self.bot.get_command('e621'), 'penis')
 
     @commands.command()
+    @commands.ratelimit(2, 1800, commands.BucketType.user)
     async def whip(self, ctx, person: discord.User):
         """Whip someone"""
         uid = person.id
@@ -164,6 +165,7 @@ class NSFW(Cog):
 
         await ctx.send(f'**{ctx.author}** whipped **{person}** '
                        f'They have been whipped {whip["whips"] + 1} times.')
+
 
 def setup(bot):
     bot.add_cog(NSFW(bot))
