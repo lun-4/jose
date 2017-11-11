@@ -76,3 +76,17 @@ class RPG(Cog):
         e.set_field(name='Items', value='\n'.join(
             f'`{name}` - {count}' for (name, count) in items.items())
         )
+
+    @rpg.group()
+    async def shop(self, ctx):
+        pass
+
+    @shop.command()
+    async def view(self, ctx):
+        """Check available items in the shop"""
+        pass
+
+    @shop.command()
+    async def buy(self, ctx, item: Item):
+        """Buy an item from the shop."""
+        pass

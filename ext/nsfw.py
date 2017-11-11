@@ -78,6 +78,10 @@ class GelBooru(BooruProvider):
 
 
 class NSFW(Cog):
+    def __init__(self, bot):
+        super().__init__(bot)
+        self.whip_coll = self.config.jose_db['whip']
+
     async def booru(self, ctx, booru, tags):
         # taxxx
         await self.jcoin.pricing(ctx, self.prices['API'])
@@ -143,6 +147,23 @@ class NSFW(Cog):
         """get penis from e621 bb"""
         await ctx.invoke(self.bot.get_command('e621'), 'penis')
 
+    @commands.command()
+    async def whip(self, ctx, person: discord.User):
+        """Whip someone"""
+        uid = person.id
+        whip = await self.whip_coll.find_one({'user_id': uid})
+        if not whip:
+            whip = {
+                'user_id': uid,
+                'whips': 0,
+            }
+            await self.whip_coll.insert_one(whip)
+
+        await self.whip_coll.update_one({'user_id': uid},
+                                        {'$inc': {'whips': 1}})
+
+        await ctx.send(f'**{ctx.author}** whipped **{person}** '
+                       f'They have been whipped {whip["whips"] + 1} times.')
 
 def setup(bot):
     bot.add_cog(NSFW(bot))
