@@ -195,6 +195,7 @@ class NSFW(Cog):
 
         async for whip in cur:
             u = self.bot.get_user(whip['user_id'])
+            u = str(u)
             data.append(f'{u:30s} -> {whip["whips"]}')
 
         joined = '\n'.join(data)
