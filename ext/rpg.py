@@ -110,3 +110,7 @@ class RPG(Cog):
     async def buy(self, ctx, item):
         """Buy an item from the shop."""
         pass
+
+
+def setup(bot):
+    bot.add_cog(RPG(bot))
