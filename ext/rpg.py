@@ -82,6 +82,9 @@ class RPG(Cog):
             person = ctx.author
 
         inv = await self.get_inventory(person.id)
+        if not inv:
+            return await ctx.send('No inventory found')
+
         e = discord.Embed(title=f'Inventory for {person}')
 
         if len(person.avatar_url):
