@@ -8,7 +8,7 @@ from discord.ext import commands
 from .common import Cog
 
 log = logging.getLogger(__name__)
-LEVEL_CONSTANT = 2
+LEVEL_CONSTANT = 0.3
 
 
 class RPG(Cog):
@@ -33,7 +33,7 @@ class RPG(Cog):
         self.skills_coll = self.config.jose_db['rpg_skills']
 
     def get_level(self, inv) -> int:
-        return LEVEL_CONSTANT * math.sqrt(inv['xp'])
+        return int(LEVEL_CONSTANT * math.sqrt(inv['xp']))
 
     def get_next_level_xp(self, inv) -> int:
         """Gives how many XP is required to the next level."""
@@ -42,7 +42,7 @@ class RPG(Cog):
         # level = C * sqrt(xp)
         # sqrt(xp) = level / C
         # xp = (level / C) ^ 2
-        return pow((lvl + 1) / LEVEL_CONSTANT, 2)
+        return int(pow((lvl + 1) / LEVEL_CONSTANT, 2))
 
     async def get_inventory(self, user_id: int) -> dict:
         return await self.inventory_coll.find_one({'user_id': user_id})
