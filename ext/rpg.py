@@ -8,7 +8,7 @@ from discord.ext import commands
 from .common import Cog
 
 log = logging.getLogger(__name__)
-LEVEL_CONSTANT = 0.3
+LEVEL_CONSTANT = 0.24
 
 
 class RPG(Cog):
