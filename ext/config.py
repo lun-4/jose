@@ -215,13 +215,15 @@ class Config(Cog):
         """Get a reason for a block if it exists"""
         userblock = await self.block_coll.find_one({'user_id': anything_id})
         if userblock is not None:
-            return await ctx.send('User blocked, reason '
-                                  f'`{userblock.get("reason")}`')
+            e = discord.Embed(title='User blocked')
+            e.description = f'<@{anything_id}> - {userblock.get("reason")}'
+            return await ctx.send(embed=e)
 
         guildblock = await self.block_coll.find_one({'guild_id': anything_id})
         if guildblock is not None:
-            return await ctx.send(f'Guild blocked, reason '
-                                  f'`{guildblock.get("reason")}`')
+            e = discord.Embed(title='Guild blocked')
+            e.description = f'why? {userblock.get("reason")}'
+            return await ctx.send(embed=e)
 
         await ctx.send('Block not found')
 
@@ -277,7 +279,7 @@ class Config(Cog):
             coll = self.jose_db[coll_name]
             counts[coll_name] = await coll.count()
 
-        coll_counts = '\n'.join([f'{collname:15} | {count}'
+        coll_counts = '\n'.join([f'{collname:20} | {count}'
                                  for collname, count in counts.most_common()])
         coll_counts = f'```\n{coll_counts}```'
         await ctx.send(coll_counts)
