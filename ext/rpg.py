@@ -59,6 +59,9 @@ class RPG(Cog):
         You cannot leave.
         """
 
+        if await self.get_inventory(ctx.user.id):
+            return await ctx.send('You already have a RPG profile')
+
         await self.inventory_coll.insert_one({
             'user_id': ctx.author.id,
             'xp': 0,
