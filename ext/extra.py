@@ -321,6 +321,19 @@ class Extra(Cog):
 
             await ctx.send(embed=em)
 
+    @commands.command()
+    async def excuse(self, ctx):
+        """Give an excuse.
+
+        http://pages.cs.wisc.edu/~ballard/bofh/
+        """
+        async with self.bot.session.get('http://pages.cs.wisc.edu'
+                                        '/~ballard/bofh/excuses') as r:
+            data = await r.text()
+            lines = data.split('\n')
+            line = random.choice(lines)
+            await ctx.send(f'`{line}`')
+
 
 def setup(bot):
     bot.add_cog(Extra(bot))
