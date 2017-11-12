@@ -11,26 +11,27 @@ log = logging.getLogger(__name__)
 LEVEL_CONSTANT = 0.24
 
 
+ITEMS = {
+
+}
+
+SKILLS = {
+}
+
+SHOPS = {
+}
+
+QUESTS = {
+}
+
+
 class RPG(Cog):
     """RPG module."""
     def __init__(self, bot):
         super().__init__(bot)
 
-        # All items
-        self.item_coll = self.config.jose_db['rpg_items']
-
         # All users are here, with their items and skills
         self.inventory_coll = self.config.jose_db['rpg_inventory']
-
-        # All shops in the system
-        self.shops_coll = self.config.jose_db['rpg_shops']
-
-        # All quests in the system
-        self.quests_coll = self.config.jose_db['rpg_quests']
-
-        # All skill data, including dependencies of
-        # one skill to another
-        self.skills_coll = self.config.jose_db['rpg_skills']
 
     def get_level(self, inv) -> int:
         return int(LEVEL_CONSTANT * math.sqrt(inv['xp']))
@@ -100,6 +101,10 @@ class RPG(Cog):
         xp_next_level = self.get_next_level_xp(inv)
         e.add_field(name='XP',
                     value=f'{inv["xp"]} / {xp_next_level} XP')
+
+        amount = (await self.jcoin.get_account(person.id))['amount']
+        e.add_field(name='Money',
+                    value=f'{amount}JC')
 
         # items
         e.add_field(name='Items',
