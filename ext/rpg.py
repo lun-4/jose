@@ -91,7 +91,9 @@ class RPG(Cog):
         e.add_field(name='Level', value=str(self.get_level(inv)))
 
         xp_next_level = self.get_next_level_xp(inv)
-        e.add_field(name='XP', value=f'{inv["xp"]} / {xp_next_level} XP')
+        print(f'inv["xp"] / {xp_next_level} XP')
+        e.add_field(name='XP',
+                    value=f'{inv["xp"]} / {xp_next_level} XP')
 
         # items
         e.add_field(name='Items', value='\n'.join(
