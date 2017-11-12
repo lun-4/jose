@@ -88,12 +88,13 @@ class RPG(Cog):
             e.set_thumbnail(url=person.avatar_url)
 
         # calculate XP and levels
-        e.set_field(name='Level', value=self.get_level(inv))
+        e.add_field(name='Level', value=self.get_level(inv))
 
         xp_next_level = self.get_next_level_xp(inv)
-        e.set_field(name='XP', value=f'{inv["xp"]} / {xp_next_level} XP')
+        e.add_field(name='XP', value=f'{inv["xp"]} / {xp_next_level} XP')
 
-        e.set_field(name='Items', value='\n'.join(
+        # items
+        e.add_field(name='Items', value='\n'.join(
             f'`{name}` - {count}' for (name, count) in inv['items'].items())
         )
 
