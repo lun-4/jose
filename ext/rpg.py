@@ -1,5 +1,4 @@
 import logging
-import collections
 import math
 
 import discord
@@ -45,10 +44,36 @@ class RPG(Cog):
         # xp = (level / C) ^ 2
         return pow((lvl + 1) / LEVEL_CONSTANT, 2)
 
+    async def get_inventory(self, user_id: int) -> dict:
+        return await self.inventory_coll.find_one({'user_id': user_id})
+
     @commands.group()
     async def rpg(self, ctx):
         """Main entry command to José RPG."""
         pass
+
+    @rpg.command()
+    async def enter(self, ctx):
+        """Enter RPG.
+
+        You cannot leave.
+        """
+
+        await self.inventory_coll.insert_one({
+            'user_id': ctx.author.id,
+            'xp': 0,
+
+            # dict: int (item id) -> int (count)
+            'items': {},
+
+            # dict: int (skill id) -> int (skill level)
+            'skills': {},
+
+            # quest ID: int
+            'current_quest': None,
+        })
+
+        await ctx.ok()
 
     @rpg.command(name='inventory', aliases=['inv'])
     async def inventory(self, ctx, person: discord.User = None):
@@ -68,13 +93,8 @@ class RPG(Cog):
         xp_next_level = self.get_next_level_xp(inv)
         e.set_field(name='XP', value=f'{inv["xp"]} / {xp_next_level} XP')
 
-        # get item count
-        items = collections.defaultdict(int)
-        for item in inv['items']:
-            items[item['name']] += 1
-
         e.set_field(name='Items', value='\n'.join(
-            f'`{name}` - {count}' for (name, count) in items.items())
+            f'`{name}` - {count}' for (name, count) in inv['items'].items())
         )
 
     @rpg.group()
@@ -87,6 +107,6 @@ class RPG(Cog):
         pass
 
     @shop.command()
-    async def buy(self, ctx, item: Item):
+    async def buy(self, ctx, item):
         """Buy an item from the shop."""
         pass
