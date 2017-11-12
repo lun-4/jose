@@ -98,6 +98,8 @@ class RPG(Cog):
             f'`{name}` - {count}' for (name, count) in inv['items'].items())
         )
 
+        await ctx.send(embed=e)
+
     @rpg.group()
     async def shop(self, ctx):
         pass
