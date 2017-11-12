@@ -85,7 +85,7 @@ class RPG(Cog):
         e = discord.Embed(title=f'Inventory for {person}')
 
         if len(person.avatar_url):
-            e.set_thumbnail(person.avatar_url)
+            e.set_thumbnail(url=person.avatar_url)
 
         # calculate XP and levels
         e.set_field(name='Level', value=self.get_level(inv))
