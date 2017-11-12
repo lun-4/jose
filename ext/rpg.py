@@ -75,6 +75,10 @@ class RPG(Cog):
 
             # quest ID: int
             'current_quest': None,
+
+            # TODO: those
+            'equiped_weapon': None,
+            'equiped_armor': None,
         })
 
         await ctx.ok()
