@@ -54,7 +54,7 @@ def pod_finder(pod_list):
         pod = dict(pod)
 
         if pod.get('@title') in RESULT_PODS:
-            log.info('pod_finder: found result pod! %s', pod)
+            # log.info('pod_finder: found result pod! %s', pod)
             return pod
 
         score = 0

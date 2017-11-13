@@ -312,11 +312,12 @@ class Coins(Cog):
                                                    {'$set': account})
 
             if res.modified_count > 1:
-                log.warning('Updating more than supposed to')
+                log.warning('Updating more than supposed to (%d)',
+                            res.modified_count)
             else:
                 total += res.modified_count
 
-        log.info('[update_accounts] Updated %d documents', total)
+        log.debug('[update_accounts] Updated %d documents', total)
 
     async def transfer(self, id_from: int, id_to: int, amount):
         """Transfer coins from one account to another.
@@ -412,9 +413,11 @@ class Coins(Cog):
                                             json=data)
             return res
 
-    async def all_accounts(self, field='amount'):
+    async def all_accounts(self, field='amount') -> list:
         """Return all accounts in decreasing order of the selected field."""
         cur = self.jcoin_coll.find()
+
+        # TODO: REMOVE THIS MADNESS OF TO_LIST
         accounts = await cur.to_list(length=None)
 
         if field != 'amount':
@@ -462,7 +465,7 @@ class Coins(Cog):
         return sorted(accounts, key=lambda account: float(account[field]),
                       reverse=True)
 
-    async def zero(self, user_id: int):
+    async def zero(self, user_id: int) -> str:
         """Zero an account."""
         account = await self.get_account(user_id)
         if account is None:
@@ -475,7 +478,7 @@ class Coins(Cog):
                                    self.bot.user.id,
                                    account['amount'])
 
-    async def sink(self, user_id: int, amount: decimal.Decimal):
+    async def sink(self, user_id: int, amount: decimal.Decimal) -> str:
         """Transfer money back to josé."""
         try:
             amount = decimal.Decimal(amount)
@@ -486,6 +489,7 @@ class Coins(Cog):
         return await self.transfer(user_id, self.bot.user.id, amount)
 
     async def ranks(self, user_id: int, guild: discord.Guild) -> tuple:
+        """Get ranking data about a user."""
         all_accounts = await self.all_accounts()
 
         all_ids = [account['id'] for account in all_accounts]
@@ -502,10 +506,13 @@ class Coins(Cog):
 
         return guildrank, globalrank, len(guild_ids), len(all_ids)
 
-    async def get_gdp(self):
+    async def get_gdp(self) -> decimal.Decimal:
         """Get the current GDP.
 
         This will calculate the GDP, if it isn't available.
+
+        This is an expensive operation,
+        since it has to iterate over all accounts.
         """
         if not self.gdp:
             gdp = decimal.Decimal(0)
@@ -519,7 +526,7 @@ class Coins(Cog):
             self.gdp = gdp
         return self.gdp
 
-    async def pricing(self, ctx, base_tax):
+    async def pricing(self, ctx, base_tax) -> str:
         """Tax someone. [insert evil laugh of capitalism]"""
         await self.ensure_taxbank(ctx)
 
@@ -529,12 +536,14 @@ class Coins(Cog):
             if not account:
                 raise self.SayException('No JoséCoin account found to tax')
 
-            # tax = base_tax + (pow(TAX_CONSTANT, account['amount']) - 1)
+            # old tax:
+            #  tax = base_tax + (pow(TAX_CONSTANT, account['amount']) - 1)
             amount = account['amount']
 
             gdp = await self.get_gdp()
             gdp_sqrt = decimal.Decimal(math.sqrt(gdp))
             tax = base_tax + pow((amount / gdp_sqrt) * TAX_MULTIPLIER, 2)
+
             await self.transfer(ctx.author.id, ctx.guild.id, tax)
         except self.TransferError as err:
             raise self.SayException(f'TransferError: `{err.args[0]}`')
@@ -573,6 +582,7 @@ class Coins(Cog):
         if account['taxpaid'] >= 50:
             em.add_field(name='Increase from tax paid',
                          value=f'{round(pow(PROB_CONSTANT, account["taxpaid"]), 5)}%')
+
             res = await self.get_probability(account)
             em.add_field(name='Total', value=f'{res * 100}%')
 
@@ -683,13 +693,10 @@ class Coins(Cog):
     @commands.command()
     async def wallet(self, ctx, person: discord.User = None):
         """See the amount of coins you currently have."""
-        acc = None
+        if not person:
+            person = ctx.author
 
-        if person is not None:
-            acc = await self.get_account(person.id)
-        else:
-            acc = await self.get_account(ctx.author.id)
-
+        acc = await self.get_account(person.id)
         if not acc:
             return await ctx.send('Account not found.')
 
@@ -788,7 +795,8 @@ class Coins(Cog):
             log.info('deleted %d accounts', count)
             if count > 1:
                 log.error('HELP, WE DELETED %d ACCOUNTS BY ACCIDENT', count)
-                raise self.SayException('Deleted more than one account, aborting.')
+                raise self.SayException('Deleted more than one'
+                                        ' account, aborting.')
 
             self.cache.pop(user_id)
             mutual_guilds = [g for g in self.bot.guilds
