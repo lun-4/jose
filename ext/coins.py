@@ -17,9 +17,6 @@ log = logging.getLogger(__name__)
 random = SystemRandom()
 
 
-# JoséCoin constants
-JOSECOIN_REWARDS = [0, 0, 0, 0.6, 0.7, 1, 1.2, 1.5, 1.7]
-
 # cooldown reward: 40 minutes
 REWARD_COOLDOWN = 1800
 
@@ -582,7 +579,7 @@ class Coins(Cog):
         await ctx.send(embed=em)
 
     async def on_message(self, message):
-        # fuck bots
+        # fuck bots and dms
         if message.author.bot or message.guild is None:
             return
 
@@ -594,16 +591,11 @@ class Coins(Cog):
         if not account:
             return
 
-        if await self.bot.is_blocked(author_id):
+        # Ignore blocked users / guilds
+        if await self.bot.is_blocked(author_id) or \
+           await self.bot.is_blocked_guild(message.guild.id):
             return
 
-        if await self.bot.is_blocked_guild(message.guild.id):
-            return
-
-        if not isinstance(message.channel, discord.TextChannel):
-            return
-
-        # get prison data from CoinsExt
         coinsext = self.bot.get_cog('CoinsExt')
         if coinsext is None:
             log.warning('CoinsExt NOT LOADED.')
@@ -611,6 +603,8 @@ class Coins(Cog):
 
         now = time.time()
 
+        # We check if the user is in jail(from CoinsExt)
+        # If someone is in jail, we shouldn't give them money.
         cdown = await coinsext.cooldown_coll.find_one({'user_id': author_id})
         if cdown is not None:
             if cdown['type'] == 0:
@@ -625,8 +619,9 @@ class Coins(Cog):
         if random.random() > prob:
             return
 
-        amount = random.choice(JOSECOIN_REWARDS)
-        if amount == 0:
+        # NOTE: main entry point of coins to the economy
+        amount = round(random.uniform(0, 1.1), 2)
+        if amount < 0.3:
             return
 
         try:
@@ -644,7 +639,7 @@ class Coins(Cog):
             except:
                 pass
         except:
-            log.error('autocoin->err', exc_info=True)
+            log.exception('autocoin error')
 
     @commands.command()
     async def account(self, ctx):
