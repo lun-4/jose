@@ -758,7 +758,7 @@ class Coins(Cog):
 
     @commands.command(hidden=True)
     async def jcgetraw(self, ctx):
-        """Get your raw josécoin account"""
+        """Get your raw josécoin account data."""
         start = time.monotonic()
         account = await self.get_account(ctx.author.id)
         end = time.monotonic()
@@ -798,6 +798,7 @@ class Coins(Cog):
                 raise self.SayException('Deleted more than one'
                                         ' account, aborting.')
 
+            # delete from cache lol
             self.cache.pop(user_id)
             mutual_guilds = [g for g in self.bot.guilds
                              if g.get_member(user_id)]
