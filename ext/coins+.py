@@ -114,6 +114,12 @@ class CoinsExt(Cog):
             accounts = filter(lambda acc: acc['type'] == 'taxbank',
                               all_accounts)
             await self.show(ctx, accounts, limit=limit)
+
+        elif mode == 'lp':
+            accounts = await self.jcoin.guild_accounts(ctx.guild, 'amount')
+            accounts = reversed(accounts)
+            await self.show(ctx, accounts, limit=limit)
+
         else:
             raise self.SayException('mode not found')
 
