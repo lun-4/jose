@@ -681,6 +681,9 @@ class Coins(Cog):
     async def _transfer(self, ctx, person: discord.User,
                         amount: CoinConverter):
         """Transfer coins to another person."""
+        if person.bot:
+            raise self.SayException('You cannot transfer to bots')
+
         try:
             await self.transfer(ctx.author.id, person.id, amount)
             await ctx.send(f'Transferred {amount!s} '
