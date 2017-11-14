@@ -815,7 +815,7 @@ class Starboard(Cog):
         except discord.NotFound:
             raise self.SayException('message not found')
 
-        star = await self.get_star(ctx.guild, message_id)
+        star = await self.get_star(ctx.guild.id, message_id)
         if star is None:
             raise self.SayException('star object not found')
 
