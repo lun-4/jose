@@ -120,7 +120,7 @@ class CoinsExt(Cog):
 
         elif mode == 'p':
             all_accounts = await self.jcoin.all_accounts()
-            accounts = filter(lambda a: a['type'] == 'user', all_accounts)
+            accounts = list(filter(lambda a: a['type'] == 'user', all_accounts))
             accounts = reversed(accounts)
             await self.show(ctx, accounts, limit=limit)
 
