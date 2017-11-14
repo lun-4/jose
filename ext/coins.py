@@ -394,6 +394,10 @@ class Coins(Cog):
             account_from['amount'] -= amount
             account_to['amount'] += amount
 
+            now = time.time()
+            account_from['last_transfer'] = now
+            account_to['last_transfer'] = now
+
             if account_from['amount'] == self.INF and self.gdp:
                 self.gdp += amount
 
