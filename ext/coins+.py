@@ -89,6 +89,9 @@ class CoinsExt(Cog):
         - t: tax, all accounts in José's database, ordered
             by the amount of tax they paid.
         - b: taxbanks, all taxbanks, globally
+
+        - p: poorest, globally
+        - lp: local poorest
         """
 
         b = '\N{NEGATIVE SQUARED LATIN CAPITAL LETTER B}'
@@ -113,6 +116,12 @@ class CoinsExt(Cog):
             all_accounts = await self.jcoin.all_accounts()
             accounts = filter(lambda acc: acc['type'] == 'taxbank',
                               all_accounts)
+            await self.show(ctx, accounts, limit=limit)
+
+        elif mode == 'p':
+            all_accounts = await self.jcoin.all_accounts()
+            accounts = filter(lambda a: a['type'] == 'user', all_accounts)
+            accounts = reversed(accounts)
             await self.show(ctx, accounts, limit=limit)
 
         elif mode == 'lp':
