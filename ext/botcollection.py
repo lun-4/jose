@@ -11,7 +11,7 @@ WHITELIST = (
     273863625590964224,  # José's server
     295341979800436736,  # Memework
     319540379495956490,  # v2 testing serv
-    297710090687873024,  # Luma's testing server
+    380295555039100932,  # Comet Obversavotory / luma's home
     319252487280525322,  # robert is gay
     340609473439596546,  # slice is a furry that plays agario
     191611344137617408,  # dan's 'haha gay pussy party'
