@@ -538,7 +538,8 @@ class Coins(Cog):
         try:
             account = await self.get_account(ctx.author.id)
             if not account:
-                raise self.SayException('No JoséCoin account found to tax')
+                raise self.SayException('No JoséCoin account found to tax,'
+                                        ' use `j!account` to make one')
 
             # old tax:
             #  tax = base_tax + (pow(TAX_CONSTANT, account['amount']) - 1)
