@@ -165,8 +165,8 @@ class Math(Cog):
                                                location)
             observation = await future
         except:
-            await ctx.send('Error retrieving weather data')
-            return
+            log.exception('Failed to get weather info')
+            raise self.SayException('Error retrieving weather data')
 
         w = observation.get_weather()
 
