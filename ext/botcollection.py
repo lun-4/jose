@@ -71,10 +71,11 @@ class BotCollection(Cog):
 
     async def on_member_join(self, member):
         guild = member.guild
-        bots, humans, ratio = self.bot_human_ratio(guild)
 
         if guild.id in WHITELIST:
             return
+
+        bots, humans, ratio = self.bot_human_ratio(guild)
 
         if ratio > BOT_RATIO_MAX:
             log.info(f'[bh:leave:member_join] leaving {guild!r} {guild.id},'
