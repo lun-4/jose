@@ -159,8 +159,7 @@ class JoseBot(commands.Bot):
             orig = error.original
             if isinstance(orig, SayException):
                 arg0 = orig.args[0]
-                log.warning('SayException: %s[%d] %s %r => %r', ctx.guild,
-                            ctx.guild.id, ctx.author, content, arg0)
+                log.warning(f'SayException: {ctx.guild}[{ctx.guild.id}] {ctx.author} {content} => {arg0}')
 
                 await ctx.send(arg0)
                 return
