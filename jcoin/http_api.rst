@@ -100,6 +100,26 @@ Reset Wallet
 
 Reset a wallet. This sets the amount to 0 and resets any other statistics associated with it.
 
+---------------------
+Increment steal usage
+---------------------
+
+.. code-block :: http
+
+  POST /wallets/:wallet_id/steal_use
+
+Increment the wallet's `steal_uses` field by one.
+
+---------------------
+Mark successful steal
+---------------------
+
+.. code-block :: http
+
+  POST /wallet/:wallet_id/steal_success
+
+Increment the wallet's `steal_success` field by one.
+
 -----------
 Wallet Rank
 -----------

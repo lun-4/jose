@@ -6,19 +6,13 @@ a webserver that makes transactions between users and stuff
 import logging
 import hashlib
 
-import motor.motor_asyncio
-
 from sanic import Sanic
 from sanic import response
 
+from .db import Database
+
 app = Sanic()
 log = logging.getLogger(__name__)
-
-# >mongo
-# why lmao # wHY NOT!!!!!!!? #!!!!!!!!
-mongo = motor.motor_asyncio.AsyncIOMotorClient()
-db = mongo['josecoin-madness']
-coll = db['coins']
 
 
 class AccountType:
