@@ -6,10 +6,9 @@ a webserver that makes transactions between users and stuff
 import logging
 import asyncio
 
-from sanic import Sanic
-from sanic import response
+from japronto import Application
 
-app = Sanic()
+app = Application()
 log = logging.getLogger(__name__)
 
 
@@ -18,20 +17,13 @@ class AccountType:
     TAXBANK = 1
 
 
-@app.route('/', methods=['GET'])
 async def index(request):
-    return response.text('henlo yes')
+    return request.Response('oof')
 
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
-    server = app.create_server(host='0.0.0.0', port=8080)
+    r = app.router
+    r.add_route('/', index)
 
-    try:
-        loop.create_task(server)
-        loop.run_forever()
-    except KeyboardInterrupt:
-        loop.close()
-    except:
-        log.exception('Closing loop.')
-        loop.close()
+    app.run(debug=True)
