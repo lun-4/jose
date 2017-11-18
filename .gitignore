@@ -131,3 +131,6 @@ jose-backup*
 
 # chatterbot
 db.sqlite3
+
+# josecoin
+jcoin/config.py
