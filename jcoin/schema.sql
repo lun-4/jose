@@ -1,34 +1,32 @@
 CREATE TABLE IF NOT EXISTS accounts (
-       user_id bigint,
+       account_id bigint PRIMARY KEY NOT NULL,
+       account_type int NOT NULL,
+       amount text DEFAULT "0",
+);
 
-       /* To be used as decimal on Python land */
-       amount text,
-       taxpaid text,
+/* only user accounts here */
+CREATE TABLE IF NOT EXISTS wallets (
+       user_id bigint NOT NULL REFERENCES accounts (account_id) ON DELETE CASCADE,
+
+       taxpaid text DEFAULT "0",
 
        /* for j!steal statistics */
-       steal_uses int,
-       steal_success int,
-
-       trust_score int,
+       steal_uses int DEFAULT 0,
+       steal_success int DEFAULT 0,
 );
 
-
-CREATE TABLE IF NOT EXISTS taxbanks (
-       guild_id bigint,
-       amount text,
-);
 
 /* The Log of all transactions */
 CREATE TABLE IF NOT EXISTS transactions (
-       txtimestamp timestamp without time zone,
-       id_from bigint,
-       id_to bigint,
-       amount text,
+       transferred_at timestamp without time zone,
+       sender bigint NOT NULL,
+       receiver bigint NOT NULL,
+       amount text NOT NULL,
 );
 
 /* If we want, we *could* group transactions */
 CREATE TABLE IF NOT EXISTS blockchain (
        prev_hash text,
        blockstamp timestamp without time zone,
-       blobk_data jsonb,
+       block_data jsonb,
 );
