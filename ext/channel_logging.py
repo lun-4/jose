@@ -67,18 +67,21 @@ class ChannelHandler(logging.Handler):
             if len(messages) < 1:
                 continue
 
-            joined = '\n'.join(messages)
-            if len(joined) >= 2000:
-                joined = joined[:2000]
+            # TODO: maybe remove ChannelHandler.queue
+            #  and offload it all to the paginator
+            p = commands.Paginator(prefix='', suffix='')
+            for msg in messages:
+                try:
+                    p.add_line(msg)
+                except RuntimeError:
+                    log.info('Log message made 2k+, paginator failed')
 
             channel = self.channels[level]
-
-            send = getattr(channel, 'send', None)
-
-            if send is None:
-                print(f'[chdump] you sure this is a channel: {channel!r}')
+            if not channel:
+                print(f'[chdump] getting channel = {channel!r}')
             else:
-                self.loop.create_task(channel.send(joined))
+                for page in p.pages:
+                    self.loop.create_task(channel.send(page))
 
             # empty queue
             self.queue[level] = []
@@ -125,7 +128,7 @@ class ChannelHandler(logging.Handler):
             return
 
         log_level = record.levelno
-        formatted = self.format(record) 
+        formatted = self.format(record)
 
         # because commands like eval can fuck the
         # codeblock up
@@ -179,6 +182,11 @@ class Logging(Cog):
     @commands.is_owner()
     async def err(self, ctx):
         raise Exception('THIS IS A TEST ERROR!!!!!')
+
+    @commands.command()
+    @commands.is_owner()
+    async def test_2k(self, ctx):
+        log.info('a' * 2000)
 
 
 def setup(bot):
