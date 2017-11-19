@@ -7,22 +7,24 @@ import logging
 import asyncio
 
 import asyncpg
-from japronto import Application
+
+from sanic import Sanic
+from sanic import response
 
 import config as jconfig
 
-app = Application()
+app = Sanic()
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__name__)
 
 
+@app.get('/')
 async def index(request):
-    return request.Response('oof')
+    return response.text('oof')
 
 
-async def get_wallet(request):
-    wallet_id = int(request.match_dict['wallet_id'])
-
+@app.get('/api/wallets/<wallet_id:int>')
+async def get_wallet(request, wallet_id):
     wallet = await request.app.db.fetchrow("""
     SELECT * FROM wallets
     WHERE wallet_id = $1
@@ -31,11 +33,11 @@ async def get_wallet(request):
       ON accounts.id = wallets.id AND accounts.account_type = 0
     """, wallet_id)
 
-    return request.Response(json=dict(wallet))
+    return response.json(dict(wallet))
 
 
-async def create_wallet(request):
-    wallet_id = int(request.match_dict['wallet_id'])
+@app.post('/api/wallets/<wallet_id:int>')
+async def create_wallet(request, wallet_id):
     wallet_type = int(request.json['type'])
 
     res = await request.app.db.execute("""
@@ -44,7 +46,7 @@ async def create_wallet(request):
     """, wallet_id, wallet_type)
 
     _, _, rows = res.split()
-    return request.Response(text=f'Inserted {rows} rows')
+    return response.text(f'Inserted {rows} rows')
 
 
 async def db_init(app):
@@ -53,10 +55,14 @@ async def db_init(app):
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
-    r = app.router
-    r.add_route('/', index)
-    r.add_route('/api/wallets/{wallet_id}', get_wallet, 'GET')
-    r.add_route('/api/wallets/{wallet_id}', create_wallet, 'POST')
 
-    app.loop.create_task(db_init(app))
-    app.run(debug=True)
+    server = app.create_server(host='0.0.0.0', port=8080)
+    loop.create_task(server)
+    loop.create_task(db_init(app))
+    try:
+        loop.run_forever()
+    except KeyboardInterrupt:
+        loop.close()
+    except:
+        log.exception('stopping')
+        loop.close()
