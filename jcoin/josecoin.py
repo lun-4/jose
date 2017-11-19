@@ -5,6 +5,7 @@ a webserver that makes transactions between users and stuff
 """
 import logging
 import asyncio
+import decimal
 
 import asyncpg
 
@@ -12,10 +13,15 @@ from sanic import Sanic
 from sanic import response
 
 import config as jconfig
+from .manager import TransferManager
 
 app = Sanic()
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__name__)
+
+
+class TransferError(Exception):
+    pass
 
 
 @app.get('/')
@@ -68,6 +74,46 @@ async def create_wallet(request, wallet_id):
     return response.text(f'Inserted {rows} rows')
 
 
+@app.post('/api/wallets/<wallet_id:int>/transfer')
+async def transfer(request, sender_id):
+    """Transfer money between users."""
+    receiver_id = int(request.json['receiver'])
+    amount = decimal.Decimal(request.json['amount'])
+
+    if receiver_id == sender_id:
+        raise TransferError('Account can not transfer to itself')
+
+    if amount < 0.0009:
+        raise TransferError('Negative amounts are not allowed')
+
+    accs = await request.app.db.fetchrows("""
+    SELECT * FROM accounts
+    WHERE account_id=$1 or account_id=$2
+    """, sender_id)
+
+    accounts = {a['account_id']: a for a in accs}
+    sender = accounts.get('sender_id')
+    receiver = accounts.get('receiver_id')
+
+    if not sender:
+        raise TransferError('Sender is missing account')
+
+    if not receiver:
+        raise TransferError('Receiver is missing account')
+
+    sender_amount = decimal.Decimal(sender['amount'])
+    if amount > sender_amount:
+        raise TransferError('Not enough funds: {amount} > {sender_amount}')
+
+    # the idea here is that we queue and have a commit task
+    # that brings up the queued transactions to postgres
+    await app.tx.queue((sender_id, receiver_id, amount))
+    return request.json({
+        'status': True,
+        'message': 'transaction queued',
+    })
+
+
 async def db_init(app):
     app.db = await asyncpg.create_pool(**jconfig.db)
 
@@ -78,6 +124,7 @@ if __name__ == '__main__':
     server = app.create_server(host='0.0.0.0', port=8080)
     loop.create_task(server)
     loop.create_task(db_init(app))
+    app.tx = TransferManager(app)
     try:
         loop.run_forever()
     except KeyboardInterrupt:

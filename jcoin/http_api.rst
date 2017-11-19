@@ -66,7 +66,7 @@ Transfer to Wallet
 
 Transfer from a wallet to another. The wallet ID in the request URI is the wallet being transferred **from**.
 
-The request body must contain a ``receiver`` wallet ID and an ``amount``.
+The request body must contain a ``receiver`` as an integer wallet ID and an ``amount`` as a string.
 
 .. note:: The amount can not be negative to transfer from the receivers account, you have to transfer with the other wallet.
 
