@@ -121,7 +121,7 @@ class ChannelHandler(logging.Handler):
 
     def detach(self):
         """Detach from loggers."""
-        self.all_logger(logging.Logger.removeHandler)
+        self.all_loggers(logging.Logger.removeHandler)
 
     async def dumper(self):
         """Does a log dump every `LOGGING_PERIOD` seconds."""
