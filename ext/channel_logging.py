@@ -69,10 +69,10 @@ class ChannelHandler(logging.Handler):
                 try:
                     p.add_line(msg)
                 except RuntimeError:
-                    n = 1997
+                    n = 1900
                     chunks = [msg[i:i+n] for i in range(0, len(msg), n)]
                     for chunk in chunks:
-                        p.add_line(msg)
+                        p.add_line(chunk)
 
             channel = self.channels[level]
             if not channel:
