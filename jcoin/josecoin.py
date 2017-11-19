@@ -58,10 +58,11 @@ async def create_wallet(request, wallet_id):
     VALUES ($1, $2)
     """, wallet_id, wallet_type)
 
-    await request.app.db.execute("""
-    INSERT INTO wallets (user_id)
-    VALUES ($1)
-    """, wallet_id)
+    if wallet_type == 0:
+        await request.app.db.execute("""
+        INSERT INTO wallets (user_id)
+        VALUES ($1)
+        """, wallet_id)
 
     _, _, rows = res.split()
     return response.text(f'Inserted {rows} rows')
