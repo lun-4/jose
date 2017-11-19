@@ -99,8 +99,8 @@ class Admin(Cog):
         """im lazy"""
         await ctx.invoke(self.bot.get_command('shell'), command='git pull')
 
-    @commands.command()
     @commands.command(typing=True)
+    @commands.is_owner()
     async def sql(self, ctx, *, statement: no_codeblock):
         """Execute SQL."""
         # this is probably not the ideal solution
