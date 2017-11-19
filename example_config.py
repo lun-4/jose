@@ -33,3 +33,10 @@ LEVELS = {
 # lottery configuration
 JOSE_GUILD = 273863625590964224
 LOTTERY_LOG = 368509920632373258
+
+postgres = {
+    'user': 'slkdjkjlsfd',
+    'password': 'dlkgajkgj',
+    'database': 'jose',
+    'host': 'memeland.com'
+}

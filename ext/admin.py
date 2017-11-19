@@ -33,6 +33,14 @@ def no_codeblock(text: str) -> str:
 
 
 class Admin(Cog):
+    def __init__(self, bot):
+        super().__init__(bot)
+        self.db = None
+        bot.loop.create_task(self.dbinit())
+
+    async def dbinit(self):
+        self.db = await asyncpg.connect(**self.bot.config.postgres)
+
     @commands.command(hidden=True)
     @commands.is_owner()
     async def shutdown(self, ctx):
