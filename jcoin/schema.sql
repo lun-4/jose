@@ -34,9 +34,10 @@ CREATE TABLE IF NOT EXISTS wallets (
 /* The Log of all transactions */
 CREATE TABLE IF NOT EXISTS transactions (
        transferred_at timestamp without time zone,
-       sender bigint NOT NULL FOREIGN KEY REFERENCES accounts (account_id) ON DELETE RESTRICT,
-       receiver bigint NOT NULL,
-       amount text NOT NULL
+       sender bigint NOT NULL REFERENCES accounts (account_id) ON DELETE RESTRICT,
+       receiver bigint NOT NULL REFERENCES accounts (account_id) ON DELETE RESTRICT,
+       amount text NOT NULL,
+       PRIMARY KEY (sender, receiver)
 );
 
 /* If we want, we *could* group transactions */
