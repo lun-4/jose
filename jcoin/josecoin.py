@@ -26,14 +26,27 @@ async def index(request):
 @app.get('/api/wallets/<wallet_id:int>')
 async def get_wallet(request, wallet_id):
     wallet = await request.app.db.fetchrow("""
-    SELECT * FROM wallets
-    WHERE wallet_id = $1
+    SELECT account_id, account_type, amount,
+     taxpaid, steal_uses, steal_success FROM wallets
 
     JOIN accounts
-      ON accounts.id = wallets.id AND accounts.account_type = 0
+      ON accounts.account_id = wallets.user_id
+
+    WHERE user_id = $1
     """, wallet_id)
 
-    return response.json(dict(wallet))
+    if not wallet:
+        return response.json(None)
+
+    dwallet = dict(wallet)
+    if wallet['account_type'] == 0:
+        return response.json(dwallet)
+    else:
+        log.info('Stripping down info from taxbank')
+        dwallet.pop('taxpaid')
+        dwallet.pop('steal_uses')
+        dwallet.pop('steal_success')
+        return response.json(dwallet)
 
 
 @app.post('/api/wallets/<wallet_id:int>')
@@ -44,6 +57,11 @@ async def create_wallet(request, wallet_id):
     INSERT INTO accounts (account_id, account_type)
     VALUES ($1, $2)
     """, wallet_id, wallet_type)
+
+    await request.app.db.execute("""
+    INSERT INTO wallets (user_id)
+    VALUES ($1)
+    """, wallet_id)
 
     _, _, rows = res.split()
     return response.text(f'Inserted {rows} rows')
