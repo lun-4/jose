@@ -197,4 +197,5 @@ def setup(bot):
         bot.channel_handler.detach()
 
     bot.channel_handler = ChannelHandler(bot)
-    # bot.loop.create_task(bot.channel_handler.ready())
+    if bot.is_ready():
+        bot.loop.create_task(bot.channel_handler.do_ready())
