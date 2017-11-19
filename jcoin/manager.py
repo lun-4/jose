@@ -30,7 +30,7 @@ class TransferManager:
         await self.db.executemany("""
         INSERT INTO transactions (sender, receiver, amount)
         VALUES ($1, $2, $3)
-        """, [(a, b, str(c)) for (a, b, c) in self._queue])
+        """, ((a, b, str(c)) for (a, b, c) in self._queue))
 
         self._queue = []
         self.txlock.release()
