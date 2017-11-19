@@ -1,5 +1,4 @@
 import logging
-import collections
 import asyncio
 
 import discord
