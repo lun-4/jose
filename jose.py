@@ -97,16 +97,18 @@ class JoseBot(commands.Bot):
         # reeeeee dont query mongo every message god damn it
         self.block_cache = {}
 
-    async def hell(self):
+    async def schedule_logging(self):
         """That happened. Yeah."""
-        await asyncio.sleep(3)
+        await asyncio.sleep(1)
 
-        if self.channel_handler is not None:
-            self.channel_handler.do_ready()
+        try:
+            self.channel_handler.load()
+        except AttributeError:
+            pass
 
     async def on_ready(self):
         log.info(f'Logged in! {self.user!s}')
-        self.loop.create_task(self.hell())
+        self.loop.create_task(self.schedule_logging())
 
     async def is_blocked(self, user_id: int):
         """Returns If a user is blocked to use José. Uses cache"""

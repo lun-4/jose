@@ -1,8 +1,6 @@
 import logging
 import asyncio
 import collections
-import json
-import zlib
 
 from discord.ext import commands
 
@@ -11,8 +9,8 @@ from joseconfig import PACKET_CHANNEL, LEVELS
 
 log = logging.getLogger(__name__)
 
-
-LOGGING_PERIOD = 5
+# pls no ratelimit
+LOGGING_PERIOD = 1
 
 LOGGERS_TO_ATTACH = [
     'discord',
@@ -60,9 +58,6 @@ class ChannelHandler(logging.Handler):
 
     def dump(self):
         """Dump all queued log messages into their respective channels."""
-        if len(self.queue) < 1:
-            return
-
         for level, messages in self.queue.items():
             if len(messages) < 1:
                 continue
@@ -89,31 +84,44 @@ class ChannelHandler(logging.Handler):
             # empty queue
             self.queue[level] = []
 
-    def do_ready(self):
+    def load(self):
+        """Fill handler with channel information
+        and attach itself to common loggers.
+        """
         for level, channel_id in LEVELS.items():
             channel = self.bot.get_channel(channel_id)
-            self.channels[level] = channel
-            print(f'[ch:ready] {level} -> {channel_id} -> {channel!s}')
+            if channel:
+                self.channels[level] = channel
+                print(f'[ch:load] {level} -> {channel_id} -> {channel!s}')
+            else:
+                print(f'[ch:load] {level} -> {channel_id} -> NOT FOUND')
 
         self.dumper_task = self.loop.create_task(self.dumper())
         self.attach()
 
-    def attach(self):
-        """Attach to the loggers in ``LOGGERS_TO_ATTACH``"""
-        log.addHandler(self)
-        for logger_name in LOGGERS_TO_ATTACH:
-            logger = logging.getLogger(logger_name)
-            logger.addHandler(self)
+    def unload(self):
+        """Detach from attached loggers.
+        Cancels the dumper task.
+        """
+        self.detach()
 
-    def detach(self):
-        """Detach from the loggers, disables the dumper task too"""
         if self.dumper_task is not None:
             self.dumper_task.cancel()
 
-        log.removeHandler(self)
+    def all_loggers(self, func):
+        """Invoke a function to all attachable loggers."""
+        func(log, self)
         for logger_name in LOGGERS_TO_ATTACH:
             logger = logging.getLogger(logger_name)
-            logger.removeHandler(self)
+            func(logger, self)
+
+    def attach(self):
+        """Attach to loggers."""
+        self.all_loggers(logging.Logger.addHandler)
+
+    def detach(self):
+        """Detach from loggers."""
+        self.all_logger(logging.Logger.removeHandler)
 
     async def dumper(self):
         """Does a log dump every `LOGGING_PERIOD` seconds."""
@@ -123,11 +131,13 @@ class ChannelHandler(logging.Handler):
                 await asyncio.sleep(LOGGING_PERIOD)
         except asyncio.CancelledError:
             log.info('[channel_logging] dumper got cancelled')
+        except:
+            log.exception('dumper failed')
 
     def emit(self, record):
         """Queues the log record to be sent on the next available window."""
         if self.channels is None:
-            # No channels setup, this is logging BEFORE client is ready.
+            log.warning('No channels are setup')
             return
 
         log_level = record.levelno
@@ -195,10 +205,10 @@ class Logging(Cog):
 def setup(bot):
     bot.add_cog(Logging(bot))
 
-    # Remove the handler if it already exists
+    # unload if already loaded
     if getattr(bot, 'channel_handler', None) is not None:
-        bot.channel_handler.detach()
+        bot.channel_handler.unload()
 
     bot.channel_handler = ChannelHandler(bot)
     if bot.is_ready():
-        bot.loop.create_task(bot.channel_handler.do_ready())
+        bot.channel_handler.load()
