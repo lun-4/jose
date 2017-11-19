@@ -1,4 +1,7 @@
 import logging
+import collections
+import asyncio
+
 import discord
 
 from chatterbot import ChatBot
@@ -161,8 +164,15 @@ class JoseChat(Cog):
             ],
 
             input_adapter="chatterbot.input.VariableInputTypeAdapter",
-            output_adapter="chatterbot.output.OutputAdapter"
+            output_adapter="chatterbot.output.OutputAdapter",
+            logger=log
         )
+
+        # Dict[int] -> str
+        self.sessions = {}
+
+        self.train_lock = asyncio.Lock()
+        self.chat_lock = asyncio.Lock()
 
     @commands.command()
     @commands.is_owner()
@@ -171,6 +181,23 @@ class JoseChat(Cog):
         for convo in TRAINING:
             self.chatbot.train(convo)
         await ctx.send(f'Trained {len(TRAINING)} Conversations.')
+
+    def get_chat_session(self, user) -> 'chatbot session object':
+        """Get a chatbot session given a user.
+
+        Creates a new chat session if it doesn't exist.
+        """
+        cs = self.chatbot.conversation_sessions
+
+        try:
+            sess_id = self.sessions[user.id]
+            sess = cs.get(sess_id)
+        except KeyError:
+            sess = cs.new()
+            sess_id = sess.id_string
+            self.sessions[user.id] = sess_id
+
+        return sess
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.default)
@@ -192,10 +219,15 @@ class JoseChat(Cog):
                                     ' to use the chatbot.')
 
         with ctx.typing():
+            session = self.get_chat_session(ctx.author)
+
+            await self.chat_lock
             future = self.loop.run_in_executor(None,
                                                self.chatbot.get_response,
-                                               user_input)
+                                               user_input, session.id_string)
             response = await future
+            self.chat_lock.release()
+
             await ctx.send(response)
 
     @commands.is_owner()
