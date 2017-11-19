@@ -55,8 +55,8 @@ if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     r = app.router
     r.add_route('/', index)
-    r.add_route('/wallets/{wallet_id}', get_wallet, 'GET')
-    r.add_route('/wallets/{wallet_id}', create_wallet, 'POST')
+    r.add_route('/api/wallets/{wallet_id}', get_wallet, 'GET')
+    r.add_route('/api/wallets/{wallet_id}', create_wallet, 'POST')
 
     app.loop.create_task(db_init(app))
     app.run(debug=True)
