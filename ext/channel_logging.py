@@ -74,7 +74,10 @@ class ChannelHandler(logging.Handler):
                 try:
                     p.add_line(msg)
                 except RuntimeError:
-                    log.info('Log message made 2k+, paginator failed')
+                    n = 2000
+                    chunks = [msg[i:i+n] for i in range(0, len(msg), n)]
+                    for chunk in chunks:
+                        p.add_line(msg)
 
             channel = self.channels[level]
             if not channel:
