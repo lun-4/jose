@@ -189,9 +189,6 @@ class JoseBot(commands.Bot):
         elif isinstance(error, commands.errors.BadArgument):
             await ctx.send('bad argument — '
                            f'{random.choice(BAD_ARG_MESSAGES)} - {error!s}')
-        elif isinstance(error, commands.errors.CheckFailure):
-            await ctx.send('check failed — '
-                           f'{random.choice(CHECK_FAILURE_PHRASES)}')
 
         elif isinstance(error, commands.errors.CommandOnCooldown):
             # retry = round(error.retry_after, 2)
@@ -211,6 +208,12 @@ class JoseBot(commands.Bot):
         elif isinstance(error, commands.errors.BotMissingPermissions):
             join = ', '.join(error.missing_perms)
             await ctx.send(f'bot is missing permissions — `{join}`')
+
+        # we put this one because MissingPermissions might be a
+        # disguised CheckFailure
+        elif isinstance(error, commands.errors.CheckFailure):
+            await ctx.send('check failed — '
+                           f'{random.choice(CHECK_FAILURE_PHRASES)}')
 
     async def on_message(self, message):
         author_id = message.author.id
