@@ -230,7 +230,7 @@ class Speak(Cog):
 
         return self.text_generators[guild.id]
 
-    async def sentence_tax(self, ctx, mode='user'):
+    async def sentence_tax(self, ctx, mode='user', recursive=False):
         """Tax someone when they request a sentence.
 
         Catches transfer errors, logs them, but
@@ -259,10 +259,25 @@ class Speak(Cog):
             try:
                 await self.coins.sink(ctx.author.id, SENTENCE_PRICE)
             except self.coins.TransferError as err:
-                if 'not found' not in repr(err):
-                    log.warning('Ignoring error on sentence paying', exc_info=True)
+                if 'not found' not in repr(err).lower():
+                    log.execption('Ignorting error on sentence tax')
 
-    async def make_sentence(self, ctx, char_limit=None):
+                    # we retry, doing the taxbank instead of user
+                    # or user instead of taxbank
+
+                    # this should be called when user or taxbank
+                    # do not have enough funds to pay.
+
+                    # We set the recursive flag
+                    # so that this function is not called more than once.
+                    # (or else we would have a very bad day when both user
+                    # and taxbank have 0 JC)
+                    if not recursive:
+                        await self.sentence_tax('txb'
+                                                if mode == 'user'
+                                                else 'user', True)
+
+    async def make_sentence(self, ctx, char_limit=None, priority='user'):
         with ctx.typing():
             try:
                 texter = await self.get_texter(ctx.guild)
@@ -270,7 +285,7 @@ class Speak(Cog):
                 raise self.SayException('Failed to generate a '
                                         f'texter: `{err.args[0]!r}`')
 
-        await self.sentence_tax(ctx, 'txb' if not ctx.command else 'user')
+        await self.sentence_tax(ctx, priority)
         sentence = await texter.sentence(char_limit)
         return sentence
 
@@ -302,6 +317,7 @@ class Speak(Cog):
         else:
             prefixes = self.bot.config.SPEAK_PREFIXES
 
+        autoreply = False
         if not any(message.content.startswith(prefix) for prefix in prefixes):
             if random.random() > prob:
                 return
@@ -311,12 +327,14 @@ class Speak(Cog):
                 message.guild, message.guild.id, message.author,
                 message.author.id, message.content
             )
+            autoreply = True
 
         if self.generating.get(ctx.guild.id):
             return
 
         try:
-            sentence = await self.make_sentence(ctx)
+            sentence = await self.make_sentence(ctx, None,
+                                                'txb' if autoreply else 'user')
         except self.SayException as err:
             return await ctx.send('Failed to generate a '
                                   f'sentence: `{err.args[0]!r}`')
