@@ -185,18 +185,32 @@ class JoseBot(commands.Bot):
             b = '\N{NEGATIVE SQUARED LATIN CAPITAL LETTER B}'
             await ctx.send(f'{b}ot machine {b}roke\n '
                            f'```py\n{error.original!r}\n```')
+
         elif isinstance(error, commands.errors.BadArgument):
             await ctx.send('bad argument — '
                            f'{random.choice(BAD_ARG_MESSAGES)} - {error!s}')
         elif isinstance(error, commands.errors.CheckFailure):
             await ctx.send('check failed — '
                            f'{random.choice(CHECK_FAILURE_PHRASES)}')
+
         elif isinstance(error, commands.errors.CommandOnCooldown):
             # retry = round(error.retry_after, 2)
             # await ctx.send(f'Command on cooldown, wait `{retry}` seconds')
             pass
+
         elif isinstance(error, commands.errors.MissingRequiredArgument):
-            await ctx.send(f'missing argument: `{error.param}`')
+            await ctx.send(f'missing argument — `{error.param}`')
+        elif isinstance(error, commands.errors.NoPrivateMessage):
+            await ctx.send('sorry, you can not use this command in a DM.')
+        elif isinstance(error, commands.errors.UserInputError):
+            await ctx.send('user input error  — please, the *right* thing')
+
+        elif isinstance(error, commands.errors.MissingPermissions):
+            join = ', '.join(error.missing_perms)
+            await ctx.send(f'user is missing permissions — `{join}`')
+        elif isinstance(error, commands.errors.BotMissingPermissions):
+            join = ', '.join(error.missing_perms)
+            await ctx.send(f'bot is missing permissions — `{join}`')
 
     async def on_message(self, message):
         author_id = message.author.id
