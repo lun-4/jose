@@ -176,7 +176,7 @@ class Logging(Cog):
             log.info('GOT A WANTED PACKET!!')
             await self._special_packet_channel.send('HELLO I GOT A GOOD'
                                                     ' PACKET PLS SEE '
-                                                    f'```py\n{j}\n```')
+                                                    f'```py\n{payload!r}\n```')
 
     @commands.command()
     @commands.is_owner()
