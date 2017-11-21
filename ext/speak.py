@@ -255,27 +255,29 @@ class Speak(Cog):
         else:
             raise RuntimeError('Sentence tax type not found')
 
-        if account:
-            try:
-                await self.coins.sink(ctx.author.id, SENTENCE_PRICE)
-            except self.coins.TransferError as err:
-                if 'not found' not in repr(err).lower():
-                    log.execption('Ignorting error on sentence tax')
+        if not account:
+            return
 
-                    # we retry, doing the taxbank instead of user
-                    # or user instead of taxbank
+        try:
+            log.info('tax mode: %s', mode)
+            await self.coins.sink(ctx.author.id, SENTENCE_PRICE)
+        except self.coins.TransferError as err:
+            log.execption('Ignorting error on sentence tax')
 
-                    # this should be called when user or taxbank
-                    # do not have enough funds to pay.
+            # we retry, doing the taxbank instead of user
+            # or user instead of taxbank
 
-                    # We set the recursive flag
-                    # so that this function is not called more than once.
-                    # (or else we would have a very bad day when both user
-                    # and taxbank have 0 JC)
-                    if not recursive:
-                        await self.sentence_tax('txb'
-                                                if mode == 'user'
-                                                else 'user', True)
+            # this should be called when user or taxbank
+            # do not have enough funds to pay.
+
+            # We set the recursive flag
+            # so that this function is not called more than once.
+            # (or else we would have a very bad day when both user
+            # and taxbank have 0 JC)
+            if not recursive:
+                await self.sentence_tax('txb'
+                                        if mode == 'user'
+                                        else 'user', True)
 
     async def make_sentence(self, ctx, char_limit=None, priority='user'):
         with ctx.typing():
