@@ -259,8 +259,7 @@ class Speak(Cog):
             return
 
         try:
-            log.info('tax mode: %s', mode)
-            await self.coins.sink(ctx.author.id, SENTENCE_PRICE)
+            await self.coins.sink(account['id'], SENTENCE_PRICE)
         except self.coins.TransferError as err:
             log.execption('Ignorting error on sentence tax')
 
