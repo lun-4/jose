@@ -164,9 +164,8 @@ class Math(Cog):
                                                self.owm.weather_at_place,
                                                location)
             observation = await future
-        except:
-            log.exception('Failed to get weather info')
-            raise self.SayException('Error retrieving weather data')
+        except Exception as err:
+            raise self.SayException('Error retrieving weather data: `{err!r}`')
 
         w = observation.get_weather()
 
