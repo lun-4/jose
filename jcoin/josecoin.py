@@ -1,7 +1,8 @@
 """
-jcoin/josecoin.py - josecoin meme module
+jcoin/josecoin.py - main module for josécoin backend
 
-a webserver that makes transactions between users and stuff
+a neat webserver which handles josécoin transfers,
+wallets, database connections, authentication, etc
 """
 import logging
 import asyncio
