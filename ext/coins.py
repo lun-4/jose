@@ -78,7 +78,9 @@ class Coins(Cog):
 
         #: I hate locks even more
         self.locked_accounts = []
+
         self.gdp = None
+        self.transfers_done = 0
 
     def get_name(self, user_id, account=None):
         """Get a string representation of a user or guild."""
@@ -402,6 +404,7 @@ class Coins(Cog):
                 self.gdp += amount
 
             await self.update_accounts([account_from, account_to])
+            self.transfers_done += 1
             res = f'{amount} was transferred from {self.get_name(account_from["id"])} to {self.get_name(account_to["id"])}'
         finally:
             self.transfer_lock.release()
