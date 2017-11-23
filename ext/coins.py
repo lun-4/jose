@@ -824,6 +824,34 @@ class Coins(Cog):
             self.unlock_account(user_id)
             self.delete_lock.release()
 
+    @commands.command()
+    @commands.is_owner()
+    async def spam(self, ctx, taskcount: int = 200, timeout: int = 30):
+        """Test JoséCoin.
+
+        This can break things.
+        """
+        while True:
+            tasks = []
+
+            t1 = time.monotonic()
+            for i in range(taskcount):
+                t = self.loop.create_task(self.transfer(self.bot.user.id,
+                                                        ctx.author.id,
+                                                        0.1))
+                tasks.append(t)
+
+            # wait for tasks
+            done, pending = await asyncio.wait(tasks, timeout=timeout)
+            t2 = time.monotonic()
+
+            delta = round(t2 - t1, 6)
+            await ctx.send(f'{taskcount} tasks completed in {delta:.6} seconds')
+
+            if len(pending):
+                return await ctx.send('Pending tasks > 0, finishing')
+
+            taskcount *= 2
 
 def setup(bot):
     bot.add_cog(Coins(bot))

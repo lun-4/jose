@@ -500,15 +500,19 @@ class CoinsExt(Cog):
             if account['id'] == self.bot.user.id:
                 continue
 
+            a = decimal.Decimal(account['amount'])
+            if a == self.coins.INF:
+                continue
+
             if account['type'] == 'taxbank':
-                taxmoney += decimal.Decimal(account['amount'])
+                taxmoney += a
             else:
-                usermoney += decimal.Decimal(account['amount'])
+                usermoney += a
                 steals += account['times_stolen']
                 success += account['success_steal']
 
-        usermoney = round(usermoney, 3)
-        taxmoney = round(taxmoney, 3)
+        #usermoney = round(usermoney, 3)
+        #taxmoney = round(taxmoney, 3)
 
         em.add_field(name='Steals',
                      value=f'{steals} steals, {success} successes')
