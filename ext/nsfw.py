@@ -29,9 +29,13 @@ class BooruProvider:
 
     @classmethod
     async def get_posts(cls, bot, tags, *, limit=5):
+        headers = {
+            'User-Agent': 'Yiffmobile v2 (José, https://github.com/lnmds/jose)'
+        }
+
         tags = urllib.parse.quote(' '.join(tags), safe='')
-        async with bot.session.get(f'{cls.url}&limit={limit}&tags={tags}') \
-                as resp:
+        async with bot.session.get(f'{cls.url}&limit={limit}&tags={tags}',
+                                   headers=headers) as resp:
             results = await resp.json()
             if not results:
                 return []
