@@ -240,13 +240,13 @@ class Math(Cog):
         try:
             if dice[0] != '':
                 dice_amount = int(dice[0])
-        except ValueError:
+        except (ValueError, IndexError):
             await ctx.send('invalid amount')
             return
 
         try:
             dice_sides = int(dice[1])
-        except ValueError:
+        except (IndexError, ValueError):
             await ctx.send('invalid dice side')
             return
 
