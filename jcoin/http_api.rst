@@ -172,3 +172,21 @@ guild_id  integer
 limit     integer 20
 ========= ======= =======
 
+
+----------------
+Get Global Stats
+----------------
+
+.. code-block :: http
+
+  GET /stats
+
+Get globally available statistics about the JoséCoin.
+
+NOTE: finish this
+
+======== ====== ==============
+field    type   description
+======== ====== ==============
+gdp      string the coin's gdp
+acccounts int   total number of accounts
