@@ -165,7 +165,7 @@ class Math(Cog):
                                                location)
             observation = await future
         except Exception as err:
-            raise self.SayException('Error retrieving weather data: `{err!r}`')
+            raise self.SayException(f'Error retrieving weather data: `{err!r}`')
 
         w = observation.get_weather()
 
