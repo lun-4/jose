@@ -183,10 +183,15 @@ Get Global Stats
 
 Get globally available statistics about the JoséCoin.
 
-NOTE: finish this
+============= ====== ==============================
+field         type   description
+============= ====== ==============================
+gdp           string the coin's gdp
+accounts      int    total number of accounts
+user_accounts int    number of user accounts
+txb_accounts  int    number of taxbank accounts
+user_money    string coins hold by users
+txb_money     string coins hold by taxbanks
+steals        int    total steals done
+success       int    total steals which had success
 
-======== ====== ==============
-field    type   description
-======== ====== ==============
-gdp      string the coin's gdp
-acccounts int   total number of accounts
