@@ -92,23 +92,13 @@ class JoseBot(commands.Bot):
         self.config = config
         self.session = aiohttp.ClientSession()
         self.simple_exc = [SayException]
-        self.channel_handler = None
+        self.channel_handlers = []
 
         # reeeeee dont query mongo every message god damn it
         self.block_cache = {}
 
-    async def schedule_logging(self):
-        """That happened. Yeah."""
-        await asyncio.sleep(1)
-
-        try:
-            self.channel_handler.load()
-        except AttributeError:
-            pass
-
     async def on_ready(self):
         log.info(f'Logged in! {self.user!s}')
-        self.loop.create_task(self.schedule_logging())
 
     async def is_blocked(self, user_id: int):
         """Returns If a user is blocked to use José. Uses cache"""
@@ -259,7 +249,8 @@ async def get_prefix(bot, message):
 jose = JoseBot(
     command_prefix=get_prefix,
     description='henlo dis is jose',
-    pm_help=None
+    pm_help=None,
+    owner_id=getattr(config, 'owner_id', None),
 )
 
 if __name__ == '__main__':
