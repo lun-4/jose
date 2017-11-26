@@ -155,6 +155,7 @@ def setup(bot):
 
     sh = logging.StreamHandler()
     sh.setFormatter(default_formatter)
+    root.addHandler(sh)
 
     formatter = logging.Formatter(
         '[%(asctime)s] [%(levelname)s] [%(name)s] %(message)s',
