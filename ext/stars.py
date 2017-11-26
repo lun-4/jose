@@ -187,7 +187,7 @@ class Starboard(Cog):
         if await self.bot.is_blocked_guild(guild_id):
             g = self.bot.get_guild(guild_id)
 
-            await self.starconfig_coll.delete_many({'guild_id': guild_id})
+            r = await self.starconfig_coll.delete_many({'guild_id': guild_id})
             log.info(f'Deleted {r.deleted_count} sconfig: `{g.name}[g.id]` from blocking')
             return
 
@@ -220,8 +220,10 @@ class Starboard(Cog):
 
             log.warning('[janitor] deleting star objectss from %d', guild_id)
             res = await self.starboard_coll.delete_many({'guild_id': guild_id})
-            log.warning('[janitor] Deleted %d star objects from janitoring gid %d',
-                        res.deleted_count, guild_id)
+            g = self.bot.get_guild(guild_id)
+
+            log.warning('[janitor] Deleted %d star objects from janitoring %s[%d]',
+                        res.deleted_count, g.name, g.id)
 
         except:
             log.exception('error on janitor task')
@@ -242,11 +244,13 @@ class Starboard(Cog):
 
         check_nsfw(guild, config, message)
 
-        # get if we already have a star or not
+        # check if we already have a star or not
         star = await self.get_star(guild_id, message.id)
-        if star is None:
+
+        if not star:
             star_object = empty_star_object(message)
             res = await self.starboard_coll.insert_one(star_object)
+
             if not res.acknowledged:
                 raise StarAddError('Insert OP not acknowledged by db')
 
@@ -310,6 +314,10 @@ class Starboard(Cog):
         return star
 
     async def update_starobj(self, star):
+        log.debug('Updating star `mid=%d cid=%d gid=%d`',
+                  star.get('message_id'), star.get('channel_id'),
+                  star.get('guild_id'))
+
         await self.starboard_coll.update_one({'guild_id': star['guild_id'],
                                               'message_id': star['message_id']},
                                              {'$set': star})
@@ -320,6 +328,10 @@ class Starboard(Cog):
         """
         if msg is not None:
             await msg.delete()
+
+        log.debug('Deleting star `mid=%d cid=%d gid=%d`',
+                  star.get('message_id'), star.get('channel_id'),
+                  star.get('guild_id'))
 
         return await self.starboard_coll.delete_one(
             {'guild_id': star['guild_id'], 'message_id': star['message_id']})
@@ -410,11 +422,8 @@ class Starboard(Cog):
         star = None
 
         try:
-            if config is None:
+            if not config:
                 config = await self._get_starconfig(message.guild.id)
-
-            if config is None:
-                raise StarAddError('No configuration for guild.')
 
             if hasattr(author_id, 'id'):
                 author_id = author_id.id
@@ -450,11 +459,8 @@ class Starboard(Cog):
         star = None
 
         try:
-            if config is None:
+            if not config:
                 config = await self._get_starconfig(message.guild.id)
-
-            if config is None:
-                raise StarRemoveError('No configuration for guild.')
 
             if hasattr(author_id, 'id'):
                 author_id = author_id.id
@@ -469,7 +475,7 @@ class Starboard(Cog):
 
         return star
 
-    async def remove_all(self, message, config=None):
+    async def remove_all(self, message: discord.Message, config: dict=None):
         """Remove all stars from a message.
 
         Parameters
@@ -481,11 +487,9 @@ class Starboard(Cog):
         await lock
 
         try:
-            if config is None:
+            if not config:
                 config = await self._get_starconfig(message.guild.id)
 
-            if config is None:
-                raise StarRemoveError('No configuration for guild.')
             star = await self.raw_remove_all(config, message)
             await self.update_star(config, star, delete=True)
         finally:
@@ -499,6 +503,10 @@ class Starboard(Cog):
         bool
             Success/Failure of the operation.
         """
+        guild = self.bot.get_guild(config['guild_id'])
+        log.debug('Deleting starconfig for %s[%d]',
+                  guild.name, guild.id)
+
         res = await self.starconfig_coll.delete_many(config)
         return res.deleted_count > 0
 
@@ -589,7 +597,9 @@ class Starboard(Cog):
         guild = ctx.guild
         config = await self.get_starconfig(guild.id)
         if config is not None:
-            await ctx.send("You already have a starboard. If you want to detach josé from it, use the `stardetach` command")
+            await ctx.send("You already have a starboard. If you want"
+                           " to detach josé from it, use the "
+                           "`stardetach` command")
             return
 
         po = discord.PermissionOverwrite
@@ -618,7 +628,7 @@ class Starboard(Cog):
 
         res = await self.starconfig_coll.insert_one(config)
         if not res.acknowledged:
-            raise self.SayException('Failed to create starboard configuration.')
+            raise self.SayException('Failed to create starboard config (no ack)')
 
         await ctx.send('All done, I guess!')
 
@@ -632,18 +642,19 @@ class Starboard(Cog):
         without needing José to automatically create the starboard for you
         """
         config = await self.get_starconfig(ctx.guild.id)
-        if config is not None:
-            await ctx.send('You already have a starboard config setup.')
-            return
+        if config:
+            return await ctx.send('You already have a starboard config setup.')
 
         config = empty_starconfig(ctx.guild)
         config['starboard_id'] = starboard_chan.id
         res = await self.starconfig_coll.insert_one(config)
+
         if not res.acknowledged:
-            await ctx.send('Failed to create starboard configuration.')
+            raise self.SayException('Failed to create starboard config (no ack)')
             return
 
         await ctx.send('Done!')
+        await ctx.ok()
 
     @commands.command()
     @commands.guild_only()
@@ -689,22 +700,18 @@ class Starboard(Cog):
         try:
             message = await ctx.channel.get_message(message_id)
         except discord.NotFound:
-            await ctx.send('Message not found')
-            return
+            return await ctx.send('Message not found')
         except discord.Forbidden:
-            await ctx.send("Can't retrieve message")
-            return
+            return await ctx.send("Can't retrieve message")
         except discord.HTTPException as err:
-            await ctx.send(f'Failed to retrieve message: {err!r}')
-            return
+            return await ctx.send(f'Failed to retrieve message: {err!r}')
 
         try:
             await self.add_star(message, ctx.author)
             await ctx.ok()
         except (StarAddError, StarError) as err:
             log.warning(f'[star_command] Errored: {err!r}')
-            await ctx.send(f'Failed to add star: {err!r}')
-            return
+            return await ctx.send(f'Failed to add star: {err!r}')
 
     @commands.command()
     @commands.guild_only()
@@ -713,22 +720,18 @@ class Starboard(Cog):
         try:
             message = await ctx.channel.get_message(message_id)
         except discord.NotFound:
-            await ctx.send('Message not found')
-            return
+            return await ctx.send('Message not found')
         except discord.Forbidden:
-            await ctx.send("Can't retrieve message")
-            return
+            return await ctx.send("Can't retrieve message")
         except discord.HTTPException as err:
-            await ctx.send(f'Failed to retrieve message: {err!r}')
-            return
+            return await ctx.send(f'Failed to retrieve message: {err!r}')
 
         try:
             await self.remove_star(message, ctx.author)
             await ctx.ok()
         except (StarRemoveError, StarError) as err:
             log.warning(f'[unstar_cmd] Errored: {err!r}')
-            await ctx.send(f'Failed to remove star: {err!r}')
-            return
+            return await ctx.send(f'Failed to remove star: {err!r}')
 
     @commands.command()
     @commands.guild_only()
@@ -737,21 +740,17 @@ class Starboard(Cog):
         try:
             message = await ctx.channel.get_message(message_id)
         except discord.NotFound:
-            await ctx.send('Message not found')
-            return
+            return await ctx.send('Message not found')
         except discord.Forbidden:
-            await ctx.send("Can't retrieve message")
-            return
+            return await ctx.send("Can't retrieve message")
         except discord.HTTPException as err:
-            await ctx.send(f'Failed to retrieve message: {err!r}')
-            return
+            return await ctx.send(f'Failed to retrieve message: {err!r}')
 
         guild = ctx.guild
         await self._get_starconfig(guild.id)
         star = await self.get_star(guild.id, message.id)
         if star is None:
-            await ctx.send('Star object not found')
-            return
+            return await ctx.send('Star object not found')
 
         _, em = make_star_embed(star, message)
         starrers = [guild.get_member(starrer_id)
@@ -822,13 +821,11 @@ class Starboard(Cog):
             star = star
 
         if star is None:
-            await ctx.send('No star object found')
-            return
+            return await ctx.send('No star object found')
 
         channel = self.bot.get_channel(star['channel_id'])
         if channel is None:
-            await ctx.send('Star references a non-findable channel.')
-            return
+            return await ctx.send('Star references a non-findable channel.')
 
         message_id = star['message_id']
         try:
@@ -840,12 +837,10 @@ class Starboard(Cog):
         except discord.HTTPException as err:
             raise self.SayException(f'Failed to retrieve message: {err!r}')
 
-        sfw = ctx.channel.is_nsfw()
         current = ctx.channel.is_nsfw()
         schan = channel.is_nsfw()
-
         if not current and schan:
-            raise self.SayException(f'current_nsfw={current} nsfw={schan}, nope')
+            raise self.SayException(f'channel nsfw={current}, nsfw={schan}, nope')
 
         title, embed = make_star_embed(star, message)
         await ctx.send(title, embed=embed)
