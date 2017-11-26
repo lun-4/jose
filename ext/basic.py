@@ -67,10 +67,12 @@ class Basic(Cog):
         t2 = time.monotonic()
 
         rtt = (t2 - t1) * 1000
-        if not self.bot.latency or not self.wsping:
-            await m.edit(content=f'incomplete information! rtt: `{rtt:.1f}ms`')
-
         gw = self.bot.latency * 1000
+
+        if not self.wsping:
+            await m.edit(content=f'incomplete information! rtt: `{rtt:.1f}ms`, gateway: `{gw:.1f}ms`')
+            return
+
         ws = self.wsping * 1000
 
         await m.edit(content=f'ws: `{ws:.1f}ms`, rtt: `{rtt:.1f}ms`, gateway: `{gw:.1f}ms`')
