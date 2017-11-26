@@ -60,7 +60,8 @@ class Admin(Cog):
                 await ctx.send(f'Oops. ```py\n{traceback.format_exc()}\n```')
                 return
             log.info(f'Loaded {ext}')
-            await ctx.send(f':ok_hand: `{ext}` loaded.')
+            m = ctx.send(f':ok_hand: `{ext}` loaded.')
+            self.bot.loop.create_task(m)
 
     @commands.command(hidden=True)
     @commands.is_owner()
@@ -69,7 +70,8 @@ class Admin(Cog):
         for ext in exts:
             self.bot.unload_extension('ext.' + ext)
             log.info(f'Unloaded {ext}')
-            await ctx.send(f':ok_hand: `{ext}` unloaded.')
+            m = ctx.send(f':ok_hand: `{ext}` unloaded.')
+            self.bot.loop.create_task(m)
 
     @commands.command(hidden=True)
     @commands.is_owner()
@@ -83,7 +85,8 @@ class Admin(Cog):
                 await ctx.send(f'```{traceback.format_exc()}```')
                 return
             log.info(f'Reloaded {ext}')
-            await ctx.send(f':ok_hand: Reloaded `{ext}`')
+            m = ctx.send(f':ok_hand: Reloaded `{ext}`')
+            self.bot.loop.create_task(m)
 
     @commands.command()
     @commands.is_owner()
