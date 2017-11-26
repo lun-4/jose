@@ -152,7 +152,9 @@ def setup(bot):
 
     default_formatter = logging.Formatter(
         '[%(levelname)s] [%(name)s] %(message)s')
-    root.setFormatter(default_formatter)
+
+    sh = logging.StreamHandler()
+    sh.setFormatter(default_formatter)
 
     formatter = logging.Formatter(
         '[%(asctime)s] [%(levelname)s] [%(name)s] %(message)s',
@@ -161,7 +163,8 @@ def setup(bot):
 
     # silence loggers
     # force them to info
-    for logger in LOGGER_SILENCE:
+    for loggername in LOGGER_SILENCE:
+        logger = logging.getLogger(loggername)
         logger.setLevel(logging.INFO)
 
     for name, url in LEVELS.items():
