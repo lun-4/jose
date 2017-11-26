@@ -118,8 +118,8 @@ class Config(Cog):
         res = await self.config_coll.update_one({'guild_id': guild.id},
                                                 {'$set': {key: value}})
 
-        log.info('[cfg:set] %s[gid=%d] k=%r <- v=%r',
-                 guild, guild.id, key, value)
+        log.debug('[cfg:set] %s[gid=%d] k=%r <- v=%r',
+                  guild, guild.id, key, value)
 
         self.config_cache[guild.id][key] = value
 

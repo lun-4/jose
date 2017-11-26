@@ -121,7 +121,7 @@ class MIDI(Cog):
 
         channel_datas = data.split('|')
 
-        log.info(f'creating MIDI out of "{data}"')
+        log.debug(f'creating MIDI out of "{data}"')
 
         for channel_index, channel_data in enumerate(channel_datas):
             await self.add_channel(midi_file, channel_index, channel_data)

@@ -162,7 +162,7 @@ class Coins(Cog):
         account = self.empty_account(account_id, account_type, init_amount)
         try:
             r = await self.jcoin_coll.insert_one(account)
-            log.info('ACK insert: %s', r.acknowledged)
+            log.debug('ACK insert: %s', r.acknowledged)
             self.cache[account_id] = account
             return True
         except:
