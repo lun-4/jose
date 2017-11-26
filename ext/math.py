@@ -46,7 +46,7 @@ UNECESSARY_PODS = {
 
 def pod_finder(pod_list):
     """Finds a probable pod."""
-    log.info('pod_finder: going to score %d pods', len(pod_list))
+    log.debug('pod_finder: going to score %d pods', len(pod_list))
     pod_scores = {}
 
     for pod in pod_list:
@@ -79,8 +79,8 @@ def pod_finder(pod_list):
 
         pod_scores[pod['@id']] = score
 
-    log.info('pod_finder: got %d pods', len(pod_scores))
-    log.info('pod_finder scores: %s', pod_scores)
+    log.debug('pod_finder: got %d pods', len(pod_scores))
+    log.debug('pod_finder scores: %s', pod_scores)
 
     # return pod with highest score
     best_id = max(pod_scores, key=pod_scores.get)
@@ -105,7 +105,7 @@ class Math(Cog):
 
         await self.jcoin.pricing(ctx, self.prices['API'])
 
-        log.info('Wolfram|Alpha: %s', term)
+        log.debug('Wolfram|Alpha: %s', term)
 
         future = self.loop.run_in_executor(None, self.wac.query, term)
         res = None
