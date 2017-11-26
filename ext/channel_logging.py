@@ -157,6 +157,9 @@ def setup(bot):
     sh.setFormatter(default_formatter)
     root.addHandler(sh)
 
+    # so it gets detach on reload
+    bot.channel_handlers.append(sh)
+
     formatter = logging.Formatter(
         '[%(asctime)s] [%(levelname)s] [%(name)s] %(message)s',
         datefmt='%H:%M:%S'
