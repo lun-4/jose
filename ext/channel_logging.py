@@ -9,6 +9,8 @@ from .common import Cog
 from joseconfig import PACKET_CHANNEL, LEVELS
 
 log = logging.getLogger(__name__)
+LOGLEVEL = logging.DEBUG
+LOGGER_SILENCE = ['discord', 'websockets']
 
 
 # copied from https://github.com/FrostLuma/Mousey
@@ -146,10 +148,21 @@ class Logging(Cog):
 
 def setup(bot):
     root = logging.getLogger()
+    root.setLevel(LOGLEVEL)
+
+    default_formatter = logging.Formatter(
+        '[%(levelname)s] [%(name)s] %(message)s')
+    root.setFormatter(default_formatter)
 
     formatter = logging.Formatter(
-        '[%(asctime)s] [%(levelname)s] [%(name)s]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S'
+        '[%(asctime)s] [%(levelname)s] [%(name)s] %(message)s',
+        datefmt='%H:%M:%S'
     )
+
+    # silence loggers
+    # force them to info
+    for logger in LOGGER_SILENCE:
+        logger.setLevel(logging.INFO)
 
     for name, url in LEVELS.items():
         level = getattr(logging, name.upper(), None)

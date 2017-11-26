@@ -17,9 +17,6 @@ from ext.common import SayException
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
-logging.basicConfig(level=logging.INFO,
-                    format='[%(levelname)7s] [%(name)s] %(message)s')
-
 log = logging.getLogger(__name__)
 
 extensions = [
