@@ -30,7 +30,8 @@ class Basic(Cog):
         self._wstask = None
 
     def __unload(self):
-        self._wstask.cancel()
+        if self._wstask:
+            self._wstask.cancel()
 
     async def on_ready(self):
         self._wstask = self.bot.loop.create_task(self.wstask())
