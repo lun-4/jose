@@ -59,7 +59,7 @@ class DiscordHandler(logging.Handler):
         msg = self.format(record).replace('\N{GRAVE ACCENT}', '\N{MODIFIER LETTER GRAVE ACCENT}')
 
         if self.level in (logging.WARNING, logging.ERROR):
-            chunks = (msg[x:x + 1989] for x in range(0, len(msg), 1989))
+            chunks = (msg[x:x + 1987] for x in range(0, len(msg), 1987))
 
             paginator = commands.Paginator(prefix='```py\n', suffix='```')
             for chunk in chunks:
