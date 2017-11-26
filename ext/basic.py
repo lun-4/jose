@@ -27,10 +27,13 @@ class Basic(Cog):
         self.process = psutil.Process(os.getpid())
 
         self.wsping = None
-        self._wstask = self.bot.loop.create_task(self.wstask())
+        self._wstask = None
 
     def __unload(self):
         self._wstask.cancel()
+
+    async def on_ready(self):
+        self._wstask = self.bot.loop.create_task(self.wstask())
 
     async def wstask(self):
         try:
@@ -64,6 +67,9 @@ class Basic(Cog):
         t2 = time.monotonic()
 
         rtt = (t2 - t1) * 1000
+        if not self.bot.latency or not self.wsping:
+            await m.edit(content=f'incomplete information! rtt: `{rtt:.1f}ms`')
+
         gw = self.bot.latency * 1000
         ws = self.wsping * 1000
 
