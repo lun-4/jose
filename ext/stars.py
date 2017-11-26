@@ -185,8 +185,10 @@ class Starboard(Cog):
         """
 
         if await self.bot.is_blocked_guild(guild_id):
+            g = self.bot.get_guild(guild_id)
+
             await self.starconfig_coll.delete_many({'guild_id': guild_id})
-            log.info('Deleted {r.deleted_count} configs for %d because of blocking', guild_id)
+            log.info(f'Deleted {r.deleted_count} sconfig: `{g.name}[g.id]` from blocking')
             return
 
         return await self.starconfig_coll.find_one({'guild_id': guild_id})
