@@ -25,6 +25,7 @@ PACKET_CHANNEL = 361685197852508173
 
 # channel log levels
 LEVELS = {
+    'debug': 'https://discordapp.com/api/webhooks/:webhook_id/:token',
     'info': 'https://discordapp.com/api/webhooks/:webhook_id/:token',
     'warning': 'https://discordapp.com/api/webhooks/:webhook_id/:token',
     'error': 'https://discordapp.com/api/webhooks/:webhook_id/:token',
