@@ -3,6 +3,8 @@ import random
 import sys
 import os
 import datetime
+import logging
+import asyncio
 
 import psutil
 import discord
@@ -15,6 +17,7 @@ FEEDBACK_CHANNEL_ID = 290244095820038144
 
 OAUTH_URL = 'https://discordapp.com/oauth2/authorize?permissions=379968&scope=bot&client_id=202586824013643777'
 SUPPORT_SERVER = 'https://discord.gg/5ASwg4C'
+log = logging.getLogger(__name__)
 
 
 class Basic(Cog):
@@ -23,17 +26,48 @@ class Basic(Cog):
         super().__init__(bot)
         self.process = psutil.Process(os.getpid())
 
+        self.wsping = None
+        self._wstask = self.bot.loop.create_task(self.wstask())
+
+    def __unload(self):
+        self._wstask.cancel()
+
+    async def wstask(self):
+        try:
+            while True:
+                t1 = time.monotonic()
+                await (await self.bot.ws.ping())
+                t2 = time.monotonic()
+                self.wsping = t2 - t1
+        except asyncio.CancelledError:
+            pass
+        except:
+            log.exception('error at websocket ping task')
+
     @commands.command(aliases=['p'])
     async def ping(self, ctx):
-        """Ping."""
+        """Ping.
+
+        Meaning of the data:
+         - ws: time taken to send a PING frame and receive
+            a PONG frame in return (should always be faster than gateway)
+
+         - rtt: time taken to send a message in discord.
+         - gateway: time taken to send a HEARTBEAT
+            packet and receive an HEARTBEAT ACK in return.
+
+        None values may be shown if josé did not update the data.
+        """
+
         t1 = time.monotonic()
         m = await ctx.send('pinging...')
         t2 = time.monotonic()
+
         rtt = (t2 - t1) * 1000
+        gw = self.bot.latency * 1000
+        ws = self.wsping * 1000
 
-        ws = self.bot.latency * 1000
-
-        await m.edit(content=f'rtt: `{rtt:.1f}ms`, gateway: `{ws:.1f}ms`')
+        await m.edit(content=f'ws: `{ws:.1f}ms`, rtt: `{rtt:.1f}ms`, gateway: `{gw:.1f}ms`')
 
     @commands.command(aliases=['rand'])
     async def random(self, ctx, n_min: int, n_max: int):
