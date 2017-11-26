@@ -138,8 +138,8 @@ class Lottery(Cog):
             raise self.SayException('`config error`: log channel not found.')
 
         if ctx.author not in joseguild.members:
-            raise self.SayException("You are not in José's server."
-                                    'For means of transparency, it is'
+            raise self.SayException("You are not in José's server. "
+                                    'For means of transparency, it is '
                                     'recommended to join it, use '
                                     f'`{ctx.prefix}invite`')
 
