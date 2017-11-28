@@ -405,12 +405,6 @@ class Coins(Cog):
 
             await self.update_accounts([account_from, account_to])
 
-            if self.bot.config.transfer_webhook:
-                data = {
-                    'content': f'`{res}`'
-                }
-                await self.bot.session.post(self.bot.config.transfer_webhook,
-                                            json=data)
             self.transfers_done += 1
 
             # incr in stats
@@ -427,14 +421,17 @@ class Coins(Cog):
             else:
                 log.warning('no stats found')
 
-            return f'{amount} was transferred from {self.get_name(account_from["id"])} to {self.get_name(account_to["id"])}'
+            res = f'{amount} was transferred from {self.get_name(account_from["id"])} to {self.get_name(account_to["id"])}'
+
+            if self.bot.config.transfer_webhook:
+                data = {
+                    'content': f'`{res}`'
+                }
+                await self.bot.session.post(self.bot.config.transfer_webhook,
+                                            json=data)
+            return res
         finally:
             self.transfer_lock.release()
-
-        # since return can in theory stop
-        # the finally block from executing
-        if res:
-            return res
 
     async def all_accounts(self, field='amount') -> list:
         """Return all accounts in decreasing order of the selected field."""
