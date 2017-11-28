@@ -404,20 +404,36 @@ class Coins(Cog):
                 self.gdp += amount
 
             await self.update_accounts([account_from, account_to])
-            self.transfers_done += 1
-            res = f'{amount} was transferred from {self.get_name(account_from["id"])} to {self.get_name(account_to["id"])}'
-        finally:
-            self.transfer_lock.release()
 
-        # since return can in theory stop
-        # the finally block from executing
-        if res:
             if self.bot.config.transfer_webhook:
                 data = {
                     'content': f'`{res}`'
                 }
                 await self.bot.session.post(self.bot.config.transfer_webhook,
                                             json=data)
+            self.transfers_done += 1
+
+            # incr in stats
+            stats = self.bot.get_cog('Statistics')
+            if stats:
+                r = await stats.cstats_coll.update_one({'t': 'coin'},
+                                                       {'$inc': {'tx': 1}})
+                if not r.modified_count:
+                    await stats.cstats_coll.insert_one({
+                        't': 'coin',
+                        'tx': 1,
+                        'uses': -20,
+                    })
+            else:
+                log.warning('no stats found')
+
+            return f'{amount} was transferred from {self.get_name(account_from["id"])} to {self.get_name(account_to["id"])}'
+        finally:
+            self.transfer_lock.release()
+
+        # since return can in theory stop
+        # the finally block from executing
+        if res:
             return res
 
     async def all_accounts(self, field='amount') -> list:

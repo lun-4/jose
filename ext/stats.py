@@ -106,6 +106,11 @@ class Statistics(Cog):
 
         await self.gauge('jose.coin.totalcoins', uc + tc)
 
+        # haha yes persist data
+        tx = await self.cstats_coll.find_one({'t': 'coin'})
+        if tx:
+            await self.gauge('jose.coin.transfers', tx.get('tx'))
+
     async def texter_stats(self):
         """Report Texter statistics to datadog."""
         speak = self.bot.get_cog('Speak')
@@ -172,6 +177,9 @@ class Statistics(Cog):
                                      .limit(limit)
         res = []
         async for single in cur:
+            if single.get('t'):
+                continue
+
             name, uses = single['name'], single['uses']
             res.append(f'{name}: used {uses} times')
 
