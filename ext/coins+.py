@@ -172,6 +172,7 @@ class CoinsExt(Cog):
     async def remove_cooldown(self, cooldown):
         """Removes a cooldown and resets the stealing points
         entry if cooldown type is 1."""
+        log.debug('Removed cooldown for uid %d', cooldown['user_id'])
         await self.cooldown_coll.delete_one(cooldown)
         if cooldown['type'] == 1:
             await self.points_coll.update_one({'user_id': cooldown['user_id']},
@@ -250,7 +251,7 @@ class CoinsExt(Cog):
         it gets removed
         """
         grace = await self.grace_coll.find_one({'user_id': target.id})
-        if grace is not None:
+        if grace:
             await self.grace_coll.delete_one(grace)
 
         await self.grace_coll.insert_one({
@@ -265,6 +266,8 @@ class CoinsExt(Cog):
 
         # make sure taxbank exists
         await self.jcoin.get_account(ctx.guild.id)
+
+        log.debug('[steal] arresting %s[%d]', thief, thief.id)
 
         try:
             transfer_info = await self.jcoin.transfer(thief.id,
