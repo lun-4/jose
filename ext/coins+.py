@@ -161,10 +161,12 @@ class CoinsExt(Cog):
 
         Cooldown types follow the same as :meth:`CoinsExt.check_cooldowns`
         """
-        r = await self.cooldown_coll.insert_one(make_cooldown(user,
-                                                              c_type, hours))
+        cdown = make_cooldown(user, c_type, hours)
+        r = await self.cooldown_coll.insert_one(cdown)
         if not r.acknowledged:
             raise RuntimeError('mongo did a dumb')
+
+        log.debug('Added cooldown %r[%d] -> %r', user, user.id, cdown)
         return hours
 
     async def remove_cooldown(self, cooldown):
