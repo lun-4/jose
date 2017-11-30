@@ -2,7 +2,6 @@ import logging
 import random
 import time
 import sys
-import traceback
 import asyncio
 
 import discord
@@ -19,9 +18,16 @@ asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 log = logging.getLogger(__name__)
 
+
 extensions = [
-    'config', 'admin', 'exec', 'pipupdates',
-    'coins', 'coins+',
+    'channel_logging',  # loading at start to get the logger to run
+
+    'config',
+    'admin',
+    'exec',
+    'pipupdates',
+    'coins',
+    'coins+',
     'basic',
     'gambling',
     'speak',
@@ -31,10 +37,13 @@ extensions = [
     'extra',
     'stars',
     'stats',
-    'mod', 'botcollection',
-    'channel_logging',
-    'playing', 'sub',
-    'nsfw', 'heist', 'midi',
+    'mod',
+    'botcollection',
+    'playing',
+    'sub',
+    'nsfw',
+    'heist',
+    'midi',
     'lottery',
     'chatbot',
 ]
@@ -146,61 +155,53 @@ class JoseBot(commands.Bot):
 
         if isinstance(error, commands.errors.CommandInvokeError):
             orig = error.original
+
             if isinstance(orig, SayException):
                 arg0 = orig.args[0]
                 log.warning('SayException: %s[%d] %s %r => %r', ctx.guild,
                             ctx.guild.id, ctx.author, content, arg0)
 
-                await ctx.send(arg0)
-                return
-
-            tb = ''.join(traceback.format_exception(
-                type(error.original), error.original,
-                error.original.__traceback__
-            ))
+                return await ctx.send(arg0)
 
             if isinstance(orig, tuple(self.simple_exc)):
-                log.error(f'Errored at {content!r}'
-                          f' from {ctx.author!s}\n{orig!r}')
+                log.error(f'Errored at {content!r} from {ctx.author!s}\n{orig!r}')
             else:
-                log.error(f'Errored at {content!r} from {ctx.author!s}\n{tb}')
+                log.exception(f'Errored at {content!r} from {ctx.author!s}', exc_info=orig)
 
             if isinstance(orig, self.cogs['Coins'].TransferError):
-                await ctx.send(f'JoséCoin error: `{error.original!r}`')
-                return
+                return await ctx.send(f'JoséCoin error: `{orig!r}`')
 
-            b = '\N{NEGATIVE SQUARED LATIN CAPITAL LETTER B}'
-            await ctx.send(f'{b}ot machine {b}roke\n '
-                           f'```py\n{error.original!r}\n```')
+            return await ctx.send(f':b:ot machine :b:roke```py\n{error.original!r}```')
 
-        elif isinstance(error, commands.errors.BadArgument):
-            await ctx.send('bad argument — '
+        if isinstance(error, commands.errors.BadArgument):
+            return await ctx.send('bad argument — '
                            f'{random.choice(BAD_ARG_MESSAGES)} - {error!s}')
 
-        elif isinstance(error, commands.errors.CommandOnCooldown):
-            # retry = round(error.retry_after, 2)
-            # await ctx.send(f'Command on cooldown, wait `{retry}` seconds')
-            pass
+        if isinstance(error, commands.errors.CommandOnCooldown):
+            # await ctx.send(f'Command on cooldown, wait `{error.retry_after:.2f}` seconds')
+            return
 
-        elif isinstance(error, commands.errors.MissingRequiredArgument):
-            await ctx.send(f'missing argument — `{error.param}`')
-        elif isinstance(error, commands.errors.NoPrivateMessage):
-            await ctx.send('sorry, you can not use this command in a DM.')
-        elif isinstance(error, commands.errors.UserInputError):
-            await ctx.send('user input error  — please, the *right* thing')
+        if isinstance(error, commands.errors.MissingRequiredArgument):
+            return await ctx.send(f'missing argument — `{error.param}`')
+        if isinstance(error, commands.errors.NoPrivateMessage):
+            return await ctx.send('sorry, you can not use this command in a DM.')
+        if isinstance(error, commands.errors.UserInputError):
+            return await ctx.send('user input error  — please, the *right* thing')
 
-        elif isinstance(error, commands.errors.MissingPermissions):
+        if isinstance(error, commands.errors.MissingPermissions):
             join = ', '.join(error.missing_perms)
-            await ctx.send(f'user is missing permissions — `{join}`')
-        elif isinstance(error, commands.errors.BotMissingPermissions):
+            return await ctx.send(f'user is missing permissions — `{join}`')
+        if isinstance(error, commands.errors.BotMissingPermissions):
             join = ', '.join(error.missing_perms)
-            await ctx.send(f'bot is missing permissions — `{join}`')
+            return await ctx.send(f'bot is missing permissions — `{join}`')
 
         # we put this one because MissingPermissions might be a
         # disguised CheckFailure
-        elif isinstance(error, commands.errors.CheckFailure):
-            await ctx.send('check failed — '
-                           f'{random.choice(CHECK_FAILURE_PHRASES)}')
+        if isinstance(error, commands.errors.CheckFailure):
+            await ctx.send(f'check failed — {random.choice(CHECK_FAILURE_PHRASES)}')
+
+    async def on_error(self, event_method, *args, **kwargs):
+        log.exception('Got an error while running the %s event', event_method)
 
     async def on_message(self, message):
         author_id = message.author.id
@@ -212,14 +213,11 @@ class JoseBot(commands.Bot):
         if await self.is_blocked(author_id):
             return
 
-        try:
+        if message.guild is not None:
             guild_id = message.guild.id
 
             if await self.is_blocked_guild(guild_id):
                 return
-        except AttributeError:
-            # in a DM
-            pass
 
         ctx = await self.get_context(message, cls=JoseContext)
         await self.invoke(ctx)
