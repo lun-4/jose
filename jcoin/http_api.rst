@@ -194,4 +194,5 @@ user_money    string coins hold by users
 txb_money     string coins hold by taxbanks
 steals        int    total steals done
 success       int    total steals which had success
+============= ====== ==============================
 
