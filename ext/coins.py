@@ -423,12 +423,9 @@ class Coins(Cog):
 
             res = f'{amount} was transferred from {self.get_name(account_from["id"])} to {self.get_name(account_to["id"])}'
 
-            if self.bot.config.transfer_webhook:
-                data = {
-                    'content': f'`{res}`'
-                }
-                await self.bot.session.post(self.bot.config.transfer_webhook,
-                                            json=data)
+            # log to the #transfer-log
+            log.log(60, res)
+
             return res
         finally:
             self.transfer_lock.release()

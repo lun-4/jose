@@ -24,11 +24,12 @@ elixir_docsearch = 'localhost:6969'
 PACKET_CHANNEL = 361685197852508173
 
 # channel log levels
+# 60 is used for transaction logs
 LEVELS = {
-    'debug': 'https://discordapp.com/api/webhooks/:webhook_id/:token',
-    'info': 'https://discordapp.com/api/webhooks/:webhook_id/:token',
-    'warning': 'https://discordapp.com/api/webhooks/:webhook_id/:token',
-    'error': 'https://discordapp.com/api/webhooks/:webhook_id/:token',
+    logging.INFO: 'https://discordapp.com/api/webhooks/:webhook_id/:token',
+    logging.WARNING: 'https://discordapp.com/api/webhooks/:webhook_id/:token',
+    logging.ERROR: 'https://discordapp.com/api/webhooks/:webhook_id/:token',
+    60: 'https://discordapp.com/api/webhooks/:webhook_id/:token',
 }
 
 # lottery configuration
