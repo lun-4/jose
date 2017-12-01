@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 RXKCD_ENDPOINT = 'http://0.0.0.0:8080/search'
 
 
-class Extra(Cog):
+class Extra(Cog, requires=['config']):
     """Extra commands that don't fit in any other cogs."""
     def __init__(self, bot):
         super().__init__(bot)

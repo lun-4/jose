@@ -222,6 +222,45 @@ class JoseBot(commands.Bot):
         ctx = await self.get_context(message, cls=JoseContext)
         await self.invoke(ctx)
 
+    def load_extension(self, name: str):
+        t_start = time.monotonic()
+        super().load_extension(name)
+        t_end = time.monotonic()
+
+        delta = round((t_end - t_start) * 1000, 2)
+        log.info(f'[load] {name} took {delta}ms')
+
+    def add_jose_cog(self, cls: 'class'):
+        """Add a cog but load its requirements first."""
+        requires = cls._cog_metadata.get('requires', [])
+
+        log.debug('requirements for %s: %r', cls, requires)
+        for _req in requires:
+            req = f'ext.{_req}'
+            if not self.extensions.get(req):
+                log.debug('loading %r from requirements', req)
+                self.load_extension(req)
+            else:
+                log.debug('%s already loaded', req)
+
+        # We instantiate here because
+        # instantiating on the old add_cog
+        # is exactly the cause of the problem
+        cog = cls(self)
+        super().add_cog(cog)
+
+    def load_all(self):
+        """Load all extensions in the extensions list,
+        but make sure all dependencies are matched for every cog."""
+
+        for extension in extensions:
+            try:
+                self.load_extension(f'ext.{extension}')
+            except Exception as err:
+                log.error(f'Failed to load {extension}', exc_info=True)
+                sys.exit(1)
+
+
 async def get_prefix(bot, message):
     if message.guild is None:
         return bot.config.prefix
@@ -249,15 +288,6 @@ jose = JoseBot(
 )
 
 if __name__ == '__main__':
-    for extension in extensions:
-        try:
-            t_start = time.monotonic()
-            jose.load_extension(f'ext.{extension}')
-            t_end = time.monotonic()
-            delta = round((t_end - t_start) * 1000, 2)
-            log.info(f"[load] {extension} took {delta}ms")
-        except Exception as err:
-            log.error(f'Failed to load {extension}', exc_info=True)
-            sys.exit(1)
+    jose.load_all()
 
     jose.run(config.token)

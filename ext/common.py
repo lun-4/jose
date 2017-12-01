@@ -87,6 +87,13 @@ class Cog:
             'API': 0.65,
         }
 
+    def __init_subclass__(cls, **kwargs):
+        requires = kwargs.get('requires', [])
+
+        cls._cog_metadata = {
+            'requires': requires,
+        }
+
     def get_name(self, user_id):
         return str(self.bot.get_user(user_id))
 

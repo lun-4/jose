@@ -47,7 +47,7 @@ TRANSFER_OBJECTS = [
 ]
 
 
-class Coins(Cog):
+class Coins(Cog, requires=['config']):
     def __init__(self, bot):
         super().__init__(bot)
         self.jcoin_coll = self.config.jose_db['josecoin']
@@ -864,4 +864,5 @@ class Coins(Cog):
             taskcount *= 2
 
 def setup(bot):
-    bot.add_cog(Coins(bot))
+    # bot.add_cog(Coins(bot))
+    bot.add_jose_cog(Coins)

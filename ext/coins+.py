@@ -45,7 +45,7 @@ def make_cooldown(thief, c_type=0, hours=8):
     }
 
 
-class CoinsExt(Cog):
+class CoinsExt(Cog, requires=['coins']):
     """More currency commands separated into another cog."""
     def __init__(self, bot):
         super().__init__(bot)
