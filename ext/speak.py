@@ -337,10 +337,12 @@ class Speak(Cog):
             sentence = await self.make_sentence(ctx, None,
                                                 'txb' if autoreply else 'user')
         except self.SayException as err:
-            return await ctx.send('Failed to generate a '
-                                  f'sentence: `{err.args[0]!r}`')
+            sentence = f'Failed to generate a sentence: `{err.args[0]!r}`'
 
-        await ctx.send(sentence)
+        try:
+            await ctx.send(sentence)
+        except discord.HTTPException:
+            pass  # no need to log not having permissions, as this occurs pretty often
 
     @commands.command()
     @commands.is_owner()
