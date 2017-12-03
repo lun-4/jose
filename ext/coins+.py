@@ -411,7 +411,7 @@ class CoinsExt(Cog, requires=['coins']):
             self.coins.unlock_account(thief.id)
             self.coins.unlock_account(target.id)
 
-    @commands.command()
+    @commands.command(aliases=['stealstatus'])
     async def stealstate(self, ctx):
         """Show your current state in the stealing business.
 
