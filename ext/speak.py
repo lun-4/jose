@@ -253,7 +253,7 @@ class Speak(Cog):
         elif mode == 'txb':
             account = await self.coins.get_account(ctx.guild.id)
         else:
-            raise RuntimeError('Sentence tax type not found')
+            raise RuntimeError(f'Sentence tax type not found: {mode}')
 
         if not account:
             return
