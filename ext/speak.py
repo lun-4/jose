@@ -274,7 +274,7 @@ class Speak(Cog):
             # (or else we would have a very bad day when both user
             # and taxbank have 0 JC)
             if not recursive:
-                await self.sentence_tax('txb'
+                await self.sentence_tax(ctx, 'txb'
                                         if mode == 'user'
                                         else 'user', True)
 
