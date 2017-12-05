@@ -73,6 +73,39 @@ class CoinConverter(commands.Converter):
 
         return value
 
+class FuzzyMember(commands.Converter):
+    """Fuzzy matching for member objects"""
+    async def convert(self, ctx, arg):
+        arg = arg.lower()
+        ms = ctx.guild.members
+        scores = {}
+        for m in ms:
+            score = 0
+            mn = m.name
+
+            # compare against username
+            # We give a better score to exact matches
+            # than to just "contain"-type matches
+            if arg == mn:
+                score += 10
+            if arg in mn:
+                score += 3
+
+            # compare with nickname in a non-throw-exception way
+            nick = getattr(m.nick, "lower", "".lower)()
+            if arg == nick:
+                score += 2
+            if arg in nick:
+                score += 1
+
+            # we don't want a really big dict thank you
+            if score > 0:
+                scores[m.id] = score
+
+        try:
+            return sorted(scores.keys(), key=lambda k: scores[k], reverse=True)[0]
+        except IndexError:
+            raise commands.BadArgument('No user was found')
 
 class Cog:
     def __init__(self, bot):
