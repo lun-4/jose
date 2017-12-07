@@ -468,6 +468,30 @@ class CoinsExt(Cog, requires=['coins']):
                            f'- {gr_del.deleted_count} in `graces`')
 
     @commands.command()
+    @commands.is_owner()
+    async def ssdc(self, ctx, person: discord.User):
+        """Steal State: Delete Cooldowns"""
+        uobj = {'user_id': person.id}
+        cd_del = await self.cooldown_coll.delete_many(uobj)
+        await ctx.send(f'deleted {cd_del.deleted_count}')
+
+    @commands.command()
+    @commands.is_owner()
+    async def ssdp(self, ctx, person: discord.User):
+        """Steal State: Delete Points"""
+        uobj = {'user_id': person.id}
+        cd_del = await self.points_coll.delete_many(uobj)
+        await ctx.send(f'deleted {cd_del.deleted_count}')
+
+    @commands.command()
+    @commands.is_owner()
+    async def ssdg(self, ctx, person: discord.User):
+        """Steal State: Delete Grace"""
+        uobj = {'user_id': person.id}
+        cd_del = await self.grace_coll.delete_many(uobj)
+        await ctx.send(f'deleted {cd_del.deleted_count}')
+
+    @commands.command()
     async def deadtxb(self, ctx):
         """Show dead taxbanks.
 
