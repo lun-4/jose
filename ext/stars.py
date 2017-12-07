@@ -383,7 +383,7 @@ class Starboard(Cog):
 
         try:
             star_message = await starboard.get_message(star['star_message_id'])
-        except KeyError, discord.errors.NotFound):
+        except (KeyError, discord.errors.NotFound):
             star_message = None
 
         if delete_mode or len(star['starrers']) < 1:
