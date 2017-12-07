@@ -189,25 +189,26 @@ class CoinsExt(Cog, requires=['coins']):
 
         thief = ctx.author
         now = time.time()
-        cooldown = await self.cooldown_coll.find_one({'user_id': thief.id})
+        cooldowns = await self.cooldown_coll.find({'user_id': thief.id}).to_list(length=None)
 
-        if cooldown is None:
+        if not cooldowns:
             return
 
-        cooldown_type, cooldown_end = cooldown['type'], cooldown['finish']
-        if now >= cooldown_end:
-            await self.remove_cooldown(cooldown)
-            return
+        for cooldown in cooldowns:
+            cooldown_type, cooldown_end = cooldown['type'], cooldown['finish']
+            if now >= cooldown_end:
+                await self.remove_cooldown(cooldown)
+                continue
 
-        remaining = (cooldown_end - now) / 60 / 60
-        remaining = round(remaining, 2)
+            remaining = (cooldown_end - now) / 60 / 60
+            remaining = round(remaining, 2)
 
-        if cooldown_type == 0:
-            raise self.SayException('You are in prison, wait'
-                                    f' {remaining} hours')
-        elif cooldown_type == 1:
-            raise self.SayException('You are waiting for stealing points '
-                                    f'to regen, {remaining} hours to go')
+            if cooldown_type == 0:
+                raise self.SayException('You are in prison, wait'
+                                        f' {remaining} hours')
+            elif cooldown_type == 1:
+                raise self.SayException('You are waiting for stealing points '
+                                        f'to regen, {remaining} hours to go')
 
     async def check_grace(self, target):
         """Check if the target is in grace period or not."""
