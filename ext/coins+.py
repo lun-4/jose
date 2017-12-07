@@ -441,9 +441,8 @@ class CoinsExt(Cog, requires=['coins']):
             expired = '**[expired]**' if remaining < 0 else ''
             res.append(f'{expired}Grace period: remaining: `{remaining}h`')
 
-        if len(res):
-            await ctx.send('No state found for you')
-            return
+        if not len(res):
+            return await ctx.send('No state found for you')
 
         await ctx.send('\n'.join(res))
 
