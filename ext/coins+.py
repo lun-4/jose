@@ -421,27 +421,27 @@ class CoinsExt(Cog, requires=['coins']):
         res = []
         now = time.time()
 
-        cooldown = await self.cooldown_coll.find_one(uobj)
+        cooldowns = await self.cooldown_coll.find(uobj).to_list(length=None)
         grace = await self.grace_coll.find_one(uobj)
         points = await self.points_coll.find_one(uobj)
 
-        if points is not None:
+        if points:
             res.append(f'You have {points["points"]} stealing '
                        'points left to use.')
 
-        if cooldown is not None:
+        for cooldown in cooldowns:
             cdowntype_str = ['Jail', 'Stealing points regen'][cooldown['type']]
             remaining = round((cooldown['finish'] - now) / 60 / 60, 2)
             expired = '**[expired]**' if remaining < 0 else ''
             res.append(f'{expired}Cooldown: `type: {cooldown["type"]}/'
                        f'{cdowntype_str}`, remaining: `{remaining}h`')
 
-        if grace is not None:
+        if grace:
             remaining = round((grace['finish'] - now) / 60 / 60, 2)
             expired = '**[expired]**' if remaining < 0 else ''
             res.append(f'{expired}Grace period: remaining: `{remaining}h`')
 
-        if len(res) < 1:
+        if len(res):
             await ctx.send('No state found for you')
             return
 
