@@ -72,15 +72,15 @@ def make_color(star, message):
     star_ratio = stars / get_humans(message)
 
     if star_ratio >= 0:
-        color = RED
-    if star_ratio >= 0.1:
         color = BLUE
-    if star_ratio >= 0.2:
+    if star_ratio >= 0.1:
         color = BRONZE
-    if star_ratio >= 0.4:
+    if star_ratio >= 0.2:
         color = SILVER
-    if star_ratio >= 0.8:
+    if star_ratio >= 0.4:
         color = GOLD
+    if star_ratio >= 0.8:
+        color = RED
     if star_ratio >= 1:
         color = WHITE
 
@@ -383,7 +383,7 @@ class Starboard(Cog):
 
         try:
             star_message = await starboard.get_message(star['star_message_id'])
-        except KeyError:
+        except KeyError, discord.errors.NotFound):
             star_message = None
 
         if delete_mode or len(star['starrers']) < 1:
