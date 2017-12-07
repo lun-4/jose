@@ -17,6 +17,93 @@ from .common import Cog
 log = logging.getLogger(__name__)
 
 RXKCD_ENDPOINT = 'http://0.0.0.0:8080/search'
+MEME_DISCRIMS = ['0420', '2600', '1337', '0666', '0000',
+                 '1234', '5678', '4321'
+                 ]
+
+
+def is_palindrome(string):
+    return string == string[::-1]
+
+
+def is_repeating(string):
+    for i in range(1, int(len(string) / 2) + 1):
+        main_substring = string[:i]
+
+        # get all other substrings
+        chunks = [string[n:n+i] for n in range(0, len(string), 1 if not i else i)]
+
+        # check if selected main substring matches
+        # all other substrings
+        repeating = all(main_substring in chunk for chunk in chunks)
+        if repeating:
+            return True
+
+    return False
+
+
+# Borrowed from https://rosettacode.org/wiki/Miller%E2%80%93Rabin_primality_test#Python:_Proved_correct_up_to_large_N
+# Thanks Rosetta Code!
+
+def _try_composite(a, d, n, s):
+    if pow(a, d, n) == 1:
+        return False
+    for i in range(s):
+        if pow(a, 2**i * d, n) == n-1:
+            return False
+    return True # n  is definitely composite
+ 
+
+def is_prime(n, _precision_for_huge_n=16):
+    if n in _known_primes or n in (0, 1):
+        return True
+    if any((n % p) == 0 for p in _known_primes):
+        return False
+    d, s = n - 1, 0
+    while not d % 2:
+        d, s = d >> 1, s + 1
+    # Returns exact according to http://primes.utm.edu/prove/prove2_3.html
+    if n < 1373653: 
+        return not any(_try_composite(a, d, n, s) for a in (2, 3))
+    if n < 25326001: 
+        return not any(_try_composite(a, d, n, s) for a in (2, 3, 5))
+    if n < 118670087467: 
+        if n == 3215031751: 
+            return False
+        return not any(_try_composite(a, d, n, s) for a in (2, 3, 5, 7))
+    if n < 2152302898747: 
+        return not any(_try_composite(a, d, n, s) for a in (2, 3, 5, 7, 11))
+    if n < 3474749660383: 
+        return not any(_try_composite(a, d, n, s) for a in (2, 3, 5, 7, 11, 13))
+    if n < 341550071728321: 
+        return not any(_try_composite(a, d, n, s) for a in (2, 3, 5, 7, 11, 13, 17))
+    # otherwise
+    return not any(_try_composite(a, d, n, s) 
+                   for a in _known_primes[:_precision_for_huge_n])
+
+
+_known_primes = [2, 3]
+_known_primes += [x for x in range(5, 1000, 2) if is_prime(x)]
+
+async def is_nice_discrim(member):
+    discrim_s = member.discriminator
+    discrim = int(discrim_s)
+    if discrim_s in MEME_DISCRIMS:
+        return True
+
+    if discrim < 20:
+        return True
+
+    if is_palindrome(discrim_s):
+        return True
+
+    if is_repeating(discrim_s):
+        return True
+
+    if is_prime(discrim):
+        return True
+
+    return False
 
 
 class Extra(Cog, requires=['config']):
@@ -333,6 +420,20 @@ class Extra(Cog, requires=['config']):
             lines = data.split('\n')
             line = random.choice(lines)
             await ctx.send(f'`{line}`')
+
+    @commands.command()
+    @commands.cooldown(1, 10, commands.BucketType.guild)
+    async def nicediscrim(self, ctx):
+        """ONLY GET NICE DISCRIM."""
+        e = discord.Embed(title='nice discrims')
+        lines = []
+
+        for m in ctx.guild.members:
+            if await is_nice_discrim(m):
+                lines.append(m.mention)
+
+        e.description = ' '.join(lines)
+        await ctx.send(embed=e)
 
 
 def setup(bot):
