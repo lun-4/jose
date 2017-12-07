@@ -533,7 +533,7 @@ class Starboard(Cog):
         except (StarError, StarAddError) as err:
             log.warning(f'raw_reaction_add: {err!r}')
         except Exception:
-            log.excpetion('add_star @ reaction_add, %s[cid=%d] %s[gid=%d]',
+            log.exception('add_star @ reaction_add, %s[cid=%d] %s[gid=%d]',
                           channel.name, channel.id,
                           channel.guild.name, channel.guild.id)
 
@@ -559,7 +559,7 @@ class Starboard(Cog):
         except (StarError, StarRemoveError) as err:
             log.warning(f'raw_reaction_remove: {err!r}')
         except Exception:
-            log.excpetion('remove_star @ reaction_remove, %s[cid=%d] %s[gid=%d]',
+            log.exception('remove_star @ reaction_remove, %s[cid=%d] %s[gid=%d]',
                           channel.name, channel.id,
                           channel.guild.name, channel.guild.id)
 
@@ -578,7 +578,7 @@ class Starboard(Cog):
         except (StarError, StarRemoveError) as err:
             log.warning(f'raw_reaction_clear: {err!r}')
         except Exception:
-            log.excpetion('remove_all @ reaction_clear, %s[cid=%d] %s[gid=%d]',
+            log.exception('remove_all @ reaction_clear, %s[cid=%d] %s[gid=%d]',
                           channel.name, channel.id,
                           channel.guild.name, channel.guild.id)
 
