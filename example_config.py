@@ -42,3 +42,5 @@ postgres = {
     'database': 'jose',
     'host': 'memeland.com'
 }
+
+JOSECOIN_API = 'http://0.0.0.0:8080/api'
