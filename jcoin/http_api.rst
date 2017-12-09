@@ -20,6 +20,29 @@ All requests must contain an ``Authorization`` header containing your applicatio
 
 Not sending this will result in your requests failing.
 
+---------------
+Calling the API
+---------------
+
+When sending requests to the API, you might get HTTP status codes that are
+different from 200.
+
+======= ===========================================================
+code    meaning
+======= ===========================================================
+500     Generic API error
+404     Account not found, or the route you requested was not found
+400     Input error, you gave wrong input to a data type
+412     A condition for the request was not satisfied
+======= ===========================================================
+
+With every non-204 and non-500 response from the API, you have
+a JSON body, it contains an ``error`` boolean field, and a ``message`` string field.
+
+Since ``error`` does not appear on successful requests, check for its `existance`
+other than actually checking for the value of the field.
+
+
 ======
 Routes
 ======
@@ -69,6 +92,15 @@ Transfer from a wallet to another. The wallet ID in the request URI is the walle
 The request body must contain a ``receiver`` as an integer wallet ID and an ``amount`` as a string.
 
 .. note:: The amount can not be negative to transfer from the receivers account, you have to transfer with the other wallet.
+
+
+=============== ======= ==================================
+response field  type    description
+=============== ======= ==================================
+sender_amount   decimal the new sender's account amount
+receiver_amount decimal the new receiver's account amoount
+=============== ======= ==================================
+
 
 -----------
 Lock Wallet
