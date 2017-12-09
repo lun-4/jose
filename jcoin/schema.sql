@@ -16,14 +16,14 @@ CREATE TABLE IF NOT EXISTS clients (
 CREATE TABLE IF NOT EXISTS accounts (
        account_id bigint PRIMARY KEY NOT NULL,
        account_type int NOT NULL,
-       amount text DEFAULT '0'
+       amount numeric(5, 3) DEFAULT 0
 );
 
 /* only user accounts here */
 CREATE TABLE IF NOT EXISTS wallets (
        user_id bigint NOT NULL REFERENCES accounts (account_id) ON DELETE CASCADE,
 
-       taxpaid text DEFAULT '0',
+       taxpaid numeric(5, 4) DEFAULT 0,
 
        /* for j!steal statistics */
        steal_uses int DEFAULT 0,
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS transactions (
        transferred_at timestamp without time zone default now(),
        sender bigint NOT NULL REFERENCES accounts (account_id) ON DELETE RESTRICT,
        receiver bigint NOT NULL REFERENCES accounts (account_id) ON DELETE RESTRICT,
-       amount text NOT NULL
+       amount numeric(5, 3) NOT NULL
 );
 
 /* If we want, we *could* group transactions */
