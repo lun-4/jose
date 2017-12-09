@@ -14,11 +14,13 @@ from sanic import Sanic
 from sanic import response
 
 import config as jconfig
-from errors import *
+from errors import GenericError, AccountNotFoundError, \
+        InputError, ConditionError
 
 app = Sanic()
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__name__)
+
 
 class AccountType:
     """Account types."""
@@ -127,18 +129,6 @@ async def transfer(request, sender_id):
     sender_amount = decimal.Decimal(sender['amount'])
     if amount > sender_amount:
         raise ConditionError(f'Not enough funds: {amount} > {sender_amount}')
-
-    """
-    NOTE: This is not going to be done
-
-    # the idea here is that we queue and have a commit task
-    # that brings up the queued transactions to postgres
-    await app.tx.queue((sender_id, receiver_id, amount))
-    return request.json({
-        'status': True,
-        'message': 'transaction queued',
-    })
-    """
 
     db = request.app.db
     async with db.acquire() as conn, conn.transaction() as _:

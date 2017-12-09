@@ -28,6 +28,7 @@ extensions = [
     'pipupdates',
     'coins',
     'coins+',
+    'coins2',
     'basic',
     'gambling',
     'speak',
@@ -128,7 +129,8 @@ class JoseBot(commands.Bot):
 
         return is_blocked
 
-    def clean_content(self, content):
+    def clean_content(self, content: str) -> str:
+        """Make a string clean of mentions"""
         content = content.replace('`', '\'')
         content = content.replace('@', '@\u200b')
         content = content.replace('&', '&\u200b')
@@ -136,6 +138,7 @@ class JoseBot(commands.Bot):
         return content
 
     async def on_command(self, ctx):
+        """Log command usage"""
         # thanks dogbot ur a good
         content = ctx.message.content
         content = self.clean_content(content)
@@ -149,7 +152,8 @@ class JoseBot(commands.Bot):
         log.info('%s [cmd] %s(%d) "%s" checks=%s', location, author,
                  author.id, content, ','.join(checks) or '(none)')
 
-    async def on_command_error(self, ctx, error):
+    async def on_command_error(self, ctx, error) -> 'None':
+        """Log and signal errors to the user"""
         message = ctx.message
         content = self.clean_content(message.content)
 
@@ -261,7 +265,8 @@ class JoseBot(commands.Bot):
                 sys.exit(1)
 
 
-async def get_prefix(bot, message):
+async def get_prefix(bot, message) -> list:
+    """Get the preferred list of prefixes for a determined guild/dm."""
     if message.guild is None:
         return bot.config.prefix
 
@@ -280,6 +285,7 @@ async def get_prefix(bot, message):
     # sort backwards due to the command parser taking the first match
     return sorted([bot.config.prefix, custom], reverse=True)
 
+
 jose = JoseBot(
     command_prefix=get_prefix,
     description='henlo dis is jose',
@@ -289,5 +295,4 @@ jose = JoseBot(
 
 if __name__ == '__main__':
     jose.load_all()
-
     jose.run(config.token)
