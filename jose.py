@@ -47,6 +47,7 @@ extensions = [
     'midi',
     'lottery',
     'chatbot',
+    'translation',
 ]
 
 CHECK_FAILURE_PHRASES = [

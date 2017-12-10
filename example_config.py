@@ -9,6 +9,10 @@ prefix = 'j!'
 # api stuff
 WOLFRAMALPHA_APP_ID = 'app id for wolframalpha'
 OWM_APIKEY = 'api key for OpenWeatherMap'
+MSFT_TRANSLATION = {
+    'name': 'name for the project',
+    'key': 'subscription key',
+}
 
 # set those to whatever
 SPEAK_PREFIXES = ['josé ', 'José ', 'jose ', 'Jose ']

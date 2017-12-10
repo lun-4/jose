@@ -204,10 +204,10 @@ class Exec(Cog):
             # too long
             try:
                 # send meat to hastebin
-                await ctx.send('fuck ass')
+                await ctx.send('too much for me')
             except KeyError:
                 # failed to upload, probably too big.
-                await ctx.send('2big')
+                await ctx.send('waaay too big')
             except aiohttp.ClientError:
                 # pastebin is probably down.
                 await ctx.send('haste is dead')

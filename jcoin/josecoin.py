@@ -130,8 +130,7 @@ async def transfer(request, sender_id):
     if amount > sender_amount:
         raise ConditionError(f'Not enough funds: {amount} > {sender_amount}')
 
-    db = request.app.db
-    async with db.acquire() as conn, conn.transaction() as _:
+    async with request.app.db.acquire() as conn, conn.transaction() as _:
         # send it back to db
         await conn.execute("""
             UPDATE accounts
