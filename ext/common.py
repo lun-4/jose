@@ -118,6 +118,7 @@ class Cog:
         self.prices = {
             'OPR': 0.9,
             'API': 0.65,
+            'TRN': '0.022/char',
         }
 
     def __init_subclass__(cls, **kwargs):
