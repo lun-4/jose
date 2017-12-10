@@ -14,7 +14,8 @@ log = logging.getLogger(__name__)
 PRICES = {
     'OPR': ('Operational tax', ('datamosh', 'youtube')),
     'API': ('API tax', ('xkcd', 'wolframalpha', 'weather', 'money',
-            'urban', 'hh', 'e621')),
+                        'urban', 'hh', 'e621')),
+    'TRN': ('Translation tax', ('translate',)),
 }
 
 
