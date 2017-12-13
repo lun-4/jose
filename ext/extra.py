@@ -298,7 +298,7 @@ class Extra(Cog, requires=['config']):
         if account is not None:
             guild_rank, global_rank, guild_accounts, all_accounts = await self.jcoin.ranks(user.id, ctx.guild)
 
-            tax_rank, tglobal_rank = await self.jcoin.tax_rank(user.id)
+            tax_rank, tglobal_rank = await self.jcoin.tax_ranks(user.id)
 
             em.add_field(name='JC Rank',
                          value=f'{guild_rank}/{guild_accounts}, '
