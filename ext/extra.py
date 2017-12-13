@@ -309,7 +309,7 @@ class Extra(Cog, requires=['config']):
             em.add_field(name='Tax paid',
                          value=f'{account["taxpaid"]}JC')
             em.add_field(name='Tax rank',
-                         value='{tax_rank} / {tglobal_rank} globally')
+                         value=f'{tax_rank} / {tglobal_rank} globally')
 
             try:
                 ratio = account['success_steal'] / account['times_stolen']
