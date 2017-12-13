@@ -74,6 +74,8 @@ class Moderation(Cog):
         logchannel = self.bot.get_channel(logchan_id)
         if logchan_id is None or logchannel is None: return
 
+        log.debug('[modlog] Logging join of %r', member)
+
         em = discord.Embed(title='Member Join', colour=discord.Colour.green())
         em.timestamp = member.joined_at
 
@@ -91,6 +93,8 @@ class Moderation(Cog):
         logchan_id = await self.modcfg_get(member.guild, 'member_log_id')
         logchannel = self.bot.get_channel(logchan_id)
         if logchan_id is None or logchannel is None: return
+
+        log.debug('[modlog] Logging removal of %r', member)
 
         em = discord.Embed(title='Member Remove', colour=discord.Colour.red())
         em.timestamp = datetime.datetime.now() 
