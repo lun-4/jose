@@ -47,7 +47,11 @@ class CoinConverter(commands.Converter):
     """
     async def convert(self, ctx, argument):
         ba = commands.BadArgument
-
+        coins = ctx.bot.get_cog('Coins')
+        if coins:
+            account = await coins.get_account(ctx.author.id)
+            if argument == 'all':
+                return account['amount']
         value = decimal.Decimal(argument)
         if value <= ZERO:
             raise ba("You can't input values lower or equal to 0.")
@@ -59,14 +63,16 @@ class CoinConverter(commands.Converter):
         except:
             raise ba('Rounding failed.')
 
-        coins = ctx.bot.get_cog('Coins')
         if not coins:
             return value
 
+        try:
+            account
+        except NameError:
+            account = await coins.get_account(ctx.author.id)
         # Ensure a taxbank account tied to the guild exists
         await coins.ensure_taxbank(ctx)
 
-        account = await coins.get_account(ctx.author.id)
         if not account:
             raise ba("You don't have a JoséCoin account, "
                      f"make one with `{ctx.bot.prefix}account`")
