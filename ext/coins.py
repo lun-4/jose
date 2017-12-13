@@ -44,6 +44,8 @@ TRANSFER_OBJECTS = [
     'cats',
     'coins',
     'paintings',
+    'flags',
+    'blobs',
 ]
 
 
