@@ -5,6 +5,7 @@ from discord.ext import commands
 
 from .common import Cog
 
+BOT_RATIO_MIN = 1.7
 BOT_RATIO_MAX = 1.1
 
 WHITELIST = (
@@ -42,6 +43,13 @@ class BotCollection(Cog):
 
         return bots, humans, (len(bots) / len(humans))
 
+    async def guild_ratio(self, guild: discord.Guild) -> float:
+        """Get the bot-to-human ratio for a guild"""
+        if len(guild.members) < 50:
+            return BOT_RATIO_MIN
+        else:
+            return BOT_RATIO_MAX
+
     async def on_guild_join(self, guild):
         bots, humans, ratio = self.bot_human_ratio(guild)
         owner = guild.owner
@@ -52,17 +60,17 @@ class BotCollection(Cog):
         if guild.id in WHITELIST:
             return
 
-        if ratio > BOT_RATIO_MAX:
-            log.info(f'[bh:leave:guild_join] leaving {guild!s}')
-            await guild.leave()
-            return
+        bot_ratio = await self.guild_ratio(guild)
+        if ratio > bot_ratio:
+            log.info(f'[bh:leave:guild_join] {ratio} > {bot_ratio},'
+                     f' leaving {guild!s}')
+            return await guild.leave()
 
         if await self.bot.is_blocked_guild(guild.id):
             await owner.send('Sorry. The guild you added José on is blocked. '
                              'Appeal to the block at the support server'
                              '(Use the invite provided in `j!invite`).')
-            await guild.leave()
-            return
+            return await guild.leave()
 
         await owner.send('Hello, welcome to José!\n'
                          "Discord's API Terms of Service requires me to tell you I log\n"
@@ -76,10 +84,11 @@ class BotCollection(Cog):
             return
 
         bots, humans, ratio = self.bot_human_ratio(guild)
+        bot_ratio = await self.guild_ratio(guild)
 
-        if ratio > BOT_RATIO_MAX:
+        if ratio > bot_ratio:
             log.info(f'[bh:leave:member_join] leaving {guild!r} {guild.id},'
-                     f' {len(bots)}/{len(humans)} = {ratio}')
+                     f' {ratio} ({len(bots)} / {len(humans)}) > {bot_ratio}')
             try:
                 await guild.owner.send('Your guild was classified as a bot'
                                        'collection, josé automatically left.'
