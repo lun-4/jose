@@ -298,6 +298,8 @@ class Extra(Cog, requires=['config']):
         if account is not None:
             guild_rank, global_rank, guild_accounts, all_accounts = await self.jcoin.ranks(user.id, ctx.guild)
 
+            tax_rank, tglobal_rank = await self.jcoin.tax_rank(user.id)
+
             em.add_field(name='JC Rank',
                          value=f'{guild_rank}/{guild_accounts}, '
                          f'{global_rank}/{all_accounts} globally')
@@ -306,6 +308,8 @@ class Extra(Cog, requires=['config']):
                          value=f'{account["amount"]}JC')
             em.add_field(name='Tax paid',
                          value=f'{account["taxpaid"]}JC')
+            em.add_field(name='Tax rank',
+                         value='{tax_rank} / {tglobal_rank} globally')
 
             try:
                 ratio = account['success_steal'] / account['times_stolen']

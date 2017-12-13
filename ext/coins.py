@@ -516,12 +516,24 @@ class Coins(Cog, requires=['config']):
 
         try:
             guildrank = guild_ids.index(user_id) + 1
-        except:
+        except ValueError:
             guildrank = -20
 
         globalrank = all_ids.index(user_id) + 1
 
         return guildrank, globalrank, len(guild_ids), len(all_ids)
+
+    async def tax_ranks(self, user_id: int) -> tuple:
+        """Get the tax ranks of a user."""
+        accounts = await self.jcoin.all_accounts('taxpaid')
+        accounts = [account['id'] for account in accounts]
+
+        try:
+            rank = accounts.index(user_id) + 1
+        except ValueError:
+            rank = -1
+
+        return rank, len(accounts)
 
     async def get_gdp(self) -> decimal.Decimal:
         """Get the current GDP.
