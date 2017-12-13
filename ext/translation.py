@@ -93,8 +93,7 @@ class Translation(Cog):
                   sentence, detected, translated, to_lang)
 
         res = [
-            f'`{sentence}` ({detected})',
-            ' > ',
+            f'detected language: {detected}',
             f'`{translated}` ({to_lang})',
         ]
         await ctx.send('\n'.join(res))
