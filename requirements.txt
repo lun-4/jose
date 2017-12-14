@@ -4,7 +4,7 @@ markovify==0.7.0
 psutil==5.4.2
 wolframalpha==3.0
 pyowm==2.7.1
-motor==1.1
+motor==1.2rc0
 Pillow==4.3.0
 datadog==0.17.0
 midiutil==1.1.3
