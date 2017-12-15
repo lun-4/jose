@@ -123,7 +123,7 @@ class Extra(Cog, requires=['config']):
         self.socket_stats[data.get('t')] += 1
 
     @commands.command()
-    async def avatar(self, ctx, person: discord.User = None):
+    async def avatar(self, ctx, *, person: discord.User = None):
         """Get someone's avatar."""
         if person is None:
             person = ctx.author
