@@ -96,7 +96,7 @@ class Math(Cog):
         self.owm = pyowm.OWM(self.bot.config.OWM_APIKEY)
 
     @commands.command(aliases=['wa'])
-    @commands.cooldown(rate=1, per=3, type=commands.BucketType.user)
+    @commands.cooldown(rate=1, per=6, type=commands.BucketType.user)
     async def wolframalpha(self, ctx, *, term: str):
         """Query Wolfram|Alpha"""
         if len(term) < 1:
