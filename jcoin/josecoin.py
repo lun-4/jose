@@ -130,7 +130,7 @@ async def transfer(request, sender_id):
     if amount > sender_amount:
         raise ConditionError(f'Not enough funds: {amount} > {sender_amount}')
 
-    async with request.app.db.acquire() as conn, conn.transaction() as _:
+    async with request.app.db.acquire() as conn, conn.transaction():
         # send it back to db
         await conn.execute("""
             UPDATE accounts
@@ -154,6 +154,29 @@ async def transfer(request, sender_id):
         'sender_amount': sender_amount - amount,
         'receiver_amount': receiver['amount'] + amount
     })
+
+
+@app.post('/api/wallets/<wallet_id:int>/steal_use')
+async def inc_steal(request, wallet_id: int):
+    """Increment a wallet's `steal_uses` field by one."""
+    async with request.app.db.acquire() as conn, conn.transaction():
+        res = await conn.execute("""
+        UPDATE wallets
+        SET steal_uses = steal_uses + 1
+        WHERE user_id=$1
+        """, wallet_id)
+
+        verb, items = res.split()
+        items = int(items)
+
+        if items:
+            return response.json({
+                'success': True,
+            })
+        else:
+            return response.json({
+                'success': False,
+            })
 
 
 async def db_init(app):
