@@ -157,7 +157,7 @@ async def transfer(request, sender_id):
 
 
 @app.post('/api/wallets/<wallet_id:int>/steal_use')
-async def inc_steal(request, wallet_id: int):
+async def inc_steal_use(request, wallet_id: int):
     """Increment a wallet's `steal_uses` field by one."""
     async with request.app.db.acquire() as conn, conn.transaction():
         res = await conn.execute("""
@@ -179,7 +179,133 @@ async def inc_steal(request, wallet_id: int):
             })
 
 
+@app.post('/api/wallets/<wallet_id:int>/steal_success')
+async def inc_steal_success(request, wallet_id: int):
+    """Increment a wallet's `steal_success` field by one."""
+    async with request.app.db.acquire() as conn, conn.transaction():
+        res = await conn.execute("""
+        UPDATE wallets
+        SET steal_success = steal_success + 1
+        WHERE user_id=$1
+        """, wallet_id)
+
+        verb, items = res.split()
+        items = int(items)
+
+        if items:
+            return response.json({
+                'success': True,
+            })
+        else:
+            return response.json({
+                'success': False,
+            })
+
+
+@app.get('/api/wallets/<wallet_id:int>/rank')
+async def wallet_rank(request, wallet_id: int):
+    """Caulculate the ranks of a wallet.
+
+    Returns more data if a guild id is provided
+    in the `guild_id` field, as json.
+    """
+    # TODO: figure out guilds
+    pass
+
+
+async def getsum(request, acc_type: int) -> asyncpg.Record:
+    """Get the sum of all the amounts of a specific account type."""
+
+    r = await request.app.db.fetchrow("""
+    SELECT SUM(amount) FROM accounts WHERE account_type=$1
+    """, acc_type)
+    return r['sum']
+
+async def get_count(request, acc_type: int):
+    r = await request.app.db.fetchrow("""
+    SELECT COUNT(*) FROM accounts WHERE account_type=$1
+    """, acc_type)
+    return r['count']
+
+
+async def get_gdp(request):
+    """Get the GDP (sum of all account amounts) in the economy"""
+    r = await request.app.db.fetchrow("""
+    SELECT SUM(amount) FROM accounts;
+    """)
+    return r['sum']
+
+async def get_counts(request) -> dict:
+    """Get account counts"""
+
+    # TODO: add idx and use MAX(idx) instead of COUNT(*)
+
+    count = await request.app.db.fetchrow("""
+    SELECT COUNT(*) FROM accounts
+    """)
+    count = count['count']
+
+    usercount = await get_count(request, AccountType.USER)
+    txbcount = await get_count(request, AccountType.TAXBANK)
+
+    return {
+        'accounts': count,
+        'user_accounts': usercount,
+        'txb_accounts': txbcount,
+    }
+
+
+async def get_sums(request) -> dict:
+    total_amount = await get_gdp(request)
+    user_amount = await getsum(request, AccountType.USER)
+    txb_amount = await getsum(request, AccountType.TAXBANK)
+
+    return {
+        'gdp': total_amount,
+        'user': user_amount,
+        'taxbank': txb_amount
+    }
+
+
+@app.get('/api/gdp')
+async def get_gdp_handler(request):
+    """Get the total amount of coins in the economy."""
+    return response.json(await get_sums(request))
+
+
+@app.get('/api/stats')
+async def get_stats_handler(request):
+    """Get stats about it all."""
+    
+    gdp_data = await get_sums(request)
+
+    res = {
+        'gdp': gdp_data['gdp'],
+    }
+
+    res.update(await get_counts(request))
+
+    res['user_money'] = gdp_data['user']
+    res['txb_money'] = gdp_data['taxbank']
+
+    steal_uses = await request.app.db.fetchrow("""
+    SELECT SUM(steal_uses) FROM wallets;
+    """)
+    steal_uses = steal_uses['sum']
+
+    steal_success = await request.app.db.fetchrow("""
+    SELECT SUM(steal_success) FROM wallets;
+    """)
+    steal_success = steal_success['sum']
+
+    res['steals'] = steal_uses
+    res['success'] = steal_success
+
+    return response.json(res)
+
+
 async def db_init(app):
+    """Initialize database"""
     app.db = await asyncpg.create_pool(**jconfig.db)
 
 
