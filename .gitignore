@@ -134,3 +134,6 @@ db.sqlite3
 
 # josecoin
 jcoin/config.py
+
+# docker data directories
+data/

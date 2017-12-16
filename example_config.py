@@ -6,6 +6,10 @@ token = 'token goes here'
 # default prefix for josé
 prefix = 'j!'
 
+# where is mongo
+# if docker, uncomment
+#  MONGO_LOC = 'mongo'
+
 # api stuff
 WOLFRAMALPHA_APP_ID = 'app id for wolframalpha'
 OWM_APIKEY = 'api key for OpenWeatherMap'
@@ -48,3 +52,6 @@ postgres = {
 }
 
 JOSECOIN_API = 'http://0.0.0.0:8080/api'
+# If on docker
+# JOSECOIN_API = 'http://josecoin:8080/api'
+

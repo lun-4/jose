@@ -1,0 +1,25 @@
+version: '3'
+services:
+  jose:
+      build: .
+      depends_on:
+          - mongo
+          - postgres
+      volumes:
+          - ./:/app
+  josecoin:
+      build: ./jcoin
+      depends_on:
+          - postgres
+      ports:
+          - "8080:8080"
+
+  mongo:
+      image: "mongo:3.6-jessie"
+      volumes:
+          - ./data/mongo:/data/db
+  postgres:
+      image: "postgres:10.1"
+      volumes:
+          - ./data/postgres:/var/lib/postgresql/data
+          - ./jcoin/schema.sql:/docker-entrypoint-initdb.d/schema.sql

@@ -30,7 +30,8 @@ class Config(Cog):
     def __init__(self, bot):
         super().__init__(bot)
 
-        self.mongo_client = motor.motor_asyncio.AsyncIOMotorClient()
+        addr = getattr(bot.config, 'MONGO_LOC', None)
+        self.mongo_client = motor.motor_asyncio.AsyncIOMotorClient(addr)
         self.bot.mongo = self.mongo_client
 
         self.jose_db = self.mongo_client['jose']
