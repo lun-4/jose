@@ -336,7 +336,7 @@ class Heist(Cog):
 
     @commands.group(invoke_without_command=True)
     async def heist(self, ctx,
-                    amount: CoinConverter, *, target: GuildConverter):
+                    target: GuildConverter, amount: CoinConverter):
         """Heist a server.
 
         This works better if you have more people joining in your heist.
