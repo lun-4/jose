@@ -89,7 +89,7 @@ class NSFW(Cog):
         self.whip_coll = self.config.jose_db['whip']
 
     async def booru(self, ctx, booru, tags):
-        if "[jose:no_nsfw]" is in ctx.channel.topic:
+        if "[jose:no_nsfw]" in ctx.channel.topic:
             return
         # taxxx
         await self.jcoin.pricing(ctx, self.prices['API'])
