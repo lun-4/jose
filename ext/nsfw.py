@@ -89,6 +89,8 @@ class NSFW(Cog):
         self.whip_coll = self.config.jose_db['whip']
 
     async def booru(self, ctx, booru, tags):
+        if '[jose:no_nsfw]' in ctx.channel.topic:
+            return
         # taxxx
         await self.jcoin.pricing(ctx, self.prices['API'])
 
@@ -141,12 +143,13 @@ class NSFW(Cog):
         """Randomly searches Hypnohub for posts."""
         async with ctx.typing():
             await self.booru(ctx, HypnohubBooru, tags)
-
+                
     @commands.command()
     @commands.is_nsfw()
     async def gelbooru(self, ctx, *tags):
         """Randomly searches Gelbooru for posts."""
-        await self.booru(ctx, GelBooru, tags)
+        async with ctx.typing():
+            await self.booru(ctx, GelBooru, tags)
 
     @commands.command()
     @commands.is_nsfw()
