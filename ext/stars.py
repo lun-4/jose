@@ -659,7 +659,7 @@ class Starboard(Cog):
     @commands.command()
     @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
-    async def stardetach(self, ctx, confirm: str = 'n'):
+    async def stardetach(self, ctx, confirm: bool=False):
         """Detaches José from your starboard.
 
         Detaching means José will remove your starboard's configuration.
@@ -669,7 +669,7 @@ class Starboard(Cog):
 
         Manage Guild permission is required.
         """
-        if confirm != 'y':
+        if not confirm:
             return await ctx.send('Operation not confirmed by user.')
 
         config = await self._get_starconfig(ctx.guild.id)
@@ -678,7 +678,7 @@ class Starboard(Cog):
     @commands.command()
     @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
-    async def stardelete(self, ctx, confirm: str = 'n'):
+    async def stardelete(self, ctx, confirm: bool=False):
         """Completly delete all starboard data from the guild.
 
         Follows the same logic as `j!stardetach`, but it
