@@ -7,6 +7,8 @@ import discord
 from discord.ext import commands
 
 from .common import Cog, CoinConverter
+from .utils import Table
+
 
 random = SystemRandom()
 log = logging.getLogger(__name__)
@@ -56,29 +58,31 @@ class CoinsExt(Cog, requires=['coins']):
         self.owner = None
 
     async def show(self, ctx, accounts, *, field='amount', limit=10):
-        res = []
-
         filtered = []
 
-        for (idx, account) in enumerate(accounts):
+        for idx, account in enumerate(accounts):
             name = self.jcoin.get_name(account['id'], account=account)
+
             if 'Unfindable' in name:
                 continue
             else:
                 account['_name'] = name
                 filtered.append(account)
 
-        filtered = filtered[:limit]
+            if len(filtered) == limit:
+                break
 
-        for (idx, account) in enumerate(filtered):
-            res.append(f'{idx + 1:3d}. {account["_name"]:30s}'
-                       f' -> {account[field]}')
+        table = Table('pos', 'name', 'account id', 'coins')
 
-        joined = '\n'.join(res)
-        if len(joined) > 1950:
-            await ctx.send('very big cant show: {len(joined)}')
+        for idx, account in enumerate(filtered):
+            table.add_row(str(idx + 1), account['_name'], str(account['id']), str(account[field]))
+
+        rendered = await table.render(loop=self.loop)
+
+        if len(rendered) > 1993:
+            await ctx.send(f'very big cant show: {len(rendered)}')
         else:
-            await ctx.send(f'```\n{joined}\n```')
+            await ctx.send(f'```\n{rendered}```')
 
     @commands.command()
     async def top(self, ctx, mode: str = 'g', limit: int = 10):
