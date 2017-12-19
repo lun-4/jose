@@ -428,7 +428,18 @@ class Extra(Cog, requires=['config']):
     @commands.command()
     @commands.cooldown(1, 10, commands.BucketType.guild)
     async def nicediscrim(self, ctx):
-        """ONLY GET NICE DISCRIM."""
+        """ONLY GET NICE DISCRIM.
+
+        This is a very expensive operation
+        to do, so it has a 1/10s ratelimit per-guild
+
+        Factors of a nice discrim:
+         - some meme discrims like '0420' OR
+         - below 20 OR
+         - is a palindrome OR
+         - has a pattern with itself OR
+         - is a prime
+        """
         e = discord.Embed(title='nice discrims')
         lines = []
 
