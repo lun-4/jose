@@ -1,10 +1,10 @@
 git+https://github.com/Rapptz/discord.py@rewrite
 
 asyncpg==0.13.0
-motor==1.2rc0
+motor==1.2.0
 uvloop==0.9.1
 
-markovify==0.7.0
+markovify==0.7.1
 psutil==5.4.2
 wolframalpha==3.0
 pyowm==2.7.1
