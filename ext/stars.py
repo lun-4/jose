@@ -11,8 +11,8 @@ from discord.ext import commands
 from .common import Cog
 
 log = logging.getLogger(__name__)
-
 IMAGE_REGEX = re.compile('(https?:\/\/.*\.(?:png|jpeg|jpg|gif))', re.M | re.I)
+ID_REGEX = re.compile('\d+', re.M | re.I)
 
 
 BLUE = 0x0066ff
@@ -24,18 +24,22 @@ WHITE = 0xffffff
 
 
 class StarAddError(Exception):
+    """Error when adding a star to a message"""
     pass
 
 
 class StarRemoveError(Exception):
+    """Error when removing a star"""
     pass
 
 
 class StarError(Exception):
+    """General error"""
     pass
 
 
-def empty_star_object(message):
+def empty_star_object(message) -> dict:
+    """Empty star object generator"""
     return {
         'message_id': message.id,
         'channel_id': message.channel.id,
@@ -44,7 +48,8 @@ def empty_star_object(message):
     }
 
 
-def empty_starconfig(guild):
+def empty_starconfig(guild) -> dict:
+    """Empty star configuration for a guild"""
     log.info(f'Generating starconfig for [{guild!s} {guild.id}]')
     return {
         'guild_id': guild.id,
@@ -52,7 +57,8 @@ def empty_starconfig(guild):
     }
 
 
-def get_humans(message):
+def get_humans(message) -> int:
+    """Get all humans in a guild."""
     l = sum(1 for m in message.guild.members if not m.bot)
 
     # Since selfstarring isn't allowed,
@@ -186,9 +192,10 @@ class Starboard(Cog):
 
         if await self.bot.is_blocked_guild(guild_id):
             g = self.bot.get_guild(guild_id)
-
             r = await self.starconfig_coll.delete_many({'guild_id': guild_id})
-            log.info(f'Deleted {r.deleted_count} sconfig: `{g.name}[g.id]` from blocking')
+
+            log.info(f'Deleted {r.deleted_count} sconfig: `{g.name}[g.id]`'
+                     ' from blocking')
             return
 
         return await self.starconfig_coll.find_one({'guild_id': guild_id})
@@ -212,8 +219,8 @@ class Starboard(Cog):
         """Deletes all star objects that refer to a specific Guild ID.
 
         This will aquire the :attr:`Stars.janitor_semaphore` semaphore,
-        and because of that, it will block the calling coroutine until some other
-        coroutine releases the semaphore.
+        and because of that, it will block the calling coroutine until
+        some other coroutine releases the semaphore.
         """
         try:
             await self.janitor_semaphore.acquire()
@@ -222,7 +229,8 @@ class Starboard(Cog):
             res = await self.starboard_coll.delete_many({'guild_id': guild_id})
             g = self.bot.get_guild(guild_id)
 
-            log.warning('[janitor] Deleted %d star objects from janitoring %s[%d]',
+            log.warning('[janitor] Deleted %d star objects from '
+                        'janitoring %s[%d]',
                         res.deleted_count, g.name, g.id)
 
         except:
@@ -367,17 +375,17 @@ class Starboard(Cog):
         delete_mode = kwargs.get('delete', False)
         message = kwargs.get('msg')
 
-        if message is not None:
+        if message:
             assert star['message_id'] == message.id
             assert star['channel_id'] == message.channel.id
 
         guild_id = config['guild_id']
         guild = self.bot.get_guild(guild_id)
-        if guild is None:
+        if not guild:
             raise StarError('No guild found with the starboard configuration')
 
         starboard = guild.get_channel(config['starboard_id'])
-        if starboard is None:
+        if not starboard:
             await self.delete_starconfig(config)
             raise StarError('No starboard channel found')
 
@@ -528,6 +536,19 @@ class Starboard(Cog):
 
         message = await channel.get_message(message_id)
 
+        if channel_id == cfg['starboard_id']:
+            # This reaction is coming from the starboard.
+            # we parse the message content and recall this function
+            content = message.content
+
+            matches = ID_REGEX.findall(content)
+            new_message_id = int(matches[-1])
+            new_channel_id = int(matches[-2])
+
+            return await self.on_raw_reaction_add(emoji_partial,
+                                                  new_message_id,
+                                                  new_channel_id, user_id)
+
         try:
             await self.add_star(message, user_id, cfg)
         except (StarError, StarAddError) as err:
@@ -554,6 +575,20 @@ class Starboard(Cog):
             return
 
         message = await channel.get_message(message_id)
+
+        if channel_id == cfg['starboard_id']:
+            # This reaction is coming from the starboard.
+            # we parse the message content and recall this function
+            content = message.content
+
+            matches = ID_REGEX.findall(content)
+            new_message_id = int(matches[-1])
+            new_channel_id = int(matches[-2])
+
+            return await self.on_raw_reaction_remove(emoji_partial,
+                                                     new_message_id,
+                                                     new_channel_id, user_id)
+
         try:
             await self.remove_star(message, user_id, cfg)
         except (StarError, StarRemoveError) as err:
@@ -737,20 +772,24 @@ class Starboard(Cog):
     @commands.guild_only()
     async def starrers(self, ctx, message_id: int):
         """Get the list of starrers from a message in the current channel."""
+        guild = ctx.guild
+        await self._get_starconfig(guild.id)
+        star = await self.get_star(guild.id, message_id)
+        if not star:
+            return await ctx.send('Star object not found')
+
+        channel = self.bot.get_channel(star['channel_id'])
+        if not channel:
+            return await ctx.send('Star found, Channel not found')
+
         try:
-            message = await ctx.channel.get_message(message_id)
+            message = await channel.get_message(message_id)
         except discord.NotFound:
             return await ctx.send('Message not found')
         except discord.Forbidden:
             return await ctx.send("Can't retrieve message")
         except discord.HTTPException as err:
             return await ctx.send(f'Failed to retrieve message: {err!r}')
-
-        guild = ctx.guild
-        await self._get_starconfig(guild.id)
-        star = await self.get_star(guild.id, message.id)
-        if star is None:
-            return await ctx.send('Star object not found')
 
         _, em = make_star_embed(star, message)
         starrers = [guild.get_member(starrer_id)
@@ -770,7 +809,8 @@ class Starboard(Cog):
         em = discord.Embed(title='Starboard statistics',
                            colour=discord.Colour(0xFFFF00))
 
-        total_stars = await self.starboard_coll.find({'guild_id': guild.id}).count()
+        total_stars = await self.starboard_coll.find(
+                {'guild_id': guild.id}).count()
         em.add_field(name='Total messages starred', value=total_stars)
 
         starrers = collections.Counter()
@@ -810,11 +850,13 @@ class Starboard(Cog):
     async def randomstar(self, ctx):
         """Get a random star from your starboard."""
         guild = ctx.guild
-        all_stars = await self.starboard_coll.find({'guild_id': guild.id}).count()
+        all_stars = await self.starboard_coll.find(
+                {'guild_id': guild.id}).count()
         random_idx = random.randint(0, all_stars)
-        
-        guild_stars_cur = self.starboard_coll.find({'guild_id': guild.id}).limit(1).skip(random_idx)
-        
+
+        guild_stars_cur = self.starboard_coll.find(
+                {'guild_id': guild.id}).limit(1).skip(random_idx)
+
         # ugly, I know.
         star = None
         async for star in guild_stars_cur:
