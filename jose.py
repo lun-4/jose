@@ -49,6 +49,7 @@ extensions = [
     'chatbot',
     'translation',
     'memework',
+    'wikihow',
 ]
 
 CHECK_FAILURE_PHRASES = [
