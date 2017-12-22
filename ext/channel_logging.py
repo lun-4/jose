@@ -1,4 +1,5 @@
 import logging
+import aiohttp
 import asyncio
 import time
 
@@ -126,8 +127,11 @@ class DiscordHandler(logging.Handler):
             self._buffer.clear()
             self._can_emit.clear()
 
-            for page in paginator.pages:
-                await self.webhook.execute(page)
+            try:
+                for page in paginator.pages:
+                    await self.webhook.execute(page)
+            except (discord.HTTPException, aiohttp.ClientError):
+                log.exception('Failed to emit logs')
 
             await self._can_emit.wait()
 
