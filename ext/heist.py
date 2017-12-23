@@ -1,9 +1,9 @@
 import asyncio
 import logging
-import discord
 import decimal
 from random import SystemRandom
 
+import discord
 from discord.ext import commands
 
 from .common import Cog, SayException, CoinConverter, GuildConverter
@@ -442,6 +442,9 @@ class Heist(Cog):
     async def heist_force(self, ctx):
         """Force a current heist join session to finish already."""
         session = self.get_sess(ctx)
+        if ctx.author.id != session.ctx.author.id:
+            raise self.SayException('You are not the author of the heist.')
+
         await session.process_heist(await session.force_finish())
 
 
