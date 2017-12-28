@@ -133,7 +133,13 @@ class Coins2(Cog):
 
         return rows
 
-    async def transfer(self, from_id:int, to_id: int,
+    async def get_ranks(self, account_id: int, guild_id=None) -> dict:
+        rank_data = await self.jc_get(f'/wallets/{account_id}/rank', {
+            'guild_id': guild_id
+        })
+        return rank_data
+
+    async def transfer(self, from_id: int, to_id: int,
                        amount: decimal.Decimal) -> 'None':
         """Make the transfer call"""
         r = await self.jc_post(f'/wallets/{from_id}/transfer', {
@@ -196,6 +202,12 @@ class Coins2(Cog):
         await self.transfer(ctx.author.id, receiver.id, amount)
         await ctx.send(f'\N{MONEY WITH WINGS} {ctx.author!s} > '
                        f'`{amount}JC` > {receiver!s} \N{MONEY BAG}')
+
+    @jc3.command()
+    @commands.guild_only()
+    async def ranks(self, ctx):
+        res = await self.get_ranks(ctx.author.id, ctx.guild.id)
+        await ctx.send(res)
 
 
 def setup(bot):

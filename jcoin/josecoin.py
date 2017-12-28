@@ -35,7 +35,7 @@ def handle_generic_error(request, exception):
     return response.json({
         'error': True,
         'message': exception.args[0]
-        }, status=exception.status_code)
+    }, status=exception.status_code)
 
 
 @app.get('/')
@@ -166,17 +166,11 @@ async def inc_steal_use(request, wallet_id: int):
         WHERE user_id=$1
         """, wallet_id)
 
-        verb, items = res.split()
+        _, items = res.split()
         items = int(items)
-
-        if items:
-            return response.json({
-                'success': True,
-            })
-        else:
-            return response.json({
-                'success': False,
-            })
+        return response.json({
+            'success': bool(items),
+        })
 
 
 @app.post('/api/wallets/<wallet_id:int>/steal_success')
@@ -189,17 +183,11 @@ async def inc_steal_success(request, wallet_id: int):
         WHERE user_id=$1
         """, wallet_id)
 
-        verb, items = res.split()
+        _, items = res.split()
         items = int(items)
-
-        if items:
-            return response.json({
-                'success': True,
-            })
-        else:
-            return response.json({
-                'success': False,
-            })
+        return response.json({
+            'success': bool(items),
+        })
 
 
 @app.get('/api/wallets/<wallet_id:int>/rank')
@@ -209,31 +197,87 @@ async def wallet_rank(request, wallet_id: int):
     Returns more data if a guild id is provided
     in the `guild_id` field, as json.
     """
-    # TODO: figure out guilds
-    pass
+    try:
+        guild_id = request.json.get('guild_id')
+    except AttributeError:
+        guild_id = None
+
+    global_total = await request.app.db.fetchrow("""
+    SELECT COUNT(*) FROM accounts
+    """)
+
+    global_total = global_total['count']
+
+    global_rank = await request.app.db.fetchrow("""
+    SELECT s.rank FROM (
+        SELECT accounts.account_id, rank() over (
+            ORDER BY accounts.amount DESC
+        ) FROM accounts
+    ) AS s WHERE s.account_id = $1
+    """, wallet_id)
+
+    global_rank = global_rank['rank']
+
+    res = {
+        'global': {
+            'rank': global_rank,
+            'total': global_total,
+        }
+    }
+
+    if guild_id:
+        local_total = await request.app.db.fetchrow("""
+        SELECT COUNT(*) FROM accounts
+        JOIN members ON accounts.account_id = members.user_id
+        WHERE members.guild_id = $1
+        """, guild_id)
+
+        local_total = local_total['count']
+
+        local_rank = await request.app.db.fetchrow("""
+        SELECT s.rank FROM (
+            SELECT accounts.account_id, rank() over (
+                ORDER BY accounts.amount DESC
+            ) FROM accounts
+            JOIN members ON accounts.account_id = members.user_id
+            WHERE members.guild_id = $1
+        ) AS s WHERE s.account_id = $2
+        """, guild_id, wallet_id)
+        local_rank = local_rank['rank']
+
+        res['local'] = {
+            'rank': local_rank,
+            'total': local_total,
+        }
+
+    return response.json(res)
 
 
-async def getsum(request, acc_type: int) -> asyncpg.Record:
-    """Get the sum of all the amounts of a specific account type."""
+async def getsum(request, acc_type: int) -> decimal.Decimal:
+    """Get the sum of all the amounts of a
+    specific account type."""
 
-    r = await request.app.db.fetchrow("""
+    resp = await request.app.db.fetchrow("""
     SELECT SUM(amount) FROM accounts WHERE account_type=$1
     """, acc_type)
-    return r['sum']
+    return resp['sum']
 
-async def get_count(request, acc_type: int):
-    r = await request.app.db.fetchrow("""
+async def get_count(request, acc_type: int) -> int:
+    """Get the total account count for a specific
+    account type."""
+    resp = await request.app.db.fetchrow("""
     SELECT COUNT(*) FROM accounts WHERE account_type=$1
     """, acc_type)
-    return r['count']
+    return resp['count']
 
 
 async def get_gdp(request):
     """Get the GDP (sum of all account amounts) in the economy"""
-    r = await request.app.db.fetchrow("""
+    resp = await request.app.db.fetchrow("""
     SELECT SUM(amount) FROM accounts;
     """)
-    return r['sum']
+    return resp['sum']
+
 
 async def get_counts(request) -> dict:
     """Get account counts"""
@@ -256,6 +300,7 @@ async def get_counts(request) -> dict:
 
 
 async def get_sums(request) -> dict:
+    """Get sum information about accounts."""
     total_amount = await get_gdp(request)
     user_amount = await getsum(request, AccountType.USER)
     txb_amount = await getsum(request, AccountType.TAXBANK)
@@ -276,9 +321,8 @@ async def get_gdp_handler(request):
 @app.get('/api/stats')
 async def get_stats_handler(request):
     """Get stats about it all."""
-    
-    gdp_data = await get_sums(request)
 
+    gdp_data = await get_sums(request)
     res = {
         'gdp': gdp_data['gdp'],
     }
@@ -309,7 +353,8 @@ async def db_init(app):
     app.db = await asyncpg.create_pool(**jconfig.db)
 
 
-if __name__ == '__main__':
+def main():
+    """Main entrypoint."""
     loop = asyncio.get_event_loop()
 
     server = app.create_server(host='0.0.0.0', port=8080)
@@ -319,6 +364,10 @@ if __name__ == '__main__':
         loop.run_forever()
     except KeyboardInterrupt:
         loop.close()
-    except:
+    except Exception:
         log.exception('stopping')
         loop.close()
+
+
+if __name__ == '__main__':
+    main()
