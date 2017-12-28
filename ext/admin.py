@@ -32,14 +32,14 @@ def no_codeblock(text: str) -> str:
     return text
 
 
-class Admin(Cog):
-    def __init__(self, bot):
-        super().__init__(bot)
-        self.db = None
-        bot.loop.create_task(self.dbinit())
+class Admin(Cog, requires=['config']):
 
-    async def dbinit(self):
-        self.db = await asyncpg.connect(**self.bot.config.postgres)
+    @property
+    def db(self) -> asyncpg.pool.Pool:
+        cfg = self.bot.get_cog('Config')
+        if cfg is not None:
+            return cfg.db
+        raise RuntimeError('Required config Cog is not loaded.')
 
     @commands.command(hidden=True)
     @commands.is_owner()

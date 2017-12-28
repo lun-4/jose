@@ -6,11 +6,13 @@ services:
           - mongo
           - postgres
       volumes:
-          - ./:/app
+          - ./:/jose
   josecoin:
       build: ./jcoin
       depends_on:
           - postgres
+      volumes:
+          - ./jcoin/:/jcoin
       ports:
           - "8080:8080"
 

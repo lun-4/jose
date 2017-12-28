@@ -50,6 +50,7 @@ extensions = [
     'translation',
     'memework',
     'wikihow',
+    'state',
 ]
 
 CHECK_FAILURE_PHRASES = [
