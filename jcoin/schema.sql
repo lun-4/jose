@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS members (
     guild_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
     PRIMARY KEY(guild_id, user_id)
-)
+);
 
 /* both users and taxbanks go here */
 CREATE TABLE IF NOT EXISTS accounts (
