@@ -3,9 +3,9 @@ import collections
 import time
 import logging
 
-import motor.motor_asyncio
+import asyncpg
 import discord
-
+import motor.motor_asyncio
 from discord.ext import commands
 
 from .common import Cog
@@ -45,6 +45,13 @@ class Config(Cog):
 
         # used to check if cache has all defined objects in it
         self.default_keys = None
+
+        # asyncpg connection pool
+        self.db = None
+        self.loop.create_task(self.pg_init())
+
+    async def pg_init(self):
+        self.db = await asyncpg.create_pool(**self.bot.config.postgres)
 
     def cfg_default(self, guild_id):
         default = {
