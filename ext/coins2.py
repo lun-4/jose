@@ -209,6 +209,45 @@ class Coins2(Cog):
         res = await self.get_ranks(ctx.author.id, ctx.guild.id)
         await ctx.send(res)
 
+    @jc3.command()
+    @commands.is_owner()
+    async def migrate(self, ctx):
+        await ctx.send('migrating shit')
+        cur = self.jcoin.jcoin_coll.find()
+        db = self.bot.get_cog("Config").db
+
+        async with db.acquire() as conn:
+            acc_stmt = await conn.prepare("""
+            INSERT INTO accounts (account_id, account_type, amount)
+            VALUES ($1, $2, $3)
+            """)
+
+            user_stmt = await conn.prepare("""
+            INSERT INTO wallets (user_id, taxpaid, steal_uses, steal_success)
+            VALUES ($1, $2, $3, $4)
+            """)
+
+            ucount, acount = 0, 0
+            async for account in cur:
+                atype = account['type']
+                acc_da = decimal.Decimal(account['amount'])
+                as_int = AccountType.USER if atype == 'user' \
+                    else AccountType.TAXBANK
+
+                if acc_da.is_infinite():
+                    acc_da = decimal.Decimal('NaN')
+
+                await acc_stmt.fetchval(account['id'], as_int, acc_da)
+                if as_int == AccountType.USER:
+                    acc_dt = decimal.Decimal(account['taxpaid'])
+                    await user_stmt.fetchval(account['id'], acc_dt,
+                                             account['times_stolen'],
+                                             account['success_steal'])
+                    ucount += 1
+                acount += 1
+
+        await ctx.send(f'Inserted {acount} accounts, {ucount} users')
+
 
 def setup(bot):
     bot.add_cog(Coins2(bot))
