@@ -8,7 +8,6 @@ import time
 
 from typing import List
 
-
 class Table:
     def __init__(self, *column_titles: str):
         self._rows = [column_titles]
@@ -45,14 +44,16 @@ class Table:
                     columns.append(f" {field:>{self._widths[index]}} ")
                     continue
 
+                # make sure the codeblock this will end up in won't get escaped
+                field = field.replace('`', '\u200b`')
+
                 # regular text gets aligned to the left
                 columns.append(f" {field:<{self._widths[index]}} ")
 
             return "|".join(columns)
 
         # column title is centered in the middle of each field
-        title_row = "|".join(f" {field:^{self._widths[index]}} "
-                             for index, field in enumerate(self._rows[0]))
+        title_row = "|".join(f" {field:^{self._widths[index]}} " for index, field in enumerate(self._rows[0]))
         separator_row = "+".join("-" * (width + 2) for width in self._widths)
 
         drawn = [title_row, separator_row]
@@ -71,7 +72,6 @@ class Table:
 
         func = functools.partial(self._render)
         return await loop.run_in_executor(None, func)
-
 
 class Timer:
     """Context manager to measure how long the indented block takes to run."""
