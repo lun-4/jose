@@ -141,7 +141,7 @@ def make_star_embed(star, message):
         if attch_url.lower().endswith(('png', 'jpeg', 'jpg', 'gif',)):
             em.set_image(url=attch_url)
         else:
-            attachments = '\n'.join([f'[Attachment]({attch_s["url"]})'
+            attachments = '\n'.join([f'[Attachment]({attch_s.url})'
                                      for attch_s in attch])
             em.description += attachments
 
