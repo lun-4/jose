@@ -21,6 +21,9 @@ app = Sanic()
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__name__)
 
+# constants
+AUTOCOIN_BASE_PROB = decimal.Decimal('0.012')
+PROB_CONSTANT = decimal.Decimal('1.003384590736')
 
 class AccountType:
     """Account types."""
@@ -42,6 +45,14 @@ def handle_generic_error(request, exception):
 async def index(request):
     """Give simple index page."""
     return response.text('oof')
+
+
+@app.get('/api/health')
+async def get_status(request) -> response:
+    """Simple response."""
+    return response.json({
+        'status': True,
+    })
 
 
 @app.get('/api/wallets/<account_id:int>')
@@ -100,11 +111,19 @@ async def create_account(request, account_id):
 @app.post('/api/wallets/<sender_id:int>/transfer')
 async def transfer(request, sender_id):
     """Transfer money between users."""
-    receiver_id = int(request.json['receiver'])
-    amount = decimal.Decimal(request.json['amount'])
+    try:
+        receiver_id = int(request.json['receiver'])
+        amount = decimal.Decimal(request.json['amount'])
+    except:
+        raise InputError('Invalid input')
 
     if receiver_id == sender_id:
         raise InputError('Account can not transfer to itself')
+
+    try:
+        amount = round(amount, 3)
+    except:
+        raise InputError('Error rounding.')
 
     if amount < 0.0009:
         raise InputError('Negative amounts are not allowed')
@@ -137,6 +156,14 @@ async def transfer(request, sender_id):
             SET amount=accounts.amount - $1
             WHERE account_id = $2
         """, amount, sender_id)
+
+        if receiver['type'] == AccountType.TAXBANK and \
+                sender['type'] == AccountType.USER:
+            await conn.execute("""
+            UPDATE wallets
+            SET taxpaid=wallets.taxpaid + $1
+            WHERE user_id=$2
+            """, amount, sender_id)
 
         await conn.execute("""
             UPDATE accounts
@@ -316,6 +343,29 @@ async def get_sums(request) -> dict:
 async def get_gdp_handler(request):
     """Get the total amount of coins in the economy."""
     return response.json(await get_sums(request))
+
+
+@app.get('/api/wallets/<wallet_id:int>/probability')
+async def get_wallet_probability(request, wallet_id: int):
+    wallet = await request.app.db.fetchrow("""
+    SELECT * FROM wallets
+    WHERE user_id=$1
+    """, wallet_id)
+    taxpaid = wallet['taxpaid']
+
+    prob = AUTOCOIN_BASE_PROB
+
+    # Based on the tax paid.
+    if taxpaid >= 50:
+        raised = pow(PROB_CONSTANT, taxpaid)
+        prob += round(raised / 100, 5)
+
+    if prob > 0.042:
+        prob = 0.042
+
+    return response.json({
+        'probability': prob,
+    })
 
 
 @app.get('/api/stats')

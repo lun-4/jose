@@ -1,4 +1,5 @@
 import logging
+import time
 import decimal
 import sys
 
@@ -208,6 +209,24 @@ class Coins2(Cog):
     async def ranks(self, ctx):
         res = await self.get_ranks(ctx.author.id, ctx.guild.id)
         await ctx.send(res)
+
+    @jc3.command()
+    async def ping(self, ctx):
+        """Check if the JoséCoin API is up."""
+        t1 = time.monotonic()
+
+        try:
+            res = await self.jc_get('/health')
+            up = res['status']
+            if not up:
+                return await ctx.send('JoséCoin API is not ok.')
+        except:
+            return await ctx.send('Failed to contact the JoséCoin API')
+
+        t2 = time.monotonic()
+
+        delta = round((t2 - t1) * 1000, 2)
+        await ctx.send(f'`{delta}ms`')
 
     @jc3.command()
     @commands.is_owner()
