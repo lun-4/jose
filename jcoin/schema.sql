@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS wallets (
        user_id bigint NOT NULL REFERENCES accounts (account_id) ON DELETE CASCADE,
 
        taxpaid numeric DEFAULT 0,
+       hidecoins boolean DEFAULT false,
 
        /* for j!steal statistics */
        steal_uses int DEFAULT 0,

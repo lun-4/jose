@@ -1,12 +1,14 @@
 import logging
-import time
+import asyncio
 import decimal
 import sys
+import pprint
 
 import discord
 from discord.ext import commands
 
 from .common import Cog, CoinConverter
+from .utils import Timer
 
 sys.path.append('..')
 from jcoin.errors import *
@@ -64,11 +66,12 @@ class Coins2(Cog):
         return await self.generic_call('GET', route, payload)
 
     async def jc_post(self, route: str, payload: dict = None) -> 'any':
-        """Calls a route with POST.
-
-        Can raise errors.
-        """
+        """Calls a route with POST."""
         return await self.generic_call('POST', route, payload)
+
+    async def jc_delete(self, route: str, payload: dict=None) -> 'any':
+        """Calls a route with DELETE."""
+        return await self.generic_call('DELETE', route, payload)
 
     def get_name(self, user_id: int, account=None):
         """Get a string representation of a user or guild.
@@ -116,9 +119,15 @@ class Coins2(Cog):
 
     async def get_account(self, wallet_id: int) -> dict:
         """Get an account"""
-        return await self.jc_get(f'/wallets/{wallet_id}')
+        r = await self.jc_get(f'/wallets/{wallet_id}')
+        r['amount'] = decimal.Decimal(r['amount'])
+        try:
+            r['taxpaid'] = decimal.Decimal(r['taxpaid'])
+        except:
+            pass
+        return r
 
-    async def create_wallet(self, thing) -> 'None':
+    async def create_wallet(self, thing):
         """Send a request to create a JoséCoin account."""
 
         log.info('Creating account for %r', thing)
@@ -134,6 +143,12 @@ class Coins2(Cog):
 
         return rows
 
+    async def ensure_ctx(self, ctx):
+        try:
+            await self.create_wallet(ctx.bot.user, 'NaN')
+        except:
+            pass
+
     async def get_ranks(self, account_id: int, guild_id=None) -> dict:
         rank_data = await self.jc_get(f'/wallets/{account_id}/rank', {
             'guild_id': guild_id
@@ -141,9 +156,9 @@ class Coins2(Cog):
         return rank_data
 
     async def transfer(self, from_id: int, to_id: int,
-                       amount: decimal.Decimal) -> 'None':
+                       amount: decimal.Decimal) -> dict:
         """Make the transfer call"""
-        r = await self.jc_post(f'/wallets/{from_id}/transfer', {
+        return await self.jc_post(f'/wallets/{from_id}/transfer', {
             'receiver': to_id,
             'amount': str(amount)
         })
@@ -205,32 +220,36 @@ class Coins2(Cog):
                        f'`{amount}JC` > {receiver!s} \N{MONEY BAG}')
 
     @jc3.command()
+    async def donate(self, ctx, amount: CoinConverter):
+        """Donate to the guild's taxbank."""
+        await self.transfer(ctx.author.id, ctx.guild.id, amount)
+        await ctx.ok()
+
+    @jc3.command()
     @commands.guild_only()
     async def ranks(self, ctx):
+        """Get rank data."""
         res = await self.get_ranks(ctx.author.id, ctx.guild.id)
         await ctx.send(res)
 
     @jc3.command()
     async def ping(self, ctx):
         """Check if the JoséCoin API is up."""
-        t1 = time.monotonic()
+        with Timer() as timer:
+            try:
+                res = await self.jc_get('/health')
+                up = res['status']
+                if not up:
+                    return await ctx.send('JoséCoin API is not ok.')
+            except:
+                return await ctx.send('Failed to contact the JoséCoin API')
 
-        try:
-            res = await self.jc_get('/health')
-            up = res['status']
-            if not up:
-                return await ctx.send('JoséCoin API is not ok.')
-        except:
-            return await ctx.send('Failed to contact the JoséCoin API')
-
-        t2 = time.monotonic()
-
-        delta = round((t2 - t1) * 1000, 2)
-        await ctx.send(f'`{delta}ms`')
+        await ctx.send(f'`{timer}`')
 
     @jc3.command()
     @commands.is_owner()
     async def migrate(self, ctx):
+        """Migrate JoséCoin data from Mongo -> Postgres"""
         await ctx.send('migrating shit')
         cur = self.jcoin.jcoin_coll.find()
         db = self.bot.get_cog("Config").db
@@ -266,6 +285,80 @@ class Coins2(Cog):
                 acount += 1
 
         await ctx.send(f'Inserted {acount} accounts, {ucount} users')
+
+    @jc3.command()
+    async def coinprob(self, ctx, person: discord.User=None):
+        if not person:
+            person = ctx.author
+
+        data = await self.jc_get(f'/wallets/{person.id}/probability')
+        p = data['probability']
+        await ctx.send(f'You have a {p * 100}%/message chance')
+
+    @jc3.command()
+    async def jcgetraw(self, ctx):
+        """Get raw info on your wallet"""
+        wallet = await self.get_account(ctx.author.id)
+        res = pprint.pformat(wallet)
+        await ctx.send(f'```python\n{res}\n```')
+
+    @jc3.command()
+    @commands.is_owner()
+    async def write(self, ctx, person: discord.User, amount: str):
+        """Overwrite someone's wallet"""
+        await ctx.send('not implemented yet')
+
+    @jc3.command()
+    @commands.is_owner()
+    async def spam(self, ctx, taskcount: int=200, timeout: int=30):
+        """webscale memes
+        
+        This will spawn an initial amount of [taskcount] tasks,
+        with each one doing a transfer call.
+
+        If all tasks complete the operation, we double the amount of tasks.
+
+        If we hit a timeout, this stops.
+        """
+        while True:
+            tasks = []
+            with Timer() as timer:
+                for i in range(taskcount):
+                    coro = self.transfer(ctx.bot.user.id,
+                                         ctx.author.id, 0.1)
+                    t = self.loop.create_task(coro)
+                    tasks.append(t)
+
+            done, pending = await asyncio.wait(tasks, timeout=timeout)
+            await ctx.send(f'{taskcount} tasks in {timer}')
+
+            lp = len(pending)
+            if lp:
+                return await ctx.send(f'stopping from {lp} > 0 pending')
+
+            taskcount *= 2
+
+    @jc3.command()
+    async def deleteaccount(self, ctx, confirm: bool=False):
+        """Delete your JoséCoin account.
+        
+        There is no going back from this operation.
+
+        Use "y", "yes", and variants, to confirm it.
+        """
+        if not confirm:
+            return await ctx.send('You did not confirm the operation.')
+
+        log.warning(f'deleting account {ctx.author!r}')
+
+        res = await self.jc_delete(f'/wallets/{ctx.author.id}')
+        await ctx.status(res['success'])
+
+    @jc3.command()
+    async def hidecoins(self, ctx):
+        """Toggle the coin reaction in your account"""
+        # TODO: this
+        raise NotImplemented
 
 
 def setup(bot):

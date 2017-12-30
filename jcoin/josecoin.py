@@ -71,6 +71,10 @@ async def get_wallet(request, account_id):
         raise AccountNotFoundError('Account not found')
 
     daccount = dict(account)
+
+    if account['amount'].is_nan():
+        daccount['amount'] = 'nan'
+
     if account['account_type'] == AccountType.USER:
         wallet = await request.app.db.fetchrow("""
         SELECT taxpaid, steal_uses, steal_success
@@ -146,19 +150,20 @@ async def transfer(request, sender_id):
         raise AccountNotFoundError('Receiver is missing account')
 
     sender_amount = decimal.Decimal(sender['amount'])
-    if amount > sender_amount:
+    if not sender_amount.is_nan() and amount > sender_amount:
         raise ConditionError(f'Not enough funds: {amount} > {sender_amount}')
 
     async with request.app.db.acquire() as conn, conn.transaction():
         # send it back to db
-        await conn.execute("""
-            UPDATE accounts
-            SET amount=accounts.amount - $1
-            WHERE account_id = $2
-        """, amount, sender_id)
+        if not sender_amount.is_nan():
+            await conn.execute("""
+                UPDATE accounts
+                SET amount=accounts.amount - $1
+                WHERE account_id = $2
+            """, amount, sender_id)
 
-        if receiver['type'] == AccountType.TAXBANK and \
-                sender['type'] == AccountType.USER:
+        if receiver['account_type'] == AccountType.TAXBANK and \
+                sender['account_type'] == AccountType.USER:
             await conn.execute("""
             UPDATE wallets
             SET taxpaid=wallets.taxpaid + $1
@@ -178,8 +183,8 @@ async def transfer(request, sender_id):
         """, sender_id, receiver_id, amount)
 
     return response.json({
-        'sender_amount': sender_amount - amount,
-        'receiver_amount': receiver['amount'] + amount
+        'sender_amount': 'nan' if sender_amount.is_nan() else sender_amount - amount,
+        'receiver_amount': 'nan' if receiver['amount'].is_nan() else receiver['amount'] + amount
     })
 
 
@@ -368,6 +373,77 @@ async def get_wallet_probability(request, wallet_id: int):
     })
 
 
+@app.get('/api/wallets')
+async def get_wallets(request):
+    """Get wallets by specific criteria"""
+    key = request.json['key']
+    try:
+        reverse = bool(request.json['reverse'])
+    except:
+        reverse = False
+
+    sorting = 'DESC' if reverse else 'ASC'
+
+    try:
+        guild_id = int(request.json['guild_id'])
+    except:
+        guild_id = None
+
+    try:
+        limit = int(request.json['limit'])
+    except:
+        limit = 20
+
+    if limit <= 0 or limit > 30:
+        raise InputError('invalid limit range')
+
+    query = ''
+    args = [guild_id]
+
+    if key == 'local':
+        query = f"""
+        SELECT * FROM accounts
+
+        JOIN members ON accounts.account_id = members.user_id
+        WHERE members.guild_id = $1
+
+        ORDER BY amount {sorting}
+        LIMIT {limit}
+        """
+    elif key == 'global':
+        query = f"""
+        SELECT * FROM accounts
+        ORDER BY amount {sorting}
+        LIMIT {limit}
+        """
+        args = []
+    elif key == 'taxpaid':
+        query = f"""
+        SELECT * FROM wallets
+        JOIN accounts ON accounts.account_id = wallets.user_id
+        ORDER BY taxpaid {sorting}
+        LIMIT {limit}
+        """
+        args = []
+    elif key == 'taxbanks':
+        query = f"""
+        SELECT * FROM accounts
+        WHERE account_type={AccountType.TAXBANK}
+        ORDER BY amount {sorting}
+        LIMIT {limit}
+        """
+        args = []
+    else:
+        return response.json({
+            'success': False,
+            'status': 'invalid key',
+        })
+
+    log.info(query)
+    rows = await request.app.db.fetch(query, *args)
+    return response.json(map(dict, rows))
+
+
 @app.get('/api/stats')
 async def get_stats_handler(request):
     """Get stats about it all."""
@@ -383,7 +459,7 @@ async def get_stats_handler(request):
     res['txb_money'] = gdp_data['taxbank']
 
     steal_uses = await request.app.db.fetchrow("""
-    SELECT SUM(steal_uses) FROM wallets;
+    SELECT SUM(steal_uses) FROM wallets
     """)
     steal_uses = steal_uses['sum']
 
