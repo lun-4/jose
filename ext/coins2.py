@@ -11,7 +11,8 @@ from .common import Cog, CoinConverter
 from .utils import Timer
 
 sys.path.append('..')
-from jcoin.errors import *
+from jcoin.errors import GenericError, AccountNotFoundError, \
+        InputError, ConditionError, err_list
 
 log = logging.getLogger(__name__)
 
@@ -40,6 +41,7 @@ class Coins2(Cog):
     def __init__(self, bot):
         super().__init__(bot)
         self.base_url = bot.config.JOSECOIN_API
+        self.bot.simple_exc.extend(err_list)
 
     def route(self, route):
         return f'{self.base_url}{route}'

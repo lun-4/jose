@@ -1,5 +1,6 @@
 import asyncio
 import decimal
+import logging
 
 import discord
 from discord.ext import commands
@@ -12,8 +13,11 @@ INF = decimal.Decimal('inf')
 WIDE_MAP = dict((i, i + 0xFEE0) for i in range(0x21, 0x7F))
 WIDE_MAP[0x20] = 0x3000
 
+log = logging.getLogger(__name__)
+
 
 class SayException(Exception):
+    """Say something using an exception."""
     pass
 
 
@@ -69,7 +73,7 @@ class CoinConverter(commands.Converter):
         if value <= ZERO:
             raise ba("You can't input values lower or equal to 0.")
         elif value >= INF:
-            raise ba("You can't input values lower of equal to infinity.")
+            raise ba("You can't input values equal or higher to infinity.")
 
         try:
             value = round(value, 3)
@@ -78,13 +82,13 @@ class CoinConverter(commands.Converter):
 
         # Ensure a taxbank account tied to the guild exists
         await coins.ensure_taxbank(ctx)
-
         account = await coins.get_account(ctx.author.id)
         if not account:
             raise ba("You don't have a JoséCoin account, "
-                     f"make one with `{ctx.bot.prefix}account`")
+                     f"make one with `j!account`")
 
         return value
+
 
 class FuzzyMember(commands.Converter):
     """Fuzzy matching for member objects"""
@@ -116,11 +120,18 @@ class FuzzyMember(commands.Converter):
                 scores[m.id] = score
 
         try:
-            return sorted(scores.keys(), key=lambda k: scores[k], reverse=True)[0]
+            sortedkeys = sorted(scores.keys(),
+                                key=lambda k: scores[k], reverse=True)
+            return sortedkeys[0]
         except IndexError:
             raise commands.BadArgument('No user was found')
 
+
 class Cog:
+    """Main cog base class.
+
+    Provides common functions to cogs.
+    """
     def __init__(self, bot):
         self.bot = bot
         self.loop = bot.loop
@@ -169,6 +180,7 @@ class Cog:
 
 
 async def shell(command: str):
+    """Execute shell commands."""
     process = await asyncio.create_subprocess_shell(
         command,
         stderr=asyncio.subprocess.PIPE,
