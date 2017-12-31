@@ -157,9 +157,9 @@ async def transfer(request, sender_id):
         # send it back to db
         if not sender_amount.is_nan():
             await conn.execute("""
-                UPDATE accounts
-                SET amount=accounts.amount - $1
-                WHERE account_id = $2
+            UPDATE accounts
+            SET amount=accounts.amount - $1
+            WHERE account_id = $2
             """, amount, sender_id)
 
         if receiver['account_type'] == AccountType.TAXBANK and \
