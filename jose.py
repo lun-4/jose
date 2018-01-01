@@ -274,9 +274,6 @@ async def get_prefix(bot, message) -> list:
     if message.guild is None:
         return bot.config.prefix
 
-    if message.guild.id == 216292020371718146:
-        return ['j%']
-
     config = bot.get_cog('Config')
     if config is None:
         log.warning('config cog not found')

@@ -50,6 +50,8 @@ async def index(request):
 @app.get('/api/health')
 async def get_status(request) -> response:
     """Simple response."""
+    # Query the DB with 'SELECT 1'
+    # and return time taken
     return response.json({
         'status': True,
     })
