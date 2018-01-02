@@ -351,6 +351,7 @@ class Memes(Cog):
             await asyncio.sleep(2)
 
     @commands.command()
+    @commands.is_nsfw()
     async def neko(self, ctx):
         """Posts a random neko picture."""
         api_url = 'http://nekos.life/api/neko'
