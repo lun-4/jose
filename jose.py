@@ -95,46 +95,51 @@ class JoseContext(commands.Context):
         else:
             await self.not_ok()
 
+    async def err(self, msg):
+        await self.send(f'\N{POLICE CARS REVOLVING LIGHT} {msg}')
+
 
 class JoseBot(commands.Bot):
+    """Main bot subclass."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
         self.init_time = time.time()
         self.config = config
         self.session = aiohttp.ClientSession()
+
+        #: Exceptions that will be simplified
+        #   to WARN logging instead of ERROR logging
         self.simple_exc = [SayException]
+
+        #: used by ext.channel_logging
         self.channel_handlers = []
 
-        # reeeeee dont query mongo every message god damn it
+        #: blocking stuff
+        self.block_coll = None
         self.block_cache = {}
 
     async def on_ready(self):
+        """Bot ready handler"""
         log.info(f'Logged in! {self.user!s}')
 
-    async def is_blocked(self, user_id: int):
-        """Returns If a user is blocked to use José. Uses cache"""
+    async def is_blocked(self, user_id: int, key: str = 'user_id') -> bool:
+        """Returns if something blocked to use José. Uses cache"""
         if user_id in self.block_cache:
             return self.block_cache[user_id]
 
-        blocked = await self.block_coll.find_one({'user_id': user_id})
+        blocked = await self.block_coll.find_one({key: user_id})
         is_blocked = bool(blocked)
         self.block_cache[user_id] = is_blocked
 
         return is_blocked
 
-    async def is_blocked_guild(self, guild_id: int):
+    async def is_blocked_guild(self, guild_id: int) -> bool:
         """Returns if a guild is blocked to use José. Uses cache"""
-        if guild_id in self.block_cache:
-            return self.block_cache[guild_id]
-
-        blocked = await self.block_coll.find_one({'guild_id': guild_id})
-        is_blocked = bool(blocked)
-        self.block_cache[guild_id] = is_blocked
-
-        return is_blocked
+        return await self.is_blocked(guild_id, 'guild_id')
 
     def clean_content(self, content: str) -> str:
-        """Make a string clean of mentions"""
+        """Make a string clean of mentions and not breaking codeblocks"""
         content = content.replace('`', '\'')
         content = content.replace('@', '@\u200b')
         content = content.replace('&', '&\u200b')
@@ -156,10 +161,14 @@ class JoseBot(commands.Bot):
         log.info('%s [cmd] %s(%d) "%s" checks=%s', location, author,
                  author.id, content, ','.join(checks) or '(none)')
 
-    async def on_command_error(self, ctx, error) -> 'None':
+    async def on_command_error(self, ctx, error):
         """Log and signal errors to the user"""
         message = ctx.message
         content = self.clean_content(message.content)
+        
+        # TODO: I get the feeling this function is too long,
+        #   We have too many branches.
+        #   Can we make this cleaner?
 
         if isinstance(error, commands.errors.CommandInvokeError):
             orig = error.original
@@ -172,29 +181,34 @@ class JoseBot(commands.Bot):
                 return await ctx.send(arg0)
 
             if isinstance(orig, tuple(self.simple_exc)):
-                log.error(f'Errored at {content!r} from {ctx.author!s}\n{orig!r}')
+                log.error(f'Errored at {content!r} from {ctx.author!s}'
+                          f'\n{orig!r}')
             else:
-                log.exception(f'Errored at {content!r} from {ctx.author!s}', exc_info=orig)
+                log.exception(f'Errored at {content!r} from {ctx.author!s}',
+                              exc_info=orig)
 
             if isinstance(orig, self.cogs['Coins'].TransferError):
                 return await ctx.send(f'JoséCoin error: `{orig!r}`')
 
-            return await ctx.send(f':b:ot machine :b:roke```py\n{error.original!r}```')
+            return await ctx.send(':b:ot machine :b:roke```py'
+                                  f'\n{error.original!r}```')
 
         if isinstance(error, commands.errors.BadArgument):
             return await ctx.send('bad argument — '
-                           f'{random.choice(BAD_ARG_MESSAGES)} - {error!s}')
+                                  f'{random.choice(BAD_ARG_MESSAGES)} '
+                                  f'- {error!s}')
 
         if isinstance(error, commands.errors.CommandOnCooldown):
-            # await ctx.send(f'Command on cooldown, wait `{error.retry_after:.2f}` seconds')
             return
 
         if isinstance(error, commands.errors.MissingRequiredArgument):
             return await ctx.send(f'missing argument — `{error.param}`')
         if isinstance(error, commands.errors.NoPrivateMessage):
-            return await ctx.send('sorry, you can not use this command in a DM.')
+            return await ctx.send('sorry, you can not use this command'
+                                  ' in a DM.')
         if isinstance(error, commands.errors.UserInputError):
-            return await ctx.send('user input error  — please, the *right* thing')
+            return await ctx.send('user input error  — '
+                                  'please, the *right* thing')
 
         if isinstance(error, commands.errors.MissingPermissions):
             join = ', '.join(error.missing_perms)
@@ -206,18 +220,17 @@ class JoseBot(commands.Bot):
         # we put this one because MissingPermissions might be a
         # disguised CheckFailure
         if isinstance(error, commands.errors.CheckFailure):
-            await ctx.send(f'check failed — {random.choice(CHECK_FAILURE_PHRASES)}')
+            await ctx.err('check generic error — '
+                          f'{random.choice(CHECK_FAILURE_PHRASES)}')
 
     async def on_error(self, event_method, *args, **kwargs):
         log.exception('Got an error while running the %s event', event_method)
 
     async def on_message(self, message):
-        author_id = message.author.id
-
-        # fucking spam, i hate it >:c
         if message.author.bot:
             return
 
+        author_id = message.author.id
         if await self.is_blocked(author_id):
             return
 
@@ -231,6 +244,7 @@ class JoseBot(commands.Bot):
         await self.invoke(ctx)
 
     def load_extension(self, name: str):
+        """wrapper for the Bot.load_extension"""
         t_start = time.monotonic()
         super().load_extension(name)
         t_end = time.monotonic()
@@ -245,11 +259,11 @@ class JoseBot(commands.Bot):
         log.debug('requirements for %s: %r', cls, requires)
         for _req in requires:
             req = f'ext.{_req}'
-            if not self.extensions.get(req):
+            if req in self.extensions:
                 log.debug('loading %r from requirements', req)
                 self.load_extension(req)
             else:
-                log.debug('%s already loaded', req)
+                log.debug('%s is already loaded', req)
 
         # We instantiate here because
         # instantiating on the old add_cog
@@ -271,15 +285,15 @@ class JoseBot(commands.Bot):
 
 async def get_prefix(bot, message) -> list:
     """Get the preferred list of prefixes for a determined guild/dm."""
-    if message.guild is None:
+    if not message.guild:
         return bot.config.prefix
 
-    config = bot.get_cog('Config')
-    if config is None:
+    config_cog = bot.get_cog('Config')
+    if not config_cog:
         log.warning('config cog not found')
         return ['j!']
 
-    custom = await config.cfg_get(message.guild, "prefix")
+    custom = await config_cog.cfg_get(message.guild, "prefix")
     if custom == bot.config.prefix:
         return custom
 
@@ -287,13 +301,18 @@ async def get_prefix(bot, message) -> list:
     return sorted([bot.config.prefix, custom], reverse=True)
 
 
-jose = JoseBot(
-    command_prefix=get_prefix,
-    description='henlo dis is jose',
-    pm_help=None,
-    owner_id=getattr(config, 'owner_id', None),
-)
+def main():
+    """Main entry point"""
+    jose = JoseBot(
+        command_prefix=get_prefix,
+        description='henlo dis is jose',
+        pm_help=None,
+        owner_id=getattr(config, 'owner_id', None),
+    )
 
-if __name__ == '__main__':
     jose.load_all()
     jose.run(config.token)
+
+
+if __name__ == '__main__':
+    main()

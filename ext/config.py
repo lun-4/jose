@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 
 
 def _is_moderator(ctx):
-    if ctx.guild is None:
+    if not ctx.guild:
         return False
 
     member = ctx.guild.get_member(ctx.author.id)
@@ -53,8 +53,9 @@ class Config(Cog):
     async def pg_init(self):
         self.db = await asyncpg.create_pool(**self.bot.config.postgres)
 
-    def cfg_default(self, guild_id):
-        default = {
+    def cfg_default(self, guild_id: int) -> dict:
+        """Default configuration object for a guild"""
+        return {
             'guild_id': guild_id,
             'botblock': True,
             'speak_channel': None,
@@ -62,9 +63,9 @@ class Config(Cog):
             'autoreply_prob': 0,
             'fullwidth_prob': 0.1,
         }
-        return default
 
     async def block_one(self, user_id, k='user_id', reason=None):
+        """Block one thing from using jose."""
         if await self.block_coll.find_one({k: user_id}) is not None:
             return False
 
@@ -76,11 +77,12 @@ class Config(Cog):
             return False
 
     async def unblock_one(self, user_id, k='user_id', reason=''):
+        """Unblock one thing from jose."""
         d = await self.block_coll.delete_one({k: user_id})
         self.bot.block_cache[user_id] = False
         return d.deleted_count > 0
 
-    async def ensure_cfg(self, guild, query=False):
+    async def ensure_cfg(self, guild, query=False) -> dict:
         """Get a configuration object for a guild.
         If `query` is `False`, it checks for a configuration object in cache
 
@@ -93,23 +95,33 @@ class Config(Cog):
             for a configuration object.
         """
         cached = self.config_cache[guild.id]
-        if not query and self.default_keys is not None:
+        default = self.cfg_default(guild)
+
+        if not self.default_keys:
+            self.default_keys = list(default.keys())
+
+        if not query:
             # check if the cached object satisfies all configuration keys
-            satisfies = all([field in cached for field in self.default_keys])
+            #  a default configuration would have
+            satisfies = all([(field in cached) for field in self.default_keys])
             if satisfies:
                 return cached
 
         cfg = await self.config_coll.find_one({'guild_id': guild.id})
-        if cfg is None:
-            await self.config_coll.insert_one(self.cfg_default(guild.id))
+        if not cfg:
+            # Create a config for the guild, since it doesn't
+            # exist.
+            await self.config_coll.insert_one(default)
+
+            # Recall ensure_cfg for caching
             return await self.ensure_cfg(guild)
 
+        # We have a proper config object, cache it.
         self.config_cache[guild.id] = cfg
-        self.default_keys = list(cfg.keys())
-
         return cfg
 
-    async def cfg_get(self, guild, key):
+    async def cfg_get(self, guild: discord.Guild, key: str) -> 'any':
+        """Get a configuration key for a guild."""
         if key in self.config_cache[guild.id]:
             return self.config_cache[guild.id][key]
 
@@ -121,7 +133,8 @@ class Config(Cog):
 
         return value
 
-    async def cfg_set(self, guild, key, value):
+    async def cfg_set(self, guild, key: str, value: 'any') -> bool:
+        """Set a configuration key."""
         await self.ensure_cfg(guild)
         res = await self.config_coll.update_one({'guild_id': guild.id},
                                                 {'$set': {key: value}})
@@ -130,10 +143,9 @@ class Config(Cog):
                   guild, guild.id, key, value)
 
         self.config_cache[guild.id][key] = value
-
         return res.modified_count > 0
 
-    @commands.command(name='cfg_get', hidden=True)
+    @commands.command(name='cfg_get')
     @commands.guild_only()
     async def _config_get(self, ctx, key: str):
         """Get a configuration key"""
@@ -155,7 +167,11 @@ class Config(Cog):
     @is_moderator()
     async def speakchannel(self, ctx, channel: discord.TextChannel=None):
         """Set the channel José will gather messages to feed
-        to his markov generator."""
+        to his markov generator.
+        
+        By default, it will choose the same channel
+        the command is invoked from.
+        """
         channel = channel or ctx.channel
         success = await self.cfg_set(ctx.guild, 'speak_channel', channel.id)
         await ctx.success(success)
@@ -196,25 +212,25 @@ class Config(Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def block(self, ctx, user: discord.User, *, reason: str=''):
+    async def block(self, ctx, user: discord.User, *, reason: str = ''):
         """Block someone from using the bot, globally"""
         await ctx.success(await self.block_one(user.id, 'user_id', reason))
 
     @commands.command()
     @commands.is_owner()
-    async def unblock(self, ctx, user: discord.User, *, reason: str=''):
+    async def unblock(self, ctx, user: discord.User, *, reason: str = ''):
         """Unblock someone from using the bot, globally"""
         await ctx.success(await self.unblock_one(user.id, 'user_id', reason))
 
     @commands.command()
     @commands.is_owner()
-    async def blockguild(self, ctx, guild_id: int, *, reason: str=''):
+    async def blockguild(self, ctx, guild_id: int, *, reason: str = ''):
         """Block an entire guild from using José."""
         await ctx.success(await self.block_one(guild_id, 'guild_id', reason))
 
     @commands.command()
     @commands.is_owner()
-    async def unblockguild(self, ctx, guild_id: int, *, reason: str=''):
+    async def unblockguild(self, ctx, guild_id: int, *, reason: str = ''):
         """Unblock a guild from using José."""
         await ctx.success(await self.unblock_one(guild_id, 'guild_id', reason))
 
@@ -223,22 +239,21 @@ class Config(Cog):
         """Get a reason for a block if it exists"""
         userblock = await self.block_coll.find_one({'user_id': anything_id})
         if userblock is not None:
-            e = discord.Embed(title='User blocked')
-            e.description = f'<@{anything_id}> - {userblock.get("reason")}'
+            e = discord.Embed(title='User blocked', color=discord.Color.red)
+            e.description = f'<@{anything_id}> - `{userblock.get("reason")}`'
             return await ctx.send(embed=e)
 
         guildblock = await self.block_coll.find_one({'guild_id': anything_id})
         if guildblock is not None:
-            e = discord.Embed(title='Guild blocked')
-            e.description = f'why? {userblock.get("reason")}'
+            e = discord.Embed(title='Guild blocked', color=discord.Color.red)
+            e.description = f'why? `{userblock.get("reason")}`'
             return await ctx.send(embed=e)
 
         await ctx.send('Block not found')
 
     @commands.command()
     @commands.guild_only()
-    # @is_moderator()
-    async def prefix(self, ctx, prefix: str=None):
+    async def prefix(self, ctx, prefix: str = None):
         """Sets a guild prefix. Returns the prefix if no args are passed."""
         if not prefix:
             prefix = await self.cfg_get(ctx.guild, 'prefix')
@@ -256,7 +271,7 @@ class Config(Cog):
     @commands.command()
     @commands.guild_only()
     @is_moderator()
-    async def notify(self, ctx, channel: discord.TextChannel=None):
+    async def notify(self, ctx, channel: discord.TextChannel = None):
         """Make a channel a notification channel.
 
         A notification channel will be used bu josé
