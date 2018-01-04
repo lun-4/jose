@@ -319,7 +319,8 @@ class Memes(Cog):
 
         await self.jcoin.pricing(ctx, self.prices['API'])
 
-        urban_url = f'https://api.urbandictionary.com/v0/define?term={urllib.parse.quote(term)}'
+        termq = urllib.parse.quote(term)
+        urban_url = f'https://api.urbandictionary.com/v0/define?term={termq}'
         content = await self.get_json(urban_url)
         c_list = content['list']
 
@@ -363,6 +364,19 @@ class Memes(Cog):
         embed.set_image(url=image_url)
 
         await ctx.send(embed=embed)
+
+    @commands.command()
+    async def owo(self, ctx, *, not_owo: str):
+        """owo-ify"""
+        owo = not_owo.replace('l', 'w')
+        await ctx.send(f'owo {owo}')
+
+    @commands.command()
+    async def nya(self, ctx, *, not_nya: str):
+        """nya-ify"""
+        nya = not_nya
+        await ctx.send(f'{nya}, nya!')
+
 
 
 def setup(bot):

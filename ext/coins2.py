@@ -308,7 +308,14 @@ class Coins2(Cog):
     @commands.is_owner()
     async def write(self, ctx, person: discord.User, amount: str):
         """Overwrite someone's wallet"""
-        await ctx.send('not implemented yet')
+        with Timer() as timer:
+            await self.pool.execute("""
+            UPDATE accounts
+            SET amount=$1
+            WHERE account_id=$2
+            """, amount, person.id)
+
+        await ctx.send(f'write took {timer}')
 
     @jc3.command()
     @commands.is_owner()
@@ -359,8 +366,10 @@ class Coins2(Cog):
     @jc3.command()
     async def hidecoins(self, ctx):
         """Toggle the coin reaction in your account"""
-        # TODO: this
-        raise NotImplemented
+        result = await self.jc_post(f'/wallets/{ctx.author.id}/hidecoins')
+        result = result['new_hidecoins']
+        resultstr = 'on' if result else 'off'
+        await ctx.send(f'no reactions are set to `{resultstr}` for you.')
 
 
 def setup(bot):

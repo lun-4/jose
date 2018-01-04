@@ -476,6 +476,25 @@ async def get_stats_handler(request):
     return response.json(res)
 
 
+@app.post('/api/wallets/<user_id:int>/hidecoins')
+async def toggle_hidecoins(request, user_id: int):
+    async with request.app.db.acquire() as conn, conn.transaction():
+        await conn.execute("""
+        UPDATE wallets
+        SET hidecoins = not hidecoins
+        WHERE user_id = $1
+        """, user_id)
+
+        new_hidecoins = await conn.fetchrow("""
+        SELECT hidecoins FROM wallets
+        WHERE user_id = $1
+        """, user_id)
+
+        return response.json({
+            'new_hidecoins': new_hidecoins['hidecoins']
+        })
+
+
 async def db_init(app):
     """Initialize database"""
     app.db = await asyncpg.create_pool(**jconfig.db)

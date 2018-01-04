@@ -178,6 +178,10 @@ class Cog:
     def coins(self):
         return self.bot.cogs.get('Coins')
 
+    @property
+    def pool(self):
+        return self.bot.cogs.get('Config').db
+
 
 async def shell(command: str):
     """Execute shell commands."""
