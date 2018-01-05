@@ -868,7 +868,7 @@ class Coins(Cog, requires=['config']):
             t2 = time.monotonic()
 
             delta = round(t2 - t1, 6)
-            await ctx.send(f'{taskcount} tasks completed in {delta:.6} seconds')
+            await ctx.send(f'{taskcount} tasks completed in {delta:.6} sec')
 
             if len(pending):
                 return await ctx.send('Pending tasks > 0, finishing')

@@ -7,6 +7,7 @@ wallets, database connections, authentication, etc
 import logging
 import asyncio
 import decimal
+import time
 
 import asyncpg
 
@@ -17,6 +18,7 @@ import config as jconfig
 from errors import GenericError, AccountNotFoundError, \
         InputError, ConditionError
 
+
 app = Sanic()
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__name__)
@@ -24,6 +26,7 @@ log = logging.getLogger(__name__)
 # constants
 AUTOCOIN_BASE_PROB = decimal.Decimal('0.012')
 PROB_CONSTANT = decimal.Decimal('1.003384590736')
+
 
 class AccountType:
     """Account types."""
@@ -42,7 +45,7 @@ def handle_generic_error(request, exception):
 
 
 @app.get('/')
-async def index(request):
+async def index(_):
     """Give simple index page."""
     return response.text('oof')
 
@@ -50,10 +53,13 @@ async def index(request):
 @app.get('/api/health')
 async def get_status(request) -> response:
     """Simple response."""
-    # Query the DB with 'SELECT 1'
-    # and return time taken
+    t1 = time.monotonic()
+    await request.app.db.fetchrow('SELECT 1')
+    t2 = time.monotonic()
+    delta = round((t2 - t1), 8)
     return response.json({
         'status': True,
+        'db_latency_sec': str(delta),
     })
 
 
@@ -250,6 +256,9 @@ async def wallet_rank(request, wallet_id: int):
     ) AS s WHERE s.account_id = $1
     """, wallet_id)
 
+    if not global_rank:
+        raise AccountNotFoundError('Account not found')
+
     global_rank = global_rank['rank']
 
     res = {
@@ -358,6 +367,8 @@ async def get_wallet_probability(request, wallet_id: int):
     SELECT * FROM wallets
     WHERE user_id=$1
     """, wallet_id)
+    if not wallet:
+        raise AccountNotFoundError('Wallet not found')
     taxpaid = wallet['taxpaid']
 
     prob = AUTOCOIN_BASE_PROB
@@ -489,10 +500,26 @@ async def toggle_hidecoins(request, user_id: int):
         SELECT hidecoins FROM wallets
         WHERE user_id = $1
         """, user_id)
+        if not new_hidecoins:
+            raise AccountNotFoundError('Account not found')
 
         return response.json({
             'new_hidecoins': new_hidecoins['hidecoins']
         })
+
+
+@app.get('/api/wallets/<user_id:int>/hidecoin_status')
+async def hidecoin_status(request, user_id: int):
+    hidecoins = await request.app.db.fetchrow("""
+    SELECT hidecoins FROM wallets
+    WHERE user_id = $1
+    """, user_id)
+    if not hidecoins:
+        raise AccountNotFoundError('Account not found')
+
+    return response.json({
+        'hidden': hidecoins['hidecoins']
+    })
 
 
 async def db_init(app):

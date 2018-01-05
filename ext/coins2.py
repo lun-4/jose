@@ -3,6 +3,8 @@ import asyncio
 import decimal
 import sys
 import pprint
+import time
+import random
 
 import discord
 from discord.ext import commands
@@ -15,6 +17,7 @@ from jcoin.errors import GenericError, AccountNotFoundError, \
         InputError, ConditionError, err_list
 
 log = logging.getLogger(__name__)
+REWARD_COOLDOWN = 1800
 
 
 class TransferError(Exception):
@@ -43,6 +46,12 @@ class Coins2(Cog):
         self.base_url = bot.config.JOSECOIN_API
         self.bot.simple_exc.extend(err_list)
 
+        #: Reward cooldowns are stored here
+        self.rewards = {}
+
+        #: Cache for probability values
+        self.prob_cache = {}
+
     def route(self, route):
         return f'{self.base_url}{route}'
 
@@ -51,7 +60,7 @@ class Coins2(Cog):
         """Generic call to any JoséCoin API route."""
         route = self.route(route)
         async with self.bot.session.request(method, route, json=payload) as r:
-            log.info('calling %s, status code %d', route, r.status)
+            log.debug('calling %s, status %d', route, r.status)
 
             if r.status == 500:
                 raise Exception('Internal Server Error')
@@ -147,7 +156,7 @@ class Coins2(Cog):
 
     async def ensure_ctx(self, ctx):
         try:
-            await self.create_wallet(ctx.bot.user, 'NaN')
+            await self.create_wallet(ctx.bot.user)
         except:
             pass
 
@@ -160,10 +169,19 @@ class Coins2(Cog):
     async def transfer(self, from_id: int, to_id: int,
                        amount: decimal.Decimal) -> dict:
         """Make the transfer call"""
-        return await self.jc_post(f'/wallets/{from_id}/transfer', {
+        res = await self.jc_post(f'/wallets/{from_id}/transfer', {
             'receiver': to_id,
             'amount': str(amount)
         })
+
+        sender_name = self.get_name(from_id)
+        receiver_name = self.get_name(to_id)
+
+        msg = f'{sender_name} > {amount} > {receiver_name}'
+        log.info(msg)
+        log.log(60, msg)
+
+        return res
 
     async def ensure_taxbank(self, ctx):
         """Ensure a taxbank exists for the guild."""
@@ -183,6 +201,58 @@ class Coins2(Cog):
         NOTE: this should be REMOVED once JoséCoin v3 becomes stable.
         """
         pass
+
+    async def on_message(self, message):
+        """Manage autocoin."""
+        # ignore bots and DMs
+        if message.author.bot or not message.guild:
+            return
+
+        author_id = message.author.id
+        guild_id = message.guild.id
+        user_blocked = await self.bot.is_blocked(author_id)
+        guild_blocked = await self.bot.is_blocked_guild(guild_id)
+        if user_blocked or guild_blocked:
+            return
+
+        now = time.monotonic()
+        # TODO: check if user is in jail
+
+        # manage reward cooldowns
+        last_reward = self.rewards.get(author_id, 0)
+        if now < last_reward:
+            return
+
+        # check the user's probability
+        probdata = await self.jc_get(f'/wallets/{author_id}/probability')
+        prob = probdata['probability']
+        log.debug(f'uid {author_id} prob {prob}')
+        prob = 1
+        if random.random() > prob:
+            return
+
+        to_give = round(random.uniform(0, 1.1), 2)
+        if to_give < 0.3:
+            return
+
+        try:
+            await self.transfer(self.bot.user.id,
+                                author_id, to_give)
+
+            self.rewards[author_id] = time.monotonic() + REWARD_COOLDOWN
+            if message.guild.large:
+                return
+
+            hc = await self.jc_get(f'/wallets/{author_id}/hidecoin_status')
+            if hc['hidden']:
+                return
+
+            try:
+                await message.add_reaction('\N{MONEY-MOUTH FACE}')
+            except:
+                log.debug('autocoin failed to add reaction')
+        except:
+            log.exception('autocoin error')
 
     @jc3.command()
     async def account(self, ctx):

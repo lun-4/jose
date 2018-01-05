@@ -224,6 +224,9 @@ class JoseBot(commands.Bot):
                           f'{random.choice(CHECK_FAILURE_PHRASES)}')
 
     async def on_error(self, event_method, *args, **kwargs):
+        # TODO: analyze current exception
+        # and simplify the logging to WARN
+        # if it is on self.simple_exc
         log.exception('Got an error while running the %s event', event_method)
 
     async def on_message(self, message):
