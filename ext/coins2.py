@@ -231,6 +231,10 @@ class Coins2(Cog):
         log.debug(f'popping {user_id} from cache')
         self.prob_cache.pop(user_id)
 
+    def pcache_set(self, author_id: int, value: 'any'):
+        self.prob_cache[author_id] = value
+        self.loop.call_later(7200, self._pcache_invalidate, author_id)
+
     async def on_message(self, message):
         """Manage autocoin."""
         # ignore bots and DMs
@@ -258,10 +262,9 @@ class Coins2(Cog):
                 probdata = self.prob_cache[author_id]
             else:
                 probdata = await self.jc_get(f'/wallets/{author_id}/probability')
-                self.prob_cache[author_id] = probdata
-                self.loop.call_later(7200, self._pcache_invalidate, author_id)
+                self.pcache_set(author_id, probdata)
         except AccountNotFoundError:
-            self.prob_cache[author_id] = None
+            self.pcache_set(author_id, None)
             return
 
         if not probdata:
@@ -269,7 +272,6 @@ class Coins2(Cog):
 
         prob = probdata['probability']
         log.debug(f'uid {author_id} prob {prob}')
-        prob = 1
         if random.random() > prob:
             return
 
