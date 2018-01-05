@@ -23,14 +23,18 @@ CREATE TABLE IF NOT EXISTS members (
 CREATE TABLE IF NOT EXISTS accounts (
        account_id bigint PRIMARY KEY NOT NULL,
        account_type int NOT NULL,
-       amount numeric DEFAULT 0
+       amount money DEFAULT 0
 );
+
+CREATE VIEW account_amount as
+SELECT account_id, account_type, amount::money::numeric::float8
+FROM accounts;
 
 /* only user accounts here */
 CREATE TABLE IF NOT EXISTS wallets (
        user_id bigint NOT NULL REFERENCES accounts (account_id) ON DELETE CASCADE,
 
-       taxpaid numeric DEFAULT 0,
+       taxpaid money DEFAULT 0,
        hidecoins boolean DEFAULT false,
 
        /* for j!steal statistics */
@@ -38,6 +42,9 @@ CREATE TABLE IF NOT EXISTS wallets (
        steal_success int DEFAULT 0
 );
 
+CREATE VIEW wallets_taxpaid as
+SELECT user_id, taxpaid::numeric::float8, hidecoins, steal_uses, steal_success
+FROM wallets;
 
 /* The Log of all transactions */
 CREATE TABLE IF NOT EXISTS transactions (

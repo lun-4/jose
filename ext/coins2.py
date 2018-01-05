@@ -166,6 +166,20 @@ class Coins2(Cog):
         })
         return rank_data
 
+    async def ranks(self, user_id: int, guild: discord.Guild) -> tuple:
+        """Get rank info about a user, gives both global and local.
+        
+        This method is compatible with JoséCoin v2.
+        """
+        rank_data = await self.get_ranks(user_id, guild.id)
+        rdl = rank_data['local']
+        rdg = rank_data['global']
+        return rdl['rank'], rdg['rank'], rdl['total'], rdl['global']
+
+    async def tax_ranks(self, user_id: int) -> tuple:
+        """Get tax ranks for a user"""
+        raise NotImplementedError('method not implemented')
+
     async def transfer(self, from_id: int, to_id: int,
                        amount: decimal.Decimal) -> dict:
         """Make the transfer call"""
@@ -193,6 +207,24 @@ class Coins2(Cog):
             return
         except AccountNotFoundError:
             await self.create_wallet(ctx.guild)
+    
+    async def get_gdp(self) -> decimal.Decimal:
+        """Get the economy's gdp."""
+        gdp = await self.jc_get('/gdp')
+        return decimal.Decimal(gdp['gdp'])
+
+    async def sink(self, user_id: int, amount: decimal.Decimal):
+        """Send money back to José."""
+        return await self.transfer(user_id,
+                                   self.bot.user.id,
+                                   amount)
+
+    async def zero(self, user_id: int):
+        """Zero an account"""
+        account = await self.get_account(user_id)
+        return await self.transfer(user_id,
+                                   self.bot.user.id,
+                                   account['amount'])
 
     @commands.group(hidden=True)
     async def jc3(self, ctx):
@@ -248,7 +280,7 @@ class Coins2(Cog):
                 return
 
             # TODO: uncomment once jc3 is released
-            #hc = await self.jc_get(f'/wallets/{author_id}/hidecoin_status')
+            # hc = await self.jc_get(f'/wallets/{author_id}/hidecoin_status')
             hc = {'hidden': True}
             if hc['hidden']:
                 return
@@ -283,8 +315,8 @@ class Coins2(Cog):
         account = await self.get_account(person.id)
 
         await ctx.send(f'`{self.get_name(person.id)}` > '
-                       f'`{account["amount"]}`, paid '
-                       f'`{account["taxpaid"]}JC` as tax.')
+                       f'`{account["amount"]:.2f}`, paid '
+                       f'`{account["taxpaid"]:.2f}JC` as tax.')
 
     @jc3.command(name='transfer')
     async def _transfer(self, ctx,
@@ -294,14 +326,15 @@ class Coins2(Cog):
             raise self.SayException('Receiver can not be a bot')
 
         await self.transfer(ctx.author.id, receiver.id, amount)
-        await ctx.send(f'\N{MONEY WITH WINGS} {ctx.author!s} > '
-                       f'`{amount}JC` > {receiver!s} \N{MONEY BAG}')
+        await ctx.send(f'\N{MONEY WITH WINGS} `{ctx.author!s}` > '
+                       f'`{amount}JC` > `{receiver!s}` \N{MONEY BAG}')
 
     @jc3.command()
     async def donate(self, ctx, amount: CoinConverter):
         """Donate to the guild's taxbank."""
         await self.transfer(ctx.author.id, ctx.guild.id, amount)
-        await ctx.ok()
+        await ctx.send(f'\N{MONEY WITH WINGS} `{ctx.author!s}` > '
+                       f'`{amount}JC` > `{ctx.guild!s}` \N{MONEY BAG}')
 
     @jc3.command()
     @commands.guild_only()
@@ -313,6 +346,7 @@ class Coins2(Cog):
     @jc3.command()
     async def ping(self, ctx):
         """Check if the JoséCoin API is up."""
+        res = None
         with Timer() as timer:
             try:
                 res = await self.jc_get('/health')
@@ -322,7 +356,7 @@ class Coins2(Cog):
             except:
                 return await ctx.send('Failed to contact the JoséCoin API')
 
-        await ctx.send(f'`{timer}`')
+        await ctx.send(f'`{timer}`, db: `{res["db_latency_sec"]*1000}ms`')
 
     @jc3.command()
     @commands.is_owner()
@@ -376,9 +410,10 @@ class Coins2(Cog):
     @jc3.command()
     async def jcgetraw(self, ctx):
         """Get raw info on your wallet"""
-        wallet = await self.get_account(ctx.author.id)
+        with Timer() as timer:
+            wallet = await self.get_account(ctx.author.id)
         res = pprint.pformat(wallet)
-        await ctx.send(f'```python\n{res}\n```')
+        await ctx.send(f'```python\n{res}\nTook {timer}\n```')
 
     @jc3.command()
     @commands.is_owner()

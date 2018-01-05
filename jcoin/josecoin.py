@@ -27,6 +27,13 @@ log = logging.getLogger(__name__)
 AUTOCOIN_BASE_PROB = decimal.Decimal('0.012')
 PROB_CONSTANT = decimal.Decimal('1.003384590736')
 
+# !!!!! VERY IMPORTANT
+ENCODED_INFINITY = -69
+
+
+def is_inf(decimal):
+    return decimal == ENCODED_INFINITY
+
 
 class AccountType:
     """Account types."""
@@ -59,7 +66,7 @@ async def get_status(request) -> response:
     delta = round((t2 - t1), 8)
     return response.json({
         'status': True,
-        'db_latency_sec': str(delta),
+        'db_latency_sec': delta,
     })
 
 
@@ -71,7 +78,7 @@ async def get_wallet(request, account_id):
     """
     account = await request.app.db.fetchrow("""
     SELECT account_id, account_type, amount
-    FROM accounts
+    FROM account_amount
     WHERE account_id = $1
     """, account_id)
 
@@ -79,14 +86,10 @@ async def get_wallet(request, account_id):
         raise AccountNotFoundError('Account not found')
 
     daccount = dict(account)
-
-    if account['amount'].is_nan():
-        daccount['amount'] = 'nan'
-
     if account['account_type'] == AccountType.USER:
         wallet = await request.app.db.fetchrow("""
         SELECT taxpaid, steal_uses, steal_success
-        FROM wallets
+        FROM wallets_taxpaid
         WHERE user_id=$1
         """, account_id)
 
@@ -137,11 +140,12 @@ async def transfer(request, sender_id):
     except:
         raise InputError('Error rounding.')
 
-    if amount < 0.0009:
+    if amount < 0.01:
         raise InputError('Negative amounts are not allowed')
 
+    # NOTE: this uses the view
     accs = await request.app.db.fetch("""
-    SELECT * FROM accounts
+    SELECT * FROM account_amount
     WHERE account_id=$1 or account_id=$2
     """, sender_id, receiver_id)
 
@@ -157,13 +161,14 @@ async def transfer(request, sender_id):
     if not receiver:
         raise AccountNotFoundError('Receiver is missing account')
 
-    sender_amount = decimal.Decimal(sender['amount'])
-    if not sender_amount.is_nan() and amount > sender_amount:
-        raise ConditionError(f'Not enough funds: {amount} > {sender_amount}')
+    snd_amount = sender['amount']
+    if not is_inf(snd_amount) and amount > snd_amount:
+        raise ConditionError(f'Not enough funds: {amount} > {snd_amount}')
 
+    amount = str(amount)
     async with request.app.db.acquire() as conn, conn.transaction():
         # send it back to db
-        if not sender_amount.is_nan():
+        if not is_inf(snd_amount):
             await conn.execute("""
             UPDATE accounts
             SET amount=accounts.amount - $1
@@ -190,9 +195,12 @@ async def transfer(request, sender_id):
             VALUES ($1, $2, $3)
         """, sender_id, receiver_id, amount)
 
+    einf = str(ENCODED_INFINITY)
+    # yes, we go back and forth.
+    amount = float(amount)
     return response.json({
-        'sender_amount': 'nan' if sender_amount.is_nan() else sender_amount - amount,
-        'receiver_amount': 'nan' if receiver['amount'].is_nan() else receiver['amount'] + amount
+        'sender_amount': einf if is_inf(snd_amount) else snd_amount - amount,
+        'receiver_amount': einf if is_inf(receiver['amount']) else receiver['amount'] + amount
     })
 
 
@@ -301,7 +309,7 @@ async def getsum(request, acc_type: int) -> decimal.Decimal:
     specific account type."""
 
     resp = await request.app.db.fetchrow("""
-    SELECT SUM(amount) FROM accounts WHERE account_type=$1
+    SELECT SUM(amount)::numeric FROM accounts WHERE account_type=$1
     """, acc_type)
     return resp['sum']
 
@@ -317,7 +325,7 @@ async def get_count(request, acc_type: int) -> int:
 async def get_gdp(request):
     """Get the GDP (sum of all account amounts) in the economy"""
     resp = await request.app.db.fetchrow("""
-    SELECT SUM(amount) FROM accounts;
+    SELECT SUM(amount)::numeric FROM accounts;
     """)
     return resp['sum']
 
@@ -364,7 +372,7 @@ async def get_gdp_handler(request):
 @app.get('/api/wallets/<wallet_id:int>/probability')
 async def get_wallet_probability(request, wallet_id: int):
     wallet = await request.app.db.fetchrow("""
-    SELECT * FROM wallets
+    SELECT taxpaid FROM wallets_taxpaid
     WHERE user_id=$1
     """, wallet_id)
     if not wallet:
@@ -374,6 +382,7 @@ async def get_wallet_probability(request, wallet_id: int):
     prob = AUTOCOIN_BASE_PROB
 
     # Based on the tax paid.
+    taxpaid = decimal.Decimal(taxpaid)
     if taxpaid >= 50:
         raised = pow(PROB_CONSTANT, taxpaid)
         prob += round(raised / 100, 5)
@@ -382,7 +391,7 @@ async def get_wallet_probability(request, wallet_id: int):
         prob = 0.042
 
     return response.json({
-        'probability': prob,
+        'probability': str(prob),
     })
 
 
