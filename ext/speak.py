@@ -261,8 +261,6 @@ class Speak(Cog):
         try:
             await self.coins.sink(account['id'], SENTENCE_PRICE)
         except self.coins.TransferError as err:
-            log.exception('Ignoring error on sentence tax')
-
             # we retry, doing the taxbank instead of user
             # or user instead of taxbank
 
