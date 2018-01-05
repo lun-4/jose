@@ -271,7 +271,6 @@ class Coins2(Cog):
             return
 
         prob = probdata['probability']
-        log.debug(f'uid {author_id} prob {prob}')
         if random.random() > prob:
             return
 
