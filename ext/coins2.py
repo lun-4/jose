@@ -247,7 +247,9 @@ class Coins2(Cog):
             if message.guild.large:
                 return
 
-            hc = await self.jc_get(f'/wallets/{author_id}/hidecoin_status')
+            # TODO: uncomment once jc3 is released
+            #hc = await self.jc_get(f'/wallets/{author_id}/hidecoin_status')
+            hc = {'hidden': True}
             if hc['hidden']:
                 return
 
