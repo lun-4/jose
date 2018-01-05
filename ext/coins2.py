@@ -226,13 +226,10 @@ class Coins2(Cog):
                                    self.bot.user.id,
                                    account['amount'])
 
-    @commands.group(hidden=True)
-    async def jc3(self, ctx):
-        """Main command group for JoséCoin v3 commands.
-
-        NOTE: this should be REMOVED once JoséCoin v3 becomes stable.
-        """
-        pass
+    def _pcache_invalidate(self, user_id: int):
+        """Invalidate the prob cache after 2 hours for one user."""
+        log.debug(f'popping {user_id} from cache')
+        self.prob_cache.pop(user_id)
 
     async def on_message(self, message):
         """Manage autocoin."""
@@ -257,7 +254,12 @@ class Coins2(Cog):
 
         # check the user's probability
         try:
-            probdata = await self.jc_get(f'/wallets/{author_id}/probability')
+            if author_id in self.prob_cache:
+                probdata = self.prob_cache[author_id]
+            else:
+                probdata = await self.jc_get(f'/wallets/{author_id}/probability')
+                self.prob_cache[author_id] = probdata
+                self.loop.call_later(7200, self._pcache_invalid, author_id)
         except AccountNotFoundError:
             return
 
@@ -291,6 +293,14 @@ class Coins2(Cog):
                 log.debug('autocoin failed to add reaction')
         except:
             log.exception('autocoin error')
+
+    @commands.group(hidden=True)
+    async def jc3(self, ctx):
+        """Main command group for JoséCoin v3 commands.
+
+        NOTE: this should be REMOVED once JoséCoin v3 becomes stable.
+        """
+        pass
 
     @jc3.command()
     async def account(self, ctx):
