@@ -271,6 +271,7 @@ class Coins2(Cog):
             return
 
         prob = probdata['probability']
+        prob = float(prob)
         if random.random() > prob:
             return
 
