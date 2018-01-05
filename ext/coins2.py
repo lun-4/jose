@@ -259,8 +259,12 @@ class Coins2(Cog):
             else:
                 probdata = await self.jc_get(f'/wallets/{author_id}/probability')
                 self.prob_cache[author_id] = probdata
-                self.loop.call_later(7200, self._pcache_invalid, author_id)
+                self.loop.call_later(7200, self._pcache_invalidate, author_id)
         except AccountNotFoundError:
+            self.prob_cache[author_id] = None
+            return
+
+        if not probdata:
             return
 
         prob = probdata['probability']
