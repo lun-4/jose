@@ -224,7 +224,11 @@ class Coins2(Cog):
             return
 
         # check the user's probability
-        probdata = await self.jc_get(f'/wallets/{author_id}/probability')
+        try:
+            probdata = await self.jc_get(f'/wallets/{author_id}/probability')
+        except AccountNotFoundError:
+            return
+
         prob = probdata['probability']
         log.debug(f'uid {author_id} prob {prob}')
         prob = 1
