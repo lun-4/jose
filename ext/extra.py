@@ -128,7 +128,7 @@ class Extra(Cog, requires=['config']):
         if person is None:
             person = ctx.author
 
-        url = person.avatar_url.replace('webp', 'png')
+        url = person.avatar_url_as(static_format='png')
         if 'gif' in url:
             url = f'{url}&discord_is_buggy_af=.gif'
 
