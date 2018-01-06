@@ -53,10 +53,12 @@ class Config(Cog):
     async def pg_init(self):
         self.db = await asyncpg.create_pool(**self.bot.config.postgres)
 
-    def cfg_default(self, guild_id: int) -> dict:
+    def cfg_default(self, guild: int) -> dict:
         """Default configuration object for a guild"""
+        if isinstance(guild, discord.Guild):
+            guild = guild.id
         return {
-            'guild_id': guild_id,
+            'guild_id': guild,
             'botblock': True,
             'speak_channel': None,
             'prefix': self.bot.config.prefix,
