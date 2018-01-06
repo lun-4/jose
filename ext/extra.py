@@ -294,7 +294,7 @@ class Extra(Cog, requires=['config']):
         if description is not None:
             em.add_field(name='Description', value=description)
 
-        delta = datetime.datetime.now() - user.created_at
+        delta = datetime.datetime.utcnow() - user.created_at
         em.add_field(name='Account age',
                      value=f'{self.delta_str(delta)}')
 
