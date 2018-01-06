@@ -45,6 +45,7 @@ class Coins2(Cog):
         super().__init__(bot)
         self.base_url = bot.config.JOSECOIN_API
         self.bot.simple_exc.extend(err_list)
+        self.transfers_done = 0
 
         #: Reward cooldowns are stored here
         self.rewards = {}
@@ -191,6 +192,7 @@ class Coins2(Cog):
         sender_name = self.get_name(from_id)
         receiver_name = self.get_name(to_id)
 
+        self.transfers_done += 1
         msg = f'{sender_name} > {amount} > {receiver_name}'
         log.info(msg)
         log.log(60, msg)
@@ -497,6 +499,37 @@ class Coins2(Cog):
         result = result['new_hidecoins']
         resultstr = 'on' if result else 'off'
         await ctx.send(f'no reactions are set to `{resultstr}` for you.')
+
+    @jc3.command()
+    async def jcstats(self, ctx):
+        """Get josécoin stats"""
+        em = discord.Embed(title='josécoin stats',
+                           color=discord.Color.gold())
+
+        stats = await self.jc_get('/stats')
+
+        em.add_field(name='total transfers currently',
+                     value=self.transfers_done)
+
+        em.add_field(name='total accounts',
+                     value=stats['accounts'])
+        em.add_field(name='total user accounts',
+                     value=stats['user_accounts'])
+        em.add_field(name='total taxbanks',
+                     value=stats['txb_accounts'])
+
+        em.add_field(name='total money',
+                     value=stats['gdp'])
+        em.add_field(name='total user money',
+                     value=stats['user_money'])
+        em.add_field(name='total taxbank money',
+                     value=stats['txb_money'])
+
+        em.add_field(name='total steals done',
+                     value=stats['steals'])
+        em.add_field(name='total steal success',
+                     value=stats['success'])
+        await ctx.send(embed=em)
 
 
 def setup(bot):

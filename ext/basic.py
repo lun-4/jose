@@ -43,6 +43,7 @@ class Basic(Cog):
                 await (await self.bot.ws.ping())
                 t2 = time.monotonic()
                 self.wsping = t2 - t1
+                await asyncio.sleep(10)
         except asyncio.CancelledError:
             pass
         except:
@@ -54,9 +55,10 @@ class Basic(Cog):
 
         Meaning of the data:
          - ws: time taken to send a PING frame and receive
-            a PONG frame in return (should always be faster than gateway)
+            a PONG frame in return
 
          - rtt: time taken to send a message in discord.
+
          - gateway: time taken to send a HEARTBEAT
             packet and receive an HEARTBEAT ACK in return.
 
