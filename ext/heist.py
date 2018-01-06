@@ -222,7 +222,7 @@ class JoinSession:
 
         self.heist.sessions.pop(self.id)
         await self.ctx.send(f'{self.fmt_res(res)} Transferred {self.fine} to all {len(self.users)} users of the session')
-        await self.target_send(f'Your taxbank got stolen from a heist, the thiefs got {self.fine}JC')
+        await self.target_send(f'Your taxbank got stolen from a heist, the thieves got {self.fine}JC')
 
     async def force_finish(self) -> 'any':
         """Force the join session to finish
