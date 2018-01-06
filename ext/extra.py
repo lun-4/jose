@@ -128,7 +128,11 @@ class Extra(Cog, requires=['config']):
         if person is None:
             person = ctx.author
 
-        await ctx.send(person.avatar_url.replace('webp', 'png'))
+        url = person.avatar_url.replace('webp', 'png')
+        if 'gif' in url:
+            url = f'{url}&discord_is_buggy_af=.gif'
+
+        await ctx.send(url)
 
     @commands.command()
     async def xkcd(self, ctx, number: str = ''):
