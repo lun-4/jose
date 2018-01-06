@@ -194,7 +194,7 @@ class Basic(Cog):
         guild = ctx.guild
 
         em = discord.Embed(title='', colour=discord.Colour.magenta())
-        em.timestamp = datetime.datetime.now()
+        em.timestamp = datetime.datetime.utcnow()
         em.set_footer(text='Feedback Report')
         em.set_author(name=str(author), icon_url=author.avatar_url or
                       author.default_avatar_url)

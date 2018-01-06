@@ -48,7 +48,7 @@ class Moderation(Cog):
         }
 
     def account_age(self, t):
-        now = datetime.datetime.now()
+        now = datetime.datetime.utcnow()
         return str(now - t)
 
     async def modcfg_get(self, guild, field=None):
@@ -97,7 +97,7 @@ class Moderation(Cog):
         log.debug('[modlog] Logging removal of %r', member)
 
         em = discord.Embed(title='Member Remove', colour=discord.Colour.red())
-        em.timestamp = datetime.datetime.now() 
+        em.timestamp = datetime.datetime.utcnow() 
 
         em.set_footer(text='Created')
         em.set_author(name=str(member), icon_url=member.avatar_url or member.default_avatar_url)
