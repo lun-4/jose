@@ -416,17 +416,33 @@ async def get_wallets(request):
     except:
         limit = 20
 
+    try:
+        acc_type = int(request.json['type'])
+    except:
+        acc_type = -1
+
     if limit <= 0 or limit > 30:
         raise InputError('invalid limit range')
 
     query = ''
+
+    # very ugly hack
+    acc_type_str = {
+        AccountType.USER: f'accounts.account_type={AccountType.USER}',
+        AccountType.TAXBANK: f'accounts.account_type={AccountType.TAXBANK}',
+    }.get(acc_type, '')
+
+    acc_type_str_w = ''
+    if acc_type_str:
+        acc_type_str_w = f'WHERE {acc_type_str}'
+
     args = [guild_id]
 
     if key == 'local':
         query = f"""
-        SELECT * FROM accounts
+        SELECT * FROM account_amount
 
-        JOIN members ON accounts.account_id = members.user_id
+        JOIN members ON account_amount.account_id = members.user_id
         WHERE members.guild_id = $1
 
         ORDER BY amount {sorting}
@@ -434,23 +450,27 @@ async def get_wallets(request):
         """
     elif key == 'global':
         query = f"""
-        SELECT * FROM accounts
+        SELECT * FROM account_amount
+        {acc_type_str_w}
+
         ORDER BY amount {sorting}
         LIMIT {limit}
         """
         args = []
     elif key == 'taxpaid':
         query = f"""
-        SELECT * FROM wallets
-        JOIN accounts ON accounts.account_id = wallets.user_id
+        SELECT * FROM wallets_taxpaid
+        JOIN accounts ON account_amount.account_id = wallets_taxpaid.user_id
+
         ORDER BY taxpaid {sorting}
         LIMIT {limit}
         """
         args = []
     elif key == 'taxbanks':
         query = f"""
-        SELECT * FROM accounts
+        SELECT * FROM account_amount
         WHERE account_type={AccountType.TAXBANK}
+
         ORDER BY amount {sorting}
         LIMIT {limit}
         """

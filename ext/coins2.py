@@ -67,7 +67,7 @@ class Coins2(Cog):
                 raise Exception('Internal Server Error')
 
             p = await r.json()
-            if p.get('error'):
+            if isinstance(p, dict) and p.get('error'):
                 for exc in err_list:
                     if exc.status_code == r.status:
                         raise exc(p['message'])

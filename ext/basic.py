@@ -26,37 +26,11 @@ class Basic(Cog):
         super().__init__(bot)
         self.process = psutil.Process(os.getpid())
 
-        self.wsping = None
-        self._wstask = None
-
-    def __unload(self):
-        if self._wstask:
-            self._wstask.cancel()
-
-    async def on_ready(self):
-        self._wstask = self.bot.loop.create_task(self.wstask())
-
-    async def wstask(self):
-        try:
-            while True:
-                t1 = time.monotonic()
-                await (await self.bot.ws.ping())
-                t2 = time.monotonic()
-                self.wsping = t2 - t1
-                await asyncio.sleep(10)
-        except asyncio.CancelledError:
-            pass
-        except:
-            log.exception('error at websocket ping task')
-
     @commands.command(aliases=['p'])
     async def ping(self, ctx):
         """Ping.
 
         Meaning of the data:
-         - ws: time taken to send a PING frame and receive
-            a PONG frame in return
-
          - rtt: time taken to send a message in discord.
 
          - gateway: time taken to send a HEARTBEAT
@@ -71,14 +45,7 @@ class Basic(Cog):
 
         rtt = (t2 - t1) * 1000
         gw = self.bot.latency * 1000
-
-        if not self.wsping:
-            await m.edit(content=f'incomplete information! rtt: `{rtt:.1f}ms`, gateway: `{gw:.1f}ms`')
-            return
-
-        ws = self.wsping * 1000
-
-        await m.edit(content=f'ws: `{ws:.1f}ms`, rtt: `{rtt:.1f}ms`, gateway: `{gw:.1f}ms`')
+        await m.edit(content=f'rtt: `{rtt:.1f}ms`, gateway: `{gw:.1f}ms`')
 
     @commands.command(aliases=['rand'])
     async def random(self, ctx, n_min: int, n_max: int):
