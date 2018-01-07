@@ -241,13 +241,13 @@ class Config(Cog):
         """Get a reason for a block if it exists"""
         userblock = await self.block_coll.find_one({'user_id': anything_id})
         if userblock is not None:
-            e = discord.Embed(title='User blocked', color=discord.Color.red)
+            e = discord.Embed(title='User blocked', color=discord.Color.red())
             e.description = f'<@{anything_id}> - `{userblock.get("reason")}`'
             return await ctx.send(embed=e)
 
         guildblock = await self.block_coll.find_one({'guild_id': anything_id})
         if guildblock is not None:
-            e = discord.Embed(title='Guild blocked', color=discord.Color.red)
+            e = discord.Embed(title='Guild blocked', color=discord.Color.red())
             e.description = f'why? `{userblock.get("reason")}`'
             return await ctx.send(embed=e)
 
