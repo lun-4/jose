@@ -397,28 +397,36 @@ class Coins2(Cog):
 
         async with db.acquire() as conn:
             acc_stmt = await conn.prepare("""
-            INSERT INTO accounts (account_id, account_type, amount)
-            VALUES ($1, $2, $3)
+            INSERT INTO account_amount
+            (account_id, account_type, amount)
+            VALUES
+            ($1, $2, $3)
             """)
 
             user_stmt = await conn.prepare("""
-            INSERT INTO wallets (user_id, taxpaid, steal_uses, steal_success)
-            VALUES ($1, $2, $3, $4)
+            INSERT INTO wallets_taxpaid
+            (user_id, taxpaid,steal_uses, steal_success)
+            VALUES
+            ($1, $2, $3, $4)
             """)
 
             ucount, acount = 0, 0
             async for account in cur:
                 atype = account['type']
+
+                # fug
                 acc_da = decimal.Decimal(account['amount'])
+                acc_da = float(acc_da)
                 as_int = AccountType.USER if atype == 'user' \
                     else AccountType.TAXBANK
 
-                if acc_da.is_infinite():
-                    acc_da = decimal.Decimal('NaN')
-
+                if acc_da == float('inf'):
+                    acc_da = -69.0
+                
                 await acc_stmt.fetchval(account['id'], as_int, acc_da)
                 if as_int == AccountType.USER:
                     acc_dt = decimal.Decimal(account['taxpaid'])
+                    acc_dt = float(acc_dt)
                     await user_stmt.fetchval(account['id'], acc_dt,
                                              account['times_stolen'],
                                              account['success_steal'])
