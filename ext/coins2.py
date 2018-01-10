@@ -400,14 +400,14 @@ class Coins2(Cog):
             INSERT INTO account_amount
             (account_id, account_type, amount)
             VALUES
-            ($1, $2, $3)
+            ($1, $2, $3::numeric::money)
             """)
 
             user_stmt = await conn.prepare("""
             INSERT INTO wallets_taxpaid
-            (user_id, taxpaid,steal_uses, steal_success)
+            (user_id, taxpaid, steal_uses, steal_success)
             VALUES
-            ($1, $2, $3, $4)
+            ($1, $2::numeric::money, $3, $4)
             """)
 
             ucount, acount = 0, 0
@@ -416,17 +416,15 @@ class Coins2(Cog):
 
                 # fug
                 acc_da = decimal.Decimal(account['amount'])
-                acc_da = float(acc_da)
                 as_int = AccountType.USER if atype == 'user' \
                     else AccountType.TAXBANK
 
                 if acc_da == float('inf'):
-                    acc_da = -69.0
+                    acc_da = decimal.Decimal('-69')
                 
                 await acc_stmt.fetchval(account['id'], as_int, acc_da)
                 if as_int == AccountType.USER:
                     acc_dt = decimal.Decimal(account['taxpaid'])
-                    acc_dt = float(acc_dt)
                     await user_stmt.fetchval(account['id'], acc_dt,
                                              account['times_stolen'],
                                              account['success_steal'])
