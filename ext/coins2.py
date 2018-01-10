@@ -397,14 +397,14 @@ class Coins2(Cog):
 
         async with db.acquire() as conn:
             acc_stmt = await conn.prepare("""
-            INSERT INTO account_amount
+            INSERT INTO accounts
             (account_id, account_type, amount)
             VALUES
             ($1, $2, $3::numeric::money)
             """)
 
             user_stmt = await conn.prepare("""
-            INSERT INTO wallets_taxpaid
+            INSERT INTO wallets
             (user_id, taxpaid, steal_uses, steal_success)
             VALUES
             ($1, $2::numeric::money, $3, $4)
