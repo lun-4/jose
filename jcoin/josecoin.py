@@ -54,7 +54,35 @@ def handle_generic_error(request, exception):
 @app.get('/')
 async def index(_):
     """Give simple index page."""
-    return response.text('oof')
+    return response.text('josecoin v3 haha ye')
+
+
+@app.middleware('request')
+async def request_check(request):
+    """Check the client token and deny if possible."""
+    try:
+        token = request.headers['Authorization']
+    except KeyError:
+        return response.json({
+            'error': 'no token provided'
+        }, status=403)
+
+    row = await request.app.db.fetchrow("""
+    SELECT client_id, client_name, auth_level FROM clients
+    WHERE token=$1
+    """, token)
+
+    if row is None:
+        log.info('token not found')
+        return response.json({
+            'error': 'unauthorized'
+        }, status=403)
+
+    client_id = row['client_id']
+    client_name = row['client_name']
+    auth_level = row['auth_level']
+
+    log.info(f'id={client_id} name={client_name} level={auth_level}')
 
 
 @app.get('/api/health')

@@ -56,11 +56,21 @@ class Coins2(Cog):
     def route(self, route):
         return f'{self.base_url}{route}'
 
+    @property
+    def headers(self):
+        return {
+            'Authorization': self.bot.config.JOSECOIN_TOKEN
+        }
+
     async def generic_call(self, method: str, route: str,
                            payload: dict = None) -> 'any':
         """Generic call to any JoséCoin API route."""
         route = self.route(route)
-        async with self.bot.session.request(method, route, json=payload) as r:
+        headers = self.headers
+        async with self.bot.session.request(method,
+                                            route,
+                                            json=payload,
+                                            headers=headers) as r:
             log.debug('calling %s, status %d', route, r.status)
 
             if r.status == 500:
@@ -71,6 +81,7 @@ class Coins2(Cog):
                 for exc in err_list:
                     if exc.status_code == r.status:
                         raise exc(p['message'])
+                raise Exception(p['message'])
             return p
 
     async def jc_get(self, route: str, payload: dict = None) -> 'any':
@@ -371,8 +382,8 @@ class Coins2(Cog):
                 up = res['status']
                 if not up:
                     return await ctx.send('JoséCoin API is not ok.')
-            except:
-                return await ctx.send('Failed to contact the JoséCoin API')
+            except Exception as e:
+                return await ctx.send(f'Failed to contact JoséCoin API {e!r}')
 
         await ctx.send(f'`{timer}`, db: `{res["db_latency_sec"]*1000}ms`')
 

@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS clients (
        /* Clients connecting to the API should use a token. */
-       client_id serial PRIMARY KEY,
+       client_id text PRIMARY KEY,
        token text NOT NULL,
        client_name text NOT NULL,
        description text DEFAULT 'no description',
@@ -52,7 +52,9 @@ CREATE TABLE IF NOT EXISTS transactions (
        transferred_at timestamp without time zone default now(),
        sender bigint NOT NULL REFERENCES accounts (account_id) ON DELETE RESTRICT,
        receiver bigint NOT NULL REFERENCES accounts (account_id) ON DELETE RESTRICT,
-       amount numeric NOT NULL
+       amount numeric NOT NULL,
+       /* so we can search for description='steal', or something */
+       description text DEFAULT 'transfer'
 );
 
 /* If we want, we *could* group transactions */
