@@ -62,11 +62,57 @@ class CoinsExt2(Cog, requires=['coins2']):
             accounts = await self.coins2.jc_get('/wallets', {
                 'key': 'global',
                 'reverse': True,
-                'type': AccountType.USER
+                'type': AccountType.USER,
+                'limit': limit,
             })
-            await self.show(ctx, accounts, limit=limit)
+        elif mode == 'l':
+            accounts = await self.coins2.jc_get('/wallets', {
+                'key': 'local',
+                'guild_id': ctx.guild.id,
+                'reverse': True,
+                'limit': 'limit'
+            })
+        elif mode == 't':
+            accounts = await self.coins2.jc_get('/wallets', {
+                'key': 'taxpaid',
+                'reverse': True,
+                'limit': limit,
+            })
+        elif mode == 'b':
+            accounts = await self.coins2.jc_get('/wallets', {
+                'key': 'taxbanks',
+                'reverse': True,
+                'limit': limit,
+            })
+        elif mode == 'p':
+            accounts = await self.coins2.jc_get('/wallets', {
+                'key': 'global',
+                'type': AccountType.USER,
+                'limit': limit,
+            })
+        elif mode == 'lp':
+            accounts = await self.coins2.jc_get('/wallets', {
+                'key': 'local',
+                'guild_id': ctx.guild.id,
+                'limit': limit,
+            })
         else:
             raise self.SayException('mode not found')
+
+        await self.show(ctx, accounts)
+
+    @commands.command(name='jc3prices')
+    async def _prices(self, ctx):
+        raise NotImplementedError('not implemented')
+
+    @commands.command(name='jc3taxes')
+    @commands.guild_only()
+    async def taxes(self, ctx):
+        raise NotImplementedError('not implemented')
+
+    @commands.command(name='jc3deadtxb')
+    async def deadtxb(self, ctx):
+        raise NotImplementedError('not implemented')
 
 
 def setup(bot):

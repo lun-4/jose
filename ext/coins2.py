@@ -17,7 +17,7 @@ from jcoin.errors import GenericError, AccountNotFoundError, \
         InputError, ConditionError, err_list
 
 log = logging.getLogger(__name__)
-REWARD_COOLDOWN = 1800
+REWARD_COOLDOWN = 18000
 
 
 class TransferError(Exception):
