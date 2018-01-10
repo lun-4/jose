@@ -456,8 +456,9 @@ async def get_wallets(request):
 
     # very ugly hack
     acc_type_str = {
-        AccountType.USER: f'accounts.account_type={AccountType.USER}',
-        AccountType.TAXBANK: f'accounts.account_type={AccountType.TAXBANK}',
+        AccountType.USER: f'account_amount.account_type={AccountType.USER}',
+        AccountType.TAXBANK: 'account_amount.account_type'
+                             f'={AccountType.TAXBANK}',
     }.get(acc_type, '')
 
     acc_type_str_w = ''
