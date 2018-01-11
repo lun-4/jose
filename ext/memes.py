@@ -2,6 +2,7 @@ import random
 import string
 import urllib.parse
 import asyncio
+import re
 
 import discord
 import pymongo
@@ -366,10 +367,20 @@ class Memes(Cog):
         await ctx.send(embed=embed)
 
     @commands.command()
-    async def owo(self, ctx, *, not_owo: str):
-        """owo-ify"""
-        owo = not_owo.replace('l', 'w')
-        await ctx.send(f'owo {owo}')
+    async def owo(self, ctx, *, text: commands.clean_content):
+        """hewwo!!"""
+        replacement_table = {
+            r'[rl]': 'w',
+            r'[RL]': 'W',
+            r'n([aeiou])': 'ny\\1',
+            r'N([aeiou])': 'Ny\\1',
+            r'ove': 'uv'
+        }
+
+        for regex, replace_with in replacement_table.items():
+            text = re.sub(regex, replace_with, text)
+
+        await ctx.send(text)
 
     @commands.command()
     async def nya(self, ctx, *, not_nya: str):
