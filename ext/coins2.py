@@ -143,10 +143,10 @@ class Coins2(Cog):
     async def get_account(self, wallet_id: int) -> dict:
         """Get an account"""
         r = await self.jc_get(f'/wallets/{wallet_id}')
-        r['amount'] = decimal.Decimal(r['amount'])
+        r['amount'] = decimal.Decimal(f'{r["amount"]:.3f}')
         try:
-            r['taxpaid'] = decimal.Decimal(r['taxpaid'])
-        except:
+            r['taxpaid'] = decimal.Decimal(f'{r["taxpaid"]:.3f}')
+        except KeyError:
             pass
         return r
 

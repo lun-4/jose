@@ -545,8 +545,8 @@ class CoinsExt(Cog, requires=['coins']):
                 steals += account['times_stolen']
                 success += account['success_steal']
 
-        #usermoney = round(usermoney, 3)
-        #taxmoney = round(taxmoney, 3)
+        # usermoney = round(usermoney, 3)
+        # taxmoney = round(taxmoney, 3)
 
         em.add_field(name='Steals',
                      value=f'{steals} steals, {success} successes')

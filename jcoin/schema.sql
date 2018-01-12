@@ -63,3 +63,24 @@ CREATE TABLE IF NOT EXISTS blockchain (
        blockstamp timestamp without time zone,
        block_data jsonb
 );
+
+
+/* Steal related stuff */
+CREATE TYPE cooldown_type AS ENUM ('prison', 'points')
+
+CREATE TABLE IF NOT EXISTS steal_points (
+    user_id bigint NOT NULL REFERENCES accounts (account_id),
+    points int NOT NULL DEFAULT 3,
+    primary key (user_id)
+);
+
+CREATE TABLE IF NOT EXISTS steal_cooldown (
+    user_id bigint NOT NULL REFERENCES accounts (account_id),
+    ctype cooldown_type NOT NULL,
+    finish timestamp without time zone default now(),
+    primary key (user_id, ctype)
+);
+
+CREATE VIEW steal_state as
+SELECT (steal_points.user_id, points, steal_cooldown.cooldown_type, steal_cooldown.finish) FROM steal_points
+JOIN steal_cooldown ON steal_points.user_id = steal_cooldown.user_id;
