@@ -63,9 +63,10 @@ class Basic(Cog):
     @commands.command(aliases=['choose', 'choice'])
     async def pick(self, ctx, *choices: commands.clean_content):
         """Pick a random element."""
-        if len(choices) < 1:
-            await ctx.send("dude what")
-            return
+        choices = set(choices)
+        if len(choices) <= 1:
+            return await ctx.send("dude what")
+        choices = list(choices)
 
         await ctx.send(random.choice(choices))
 
