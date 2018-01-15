@@ -1,4 +1,5 @@
 import logging
+import datetime
 
 import discord
 from discord.ext import commands
@@ -13,6 +14,15 @@ log = logging.getLogger(__name__)
 # 9 hours for point regen
 DEFAULT_ARREST = 6
 DEFAULT_REGEN = 9
+
+
+class CooldownTypes:
+    prison = 0
+    points = 1
+
+
+class CooldownError(Exception):
+    pass
 
 
 class CoinsExt2(Cog, requires=['coins2']):
@@ -127,24 +137,59 @@ class CoinsExt2(Cog, requires=['coins2']):
         """
 
         c_type = 'prison' if c_type == 0 else 'points'
-        await self.pool.execute("""
-        INSERT INTO steal_cooldowns (user_id, ctype, finish)
-        VALUES ($1, $2, now() + interval $3)
-        """, user.id, c_type, f'{hours} hours')
+        await self.pool.execute(f"""
+        INSERT INTO steal_cooldown (user_id, ctype, finish)
+        VALUES ($1, $2, now() + interval '{hours} hours')
+        """, user.id, c_type)
 
-    async def remove_cooldown(self, user_id, c_type):
+    async def remove_cooldown(self, user, c_type: CooldownTypes):
         """Remove a cooldown from a user.
         
         This resets the user's steal points if we are
         removing a type 1 cooldown.
         """
-        pass
+        user_id = user.id
+        _ctype = 'points' if c_type == CooldownTypes.points else 'prison'
+        res = await self.pool.execute("""
+        DELETE FROM steal_cooldown
+        WHERE user_id=$1 AND ctype=$2
+        """, user_id, _ctype)
 
-    async def check_cooldowns(self, ctx):
+        _, deleted = res.split()
+        deleted = int(deleted)
+        if deleted and c_type == CooldownTypes.points:
+            await self.pool.execute("""
+            UPDATE steal_points
+            SET points=3
+            WHERE user_id=$1
+            """, user_id)
+
+    async def check_cooldowns(self, thief):
         """Check if the current thief is with its cooldowns
         checked up.
         """
-        pass
+        now = datetime.datetime.utcnow()
+        cooldowns = await self.pool.fetch("""
+        SELECT * FROM steal_cooldown
+        WHERE user_id=$1
+        """, thief.id)
+
+        for cooldown in cooldowns:
+            c_type, c_finish = cooldown['ctype'], cooldown['finish']
+            if now >= c_finish:
+                await self.remove_cooldown(thief.id, c_type)
+                continue
+
+            # in the case the cooldown isnt finished
+            remaining = c_finish - now
+            if c_type == 'prison':
+                raise self.SayException('\N{POLICE CAR} You are still in '
+                                        f'prison, wait {remaining} hours')
+
+            elif c_type == 'points':
+                raise self.SayException('\N{DIAMOND SHAPE WITH A DOT INSIDE}'
+                                        ' You are waiting for steal points.'
+                                        f'Wait {remaining} hours')
 
     async def check_grace(self, target: discord.User):
         """Check if the target is in grace period."""
