@@ -81,6 +81,11 @@ CREATE TABLE IF NOT EXISTS steal_cooldown (
     primary key (user_id, ctype)
 );
 
+CREATE TABLE IF NOT EXISTS steal_grace (
+    user_id bigint NOT NULL PRIMARY KEY,
+    finish timestamp without time zone default now()
+);
+
 CREATE VIEW steal_state as
 SELECT (steal_points.user_id, points, steal_cooldown.cooldown_type, steal_cooldown.finish) FROM steal_points
 JOIN steal_cooldown ON steal_points.user_id = steal_cooldown.user_id;

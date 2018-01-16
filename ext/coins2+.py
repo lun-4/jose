@@ -1,5 +1,6 @@
 import logging
 import datetime
+import decimal
 
 import discord
 from discord.ext import commands
@@ -170,7 +171,7 @@ class CoinsExt2(Cog, requires=['coins2']):
         """
         now = datetime.datetime.utcnow()
         cooldowns = await self.pool.fetch("""
-        SELECT * FROM steal_cooldown
+        SELECT ctype, finish FROM steal_cooldown
         WHERE user_id=$1
         """, thief.id)
 
@@ -193,19 +194,54 @@ class CoinsExt2(Cog, requires=['coins2']):
 
     async def check_grace(self, target: discord.User):
         """Check if the target is in grace period."""
-        pass
+        now = datetime.datetime.utcnow()
+        grace = await self.pool.fetchrow("""
+        SELECT grace FROM steal_grace
+        WHERE user_id = $1
+        """, target.id)
 
-    async def check_points(self, ctx):
+        if not grace:
+            return
+
+        if now < grace['finish']:
+            remaining = grace['finish'] - now
+            raise self.SayException('\N{BABY ANGEL} Your target is in'
+                                    ' grace period. it will expire in'
+                                    f' {remaining} hours')
+
+    async def check_points(self, thief: discord.User):
         """Check if current thief has enough steal points,
         decrement 1 from them if thief has enough,
         puts cooldown if it reaches 0."""
-        pass
+        points = await self.pool.fetchrow("""
+        SELECT points FROM steal_points
+        WHERE user_id = $1
+        """, thief.id)
 
-    async def add_grace(self, target, hours):
+        if not points:
+            await self.pool.execute("""
+            INSERT INTO steal_points (user_id)
+            VALUES ($1)
+            """, thief.id)
+            points = {'points': 3}
+
+        if points['points'] < 1:
+            await self.add_cooldown(thief, 1, DEFAULT_REGEN)
+            raise self.SayException('\N{FACE WITH TEARS OF JOY}'
+                                    ' You ran out of stealing points!'
+                                    f' wait {DEFAULT_REGEN} hours.')
+
+        await self.pool.execute("""
+        UPDATE steal_points
+        SET points = points - 1
+        WHERE user_id = $1
+        """, thief.id)
+
+    async def add_grace(self, target: discord.User, hours: int):
         """Add a grace period to the target."""
         pass
 
-    async def arrest(self, ctx, amount):
+    async def arrest(self, thief: discord.User, amount: decimal.Decimal):
         """Arrest the thief."""
         pass
 
