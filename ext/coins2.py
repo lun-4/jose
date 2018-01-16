@@ -142,6 +142,9 @@ class Coins2(Cog):
 
     async def get_account(self, wallet_id: int) -> dict:
         """Get an account"""
+        if getattr(wallet_id, 'id', None):
+            wallet_id = wallet_id.id
+
         r = await self.jc_get(f'/wallets/{wallet_id}')
         r['amount'] = decimal.Decimal(f'{r["amount"]:.3f}')
         try:
@@ -195,6 +198,15 @@ class Coins2(Cog):
     async def transfer(self, from_id: int, to_id: int,
                        amount: decimal.Decimal) -> dict:
         """Make the transfer call"""
+
+        _from_id = getattr(from_id, 'id', False)
+        if _from_id:
+            from_id = _from_id
+
+        _to_id = getattr(to_id, 'id', False)
+        if _to_id:
+            to_id = _to_id
+
         res = await self.jc_post(f'/wallets/{from_id}/transfer', {
             'receiver': to_id,
             'amount': str(amount)
@@ -232,11 +244,11 @@ class Coins2(Cog):
                                    self.bot.user.id,
                                    amount)
 
-    async def zero(self, user_id: int):
+    async def zero(self, user_id: int, where: 'any'=None):
         """Zero an account"""
         account = await self.get_account(user_id)
-        return await self.transfer(user_id,
-                                   self.bot.user.id,
+        target = where or self.bot.user.id
+        return await self.transfer(user_id, target,
                                    account['amount'])
 
     def _pcache_invalidate(self, user_id: int):

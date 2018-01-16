@@ -138,6 +138,8 @@ class CoinsExt2(Cog, requires=['coins2']):
         """
 
         c_type = 'prison' if c_type == 0 else 'points'
+
+        # Yes, I know, SQL Inejection.
         await self.pool.execute(f"""
         INSERT INTO steal_cooldown (user_id, ctype, finish)
         VALUES ($1, $2, now() + interval '{hours} hours')
@@ -238,12 +240,62 @@ class CoinsExt2(Cog, requires=['coins2']):
         """, thief.id)
 
     async def add_grace(self, target: discord.User, hours: int):
-        """Add a grace period to the target."""
-        pass
+        """Add a grace period to the target.
+        
+        Removes an existing grace period.
+        """
+        grace = await self.pool.fetch("""
+        SELECT finish FROM steal_grace
+        WHERE user_id = $1
+        """, target.id)
 
-    async def arrest(self, thief: discord.User, amount: decimal.Decimal):
-        """Arrest the thief."""
-        pass
+        if grace:
+            await self.pool.execute("""
+            DELETE FROM steal_grace
+            WHERE user_id = $1
+            """, target.id)
+
+        # Yes, I know, SQL injection, again.
+        await self.pool.execute(f"""
+        INSERT INTO steal_grace (user_id, finish)
+        VALUES ($1, now() + interval '{hours} hours')
+        """, target.id)
+
+    async def arrest(self, ctx,
+                     amount: decimal.Decimal) -> tuple:
+        """Arrest the thief.
+        
+        Returns
+        -------
+        tuple
+            with information about the arrest,
+            and how many hours does the thief get
+            in prison.
+        """
+        thief = ctx.author
+        guild = ctx.guild
+        fee = amount / 2
+
+        # maintain sanity
+        await self.coins2.ensure_ctx(ctx)
+
+        log.debug(f'arresting {thief}[{thief.id}]')
+
+        try:
+            await self.coins2.transfer(thief, guild, fee)
+            # fee is paid, jail.
+            hours = await self.add_cooldown(thief)
+        except self.coins2.TransferError:
+            # fee is not paid, BIG JAIL.
+            thief_account = await self.coins2.get_account(thief)
+            amnt = thief_account['amount']
+
+            # zero the wallet, convert 1jc to extra hour in jail
+            transfer_info = await self.coins2.zero(thief, ctx.guild.id)
+            hours = await self.add_cooldown(thief, 0,
+                                            DEFAULT_ARREST + int(amnt))
+
+        return hours, transfer_info
 
     @commands.command(name='jc3steal')
     @commands.guild_only()
