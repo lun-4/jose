@@ -185,7 +185,7 @@ class Math(Cog):
         em.add_field(name='Situation',
                      value=f'{status} {icon}')
         em.add_field(name='Temperature',
-                     value=f'`{_wg("celsius")} °C, {_wg("fahrenheit")} °F, {_wg("kelvin")} °K`')
+                     value=f'`{_wg("celsius")} °C, {_wg("fahrenheit")} °F, {_wg("kelvin")} K`')
 
         await ctx.send(embed=em)
 
