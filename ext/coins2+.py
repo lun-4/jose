@@ -136,6 +136,7 @@ class CoinsExt2(Cog, requires=['coins2']):
 
     @commands.command(name='jc3prices')
     async def _prices(self, ctx):
+        """Show price information about commands."""
         em = discord.Embed(title='Pricing')
         descriptions = {
             'OPR': ('Operational tax for high-load commands',

@@ -258,8 +258,8 @@ class Math(Cog):
             await ctx.send('100+ dice? nonono')
             return
 
-        if dice_sides > 50:
-            await ctx.send('50+ sides? nonono')
+        if dice_sides > 10000:
+            await ctx.send('10000+ sides? nonono')
             return
 
         dices = []
