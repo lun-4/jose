@@ -299,7 +299,7 @@ class CoinsExt2(Cog, requires=['coins2']):
             transfer_info = await self.coins2.transfer_str(thief, guild, fee)
             # fee is paid, jail.
             hours = await self.add_cooldown(thief)
-        except self.coins2.TransferError:
+        except self.coins2.ConditionError:
             # fee is not paid, BIG JAIL.
             thief_acc = await self.coins2.get_account(thief)
             amnt = thief_acc['amount']
@@ -314,7 +314,7 @@ class CoinsExt2(Cog, requires=['coins2']):
     def info_arrest(self, hours: int, transfer_info: str, message: str):
         """Generate a SayException with the information on the autojail."""
         raise self.SayException(f'\N{POLICE OFFICER} You got '
-                                f'arrested! {message}, {hours}h in jail.'
+                                f'arrested! {message}\n{hours}h in jail.\n'
                                 f'`{transfer_info}`')
 
     def steal_info(self, res: float, chance: float,
@@ -435,7 +435,7 @@ class CoinsExt2(Cog, requires=['coins2']):
                 self.steal_info(res, chance, transfer_info)
             else:
                 # jail
-                hours, transfer = await self.arrest(ctx, amount)
+                hours, transfer_info = await self.arrest(ctx, amount)
                 self.steal_info(res, chance, transfer_info, hours)
         finally:
             # TODO: await c2.unlock(thief.id, target.id)
@@ -492,7 +492,14 @@ class CoinsExt2(Cog, requires=['coins2']):
     @commands.command(name='jc3stealreset')
     @commands.is_owner()
     async def stealreset(self, ctx, *people: discord.User):
-        pass
+        for person in people:
+            res = await self.pool.execute(f"""
+            DELETE FROM steal_points WHERE user_id = {person.id};
+            DELETE FROM steal_cooldown WHERE user_id = {person.id};
+            DELETE FROM steal_grace WHERE user_id = {person.id};
+            """)
+
+            self.loop.create_task(ctx.send(f'`{person}: {res}`'))
 
 
 def setup(bot):

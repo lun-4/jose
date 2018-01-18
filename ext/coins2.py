@@ -54,6 +54,7 @@ class Coins2(Cog):
         self.prob_cache = {}
 
         self.TransferError = TransferError
+        self.ConditionError = ConditionError
 
     def route(self, route):
         return f'{self.base_url}{route}'
