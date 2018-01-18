@@ -443,7 +443,51 @@ class CoinsExt2(Cog, requires=['coins2']):
 
     @commands.command(name='jc3stealstate', aliases=['jc3stealstatus'])
     async def stealstate(self, ctx):
-        pass
+        """Show your current stealing state."""
+        author = ctx.author
+        now = datetime.datetime.utcnow()
+        em = discord.Embed(title=f'Steal state for {author}')
+
+        cooldowns = await self.pool.fetch("""
+        SELECT ctype, finish FROM steal_cooldown
+        WHERE user_id = $1
+        """, author.id)
+        grace = await self.pool.fetchrow("""
+        SELECT finish FROM steal_grace
+        WHERE user_id = $1
+        """, author.id)
+        points = await self.pool.fetchrow("""
+        SELECT points FROM steal_points
+        WHERE user_id = $1
+        """, author.id)
+
+        if points:
+            em.add_field(name='remaining stealing points',
+                         value=points['points'],
+                         inline=False)
+
+        for idx, cooldown in enumerate(cooldowns):
+            c_type = cooldown['ctype']
+            c_type_str = 'jail' if c_type == 'prison' else 'steal points regen'
+
+            remaining = cooldown['finish'] - now
+            r_sec = remaining.total_seconds()
+            expired = ' [EXPIRED]' if r_sec < 0 else ''
+
+            em.add_field(name=f'cooldown {idx}{expired}',
+                         value=f'{c_type_str}: `{fmt_tdelta(remaining)}`',
+                         inline=False)
+
+        if grace:
+            # get timedelta
+            remaining = grace['finish'] - now
+            r_sec = remaining.total_seconds()
+            expired = '[EXPIRED] ' if r_sec < 0 else ''
+            em.add_field(name=f'{expired}grace period',
+                         value=f'`{fmt_tdelta(remaining)}`',
+                         inline=False)
+
+        await ctx.send(embed=em)
 
     @commands.command(name='jc3stealreset')
     @commands.is_owner()

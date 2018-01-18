@@ -117,6 +117,8 @@ class Coins2(Cog):
             return f'taxbank:{user_id.name}'
         elif isinstance(user_id, discord.User):
             return str(user_id)
+        elif isinstance(user_id, discord.Member):
+            return str(user_id)
 
         obj = self.bot.get_user(int(user_id))
 
