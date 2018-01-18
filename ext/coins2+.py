@@ -1,6 +1,7 @@
 import logging
 import datetime
 import decimal
+from random import uniform
 
 import discord
 from discord.ext import commands
@@ -11,10 +12,17 @@ from .coins2 import AccountType
 
 log = logging.getLogger(__name__)
 
+# steal constants
+BASE_CHANCE = decimal.Decimal('1')
+STEAL_CONSTANT = decimal.Decimal('0.42')
+
 # 6 hours in jail by default
 # 9 hours for point regen
 DEFAULT_ARREST = 6
 DEFAULT_REGEN = 9
+
+# how many hours for grace periods
+GRACE_PERIOD = 5
 
 
 class CooldownTypes:
@@ -24,6 +32,11 @@ class CooldownTypes:
 
 class CooldownError(Exception):
     pass
+
+
+def fmt_tdelta(delta):
+    """Remove the microseconds from a timedelta object."""
+    return datetime.timedelta(days=delta.days, seconds=delta.seconds)
 
 
 class CoinsExt2(Cog, requires=['coins2']):
@@ -187,18 +200,19 @@ class CoinsExt2(Cog, requires=['coins2']):
             remaining = c_finish - now
             if c_type == 'prison':
                 raise self.SayException('\N{POLICE CAR} You are still in '
-                                        f'prison, wait {remaining} hours')
+                                        'prison, wait '
+                                        f'{fmt_tdelta(remaining)} hours')
 
             elif c_type == 'points':
                 raise self.SayException('\N{DIAMOND SHAPE WITH A DOT INSIDE}'
                                         ' You are waiting for steal points.'
-                                        f'Wait {remaining} hours')
+                                        f'Wait {fmt_tdelta(remaining)} hours')
 
     async def check_grace(self, target: discord.User):
         """Check if the target is in grace period."""
         now = datetime.datetime.utcnow()
         grace = await self.pool.fetchrow("""
-        SELECT grace FROM steal_grace
+        SELECT finish FROM steal_grace
         WHERE user_id = $1
         """, target.id)
 
@@ -209,7 +223,7 @@ class CoinsExt2(Cog, requires=['coins2']):
             remaining = grace['finish'] - now
             raise self.SayException('\N{BABY ANGEL} Your target is in'
                                     ' grace period. it will expire in'
-                                    f' {remaining} hours')
+                                    f' {fmt_tdelta(remaining)} hours')
 
     async def check_points(self, thief: discord.User):
         """Check if current thief has enough steal points,
@@ -282,13 +296,13 @@ class CoinsExt2(Cog, requires=['coins2']):
         log.debug(f'arresting {thief}[{thief.id}]')
 
         try:
-            await self.coins2.transfer(thief, guild, fee)
+            transfer_info = await self.coins2.transfer_str(thief, guild, fee)
             # fee is paid, jail.
             hours = await self.add_cooldown(thief)
         except self.coins2.TransferError:
             # fee is not paid, BIG JAIL.
-            thief_account = await self.coins2.get_account(thief)
-            amnt = thief_account['amount']
+            thief_acc = await self.coins2.get_account(thief)
+            amnt = thief_acc['amount']
 
             # zero the wallet, convert 1jc to extra hour in jail
             transfer_info = await self.coins2.zero(thief, ctx.guild.id)
@@ -297,10 +311,135 @@ class CoinsExt2(Cog, requires=['coins2']):
 
         return hours, transfer_info
 
+    def info_arrest(self, hours: int, transfer_info: str, message: str):
+        """Generate a SayException with the information on the autojail."""
+        raise self.SayException(f'\N{POLICE OFFICER} You got '
+                                f'arrested! {message}, {hours}h in jail.'
+                                f'`{transfer_info}`')
+
+    def steal_info(self, res: float, chance: float,
+                   transfer_info: str, hours: int = None):
+        """Show the information about the success / failure of a steal."""
+        msg_res = [f'`[chance: {chance} | res: {res}]`']
+
+        if res < chance:
+            msg_res.append(f'Congrats!')
+        else:
+            msg_res.append(f'\N{POLICE OFFICER} Arrested!')
+            msg_res.append(f'{hours}h in jail.')
+
+        msg_res.append(transfer_info)
+        raise self.SayException('\n'.join(msg_res))
+
     @commands.command(name='jc3steal')
     @commands.guild_only()
     async def steal(self, ctx, target: discord.User, *, amount: CoinConverter):
-        pass
+        """Steal JoséCoins from someone.
+
+        Obviously this does not have a 100% success rate,
+        the best success you can achieve is a 50% rate.
+
+        The probability of success depends on four factors:
+        the base chance, the wallet of your target,
+        the amount you want to steal from the wallet,
+        and the steal constant.
+
+        Rules:
+         - You can't steal less than 0.01JC.
+         - You can't steal if you have less than 6JC.
+         - You can't steal from targets who are in grace period.
+         - You, by default, have 3 stealing points, and you lose
+            one each time you use the steal command successfully.
+         - You can't steal from José, it will automatically jail you.
+         - You are automatically jailed if you try to steal
+            more than your target's wallet.
+        """
+        c2 = self.coins2
+        await c2.ensure_ctx(ctx)
+        thief = ctx.author
+
+        if thief == target:
+            raise self.SayException('You can not steal from yourself')
+        
+        # make sure both have accounts
+        try:
+            thief_acc = await c2.get_account(thief.id)
+            target_acc = await c2.get_account(thief.id)
+        except c2.AccountNotFoundError:
+            raise self.SayException("One of you don't have a JoséCoin wallet")
+
+        if amount <= 0.01:
+            raise self.SayException('\N{LOW BRIGHTNESS SYMBOL} '
+                                    'Stealing too low.')
+
+        if thief_acc['amount'] < 6:
+            raise self.SayException("You have less than `6JC`, "
+                                    "can't use the steal command")
+
+        if target_acc['amount'] < 3:
+            raise self.SayException('Target has less than `3JC`, '
+                                    'cannot steal them')
+
+        try:
+            # critical session
+            # TODO: await c2.lock(thief.id, target.id)
+            await ctx.send('lock?')
+
+            await self.check_cooldowns(thief)
+            await self.check_grace(target)
+            await self.check_points(thief)
+
+            await c2.jc_post(f'/wallets/{thief.id}/steal_use')
+            # TODO: await c2.unlock(thief.id, target.id)
+            await ctx.send('unlock?')
+
+            # checking for other stuff that cause autojail
+            if target_acc['amount'] == -69:
+                hours, transfer_info = await self.arrest(ctx, amount)
+                self.info_arrest(hours, transfer_info,
+                                 'You can not steal from this account.')
+
+            t_amnt = target_acc['amount']
+            if amount > t_amnt:
+                hours, transfer_info = await self.arrest(ctx, amount)
+                self.info_arrest(hours, transfer_info,
+                                 'Trying to steal more than the target')
+
+            chance = (BASE_CHANCE + (t_amnt / amount)) * STEAL_CONSTANT
+            if chance > 5:
+                chance = 5
+            chance = round(chance, 3)
+
+            res = uniform(0, 10)
+            res = round(res, 3)
+
+            log.info(f'[steal] chance={chance} res={res} amount={amount}'
+                     f' t_amnt={t_amnt} '
+                     f'thief={thief}[{thief.id}] target={target}[{target.id}]')
+            
+            if res < chance:
+                # success
+                await c2.jc_post(f'/wallets/{thief.id}/steal_success')
+                transfer_info = await c2.transfer_str(target.id,
+                                                      thief.id, amount)
+
+                try:
+                    await target.send(':gun: **You were robbed!** '
+                                      f'The thief(`{thief}`) stole '
+                                      f'{amount} from you. '
+                                      f'{GRACE_PERIOD}h grace period')
+                except:
+                    pass
+
+                await self.add_grace(target, GRACE_PERIOD)
+                self.steal_info(res, chance, transfer_info)
+            else:
+                # jail
+                hours, transfer = await self.arrest(ctx, amount)
+                self.steal_info(res, chance, transfer_info, hours)
+        finally:
+            # TODO: await c2.unlock(thief.id, target.id)
+            await ctx.send('unlock?')
 
     @commands.command(name='jc3stealstate', aliases=['jc3stealstatus'])
     async def stealstate(self, ctx):
@@ -310,6 +449,7 @@ class CoinsExt2(Cog, requires=['coins2']):
     @commands.is_owner()
     async def stealreset(self, ctx, *people: discord.User):
         pass
+
 
 def setup(bot):
     bot.add_jose_cog(CoinsExt2)

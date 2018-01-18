@@ -53,6 +53,8 @@ class Coins2(Cog):
         #: Cache for probability values
         self.prob_cache = {}
 
+        self.TransferError = TransferError
+
     def route(self, route):
         return f'{self.base_url}{route}'
 
@@ -222,6 +224,12 @@ class Coins2(Cog):
 
         return res
 
+    async def transfer_str(self, from_id: int, to_id: int,
+                           amount: decimal.Decimal) -> str:
+        """Transfer between accounts, but returning a string."""
+        await self.transfer(from_id, to_id, amount)
+        return f'{self.get_name(from_id)} > {amount} > {self.get_name(to_id)}'
+
     async def ensure_taxbank(self, ctx):
         """Ensure a taxbank exists for the guild."""
         if ctx.guild is None:
@@ -244,12 +252,12 @@ class Coins2(Cog):
                                    self.bot.user.id,
                                    amount)
 
-    async def zero(self, user_id: int, where: 'any'=None):
+    async def zero(self, user_id: int, where: 'any'=None) -> str:
         """Zero an account"""
         account = await self.get_account(user_id)
         target = where or self.bot.user.id
-        return await self.transfer(user_id, target,
-                                   account['amount'])
+        return await self.transfer_str(user_id, target,
+                                       account['amount'])
 
     def _pcache_invalidate(self, user_id: int):
         """Invalidate the prob cache after 2 hours for one user."""
