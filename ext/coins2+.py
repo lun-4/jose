@@ -136,11 +136,33 @@ class CoinsExt2(Cog, requires=['coins2']):
 
     @commands.command(name='jc3prices')
     async def _prices(self, ctx):
-        raise NotImplementedError('not implemented')
+        em = discord.Embed(title='Pricing')
+        descriptions = {
+            'OPR': ('Operational tax for high-load commands',
+                    ('yt', 'datamosh'),
+                    ),
+            'API': ('API tax (includes the NSFW commands)',
+                    ('xkcd', 'wolframalpha', 'weather', 'money',
+                     'urban')
+                    ),
+            'TRN': ('Translation tax',
+                    ('translate',)
+                    ),
+        }
+
+        for category in self.prices:
+            price = self.prices[category]
+            em.add_field(name=f'Category: {category}, Price: {price}',
+                         value=f'{descriptions[category][0]}: '
+                               f'{", ".join(descriptions[category][1])}',
+                         inline=False)
+
+        await ctx.send(embed=em)
 
     @commands.command(name='jc3taxes')
     @commands.guild_only()
     async def taxes(self, ctx):
+        """Show your taxbank's wallet."""
         await self.coins2.ensure_taxbank(ctx)
         acc = await self.coins2.get_account(ctx.guild.id)
         await ctx.send(f'`{self.coins2.get_name(ctx.guild)}: {acc["amount"]}`')
@@ -492,6 +514,7 @@ class CoinsExt2(Cog, requires=['coins2']):
     @commands.command(name='jc3stealreset')
     @commands.is_owner()
     async def stealreset(self, ctx, *people: discord.User):
+        """Reset people's steal states."""
         for person in people:
             res = await self.pool.execute(f"""
             DELETE FROM steal_points WHERE user_id = {person.id};
