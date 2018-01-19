@@ -38,7 +38,11 @@ class Moderation(Cog):
     def __init__(self, bot):
         super().__init__(bot)
         self.modcfg_coll = self.config.jose_db['mod_config']
+        #: cache for moglog entries
         self.cache = {}
+
+        #: ignore events
+        self.ignore = {}
 
         self.handlers = {
             Actions.REASON: self.reason_handler,
@@ -81,10 +85,12 @@ class Moderation(Cog):
 
         em.set_footer(text='Created')
 
-        em.set_author(name=str(member), icon_url=member.avatar_url or member.default_avatar_url)
+        em.set_author(name=str(member),
+                      icon_url=member.avatar_url or member.default_avatar_url)
         
         em.add_field(name='ID', value=member.id)
-        em.add_field(name='Account age', value=f'`{self.account_age(member.created_at)}`')
+        em.add_field(name='Account age',
+                     value=f'`{self.account_age(member.created_at)}`')
 
         await logchannel.send(embed=em)
 
@@ -92,7 +98,8 @@ class Moderation(Cog):
         """Called upon member remove."""
         logchan_id = await self.modcfg_get(member.guild, 'member_log_id')
         logchannel = self.bot.get_channel(logchan_id)
-        if logchan_id is None or logchannel is None: return
+        if not logchan_id or not logchannel:
+            return
 
         log.debug('[modlog] Logging removal of %r', member)
 
@@ -100,7 +107,8 @@ class Moderation(Cog):
         em.timestamp = datetime.datetime.utcnow() 
 
         em.set_footer(text='Created')
-        em.set_author(name=str(member), icon_url=member.avatar_url or member.default_avatar_url)
+        em.set_author(name=str(member),
+                      icon_url=member.avatar_url or member.default_avatar_url)
 
         fields = {
             'ID': member.id,
@@ -180,10 +188,11 @@ class Moderation(Cog):
             'action_id': modcfg['last_action_id'] + 1,
         }
 
-        await self.modcfg_coll.update_one({'guild_id': guild.id}, {'$inc': {'last_action_id': 1}})
+        await self.modcfg_coll.update_one({'guild_id': guild.id},
+                                          {'$inc': {'last_action_id': 1}})
         await self.add_mod_entry(modcfg, data)
-    
-    async def ban_handler(self, modcfg, guild, user, reason, **kwargs): 
+
+    async def ban_handler(self, modcfg, guild, user, reason, **kwargs):
         """Handle the 'ban' action, creates an entry."""
         data = {
             'guild': guild,
@@ -193,11 +202,13 @@ class Moderation(Cog):
             'action_id': modcfg['last_action_id'] + 1,
         }
 
-        await self.modcfg_coll.update_one({'guild_id': guild.id}, {'$inc': {'last_action_id': 1}})
+        await self.modcfg_coll.update_one({'guild_id': guild.id},
+                                          {'$inc': {'last_action_id': 1}})
         await self.add_mod_entry(modcfg, data)
 
     async def reason_handler(self, modcfg, guild, user, reason, **kwargs):
-        """Add a reason to an action, doesn't edit audit logs(since it isn't possible)."""
+        """Add a reason to an action, doesn't edit audit logs
+        (since it isn't possible)."""
         data = {
             'guild': guild,
             'user': user,
@@ -217,20 +228,24 @@ class Moderation(Cog):
             'action': Actions.UNBAN,
             'action_id': modcfg['last_action_id'] + 1,
         }
+
+        await self.modcfg_coll.update_one({'guild_id': guild.id},
+                                          {'$inc': {'last_action_id': 1}})
         await self.add_mod_entry(modcfg, data)
 
     async def modlog(self, action, guild, user, **kwargs):
         """Add a moderation entry.
 
-        This creates/edits a message in the moderation log channel with respective
-        data about the action user and moderator that did the action.
+        This creates/edits a message in the moderation log channel
+        with respective data about the action user and moderator
+        that did the action.
 
         If a reason is not provided, this polls the guild's audit logs.
         
         Parameters
         ----------
         action: int
-            Action to be logged, :meth:`Actions` describes them..
+            Action to be logged, :meth:`Actions` describes them.
         guild: discord.Guild
             The guild this moderation entry is going to.
         user: discord.User
@@ -239,13 +254,24 @@ class Moderation(Cog):
             keyword-arguments you can use to save the method to query mongo
             or insert a reason to the moderation entry.
         """
+        try:
+            user_id = user.id
+        except AttributeError:
+            user_id = None
+        ikey = (user_id, guild.id)
+        if self.ignore.get(ikey) == action:
+            log.debug(f'ignoring action {action} to user {user_id}')
+            return
+
         reason = kwargs.get('reason')
-        if reason is None:
+        if not reason:
             # poll audit logs
             reason = {}
-            action_as_auditlog = getattr(discord.AuditLogAction, ACTION_AS_AUDITLOG[action])
+            action_as_auditlog = getattr(discord.AuditLogAction,
+                                         ACTION_AS_AUDITLOG[action])
             try:
-                async for entry in guild.audit_logs(limit=10, action=action_as_auditlog):
+                async for entry in guild.audit_logs(limit=10,
+                                                    action=action_as_auditlog):
                     if entry.target.id != user.id:
                         continue
 
@@ -260,25 +286,26 @@ class Moderation(Cog):
                 await self.SayException(f'fug `{err!r}`')
 
         modconfig = kwargs.get('modconfig')
-        if modconfig is None:
+        if not modconfig:
             # get modconfig
             modconfig = await self._modcfg_get(guild)
-        
+
         handler = self.handlers[action]
         try:
-            kwargs.pop('reason') # because we already give the reason to handler
+            # because we already give the reason to handler
+            kwargs.pop('reason')
         except KeyError:
             pass
 
         try:
-            _g = guild.name
+            guild.name
         except (AttributeError, NameError):
             guild = namedtuple('Fake Guild', 'name id')
             guild.name = 'fake guild'
             guild.id = -1
 
         try:
-            _u = user.name
+            user.name
         except (AttributeError, NameError):
             user = namedtuple('FakeUser', 'name id')
             user.name = 'fake user'
@@ -291,7 +318,8 @@ class Moderation(Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def modattach(self, ctx, memberlog: discord.TextChannel, modlog: discord.TextChannel):
+    async def modattach(self, ctx, memberlog: discord.TextChannel,
+                        modlog: discord.TextChannel):
         """Attach channels to the moderation system"""
         modconfig = await self.modcfg_get(ctx.guild)
         if modconfig is not None:
@@ -305,7 +333,7 @@ class Moderation(Cog):
         }
 
         log.info('[modlog:attach] Creating a modcfg @ g=%s[gid=%d]',
-            ctx.guild.name, ctx.guild.id)
+                 ctx.guild.name, ctx.guild.id)
 
         res = await self.modcfg_coll.insert_one(modconfig)
         await ctx.success(res.acknowledged)
@@ -320,7 +348,8 @@ class Moderation(Cog):
         """
         modconfig = await self._modcfg_get(ctx.guild)
         _reason = {'reason': reason, 'moderator': ctx.author}
-        await self.modlog(Actions.REASON, ctx.guild, None, reason=_reason, action_id=action_id, modconfig=modconfig)
+        await self.modlog(Actions.REASON, ctx.guild, None, reason=_reason,
+                          action_id=action_id, modconfig=modconfig)
         await ctx.ok()
 
     @commands.command()
@@ -337,24 +366,30 @@ class Moderation(Cog):
             raise self.SayException(f'wtf is happening discord `{err!r}`')
 
         _reason = {'reason': reason, 'moderator': ctx.author}
-        await self.modlog(Actions.KICK, ctx.guild, member, reason=_reason, modconfig=modconfig)
+        await self.modlog(Actions.KICK, ctx.guild, member,
+                          reason=_reason, modconfig=modconfig)
         await ctx.ok()
 
     @commands.command()
     @is_moderator()
     async def ban(self, ctx, member: discord.Member, *, reason: str = None):
         """Bans someone and add it to mod logs."""
-        modconfig = await self._modcfg_get(ctx.guild)
+        guild = ctx.guild
+        modconfig = await self._modcfg_get(guild)
 
         try:
+            self.ignore[(member.id, guild.id)] = Actions.BAN
             await member.ban(reason=reason)
         except discord.Forbidden:
             raise self.SayException("can't ban u suck ass >:c")
         except discord.HTTPException as err:
             raise self.SayException(f'wtf is happening discord `{err!r}`')
+        finally:
+            self.ignore.pop((member.id, guild.id))
 
-        #_reason = {'reason': reason, 'moderator': ctx.author}
-        #await self.modlog(Actions.BAN, ctx.guild, member, reason=_reason, modconfig=modconfig)
+        _reason = {'reason': reason, 'moderator': ctx.author}
+        await self.modlog(Actions.BAN, ctx.guild, member,
+                          reason=_reason, modconfig=modconfig)
         await ctx.ok()
 
 
