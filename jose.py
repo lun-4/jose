@@ -3,6 +3,8 @@ import random
 import time
 import sys
 import asyncio
+import pathlib
+import importlib
 
 import discord
 import aiohttp
@@ -277,15 +279,28 @@ class JoseBot(commands.Bot):
         super().add_cog(cog)
 
     def load_all(self):
-        """Load all extensions in the extensions list,
-        but make sure all dependencies are matched for every cog."""
+        """Load all extensions in the extensions folder.
+        
+        Thanks FrostLuma for code!
+        """
 
-        for extension in extensions:
-            try:
-                self.load_extension(f'ext.{extension}')
-            except Exception as err:
-                log.error(f'Failed to load {extension}', exc_info=True)
-                sys.exit(1)
+        path = pathlib.Path('ext/')
+        files = path.glob('**/*.py')
+
+        for fileobj in files:
+            if fileobj.stem == '__init__':
+                name = str(fileobj)[:-12]
+            else:
+                name = str(fileobj)[:-3]
+
+            name = name.replace('/', '.')
+            module = importlib.import_module(name)
+
+            if not hasattr(module, 'setup'):
+                # ignore extensions that do not have a setup() function
+                continue
+
+            self.load_extension(name)
 
 
 async def get_prefix(bot, message) -> list:
@@ -296,7 +311,7 @@ async def get_prefix(bot, message) -> list:
     config_cog = bot.get_cog('Config')
     if not config_cog:
         log.warning('config cog not found')
-        return ['j!']
+        return [config.prefix]
 
     custom = await config_cog.cfg_get(message.guild, "prefix")
     if custom == bot.config.prefix:
