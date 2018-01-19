@@ -16,7 +16,7 @@ TICKET_PRICE = 15
 TICKET_INCREASE = decimal.Decimal(35 / 100)
 
 
-class Lottery(Cog):
+class Lottery(Cog, requires=['coins']):
     """Weekly lottery.
 
     The lottery works with you buying a 15JC lottery ticket.
@@ -158,4 +158,4 @@ class Lottery(Cog):
 
 
 def setup(bot):
-    bot.add_cog(Lottery(bot))
+    bot.add_jose_cog(Lottery)

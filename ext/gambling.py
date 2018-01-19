@@ -16,7 +16,7 @@ X4_EMOJI = [':snail:', ':ok_hand', ':chestnut:']
 X6_EMOJI = [':eggplant:']
 
 
-class Gambling(Cog):
+class Gambling(Cog, requires=['coins']):
     """Gambling commands."""
     def __init__(self, bot):
         super().__init__(bot)
@@ -193,5 +193,6 @@ class Gambling(Cog):
         else:
             await ctx.send('https://i.imgur.com/yDPUp3P.png')
 
+
 def setup(bot):
-    bot.add_cog(Gambling(bot))
+    bot.add_jose_cog(Gambling)
