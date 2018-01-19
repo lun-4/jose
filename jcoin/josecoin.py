@@ -81,7 +81,6 @@ async def request_check(request):
     client_id = row['client_id']
     client_name = row['client_name']
     auth_level = row['auth_level']
-
     log.info(f'id={client_id} name={client_name} level={auth_level}')
 
 
@@ -136,10 +135,13 @@ async def create_account(request, account_id):
     log.info('create %d', account_id)
     account_type = int(request.json['type'])
 
-    res = await request.app.db.execute("""
-    INSERT INTO accounts (account_id, account_type)
-    VALUES ($1, $2)
-    """, account_id, account_type)
+    try:
+        res = await request.app.db.execute("""
+        INSERT INTO accounts (account_id, account_type)
+        VALUES ($1, $2)
+        """, account_id, account_type)
+    except asyncpg.exceptions.UniqueViolationError:
+        raise ConditionError('Account exists')
 
     if account_type == 0:
         await request.app.db.execute("""
@@ -178,8 +180,6 @@ async def transfer(request, sender_id):
     """, sender_id, receiver_id)
 
     accounts = {a['account_id']: a for a in accs}
-    log.debug(accounts)
-
     sender = accounts.get(sender_id)
     receiver = accounts.get(receiver_id)
 

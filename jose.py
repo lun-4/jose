@@ -26,9 +26,11 @@ extensions = [
     'admin',
     'exec',
     'pipupdates',
-    'coins',
-    'coins+',
+    # 'coins',
+    # 'coins+',
     'coins2',
+    'coins2+',
+
     'basic',
     'gambling',
     'speak',

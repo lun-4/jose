@@ -5,6 +5,7 @@ import sys
 import pprint
 import time
 import random
+import math
 
 import discord
 from discord.ext import commands
@@ -18,6 +19,8 @@ from jcoin.errors import GenericError, AccountNotFoundError, \
 
 log = logging.getLogger(__name__)
 REWARD_COOLDOWN = 18000
+
+TAX_MULTIPLIER = decimal.Decimal('1.42')
 
 
 class TransferError(Exception):
@@ -36,7 +39,7 @@ class AccountType:
     TAXBANK = 1
 
 
-class Coins2(Cog):
+class Coins(Cog):
     """Version 3 of JoséCoin.
 
     NOTE: this is incomplete
@@ -271,6 +274,27 @@ class Coins2(Cog):
         self.prob_cache[author_id] = value
         self.loop.call_later(7200, self._pcache_invalidate, author_id)
 
+    async def pricing(self, ctx, base_tax: decimal.Decimal) -> str:
+        await self.ensure_ctx(ctx)
+        base_tax = decimal.Decimal(base_tax)
+
+        try:
+            account = await self.get_account(ctx.author.id)
+        except AccountNotFoundError:
+            raise self.SayException("You don't have a JoséCoin wallet, "
+                                    f'use the `account` command.')
+
+        amount = account['amount']
+        gdp = await self.jc_get('/gdp')
+        gdp = gdp['gdp']
+
+        gdp_sqrt = decimal.Decimal(math.sqrt(gdp))
+        total_tax = base_tax + pow((amount / gdp_sqrt) * TAX_MULTIPLIER, 2)
+        try:
+            await self.transfer(ctx.author.id, ctx.guild.id, total_tax)
+        except self.ConditionError as err:
+            raise self.SayException(f'TransferError: `{err.args[0]}`')
+
     async def on_message(self, message):
         """Manage autocoin."""
         # ignore bots and DMs
@@ -323,9 +347,8 @@ class Coins2(Cog):
             if message.guild.large:
                 return
 
-            # TODO: uncomment once jc3 is released
-            # hc = await self.jc_get(f'/wallets/{author_id}/hidecoin_status')
-            hc = {'hidden': True}
+            hc = await self.jc_get(f'/wallets/{author_id}/hidecoin_status')
+            # hc = {'hidden': True}
             if hc['hidden']:
                 return
 
@@ -336,15 +359,7 @@ class Coins2(Cog):
         except:
             log.exception('autocoin error')
 
-    @commands.group(hidden=True)
-    async def jc3(self, ctx):
-        """Main command group for JoséCoin v3 commands.
-
-        NOTE: this should be REMOVED once JoséCoin v3 becomes stable.
-        """
-        pass
-
-    @jc3.command()
+    @commands.command()
     async def account(self, ctx):
         """Create a JoséCoin wallet."""
         try:
@@ -358,7 +373,7 @@ class Coins2(Cog):
             await ctx.not_ok()
             await ctx.send(f':x: `{err!r}`')
 
-    @jc3.command()
+    @commands.command()
     async def wallet(self, ctx, person: discord.User = None):
         """Check your wallet details."""
         if not person:
@@ -370,7 +385,7 @@ class Coins2(Cog):
                        f'`{account["amount"]:.2f}`, paid '
                        f'`{account["taxpaid"]:.2f}JC` as tax.')
 
-    @jc3.command(name='transfer')
+    @commands.command(name='transfer')
     async def _transfer(self, ctx,
                         receiver: discord.User, amount: CoinConverter):
         """Transfer coins between you and someone else."""
@@ -381,22 +396,22 @@ class Coins2(Cog):
         await ctx.send(f'\N{MONEY WITH WINGS} `{ctx.author!s}` > '
                        f'`{amount}JC` > `{receiver!s}` \N{MONEY BAG}')
 
-    @jc3.command()
+    @commands.command()
     async def donate(self, ctx, amount: CoinConverter):
         """Donate to the guild's taxbank."""
         await self.transfer(ctx.author.id, ctx.guild.id, amount)
         await ctx.send(f'\N{MONEY WITH WINGS} `{ctx.author!s}` > '
                        f'`{amount}JC` > `{ctx.guild!s}` \N{MONEY BAG}')
 
-    @jc3.command()
+    @commands.command()
     @commands.guild_only()
-    async def ranks(self, ctx):
+    async def _ranks(self, ctx):
         """Get rank data."""
         res = await self.get_ranks(ctx.author.id, ctx.guild.id)
         await ctx.send(res)
 
-    @jc3.command()
-    async def ping(self, ctx):
+    @commands.command()
+    async def jcping(self, ctx):
         """Check if the JoséCoin API is up."""
         res = None
         with Timer() as timer:
@@ -410,7 +425,7 @@ class Coins2(Cog):
 
         await ctx.send(f'`{timer}`, db: `{res["db_latency_sec"]*1000}ms`')
 
-    @jc3.command()
+    @commands.command()
     @commands.is_owner()
     async def migrate(self, ctx):
         """Migrate JoséCoin data from Mongo -> Postgres"""
@@ -456,16 +471,17 @@ class Coins2(Cog):
 
         await ctx.send(f'Inserted {acount} accounts, {ucount} users')
 
-    @jc3.command()
+    @commands.command()
     async def coinprob(self, ctx, person: discord.User=None):
+        """Get your coin probability values."""
         if not person:
             person = ctx.author
 
         data = await self.jc_get(f'/wallets/{person.id}/probability')
-        p = data['probability']
+        p = float(data['probability'])
         await ctx.send(f'You have a {p * 100}%/message chance')
 
-    @jc3.command()
+    @commands.command()
     async def jcgetraw(self, ctx):
         """Get raw info on your wallet"""
         with Timer() as timer:
@@ -473,7 +489,7 @@ class Coins2(Cog):
         res = pprint.pformat(wallet)
         await ctx.send(f'```python\n{res}\nTook {timer}\n```')
 
-    @jc3.command()
+    @commands.command()
     @commands.is_owner()
     async def write(self, ctx, person: discord.User, amount: str):
         """Overwrite someone's wallet"""
@@ -486,7 +502,7 @@ class Coins2(Cog):
 
         await ctx.send(f'write took {timer}')
 
-    @jc3.command()
+    @commands.command()
     @commands.is_owner()
     async def spam(self, ctx, taskcount: int=200, timeout: int=30):
         """webscale memes
@@ -516,7 +532,7 @@ class Coins2(Cog):
 
             taskcount *= 2
 
-    @jc3.command()
+    @commands.command()
     async def deleteaccount(self, ctx, confirm: bool=False):
         """Delete your JoséCoin account.
         
@@ -532,7 +548,7 @@ class Coins2(Cog):
         res = await self.jc_delete(f'/wallets/{ctx.author.id}')
         await ctx.status(res['success'])
 
-    @jc3.command()
+    @commands.command()
     async def hidecoins(self, ctx):
         """Toggle the coin reaction in your account"""
         result = await self.jc_post(f'/wallets/{ctx.author.id}/hidecoins')
@@ -540,7 +556,7 @@ class Coins2(Cog):
         resultstr = 'on' if result else 'off'
         await ctx.send(f'no reactions are set to `{resultstr}` for you.')
 
-    @jc3.command()
+    @commands.command()
     async def jcstats(self, ctx):
         """Get josécoin stats"""
         em = discord.Embed(title='josécoin stats',
@@ -573,4 +589,4 @@ class Coins2(Cog):
 
 
 def setup(bot):
-    bot.add_cog(Coins2(bot))
+    bot.add_cog(Coins(bot))

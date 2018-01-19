@@ -150,7 +150,7 @@ class Gambling(Cog):
         if amount > 8:
             raise self.SayException('You cannot gamble too much.')
 
-        await self.jcoin.pricing(ctx, amount)
+        await self.jcoin.transfer(ctx.author.id, ctx.guild.id, amount)
 
         res = []
         slots = [random.choice(EMOJI_POOL) for i in range(3)]

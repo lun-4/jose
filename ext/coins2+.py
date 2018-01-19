@@ -39,7 +39,7 @@ def fmt_tdelta(delta):
     return datetime.timedelta(days=delta.days, seconds=delta.seconds)
 
 
-class CoinsExt2(Cog, requires=['coins2']):
+class CoinsExt(Cog, requires=['coins']):
     @property
     def coins2(self):
         return self.bot.get_cog('Coins2')
@@ -73,7 +73,7 @@ class CoinsExt2(Cog, requires=['coins2']):
             await ctx.send(f'```\n{rendered}```')
 
     @commands.command()
-    async def jc3top(self, ctx, mode: str='g', limit: int=10):
+    async def top(self, ctx, mode: str='g', limit: int=10):
         """Show accounts by specific criteria.
 
         'global' means all accounts in josé.
@@ -134,7 +134,7 @@ class CoinsExt2(Cog, requires=['coins2']):
 
         await self.show(ctx, accounts)
 
-    @commands.command(name='jc3prices')
+    @commands.command(name='prices')
     async def _prices(self, ctx):
         """Show price information about commands."""
         em = discord.Embed(title='Pricing')
@@ -160,7 +160,7 @@ class CoinsExt2(Cog, requires=['coins2']):
 
         await ctx.send(embed=em)
 
-    @commands.command(name='jc3taxes')
+    @commands.command(name='taxes')
     @commands.guild_only()
     async def taxes(self, ctx):
         """Show your taxbank's wallet."""
@@ -354,7 +354,7 @@ class CoinsExt2(Cog, requires=['coins2']):
         msg_res.append(transfer_info)
         raise self.SayException('\n'.join(msg_res))
 
-    @commands.command(name='jc3steal')
+    @commands.command(name='steal')
     @commands.guild_only()
     async def steal(self, ctx, target: discord.User, *, amount: CoinConverter):
         """Steal JoséCoins from someone.
@@ -464,7 +464,7 @@ class CoinsExt2(Cog, requires=['coins2']):
             # TODO: await c2.unlock(thief.id, target.id)
             await ctx.send('unlock?')
 
-    @commands.command(name='jc3stealstate', aliases=['jc3stealstatus'])
+    @commands.command(name='stealstate', aliases=['stealstatus'])
     async def stealstate(self, ctx):
         """Show your current stealing state."""
         author = ctx.author
@@ -512,7 +512,7 @@ class CoinsExt2(Cog, requires=['coins2']):
 
         await ctx.send(embed=em)
 
-    @commands.command(name='jc3stealreset')
+    @commands.command(name='stealreset')
     @commands.is_owner()
     async def stealreset(self, ctx, *people: discord.User):
         """Reset people's steal states."""
@@ -527,4 +527,4 @@ class CoinsExt2(Cog, requires=['coins2']):
 
 
 def setup(bot):
-    bot.add_jose_cog(CoinsExt2)
+    bot.add_jose_cog(CoinsExt)
