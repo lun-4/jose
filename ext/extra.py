@@ -262,6 +262,7 @@ class Extra(Cog, requires=['config']):
             return f'{days:.2f} days'
 
     @commands.command()
+    @commands.guild_only()
     async def profile(self, ctx, *, user: discord.User = None):
         """Get profile cards."""
         if user is None:
