@@ -4,7 +4,6 @@ import decimal
 
 import pymongo
 
-from datadog import statsd
 from discord.ext import commands
 
 from .common import Cog
@@ -26,32 +25,14 @@ class Statistics(Cog):
 
         self.cstats_coll = self.config.jose_db['command_stats']
 
-        self.stats_task = None
-        if self.bot.config.datadog:
-            self.stats_task = bot.loop.create_task(self.querystats())
-        else:
-            log.warning('Datadog is disabled!')
-
-    def __unload(self):
-        if self.stats_task:
-            self.stats_task.cancel()
-
-    async def datadog(self, method_str, *args):
-        if not self.bot.config.datadog:
-            return
-
-        method = getattr(statsd, method_str)
-        saviour = self.loop.run_in_executor(None, method, *args)
-        return await saviour
-
     async def gauge(self, key, value):
-        return await self.datadog('gauge', key, value)
+        pass
 
     async def increment(self, key):
-        return await self.datadog('increment', key)
+        pass
 
     async def decrement(self, key):
-        return await self.datadog('decrement', key)
+        pass
 
     async def basic_measures(self):
         await self.gauge('jose.guilds', len(self.bot.guilds))
@@ -134,18 +115,6 @@ class Statistics(Cog):
         await self.jcoin_stats()
         await self.texter_stats()
 
-    async def querystats(self):
-        try:
-            while True:
-                await self.single_stats(True)
-                await asyncio.sleep(60)
-        except asyncio.CancelledError:
-            log.info('[statsd] stats machine cancelled')
-        except:
-            log.exception('[statsd] MACHINE BROKE')
-        finally:
-            log.warning('[stats] finishing')
-
     async def on_command(self, ctx):
         command = ctx.command
         c_name = command.name
@@ -194,12 +163,6 @@ class Statistics(Cog):
             raise self.SayException('Command not found')
 
         await ctx.send(f'`{command}: {stat["uses"]} uses`')
-
-    @commands.command()
-    @commands.is_owner()
-    async def statspost(self, ctx):
-        await self.single_stats()
-        await ctx.ok()
 
 
 def setup(bot):
