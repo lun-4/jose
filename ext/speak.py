@@ -376,7 +376,6 @@ class Speak(Cog):
 
     @commands.command(aliases=['spt'])
     @commands.guild_only()
-    @commands.cooldown(2, 5, commands.BucketType.guild)
     async def speaktrigger(self, ctx):
         """Force your Texter to say a sentence.
 
