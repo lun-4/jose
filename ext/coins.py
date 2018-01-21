@@ -213,11 +213,6 @@ class Coins(Cog):
         rdg = rank_data['global']
         return rdl['rank'], rdg['rank'], rdl['total'], rdg['total']
 
-    async def tax_ranks(self, user_id: int) -> tuple:
-        """Get tax ranks for a user"""
-        await self.jc_get('/taxranks')
-        return (-1, -1)
-
     async def transfer(self, from_id: int, to_id: int,
                        amount: decimal.Decimal) -> dict:
         """Make the transfer call"""
