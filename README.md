@@ -4,8 +4,8 @@ Welcome to José! José is a multi-function Discord bot made with Python and dis
 
 Requirements
 ==========
-- MongoDB
-- Python 3.6
+- Docker
+- Docker Compose
 
 Installation
 ============
@@ -15,15 +15,12 @@ git clone https://github.com/lnmds/jose.git
 
 cd jose
 
-python3.6 -m venv env
-env/bin/python3.6 -m pip install -Ur requirements.txt
-
 # fill in stuff from the example config file
 # as you wish
 nano joseconfig.py
 
 # profit
-env/bin/python3.6 jose.py
+sudo docker-compose up
 ```
 
 Example config file
