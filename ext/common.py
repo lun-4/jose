@@ -146,16 +146,15 @@ class Cog:
         }
 
     def __init_subclass__(cls, **kwargs):
+        """Fill in cog metadata about a cog's requirements."""
         requires = kwargs.get('requires', [])
 
         cls._cog_metadata = {
             'requires': requires,
         }
 
-    def get_name(self, user_id):
-        return str(self.bot.get_user(user_id))
-
-    async def get_json(self, url):
+    async def get_json(self, url: str) -> 'any':
+        """Get JSON from a url."""
         async with self.bot.session.get(url) as resp:
             try:
                 return await resp.json()
@@ -183,7 +182,7 @@ class Cog:
         return self.bot.cogs.get('Config').db
 
 
-async def shell(command: str):
+async def shell(command: str) -> str:
     """Execute shell commands."""
     process = await asyncio.create_subprocess_shell(
         command,

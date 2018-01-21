@@ -261,6 +261,41 @@ class Extra(Cog, requires=['config']):
         else:
             return f'{days:.2f} days'
 
+    async def fill_jcoin(self, account, user, em, ctx):
+        ranks = await self.jcoin.get_ranks(user.id, ctx.guild.id)
+        r_global, r_tax, r_guild = ranks['global'], ranks['taxes'], \
+            ranks['local']
+
+        guild_rank, global_rank = r_guild['rank'], r_global['rank']
+        guild_accounts, all_accounts = r_guild['total'], r_global['total']
+        tax_rank, tax_global = r_tax['rank'], r_tax['total']
+
+        em.add_field(name='JC Rank',
+                     value=f'{guild_rank}/{guild_accounts}, '
+                           f'{global_rank}/{all_accounts} globally')
+
+        em.add_field(name='JoséCoin Wallet',
+                     value=f'{account["amount"]}JC')
+        em.add_field(name='Tax paid',
+                     value=f'{account["taxpaid"]}JC')
+
+        em.add_field(name='Tax rank',
+                     value=f'{tax_rank} / {tax_global} globally')
+
+        try:
+            s_success = account['steal_success']
+            s_uses = account['steal_uses']
+
+            ratio = s_success / s_uses
+            ratio = round((ratio * 100), 3)
+
+            em.add_field(name='Stealing',
+                         value=f'{s_uses} tries, '
+                               f'{s_success} success, '
+                               f'ratio of success: {ratio}/steal')
+        except ZeroDivisionError:
+            pass
+
     @commands.command()
     @commands.guild_only()
     async def profile(self, ctx, *, user: discord.User = None):
@@ -275,7 +310,7 @@ class Extra(Cog, requires=['config']):
         em = discord.Embed(title='Profile card',
                            colour=self.mkcolor(user.name))
 
-        if len(user.avatar_url) > 0:
+        if user.avatar_url:
             em.set_thumbnail(url=user.avatar_url)
 
         raw_repr = await self.get_json('https://api.getdango.com/api/'
@@ -299,33 +334,11 @@ class Extra(Cog, requires=['config']):
         em.add_field(name='Account age',
                      value=f'{self.delta_str(delta)}')
 
-        account = await self.jcoin.get_account(user.id)
-        if account is not None:
-            guild_rank, global_rank, guild_accounts, all_accounts = await self.jcoin.ranks(user.id, ctx.guild)
-
-            tax_rank, tglobal_rank = await self.jcoin.tax_ranks(user.id)
-
-            em.add_field(name='JC Rank',
-                         value=f'{guild_rank}/{guild_accounts}, '
-                         f'{global_rank}/{all_accounts} globally')
-
-            em.add_field(name='JoséCoin Wallet',
-                         value=f'{account["amount"]}JC')
-            em.add_field(name='Tax paid',
-                         value=f'{account["taxpaid"]}JC')
-            em.add_field(name='Tax rank',
-                         value=f'{tax_rank} / {tglobal_rank} globally')
-
-            try:
-                ratio = account['success_steal'] / account['times_stolen']
-                ratio = round((ratio * 100), 3)
-
-                em.add_field(name='Stealing',
-                             value=f'{account["times_stolen"]} tries, '
-                             f'{account["success_steal"]} success, '
-                             f'ratio of success: {ratio}/steal')
-            except ZeroDivisionError:
-                pass
+        try:
+            account = await self.jcoin.get_account(user.id)
+            await self.fill_jcoin(account, user, em, ctx)
+        except self.jcoin.AccountNotFoundError:
+            pass
 
         await ctx.send(embed=em)
 
@@ -338,10 +351,10 @@ class Extra(Cog, requires=['config']):
             raise self.SayException('3 long 5 me pls bring it down dud')
 
         notmatch = re.sub(self.description_regex, '', description)
-        if len(notmatch) > 0:
+        if notmatch:
             raise self.SayException('there are non-allowed characters.')
 
-        if len(description) < 1:
+        if not description:
             raise self.SayException('pls put something')
 
         if description.count('\n') > 10:

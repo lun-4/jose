@@ -56,6 +56,7 @@ class Coins(Cog):
         #: Cache for probability values
         self.prob_cache = {}
 
+        self.AccountNotFoundError = AccountNotFoundError
         self.TransferError = TransferError
         self.ConditionError = ConditionError
 
@@ -64,43 +65,48 @@ class Coins(Cog):
 
     @property
     def headers(self):
+        """Get the headers for a josécoin request."""
         return {
             'Authorization': self.bot.config.JOSECOIN_TOKEN
         }
 
     async def generic_call(self, method: str, route: str,
-                           payload: dict = None) -> 'any':
+                           payload: dict = None, **kwargs) -> 'any':
         """Generic call to any JoséCoin API route."""
         route = self.route(route)
         headers = self.headers
         async with self.bot.session.request(method,
                                             route,
                                             json=payload,
-                                            headers=headers) as r:
-            log.debug('calling %s, status %d', route, r.status)
+                                            headers=headers) as resp:
 
-            if r.status == 500:
+            if kwargs.get('log', True):
+                log.debug('calling %s, status %d', route, resp.status)
+
+            if resp.status == 500:
                 raise Exception('Internal Server Error')
 
-            p = await r.json()
-            if isinstance(p, dict) and p.get('error'):
+            data = await resp.json()
+            if isinstance(data, dict) and data.get('error'):
+                msg = data.get('message')
                 for exc in err_list:
-                    if exc.status_code == r.status:
-                        raise exc(p['message'])
-                raise Exception(p['message'])
-            return p
+                    if exc.status_code == resp.status:
+                        raise exc(msg)
+                raise Exception(msg)
 
-    async def jc_get(self, route: str, payload: dict = None) -> 'any':
+            return data
+
+    async def jc_get(self, route: str, payload: dict = None, **kwargs):
         """Make a GET request to JoséCoin API."""
-        return await self.generic_call('GET', route, payload)
+        return await self.generic_call('GET', route, payload, **kwargs)
 
-    async def jc_post(self, route: str, payload: dict = None) -> 'any':
+    async def jc_post(self, route: str, payload: dict = None, **kwargs):
         """Calls a route with POST."""
-        return await self.generic_call('POST', route, payload)
+        return await self.generic_call('POST', route, payload, **kwargs)
 
-    async def jc_delete(self, route: str, payload: dict=None) -> 'any':
+    async def jc_delete(self, route: str, payload: dict = None, **kwargs):
         """Calls a route with DELETE."""
-        return await self.generic_call('DELETE', route, payload)
+        return await self.generic_call('DELETE', route, payload, **kwargs)
 
     def get_name(self, user_id: int, account=None):
         """Get a string representation of a user or guild.
@@ -119,9 +125,7 @@ class Coins(Cog):
         """
         if isinstance(user_id, discord.Guild):
             return f'taxbank:{user_id.name}'
-        elif isinstance(user_id, discord.User):
-            return str(user_id)
-        elif isinstance(user_id, discord.Member):
+        elif isinstance(user_id, (discord.User, discord.Member)):
             return str(user_id)
 
         obj = self.bot.get_user(int(user_id))
@@ -178,12 +182,22 @@ class Coins(Cog):
         return rows
 
     async def ensure_ctx(self, ctx):
+        """Ensure that things are sane, given ctx."""
         try:
             await self.create_wallet(ctx.bot.user)
         except:
             pass
 
     async def get_ranks(self, account_id: int, guild_id=None) -> dict:
+        """Get rank information.
+
+        Parameters
+        ----------
+        account_id: int
+            The user's account ID to compare with the guild accounts
+        guild_id: int
+            The guild's ID.
+        """
         rank_data = await self.jc_get(f'/wallets/{account_id}/rank', {
             'guild_id': guild_id
         })
@@ -191,17 +205,18 @@ class Coins(Cog):
 
     async def ranks(self, user_id: int, guild: discord.Guild) -> tuple:
         """Get rank info about a user, gives both global and local.
-        
+
         This method is compatible with JoséCoin v2.
         """
         rank_data = await self.get_ranks(user_id, guild.id)
         rdl = rank_data['local']
         rdg = rank_data['global']
-        return rdl['rank'], rdg['rank'], rdl['total'], rdl['global']
+        return rdl['rank'], rdg['rank'], rdl['total'], rdg['total']
 
     async def tax_ranks(self, user_id: int) -> tuple:
         """Get tax ranks for a user"""
-        raise NotImplementedError('method not implemented')
+        await self.jc_get('/taxranks')
+        return (-1, -1)
 
     async def transfer(self, from_id: int, to_id: int,
                        amount: decimal.Decimal) -> dict:
@@ -324,7 +339,8 @@ class Coins(Cog):
             if author_id in self.prob_cache:
                 probdata = self.prob_cache[author_id]
             else:
-                probdata = await self.jc_get(f'/wallets/{author_id}/probability')
+                probdata = await self.jc_get(f'/wallets/{author_id}/'
+                                             'probability', log=False)
                 self.pcache_set(author_id, probdata)
         except AccountNotFoundError:
             self.pcache_set(author_id, None)

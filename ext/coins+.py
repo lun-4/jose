@@ -8,7 +8,7 @@ from discord.ext import commands
 
 from .common import Cog, CoinConverter
 from .utils import Table
-from .coins2 import AccountType
+from .coins import AccountType
 
 log = logging.getLogger(__name__)
 

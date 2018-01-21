@@ -99,6 +99,9 @@ class JoseContext(commands.Context):
         else:
             await self.not_ok()
 
+    async def status(self, flag):
+        await self.success(flag)
+
     async def err(self, msg):
         await self.send(f'\N{POLICE CARS REVOLVING LIGHT} {msg}')
 
@@ -187,6 +190,7 @@ class JoseBot(commands.Bot):
             if isinstance(orig, tuple(self.simple_exc)):
                 log.error(f'Errored at {content!r} from {ctx.author!s}'
                           f'\n{orig!r}')
+                return await ctx.send(f'Error: `{error.original!r}`')
             else:
                 log.exception(f'Errored at {content!r} from {ctx.author!s}',
                               exc_info=orig)

@@ -153,6 +153,25 @@ async def create_account(request, account_id):
     return response.json({'inserted': rows})
 
 
+@app.delete('/api/wallets/<account_id:int>')
+async def delete_account(request, account_id: int):
+    try:
+        await request.app.db.execute("""
+        DELETE FROM accounts
+        WHERE account_id = $1
+        """, account_id)
+
+        return response.json({
+            'success': True
+        })
+    except Exception as err:
+        log.exception('error while deleting')
+        return response.json({
+            'success': False,
+            'err': repr(err)
+        })
+
+
 @app.post('/api/wallets/<sender_id:int>/transfer')
 async def transfer(request, sender_id):
     """Transfer money between users."""
@@ -297,10 +316,28 @@ async def wallet_rank(request, wallet_id: int):
 
     global_rank = global_rank['rank']
 
+    taxes_total = await request.app.db.fetchrow("""
+    SELECT COUNT(*) FROM wallets
+    """)
+    taxes_total = taxes_total['count']
+
+    taxes_rank = await request.app.db.fetchrow("""
+    SELECT s.rank FROM (
+        SELECT wallets.user_id, rank() over (
+            ORDER BY wallets.taxpaid DESC
+        ) FROM wallets
+    ) AS s WHERE s.user_id = $1
+    """, wallet_id)
+    taxes_rank = taxes_rank['rank']
+
     res = {
         'global': {
             'rank': global_rank,
             'total': global_total,
+        },
+        'taxes': {
+            'rank': taxes_rank,
+            'total': taxes_total,
         }
     }
 
