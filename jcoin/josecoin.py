@@ -28,6 +28,9 @@ AUTOCOIN_BASE_PROB = decimal.Decimal('0.012')
 PROB_CONSTANT = decimal.Decimal('1.003384590736')
 
 # !!!!! VERY IMPORTANT
+# the money type in psql doesn't handle Infinity or NaN,
+# so I have to "encode" infinity inside another number which
+# application wise is impossible, negative numbers do the job.
 ENCODED_INFINITY = -69
 
 
@@ -212,6 +215,8 @@ async def transfer(request, sender_id):
     if not is_inf(snd_amount) and amount > snd_amount:
         raise ConditionError(f'Not enough funds: {amount} > {snd_amount}')
 
+    rcv_amount = receiver['amount']
+
     amount = str(amount)
     async with request.app.db.acquire() as conn, conn.transaction():
         # send it back to db
@@ -230,11 +235,12 @@ async def transfer(request, sender_id):
             WHERE user_id=$2
             """, amount, sender_id)
 
-        await conn.execute("""
-            UPDATE accounts
-            SET amount=accounts.amount + $1
-            WHERE account_id = $2
-        """, amount, receiver_id)
+        if not is_inf(rcv_amount):
+            await conn.execute("""
+                UPDATE accounts
+                SET amount=accounts.amount + $1
+                WHERE account_id = $2
+            """, amount, receiver_id)
 
         # log transaction
         await conn.execute("""
@@ -247,7 +253,7 @@ async def transfer(request, sender_id):
     amount = float(amount)
     return response.json({
         'sender_amount': einf if is_inf(snd_amount) else snd_amount - amount,
-        'receiver_amount': einf if is_inf(receiver['amount']) else receiver['amount'] + amount
+        'receiver_amount': einf if is_inf(rcv_amount) else rcv_amount + amount
     })
 
 
@@ -466,27 +472,27 @@ async def get_wallets(request):
     key = request.json['key']
     try:
         reverse = bool(request.json['reverse'])
-    except:
+    except (ValueError, TypeError, KeyError):
         reverse = False
 
     sorting = 'DESC' if reverse else 'ASC'
 
     try:
         guild_id = int(request.json['guild_id'])
-    except:
+    except (ValueError, TypeError, KeyError):
         guild_id = None
 
     try:
         limit = int(request.json['limit'])
-    except:
+    except (ValueError, TypeError, KeyError):
         limit = 20
 
     try:
         acc_type = int(request.json['type'])
-    except:
+    except (ValueError, TypeError, KeyError):
         acc_type = -1
 
-    if limit <= 0 or limit > 30:
+    if limit <= 0 or limit > 60:
         raise InputError('invalid limit range')
 
     query = ''

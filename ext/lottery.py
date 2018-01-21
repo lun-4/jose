@@ -23,12 +23,20 @@ class Lottery(Cog, requires=['coins']):
     From time to time(maximum a week) a winner is chosen from the people
     who bought a ticket.
 
-    The winner gets 0.275% of money from all taxbanks.
+    The winner gets 0.275% of money from the top 40 taxbanks.
     This amount also increases with more people buying tickets.
     """
     def __init__(self, bot):
         super().__init__(bot)
         self.ticket_coll = self.config.jose_db['lottery']
+
+    async def get_taxbanks(self):
+        return await self.coins.jc_get('/wallets', {
+            'key': 'global',
+            'reverse': True,
+            'type': self.coins.AccountType.TAXBANK,
+            'limit': 40,
+        })
 
     @commands.group(aliases=['l'], invoke_without_command=True)
     async def lottery(self, ctx):
@@ -37,7 +45,8 @@ class Lottery(Cog, requires=['coins']):
         A read on 'j!help Lottery' is highly recommended.
         """
         amount = decimal.Decimal(0)
-        async for account in self.jcoin.jcoin_coll.find({'type': 'taxbank'}):
+        taxbanks = await self.get_taxbanks()
+        for account in taxbanks:
             amount += PERCENTAGE_PER_TAXBANK * \
                       decimal.Decimal(account['amount'])
 
@@ -97,18 +106,17 @@ class Lottery(Cog, requires=['coins']):
 
         # business logic is here
         total = decimal.Decimal(0)
-        async for account in self.jcoin.jcoin_coll.find({'type': 'taxbank'}):
+        taxbanks = await self.get_taxbanks()
+        for account in taxbanks:
             amount = PERCENTAGE_PER_TAXBANK * \
-                     decimal.Decimal(account['amount'])
-
-            if amount < 0.1:
-                continue
+                    decimal.Decimal(account['amount'])
 
             try:
-                await self.jcoin.transfer(account['id'], winner_id, amount)
+                await self.jcoin.transfer(account['account_id'],
+                                          winner_id, amount)
                 total += amount
             except Exception as err:
-                await ctx.send(f'err: {err}')
+                await ctx.send(f'err txb tx: {err!r}')
 
             await asyncio.sleep(0.2)
 

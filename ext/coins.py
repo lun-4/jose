@@ -56,6 +56,7 @@ class Coins(Cog):
         #: Cache for probability values
         self.prob_cache = {}
 
+        self.AccountType = AccountType
         self.AccountNotFoundError = AccountNotFoundError
         self.TransferError = TransferError
         self.ConditionError = ConditionError

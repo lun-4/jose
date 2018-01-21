@@ -68,8 +68,7 @@ class Gambling(Cog, requires=['coins']):
                                     " funds to make the duel.")
 
         try:
-            self.coins.lock_account(challenger)
-            self.coins.lock_account(challenged)
+            # TODO: await self.coins.lock(challenger, challenged)
 
             self.locked[challenged] = True
             try:
@@ -123,14 +122,12 @@ class Gambling(Cog, requires=['coins']):
                 msg = await self.bot.wait_for('message',
                                               timeout=5, check=duel_check)
             except asyncio.TimeoutError:
-                raise self.SayException('u guys suck')
+                raise self.SayException('u guys suck.')
 
             winner = msg.author.id
             duelists.remove(winner)
             loser = duelists[0]
 
-            self.coins.unlock_account(challenger)
-            self.coins.unlock_account(challenged)
             try:
                 await self.jcoin.transfer(loser, winner, amount)
             except self.jcoin.TransferError as err:
@@ -141,8 +138,8 @@ class Gambling(Cog, requires=['coins']):
             self.locked[challenged] = False
             if challenger in self.duels:
                 del self.duels[challenger]
-            self.coins.unlock_account(challenger)
-            self.coins.unlock_account(challenged)
+
+            # TODO: await self.coins.unlock(challenger, challenged)
 
     @commands.command()
     async def slots(self, ctx, amount: CoinConverter):

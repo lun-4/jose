@@ -92,39 +92,39 @@ class CoinsExt(Cog, requires=['coins']):
             raise self.SayException('invalid limit')
 
         if mode == 'g':
-            accounts = await self.coins2.jc_get('/wallets', {
+            accounts = await self.coins.jc_get('/wallets', {
                 'key': 'global',
                 'reverse': True,
                 'type': AccountType.USER,
                 'limit': limit,
             })
         elif mode == 'l':
-            accounts = await self.coins2.jc_get('/wallets', {
+            accounts = await self.coins.jc_get('/wallets', {
                 'key': 'local',
                 'guild_id': ctx.guild.id,
                 'reverse': True,
                 'limit': 'limit'
             })
         elif mode == 't':
-            accounts = await self.coins2.jc_get('/wallets', {
+            accounts = await self.coins.jc_get('/wallets', {
                 'key': 'taxpaid',
                 'reverse': True,
                 'limit': limit,
             })
         elif mode == 'b':
-            accounts = await self.coins2.jc_get('/wallets', {
+            accounts = await self.coins.jc_get('/wallets', {
                 'key': 'taxbanks',
                 'reverse': True,
                 'limit': limit,
             })
         elif mode == 'p':
-            accounts = await self.coins2.jc_get('/wallets', {
+            accounts = await self.coins.jc_get('/wallets', {
                 'key': 'global',
                 'type': AccountType.USER,
                 'limit': limit,
             })
         elif mode == 'lp':
-            accounts = await self.coins2.jc_get('/wallets', {
+            accounts = await self.coins.jc_get('/wallets', {
                 'key': 'local',
                 'guild_id': ctx.guild.id,
                 'limit': limit,
@@ -164,9 +164,9 @@ class CoinsExt(Cog, requires=['coins']):
     @commands.guild_only()
     async def taxes(self, ctx):
         """Show your taxbank's wallet."""
-        await self.coins2.ensure_taxbank(ctx)
-        acc = await self.coins2.get_account(ctx.guild.id)
-        await ctx.send(f'`{self.coins2.get_name(ctx.guild)}: {acc["amount"]}`')
+        await self.coins.ensure_taxbank(ctx)
+        acc = await self.coins.get_account(ctx.guild.id)
+        await ctx.send(f'`{self.coins.get_name(ctx.guild)}: {acc["amount"]}`')
 
     async def add_cooldown(self, user, c_type=0,
                            hours: int=DEFAULT_ARREST) -> int:
@@ -314,21 +314,21 @@ class CoinsExt(Cog, requires=['coins']):
         fee = amount / 2
 
         # maintain sanity
-        await self.coins2.ensure_ctx(ctx)
+        await self.coins.ensure_ctx(ctx)
 
         log.debug(f'arresting {thief}[{thief.id}]')
 
         try:
-            transfer_info = await self.coins2.transfer_str(thief, guild, fee)
+            transfer_info = await self.coins.transfer_str(thief, guild, fee)
             # fee is paid, jail.
             hours = await self.add_cooldown(thief)
-        except self.coins2.ConditionError:
+        except self.coins.ConditionError:
             # fee is not paid, BIG JAIL.
-            thief_acc = await self.coins2.get_account(thief)
+            thief_acc = await self.coins.get_account(thief)
             amnt = thief_acc['amount']
 
             # zero the wallet, convert 1jc to extra hour in jail
-            transfer_info = await self.coins2.zero(thief, ctx.guild.id)
+            transfer_info = await self.coins.zero(thief, ctx.guild.id)
             hours = await self.add_cooldown(thief, 0,
                                             DEFAULT_ARREST + int(amnt))
 
@@ -377,7 +377,7 @@ class CoinsExt(Cog, requires=['coins']):
          - You are automatically jailed if you try to steal
             more than your target's wallet.
         """
-        c2 = self.coins2
+        c2 = self.coins
         await c2.ensure_ctx(ctx)
         thief = ctx.author
 
