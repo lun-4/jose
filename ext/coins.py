@@ -186,7 +186,7 @@ class Coins(Cog):
         """Ensure that things are sane, given ctx."""
         try:
             await self.create_wallet(ctx.bot.user)
-        except:
+        except self.ConditionError:
             pass
 
     async def get_ranks(self, account_id: int, guild_id=None) -> dict:
