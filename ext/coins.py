@@ -561,6 +561,8 @@ class Coins(Cog):
         """
         while True:
             tasks = []
+            done, pending = None, None
+
             with Timer() as timer:
                 for i in range(taskcount):
                     coro = self.transfer(ctx.bot.user.id,
@@ -568,11 +570,10 @@ class Coins(Cog):
                     t = self.loop.create_task(coro)
                     tasks.append(t)
 
-            done, pending = await asyncio.wait(tasks, timeout=timeout)
+                done, pending = await asyncio.wait(tasks, timeout=timeout)
             self.loop.create_task(ctx.send(f'{taskcount} tasks in {timer}'))
 
-            lp = len(pending)
-            if lp:
+            if pending:
                 return await ctx.send(f'stopping from {lp} > 0 pending')
 
             taskcount *= 2
