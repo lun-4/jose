@@ -252,16 +252,18 @@ class JoinSession:
         and the heist to start.
 
         Returns
+        -------
         any
             Anything
 
         Raises
         ------
         Exception
-            Whatever :class:`JoinSession.do_heist` raises.
+            Whatever :meth:`JoinSession.do_heist` raises.
         RuntimeError
             If no task is provided to the session.
         """
+        # NOTE: I do not know how well this works.
         guild = self.ctx.guild
         log.info(f'Forcing a finish at {guild!s}[{guild.id}]')
         self.finish.set()
@@ -329,21 +331,36 @@ class Heist(Cog):
             - If the session isn't started and we required a started session
         """
         session = self.sessions.get(ctx.guild.id)
-        if session is None and target is None:
+        if not session and not target:
             raise self.SayException('Cannot create a session without a target')
 
-        if session is None:
+        if not session:
+            # create a session
             session = JoinSession(ctx, target)
             self.sessions[ctx.guild.id] = session
 
         if session.started and clean:
             raise self.SayException('An already started join session exists')
-        elif (not session.started) and (not clean):
+        elif not session.started and not clean:
             raise self.SayException("Join session isn't started")
 
         return session
 
-    async def check_user(self, ctx, session):
+    async def check_user(self, ctx, session: JoinSession):
+        """Check if this user can enter the session
+        
+        Paramters
+        ---------
+        ctx: `Context`
+            Command context.
+        session: `JoinSession`
+            The heist join session to check against.
+
+        Raises
+        ------
+        SayException
+            On a failed check.
+        """
         cext = self.bot.get_cog('CoinsExt')
         coins = self.bot.get_cog('Coins')
 
@@ -389,10 +406,12 @@ class Heist(Cog):
                                         'exists with the same target')
 
         if target == ctx.guild:
-            raise self.SayException('stealing from the same guild? :thinking:')
+            raise self.SayException('stealing from the same guild? '
+                                    '\N{THINKING FACE}')
 
-        taxbank = await self.coins.get_account(target.id)
-        if not taxbank:
+        try:
+            taxbank = await self.coins.get_account(target.id)
+        except self.coins.AccountNotFoundError:
             raise self.SayException('Guild taxbank account not found')
 
         if amount > taxbank['amount']:
@@ -445,12 +464,16 @@ class Heist(Cog):
         """Get your current heist join session."""
         session = self.get_sess(ctx)
 
-        em = discord.Embed(title='Current heist status')
+        em = discord.Embed(title='Current heist status',
+                           color=discord.Color.blurple())
 
         em.add_field(name='Guild being attacked',
-                     value=f'`{session.target!s}` [{session.target.id}]')
+                     value=f'`{session.target!s}` [{session.target.id}]',
+                     inline=False)
+
         em.add_field(name='Amount being heisted',
-                     value=f'`{session.amount!s}`JC')
+                     value=f'`{session.amount!s}`JC',
+                     inline=False)
 
         users_in_heist = []
         for user_id in session.users:

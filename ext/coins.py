@@ -158,7 +158,7 @@ class Coins(Cog):
         if getattr(wallet_id, 'id', None):
             wallet_id = wallet_id.id
 
-        r = await self.jc_get(f'/wallets/{wallet_id}')
+        r = await self.jc_get(f'/wallets/{wallet_id}', log=False)
         r['amount'] = decimal.Decimal(f'{r["amount"]:.3f}')
         try:
             r['taxpaid'] = decimal.Decimal(f'{r["taxpaid"]:.3f}')
@@ -229,7 +229,7 @@ class Coins(Cog):
         res = await self.jc_post(f'/wallets/{from_id}/transfer', {
             'receiver': to_id,
             'amount': str(amount)
-        })
+        }, log=False)
 
         sender_name = self.get_name(from_id)
         receiver_name = self.get_name(to_id)
@@ -257,7 +257,7 @@ class Coins(Cog):
             return
         except AccountNotFoundError:
             await self.create_wallet(ctx.guild)
-    
+
     async def get_gdp(self) -> decimal.Decimal:
         """Get the economy's gdp."""
         gdp = await self.jc_get('/gdp')
@@ -269,12 +269,42 @@ class Coins(Cog):
                                    self.bot.user.id,
                                    amount)
 
-    async def zero(self, user_id: int, where: 'any'=None) -> str:
+    async def zero(self, user_id: int, where: 'any' = None) -> str:
         """Zero an account"""
         account = await self.get_account(user_id)
         target = where or self.bot.user.id
         return await self.transfer_str(user_id, target,
                                        account['amount'])
+
+    def to_acclist(self, users: list) -> list:
+        account_ids = []
+        for u in users:
+            uid = getattr(u, 'id', None)
+            if uid:
+                account_ids.append(uid)
+                continue
+
+            account_ids.append(u)
+
+        return account_ids
+
+    async def lock(self, *users):
+        """Lock accounts from transfer operations."""
+        await self.jc_post('/lock_accounts', {
+            'accounts': self.to_acclist(users)
+        })
+
+    async def unlock(self, *users):
+        """Unlock accounts from transfer operations."""
+        await self.jc_post('/unlock_accounts', {
+            'accounts': self.to_acclist(users)
+        })
+
+    async def is_locked(self, account_id: int):
+        """Check if an account is locked"""
+        return await self.jc_get('/check_lock', {
+            'account_id': account_id
+        })
 
     def _pcache_invalidate(self, user_id: int):
         """Invalidate the prob cache after 2 hours for one user."""
@@ -539,7 +569,7 @@ class Coins(Cog):
                     tasks.append(t)
 
             done, pending = await asyncio.wait(tasks, timeout=timeout)
-            await ctx.send(f'{taskcount} tasks in {timer}')
+            self.loop.create_task(ctx.send(f'{taskcount} tasks in {timer}'))
 
             lp = len(pending)
             if lp:

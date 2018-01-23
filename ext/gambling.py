@@ -24,6 +24,7 @@ class Gambling(Cog, requires=['coins']):
         self.locked = collections.defaultdict(bool)
 
     @commands.command()
+    @commands.guild_only()
     async def duel(self, ctx, challenged_user: discord.User,
                    amount: CoinConverter):
         """Duel a user for coins.
@@ -68,15 +69,12 @@ class Gambling(Cog, requires=['coins']):
                                     " funds to make the duel.")
 
         try:
-            # TODO: await self.coins.lock(challenger, challenged)
+            await self.coins.lock(challenger, challenged)
 
             self.locked[challenged] = True
-            try:
-                await ctx.send(f'{challenged_user}, you got challenged '
-                               f'for a duel :gun: by {challenger_user} '
-                               f'with a total of {amount}JC, accept it? (y/n)')
-            except:
-                pass
+            await ctx.send(f'{challenged_user}, you got challenged '
+                           f'for a duel :gun: by {challenger_user} '
+                           f'with a total of {amount}JC, accept it? (y/n)')
 
             def yn_check(msg):
                 cnt = msg.content
@@ -93,8 +91,6 @@ class Gambling(Cog, requires=['coins']):
             if msg.content != 'y':
                 raise self.SayException("Challenged person didn't"
                                         " say a lowercase `y`.")
-
-            self.locked[challenged] = False
 
             countdown = 3
             countdown_msg = await ctx.send('First to send a '
@@ -124,6 +120,9 @@ class Gambling(Cog, requires=['coins']):
             except asyncio.TimeoutError:
                 raise self.SayException('u guys suck.')
 
+            self.locked[challenged] = False
+            await self.coins.unlock(challenger, challenged)
+
             winner = msg.author.id
             duelists.remove(winner)
             loser = duelists[0]
@@ -139,7 +138,7 @@ class Gambling(Cog, requires=['coins']):
             if challenger in self.duels:
                 del self.duels[challenger]
 
-            # TODO: await self.coins.unlock(challenger, challenged)
+            await self.coins.unlock(challenger, challenged)
 
     @commands.command()
     async def slots(self, ctx, amount: CoinConverter):

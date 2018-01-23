@@ -404,8 +404,7 @@ class CoinsExt(Cog, requires=['coins']):
                                     'cannot steal them')
 
         try:
-            # critical session
-            # TODO: await c2.lock(thief.id, target.id)
+            await c2.lock(thief.id, target.id)
             await ctx.send('lock?')
 
             await self.check_cooldowns(thief)
@@ -413,7 +412,7 @@ class CoinsExt(Cog, requires=['coins']):
             await self.check_points(thief)
 
             await c2.jc_post(f'/wallets/{thief.id}/steal_use')
-            # TODO: await c2.unlock(thief.id, target.id)
+            await c2.unlock(thief.id, target.id)
             await ctx.send('unlock?')
 
             # checking for other stuff that cause autojail
@@ -461,7 +460,7 @@ class CoinsExt(Cog, requires=['coins']):
                 hours, transfer_info = await self.arrest(ctx, amount)
                 self.steal_info(res, chance, transfer_info, hours)
         finally:
-            # TODO: await c2.unlock(thief.id, target.id)
+            await c2.unlock(thief.id, target.id)
             await ctx.send('unlock?')
 
     @commands.command(name='stealstate', aliases=['stealstatus'])
