@@ -8,6 +8,7 @@ import logging
 import asyncio
 import decimal
 import time
+from collections import defaultdict
 
 import asyncpg
 
@@ -211,6 +212,15 @@ async def transfer(request, sender_id):
     if not receiver:
         raise AccountNotFoundError('Receiver is missing account')
 
+    sender_lock = request.app.account_locks[sender_id]
+    receiver_lock = request.app.account_locks[receiver_id]
+
+    if sender_lock:
+        raise ConditionError('Sender account is locked')
+
+    if receiver_lock:
+        raise ConditionError('Receiver account is locked')
+
     snd_amount = sender['amount']
     if not is_inf(snd_amount) and amount > snd_amount:
         raise ConditionError(f'Not enough funds: {amount} > {snd_amount}')
@@ -254,6 +264,39 @@ async def transfer(request, sender_id):
     return response.json({
         'sender_amount': einf if is_inf(snd_amount) else snd_amount - amount,
         'receiver_amount': einf if is_inf(rcv_amount) else rcv_amount + amount
+    })
+
+
+@app.post('/api/lock_accounts')
+async def lock_account(request):
+    """Lock an account from transfer operations."""
+    accounts = list(request.json['accounts'])
+    for acc_id in accounts:
+        request.app.account_locks[acc_id] = True
+
+    return response.json({
+        'status': True
+    })
+
+
+@app.post('/api/unlock_accounts')
+async def unlock_account(request):
+    """UnLock an account from transfer operations."""
+    accounts = list(request.json['accounts'])
+    for acc_id in accounts:
+        request.app.account_locks[acc_id] = False
+
+    return response.json({
+        'status': True
+    })
+
+
+@app.get('/api/check_lock')
+async def is_locked(request):
+    """Return if the account is locked or not."""
+    account_id = int(request.json['account_id'])
+    return response.json({
+        'locked': request.app.account_locks[account_id]
     })
 
 
@@ -633,6 +676,7 @@ def main():
     loop = asyncio.get_event_loop()
 
     server = app.create_server(host='0.0.0.0', port=8080)
+    app.account_locks = defaultdict(bool)
     loop.create_task(server)
     loop.create_task(db_init(app))
     try:
