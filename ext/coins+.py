@@ -203,7 +203,7 @@ class CoinsExt(Cog, requires=['coins']):
             WHERE user_id=$1
             """, user_id)
 
-    async def check_cooldowns(self, thief):
+    async def check_cooldowns(self, thief: discord.User):
         """Check if the current thief is with its cooldowns
         checked up.
         """

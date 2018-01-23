@@ -47,6 +47,7 @@ class JoinSession:
     def __init__(self, ctx, target):
         self.ctx = ctx
         self.bot = ctx.bot
+
         self.heist = ctx.cog
         self.id = ctx.guild.id
 
@@ -112,12 +113,10 @@ class JoinSession:
         if not jcoin:
             raise SayException('coins cog not loaded')
 
-        target_account = await jcoin.get_account(self.target.id)
-        if target_account is None:
+        try:
+            target_account = await jcoin.get_account(self.target.id)
+        except self.coins.AccountNotFoundError:
             raise SayException('Guild not found')
-
-        if target_account['type'] != 'taxbank':
-            raise SayException('Account is not a taxbank')
 
         amnt = target_account['amount']
         increase_people = len(self.users) * INCREASE_PER_PERSON
@@ -324,7 +323,7 @@ class Heist(Cog):
         cext = self.bot.get_cog('CoinsExt')
         coins = self.bot.get_cog('Coins')
 
-        await cext.check_cooldowns(ctx)
+        await cext.check_cooldowns(ctx.author)
         acc = await coins.get_account(ctx.author.id)
         if acc['amount'] < 10:
             raise self.SayException("You don't have more than"
