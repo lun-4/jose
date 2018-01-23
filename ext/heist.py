@@ -64,7 +64,7 @@ class JoinSession:
         self.task = None
 
     @property
-    def fine(self) -> 'decimal.Decimal':
+    def fine(self) -> decimal.Decimal:
         """Get the fine to be paid by all people in the session
         if the heist failed.
 
@@ -77,9 +77,10 @@ class JoinSession:
         fine = self.amount / len(self.users)
         return round(fine, 3)
 
-    def fmt_res(self, res):
+    def fmt_res(self, res: dict) -> str:
         """Format data from a heist result object to a nice string"""
-        return f'`success: {res["success"]}, chance: {res["chance"]}, res: {res["result"]}`'
+        rs, rc, rr = res['success'], res['change'], res['result']
+        return f'`success: {rs}, chance: {rc}, res: {rr}`'
 
     def add_member(self, user_id: int):
         self.started = True
@@ -103,7 +104,6 @@ class JoinSession:
         log.info('Doing the heist')
 
         res = {
-            'success': False,
             'jailed': [],
             'saved': [],
         }
@@ -111,7 +111,7 @@ class JoinSession:
         bot = ctx.bot
         jcoin = bot.get_cog('Coins')
         if not jcoin:
-            raise SayException('coins cog not loaded')
+            raise RuntimeError('coins cog not loaded')
 
         try:
             target_account = await jcoin.get_account(self.target.id)
@@ -120,22 +120,23 @@ class JoinSession:
 
         amnt = target_account['amount']
         increase_people = len(self.users) * INCREASE_PER_PERSON
-        chance = BASE_HEIST_CHANCE + ((amnt / self.amount) + increase_people) * HEIST_CONSTANT
+
+        samnt = self.amount
+        incr = increase_people
+        chance = BASE_HEIST_CHANCE + ((amnt / samnt) + incr) * HEIST_CONSTANT
 
         # trim it to 60% success
         if chance > 6:
             chance = 6
 
         result = random.uniform(0, 10)
+        res.update({
+            'chance': chance,
+            'result': result,
+            'success': result < chance,
+        })
 
-        res['chance'] = chance
-        res['result'] = result
-
-        if result < chance:
-            res['success'] = True
-        else:
-            res['success'] = False
-
+        if not res['success']:
             # 50% chance of every person
             # in the heist to go to jail
             for user_id in self.users:
@@ -145,6 +146,22 @@ class JoinSession:
                     res['saved'].append(user_id)
 
         return res
+
+    def get_embed(self, res):
+        em = discord.Embed(title='Heist Results')
+
+        rs = res['success']
+        em.color = discord.Color.green() if rs else discord.Color.red()
+
+        em.add_field(name='Chance & Res',
+                     value=f'{res["chance"]}, {res["result"]:.2}',
+                     inline=False)
+
+        em.add_field(name='Success',
+                     value=rs,
+                     inline=False)
+
+        return em
 
     async def jail(self, res: dict):
         """Put people in jail."""
@@ -158,22 +175,26 @@ class JoinSession:
 
         for jailed_id in res['jailed']:
             jailed = self.bot.get_user(jailed_id)
-            if jailed is None:
+            if not jailed:
                 log.warning('uid=%d not found', jailed_id)
                 continue
 
             # put them in normal jail
             await self.cext.add_cooldown(jailed)
 
-        await ctx.send(self.fmt_res(res))
+        em = self.get_embed(res)
 
         jailed_mentions = ' '.join([f'<@{jailed}>'
                                     for jailed in res['jailed']])
-        await ctx.send(f'In jail: {jailed_mentions}')
+        em.add_field(name='Users in jail',
+                     value=jailed_mentions or '<none>', inline=False)
 
         saved_mentions = ' '.join([f'<@{saved}>'
                                    for saved in res['saved']])
-        await ctx.send(f'Not in Jail: {saved_mentions}')
+        em.add_field(name='Users not in jail',
+                     value=saved_mentions or '<none>', inline=False)
+
+        await ctx.send(embed=em)
 
     async def target_send(self, msg):
         """Send a message to the target guild.
@@ -186,21 +207,22 @@ class JoinSession:
         config = self.heist.config
 
         chan_id = await config.cfg_get(self.target, 'notify_channel')
-        if chan_id is None:
+        if not chan_id:
             return
 
         notify = self.target.get_channel(chan_id)
-        if notify is None:
+        if not notify:
             return
 
         await notify.send(msg)
 
     async def process_heist(self, res: dict):
         """Process the result given by :meth:`JoinSession.do_heist`"""
-        await self.ctx.send(f'debug information, ignore: `{res!r}`')
+        log.log(60, f'heist debug information: `{res!r}`')
+        ctx = self.ctx
 
+        self.heist.sessions.pop(self.id)
         if not res['success']:
-            self.heist.sessions.pop(self.id)
             return await self.jail(res)
 
         log.info('Heist success')
@@ -215,13 +237,15 @@ class JoinSession:
                 await self.coins.transfer(self.target.id, user_id, self.fine)
             except self.coins.TransferError as err:
                 log.warning(f'transfer failed {err!r}')
-                pass
 
             await self.cext.add_cooldown(user, 1, 7)
 
-        self.heist.sessions.pop(self.id)
-        await self.ctx.send(f'{self.fmt_res(res)} Transferred {self.fine} to all {len(self.users)} users of the session')
-        await self.target_send(f'Your taxbank got stolen from a heist, the thieves got {self.fine}JC')
+        em = self.get_embed(res)
+        em.add_field(name='Outcome',
+                     value=f'Transferred {self.fine} to {len(self.users)}')
+        await ctx.send(embed=em)
+        await self.target_send(f'Your taxbank got stolen from a heist, the '
+                               f'thieves got {self.fine}JC')
 
     async def force_finish(self) -> 'any':
         """Force the join session to finish
