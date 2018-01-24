@@ -257,6 +257,7 @@ class JoseBot(commands.Bot):
 
     def load_extension(self, name: str):
         """wrapper for the Bot.load_extension"""
+        log.debug(f'[load:loading] {name}')
         t_start = time.monotonic()
         super().load_extension(name)
         t_end = time.monotonic()
@@ -269,6 +270,8 @@ class JoseBot(commands.Bot):
         requires = cls._cog_metadata.get('requires', [])
 
         log.debug('requirements for %s: %r', cls, requires)
+        if not requires:
+            log.debug(f'no requirements for {cls}')
         for _req in requires:
             req = f'ext.{_req}'
             if req in self.extensions:
