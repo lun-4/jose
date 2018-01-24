@@ -917,4 +917,4 @@ class Starboard(Cog, requires=['config']):
 
 
 def setup(bot):
-    bot.add_cog(Starboard(bot))
+    bot.add_jose_cog(Starboard)

@@ -212,4 +212,4 @@ class NSFW(Cog, requires=['config']):
 
 
 def setup(bot):
-    bot.add_cog(NSFW(bot))
+    bot.add_jose_cog(NSFW)

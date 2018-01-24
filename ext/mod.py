@@ -394,4 +394,4 @@ class Moderation(Cog, requires=['config']):
 
 
 def setup(bot):
-    bot.add_cog(Moderation(bot))
+    bot.add_jose_cog(Moderation)
