@@ -62,8 +62,9 @@ class CoinConverter(commands.Converter):
             else:
                 target = ctx.author
 
-            account = await coins.get_account(target.id)
-            if not account:
+            try:
+                account = await coins.get_account(target.id)
+            except coins.AccountNotFoundError:
                 raise ba(f'Your target `{target}` does not have a'
                          ' JoséCoin account.')
 
@@ -82,8 +83,9 @@ class CoinConverter(commands.Converter):
 
         # Ensure a taxbank account tied to the guild exists
         await coins.ensure_taxbank(ctx)
-        account = await coins.get_account(ctx.author.id)
-        if not account:
+        try:
+            account = await coins.get_account(ctx.author.id)
+        except coins.AccountNotFoundError:
             raise ba("You don't have a JoséCoin account, "
                      f"make one with `j!account`")
 

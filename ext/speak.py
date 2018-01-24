@@ -248,10 +248,17 @@ class Speak(Cog):
         None
         """
         account = None
+        # quickpatches
         if mode == 'user':
-            account = await self.coins.get_account(ctx.author.id)
+            try:
+                account = await self.coins.get_account(ctx.author.id)
+            except self.coins.AccountNotFoundError:
+                account = None
         elif mode == 'txb':
-            account = await self.coins.get_account(ctx.guild.id)
+            try:
+                account = await self.coins.get_account(ctx.guild.id)
+            except self.coins.AccountNotFoundError:
+                account = None
         else:
             raise RuntimeError(f'Sentence tax type not found: {mode}')
 
@@ -259,7 +266,7 @@ class Speak(Cog):
             return
 
         try:
-            await self.coins.sink(account['id'], SENTENCE_PRICE)
+            await self.coins.sink(account['account_id'], SENTENCE_PRICE)
         except self.coins.TransferError as err:
             # we retry, doing the taxbank instead of user
             # or user instead of taxbank
