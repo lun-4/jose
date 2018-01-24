@@ -575,7 +575,8 @@ async def get_wallets(request):
     elif key == 'taxpaid':
         query = f"""
         SELECT * FROM wallets_taxpaid
-        JOIN accounts ON account_amount.account_id = wallets_taxpaid.user_id
+        JOIN account_amount
+        ON account_amount.account_id = wallets_taxpaid.user_id
 
         ORDER BY taxpaid {sorting}
         LIMIT {limit}

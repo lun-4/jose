@@ -103,7 +103,7 @@ class CoinsExt(Cog, requires=['coins']):
                 'key': 'local',
                 'guild_id': ctx.guild.id,
                 'reverse': True,
-                'limit': 'limit'
+                'limit': limit
             })
         elif mode == 't':
             accounts = await self.coins.jc_get('/wallets', {
@@ -111,6 +111,7 @@ class CoinsExt(Cog, requires=['coins']):
                 'reverse': True,
                 'limit': limit,
             })
+            return await self.show(ctx, accounts, field='taxpaid')
         elif mode == 'b':
             accounts = await self.coins.jc_get('/wallets', {
                 'key': 'taxbanks',
