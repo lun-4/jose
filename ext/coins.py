@@ -141,9 +141,9 @@ class Coins(Cog):
             # we tried stuff, show a special text
             if account:
                 res = ''
-                if account['type'] == AccountType.USER:
+                if account['account_type'] == AccountType.USER:
                     res = f'Unfindable User {user_id}'
-                elif account['type'] == AccountType.TAXBANK:
+                elif account['account_type'] == AccountType.TAXBANK:
                     res = f'Unfindable Guild {user_id}'
                 else:
                     res = f'Unfindable Unknown {user_id}'
