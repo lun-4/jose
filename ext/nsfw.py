@@ -83,7 +83,7 @@ class GelBooru(BooruProvider):
         return post['owner']
 
 
-class NSFW(Cog):
+class NSFW(Cog, requires=['config']):
     def __init__(self, bot):
         super().__init__(bot)
         self.whip_coll = self.config.jose_db['whip']

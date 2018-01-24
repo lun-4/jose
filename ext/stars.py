@@ -162,7 +162,7 @@ def check_nsfw(guild, config, message):
         raise StarError('NSFW message in SFW starboard')
 
 
-class Starboard(Cog):
+class Starboard(Cog, requires=['config']):
     """Starboard.
 
     lol starboard u kno the good shit

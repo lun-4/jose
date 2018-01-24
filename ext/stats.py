@@ -18,7 +18,7 @@ def empty_stats(c_name):
     }
 
 
-class Statistics(Cog):
+class Statistics(Cog, requires=['config']):
     """Bot stats stuff."""
     def __init__(self, bot):
         super().__init__(bot)

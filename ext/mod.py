@@ -33,7 +33,7 @@ def is_moderator():
     return commands.check(_is_moderator)
 
 
-class Moderation(Cog):
+class Moderation(Cog, requires=['config']):
     """Moderation system."""
     def __init__(self, bot):
         super().__init__(bot)
