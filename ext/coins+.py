@@ -95,7 +95,7 @@ class CoinsExt(Cog, requires=['coins']):
             accounts = await self.coins.jc_get('/wallets', {
                 'key': 'global',
                 'reverse': True,
-                'type': AccountType.USER,
+                'type': self.coins.AccountType.USER,
                 'limit': limit,
             })
         elif mode == 'l':
@@ -111,7 +111,7 @@ class CoinsExt(Cog, requires=['coins']):
                 'reverse': True,
                 'limit': limit,
             })
-            return await self.show(ctx, accounts, field='taxpaid')
+            return await self.show(ctx, accounts, field='taxpaid', limit=limit)
         elif mode == 'b':
             accounts = await self.coins.jc_get('/wallets', {
                 'key': 'taxbanks',
@@ -133,7 +133,7 @@ class CoinsExt(Cog, requires=['coins']):
         else:
             raise self.SayException('mode not found')
 
-        await self.show(ctx, accounts)
+        await self.show(ctx, accounts, limit=limit)
 
     @commands.command(name='prices')
     async def _prices(self, ctx):
