@@ -14,23 +14,14 @@ from .common import Cog, CoinConverter
 from .utils import Timer
 
 sys.path.append('..')
-from jcoin.errors import GenericError, AccountNotFoundError, \
-        InputError, ConditionError, err_list
+from jcoin.errors import GenericError, TransferError, \
+        AccountNotFoundError, InputError, ConditionError, err_list
+
 
 log = logging.getLogger(__name__)
 REWARD_COOLDOWN = 18000
 
 TAX_MULTIPLIER = decimal.Decimal('1.42')
-
-
-class TransferError(Exception):
-    """Represents a generic transfer error."""
-    pass
-
-
-class PostError(Exception):
-    """Represents a generic POST error to the API."""
-    pass
 
 
 class AccountType:
@@ -40,9 +31,7 @@ class AccountType:
 
 
 class Coins(Cog):
-    """Version 3 of JoséCoin.
-
-    NOTE: this is incomplete
+    """JoséCoin v3
     """
     def __init__(self, bot):
         super().__init__(bot)
