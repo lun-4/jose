@@ -27,33 +27,7 @@ extensions = [
     'config',
     'admin',
     'exec',
-    'pipupdates',
-    # 'coins',
-    # 'coins+',
-    'coins2',
-    'coins2+',
 
-    'basic',
-    'gambling',
-    'speak',
-    'math',
-    'datamosh',
-    'memes',
-    'extra',
-    'stars',
-    'stats',
-    'mod',
-    'botcollection',
-    'playing',
-    'sub',
-    'nsfw',
-    'heist',
-    'midi',
-    'lottery',
-    'chatbot',
-    'translation',
-    'memework',
-    'wikihow',
     'state',
 ]
 
@@ -292,6 +266,9 @@ class JoseBot(commands.Bot):
         Thanks FrostLuma for code!
         """
 
+        for extension in extensions:
+            self.load_extension(f'ext.{extension}')
+
         path = pathlib.Path('ext/')
         files = path.glob('**/*.py')
 
@@ -307,6 +284,9 @@ class JoseBot(commands.Bot):
             if not hasattr(module, 'setup'):
                 # ignore extensions that do not have a setup() function
                 continue
+
+            if name in extensions:
+                log.debug(f'ignoring {name}')
 
             self.load_extension(name)
 
