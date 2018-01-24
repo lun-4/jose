@@ -5,7 +5,7 @@ import logging
 import discord
 from discord.ext import commands
 
-JOSE_VERSION = '2.3'
+JOSE_VERSION = '2.4'
 
 ZERO = decimal.Decimal(0)
 INF = decimal.Decimal('inf')
