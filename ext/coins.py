@@ -109,7 +109,7 @@ class Coins(Cog):
         """Calls a route with DELETE."""
         return await self.generic_call('DELETE', route, payload, **kwargs)
 
-    def get_name(self, user_id: int, account=None):
+    def get_name_raw(self, user_id: int, account=None):
         """Get a string representation of a user or guild.
 
         Parameters
@@ -125,7 +125,7 @@ class Coins(Cog):
         str
         """
         if isinstance(user_id, discord.Guild):
-            return f'taxbank:{user_id.name}'
+            return str(f'taxbank:{user_id.name}')
         elif isinstance(user_id, (discord.User, discord.Member)):
             return str(user_id)
 
@@ -152,6 +152,11 @@ class Coins(Cog):
                 return f'Unfindable ID {user_id}'
 
         return str(obj)
+
+    def get_name(self, *args, **kwargs):
+        """Clean the content of get_name call."""
+        res = self.get_name_raw(*args, **kwargs)
+        return self.bot.clean_content(res)
 
     async def get_account(self, wallet_id: int) -> dict:
         """Get an account"""
@@ -448,12 +453,25 @@ class Coins(Cog):
         await ctx.send(f'\N{MONEY WITH WINGS} `{ctx.author!s}` > '
                        f'`{amount}JC` > `{ctx.guild!s}` \N{MONEY BAG}')
 
-    @commands.command()
+    @commands.command(name='ranks')
     @commands.guild_only()
-    async def _ranks(self, ctx):
-        """Get rank data."""
-        res = await self.get_ranks(ctx.author.id, ctx.guild.id)
-        await ctx.send(res)
+    async def _ranks(self, ctx, person: discord.User = None):
+        """Get rank data from someone."""
+        if not person:
+            person = ctx.author
+
+        res = await self.get_ranks(person.id, ctx.guild.id)
+        em = discord.Embed(title=f'Rank data for {person}',
+                           color=discord.Color(0x540786))
+
+        for cat in res:
+            data = res[cat]
+            em.add_field(name=cat.capitalize(),
+                         value=f'#{data["rank"]} out from '
+                               f'{data["total"]} accounts',
+                         inline=False)
+
+        await ctx.send(embed=em)
 
     @commands.command()
     async def jcping(self, ctx):

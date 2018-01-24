@@ -137,7 +137,8 @@ class CoinsExt(Cog, requires=['coins']):
     @commands.command(name='prices')
     async def _prices(self, ctx):
         """Show price information about commands."""
-        em = discord.Embed(title='Pricing')
+        em = discord.Embed(title='Pricing',
+                           color=discord.Color(0x2192bc))
         descriptions = {
             'OPR': ('Operational tax for high-load commands',
                     ('yt', 'datamosh'),
@@ -180,6 +181,8 @@ class CoinsExt(Cog, requires=['coins']):
         INSERT INTO steal_cooldown (user_id, ctype, finish)
         VALUES ($1, $2, now() + interval '{hours} hours')
         """, user.id, c_type)
+
+        return hours
 
     async def remove_cooldown(self, user, c_type: CooldownTypes):
         """Remove a cooldown from a user.
@@ -387,7 +390,7 @@ class CoinsExt(Cog, requires=['coins']):
         # make sure both have accounts
         try:
             thief_acc = await c2.get_account(thief.id)
-            target_acc = await c2.get_account(thief.id)
+            target_acc = await c2.get_account(target.id)
         except c2.AccountNotFoundError:
             raise self.SayException("One of you don't have a JoséCoin wallet")
 
@@ -405,7 +408,6 @@ class CoinsExt(Cog, requires=['coins']):
 
         try:
             await c2.lock(thief.id, target.id)
-            await ctx.send('lock?')
 
             await self.check_cooldowns(thief)
             await self.check_grace(target)
@@ -413,7 +415,6 @@ class CoinsExt(Cog, requires=['coins']):
 
             await c2.jc_post(f'/wallets/{thief.id}/steal_use')
             await c2.unlock(thief.id, target.id)
-            await ctx.send('unlock?')
 
             # checking for other stuff that cause autojail
             if target_acc['amount'] == -69:
@@ -461,7 +462,6 @@ class CoinsExt(Cog, requires=['coins']):
                 self.steal_info(res, chance, transfer_info, hours)
         finally:
             await c2.unlock(thief.id, target.id)
-            await ctx.send('unlock?')
 
     @commands.command(name='stealstate', aliases=['stealstatus'])
     async def stealstate(self, ctx):

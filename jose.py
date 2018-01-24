@@ -147,6 +147,7 @@ class JoseBot(commands.Bot):
 
     def clean_content(self, content: str) -> str:
         """Make a string clean of mentions and not breaking codeblocks"""
+        content = str(content)
         content = content.replace('`', '\'')
         content = content.replace('@', '@\u200b')
         content = content.replace('&', '&\u200b')
