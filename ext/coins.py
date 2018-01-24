@@ -403,7 +403,7 @@ class Coins(Cog):
                 return
 
             try:
-                await message.add_reaction('\N{MONEY-MOUTH FACE}')
+                await message.add_reaction('\N{MONEY BAG}')
             except:
                 log.debug('autocoin failed to add reaction')
         except:

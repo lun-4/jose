@@ -50,12 +50,8 @@ class CoinsExt(Cog, requires=['coins']):
 
         for idx, account in enumerate(accounts):
             name = self.jcoin.get_name(account['account_id'], account=account)
-
-            if 'Unfindable' in name:
-                continue
-            else:
-                account['_name'] = name
-                filtered.append(account)
+            account['_name'] = name
+            filtered.append(account)
 
             if len(filtered) == limit:
                 break
