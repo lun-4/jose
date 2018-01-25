@@ -216,7 +216,7 @@ class CoinsExt(Cog, requires=['coins']):
         for cooldown in cooldowns:
             c_type, c_finish = cooldown['ctype'], cooldown['finish']
             if now >= c_finish:
-                await self.remove_cooldown(thief.id, c_type)
+                await self.remove_cooldown(thief, c_type)
                 continue
 
             # in the case the cooldown isnt finished
