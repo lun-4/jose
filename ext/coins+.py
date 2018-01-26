@@ -26,8 +26,8 @@ GRACE_PERIOD = 5
 
 
 class CooldownTypes:
-    prison = 0
-    points = 1
+    prison = 'prison'
+    points = 'points'
 
 
 class CooldownError(Exception):
@@ -166,12 +166,10 @@ class CoinsExt(Cog, requires=['coins']):
         acc = await self.coins.get_account(ctx.guild.id)
         await ctx.send(f'`{self.coins.get_name(ctx.guild)}: {acc["amount"]}`')
 
-    async def add_cooldown(self, user, c_type=0,
+    async def add_cooldown(self, user, c_type: str='prison',
                            hours: int=DEFAULT_ARREST) -> int:
         """Add a steal cooldown to a user.
         """
-
-        c_type = 'prison' if c_type == 0 else 'points'
 
         # Yes, I know, SQL Inejection.
         await self.pool.execute(f"""
@@ -185,14 +183,15 @@ class CoinsExt(Cog, requires=['coins']):
         """Remove a cooldown from a user.
         
         This resets the user's steal points if we are
-        removing a type 1 cooldown.
+        removing a points cooldown.
         """
         user_id = user.id
-        _ctype = 'points' if c_type == CooldownTypes.points else 'prison'
         res = await self.pool.execute("""
         DELETE FROM steal_cooldown
         WHERE user_id=$1 AND ctype=$2
-        """, user_id, _ctype)
+        """, user_id, c_type)
+
+        log.debug(f'Removing cooldown type {c_type} for {user!s}[{user.id}]')
 
         _, deleted = res.split()
         deleted = int(deleted)
@@ -276,6 +275,9 @@ class CoinsExt(Cog, requires=['coins']):
         WHERE user_id = $1
         """, thief.id)
 
+        if (points['points'] - 1) < 1:
+            await self.add_cooldown(thief, CooldownTypes.points, DEFAULT_REGEN)
+
     async def add_grace(self, target: discord.User, hours: int):
         """Add a grace period to the target.
         
@@ -329,7 +331,7 @@ class CoinsExt(Cog, requires=['coins']):
 
             # zero the wallet, convert 1jc to extra hour in jail
             transfer_info = await self.coins.zero(thief, ctx.guild.id)
-            hours = await self.add_cooldown(thief, 0,
+            hours = await self.add_cooldown(thief, CooldownTypes.prison,
                                             DEFAULT_ARREST + int(amnt))
 
         return hours, transfer_info

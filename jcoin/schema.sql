@@ -87,5 +87,5 @@ CREATE TABLE IF NOT EXISTS steal_grace (
 );
 
 CREATE VIEW steal_state as
-SELECT (steal_points.user_id, points, steal_cooldown.cooldown_type, steal_cooldown.finish) FROM steal_points
+SELECT (steal_points.user_id, points, steal_cooldown.ctype, steal_cooldown.finish) FROM steal_points
 JOIN steal_cooldown ON steal_points.user_id = steal_cooldown.user_id;
