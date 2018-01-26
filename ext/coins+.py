@@ -264,7 +264,8 @@ class CoinsExt(Cog, requires=['coins']):
             points = {'points': 3}
 
         if points['points'] < 1:
-            await self.add_cooldown(thief, 1, DEFAULT_REGEN)
+            await self.add_cooldown(thief, CooldownTypes.points,
+                                    DEFAULT_REGEN)
             raise self.SayException('\N{FACE WITH TEARS OF JOY}'
                                     ' You ran out of stealing points!'
                                     f' wait {DEFAULT_REGEN} hours.')
@@ -276,7 +277,8 @@ class CoinsExt(Cog, requires=['coins']):
         """, thief.id)
 
         if (points['points'] - 1) < 1:
-            await self.add_cooldown(thief, CooldownTypes.points, DEFAULT_REGEN)
+            await self.add_cooldown(thief, CooldownTypes.points,
+                                    DEFAULT_REGEN)
 
     async def add_grace(self, target: discord.User, hours: int):
         """Add a grace period to the target.
