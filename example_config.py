@@ -52,6 +52,10 @@ postgres = {
 }
 
 JOSECOIN_API = 'http://0.0.0.0:8080/api'
+
+# generated using ./jcoin/client_add.py
+JOSECOIN_TOKEN = 'something secret'
+
 # If on docker
 # JOSECOIN_API = 'http://josecoin:8080/api'
 

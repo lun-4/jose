@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS blockchain (
 
 
 /* Steal related stuff */
-CREATE TYPE cooldown_type AS ENUM ('prison', 'points')
+CREATE TYPE cooldown_type AS ENUM ('prison', 'points');
 
 CREATE TABLE IF NOT EXISTS steal_points (
     user_id bigint NOT NULL REFERENCES accounts (account_id),
