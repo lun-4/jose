@@ -92,9 +92,10 @@ async def request_check(request):
 async def get_status(request) -> response:
     """Simple response."""
     t1 = time.monotonic()
-    await request.app.db.fetchrow('SELECT 1')
+    await request.app.db.execute('SELECT 1')
     t2 = time.monotonic()
     delta = round((t2 - t1), 8)
+
     return response.json({
         'status': True,
         'db_latency_sec': delta,
@@ -346,38 +347,32 @@ async def wallet_rank(request, wallet_id: int):
     except AttributeError:
         guild_id = None
 
-    global_total = await request.app.db.fetchrow("""
-    SELECT COUNT(*) FROM accounts
-    """)
-
-    global_total = global_total['count']
-
-    global_rank = await request.app.db.fetchrow("""
+    global_rank = await request.app.db.fetchval("""
     SELECT s.rank FROM (
         SELECT accounts.account_id, rank() over (
             ORDER BY accounts.amount DESC
-        ) FROM accounts
+        ) FROM accounts WHERE account_type = $2
     ) AS s WHERE s.account_id = $1
-    """, wallet_id)
+    """, wallet_id, AccountType.USER)
 
-    if not global_rank:
+    if global_rank is None:
         raise AccountNotFoundError('Account not found')
 
-    global_rank = global_rank['rank']
+    global_total = await request.app.db.fetchval("""
+    SELECT COUNT(*) FROM accounts WHERE account_type = $1
+    """, AccountType.USER)
 
-    taxes_total = await request.app.db.fetchrow("""
+    taxes_total = await request.app.db.fetchval("""
     SELECT COUNT(*) FROM wallets
     """)
-    taxes_total = taxes_total['count']
 
-    taxes_rank = await request.app.db.fetchrow("""
+    taxes_rank = await request.app.db.fetchval("""
     SELECT s.rank FROM (
         SELECT wallets.user_id, rank() over (
             ORDER BY wallets.taxpaid DESC
         ) FROM wallets
     ) AS s WHERE s.user_id = $1
     """, wallet_id)
-    taxes_rank = taxes_rank['rank']
 
     res = {
         'global': {
@@ -391,15 +386,13 @@ async def wallet_rank(request, wallet_id: int):
     }
 
     if guild_id:
-        local_total = await request.app.db.fetchrow("""
+        local_total = await request.app.db.fetchval("""
         SELECT COUNT(*) FROM accounts
         JOIN members ON accounts.account_id = members.user_id
         WHERE members.guild_id = $1
         """, guild_id)
 
-        local_total = local_total['count']
-
-        local_rank = await request.app.db.fetchrow("""
+        local_rank = await request.app.db.fetchval("""
         SELECT s.rank FROM (
             SELECT accounts.account_id, rank() over (
                 ORDER BY accounts.amount DESC
@@ -408,7 +401,6 @@ async def wallet_rank(request, wallet_id: int):
             WHERE members.guild_id = $1
         ) AS s WHERE s.account_id = $2
         """, guild_id, wallet_id)
-        local_rank = local_rank['rank']
 
         res['local'] = {
             'rank': local_rank,
@@ -549,7 +541,7 @@ async def get_wallets(request):
 
     acc_type_str_w = ''
     if acc_type_str:
-        acc_type_str_w = f'WHERE {acc_type_str}'
+        acc_type_str_w = f'AND {acc_type_str}'
 
     args = [guild_id]
 
@@ -563,9 +555,12 @@ async def get_wallets(request):
         ORDER BY amount {sorting}
         LIMIT {limit}
         """
+
+    # global / taxpaid checks if the user is in any mutual guild to avoid having unknown users in j!top
     elif key == 'global':
         query = f"""
         SELECT * FROM account_amount
+        WHERE account_amount.account_id = ANY(SELECT user_id FROM members)
         {acc_type_str_w}
 
         ORDER BY amount {sorting}
@@ -575,8 +570,8 @@ async def get_wallets(request):
     elif key == 'taxpaid':
         query = f"""
         SELECT * FROM wallets_taxpaid
-        JOIN account_amount
-        ON account_amount.account_id = wallets_taxpaid.user_id
+        JOIN account_amount ON account_amount.account_id = wallets_taxpaid.user_id
+        WHERE account_amount.account_id = ANY(SELECT user_id FROM members)
 
         ORDER BY taxpaid {sorting}
         LIMIT {limit}
