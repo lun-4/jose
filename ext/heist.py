@@ -226,6 +226,7 @@ class JoinSession:
         ctx = self.ctx
 
         self.heist.sessions.pop(self.id)
+        await self.coins.unlock(*self.users)
         if not res['success']:
             return await self.jail(res)
 
