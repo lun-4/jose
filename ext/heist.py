@@ -92,7 +92,7 @@ class JoinSession:
             raise SayException('User already in the session')
         except ValueError:
             self.users.append(user_id)
-            await self.coins.lock(user_id)
+            self.bot.loop.create_task(self.coins.lock(user_id))
 
     async def do_heist(self, ctx) -> dict:
         """Actually does the heist.
