@@ -382,13 +382,6 @@ class Memes(Cog):
 
         await ctx.send(text)
 
-    @commands.command()
-    async def nya(self, ctx, *, not_nya: str):
-        """nya-ify"""
-        nya = not_nya
-        await ctx.send(f'{nya}, nya!')
-
-
 
 def setup(bot):
     bot.add_cog(Memes(bot))
