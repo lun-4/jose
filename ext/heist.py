@@ -83,12 +83,16 @@ class JoinSession:
         return f'`success: {rs}, chance: {rc}, res: {rr}`'
 
     def add_member(self, user_id: int):
+        """Add a member to the join session.
+        locks the account.
+        """
         self.started = True
         try:
             self.users.index(user_id)
             raise SayException('User already in the session')
         except ValueError:
             self.users.append(user_id)
+            await self.coins.lock(user_id)
 
     async def do_heist(self, ctx) -> dict:
         """Actually does the heist.
@@ -285,8 +289,10 @@ class JoinSession:
         if err is not None:
             raise err
 
-        log.info('returning result')
-        return self.task.result()
+        log.info('getting result')
+        res = self.task.result()
+        log.info(f'result = {res!r}')
+        return res
 
     def destroy(self):
         self.finish.set()
@@ -436,7 +442,10 @@ class Heist(Cog):
         # OR "j!heist raid"
         await asyncio.sleep(300)
         if not session.finish.is_set():
-            await session.process_heist(await session.force_finish())
+            try:
+                await session.process_heist(await session.force_finish())
+            finally:
+                await self.coins.unlock(*session.users)
 
     @heist.command(name='join')
     async def heist_join(self, ctx):
@@ -492,7 +501,10 @@ class Heist(Cog):
         if ctx.author.id != session.ctx.author.id:
             raise self.SayException('You are not the author of the heist.')
 
-        await session.process_heist(await session.force_finish())
+        try:
+            await session.process_heist(await session.force_finish())
+        finally:
+            await self.coins.unlock(*session.users)
 
 
 def setup(bot):
