@@ -238,7 +238,8 @@ class JoinSession:
             except self.coins.TransferError as err:
                 log.warning(f'transfer failed {err!r}')
 
-            await self.cext.add_cooldown(user, 1, 7)
+            # using hardcoded because we cant import coins+
+            await self.cext.add_cooldown(user, 'points', 7)
 
         em = self.get_embed(res)
         em.add_field(name='Outcome',
