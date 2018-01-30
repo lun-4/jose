@@ -15,7 +15,7 @@ IMAGE_REGEX = re.compile('(https?:\/\/.*\.(?:png|jpeg|jpg|gif))', re.M | re.I)
 ID_REGEX = re.compile('\d+', re.M | re.I)
 
 
-BLUE = 0x0066ff
+BLUE = 0x5dadec
 BRONZE = 0xc67931
 SILVER = 0xC0C0C0
 GOLD = 0xD4AF37
@@ -536,20 +536,22 @@ class Starboard(Cog, requires=['config']):
 
         message = await channel.get_message(message_id)
 
-        if channel_id == cfg['starboard_id']:
-            # This reaction is coming from the starboard.
-            # we parse the message content and recall this function
-            content = message.content
-
-            matches = ID_REGEX.findall(content)
-            new_message_id = int(matches[-1])
-            new_channel_id = int(matches[-2])
-
-            return await self.on_raw_reaction_add(emoji_partial,
-                                                  new_message_id,
-                                                  new_channel_id, user_id)
-
         try:
+            if channel_id == cfg['starboard_id']:
+                # This reaction is coming from the starboard.
+                # we parse the message content and recall this function
+                content = message.content
+                log.debug(f'parsing things out from {content!r}')
+
+                matches = ID_REGEX.findall(content)
+                new_message_id = int(matches[-1])
+                new_channel_id = int(matches[-2])
+
+                return await self.on_raw_reaction_add(emoji_partial,
+                                                      new_message_id,
+                                                      new_channel_id,
+                                                      user_id)
+
             await self.add_star(message, user_id, cfg)
         except (StarError, StarAddError) as err:
             log.warning(f'raw_reaction_add: {err!r}')
