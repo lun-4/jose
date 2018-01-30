@@ -19,7 +19,7 @@ class Memework(Cog):
     @commands.command()
     async def email(self, ctx):
         """fuck gerd"""
-        await ctx.send('no')
+        await ctx.send('You can now get a @memework.org address, pm heatingdevice#1212 for more info!')
 
 
 def setup(bot):
