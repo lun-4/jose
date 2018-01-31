@@ -227,7 +227,7 @@ class CoinsExt(Cog, requires=['coins']):
 
             elif c_type == 'points':
                 raise self.SayException('\N{DIAMOND SHAPE WITH A DOT INSIDE}'
-                                        ' You are waiting for steal points.'
+                                        ' You are waiting for steal points. '
                                         f'Wait {fmt_tdelta(remaining)} hours')
 
     async def check_grace(self, target: discord.User):
