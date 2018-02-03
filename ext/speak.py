@@ -329,7 +329,7 @@ class Speak(Cog):
         else:
             prefixes = self.bot.config.SPEAK_PREFIXES
 
-        for prefix in prefixes:
+        for prefix in list(prefixes):
             modified = prefix.replace(' ', ', ')
             try:
                 prefixes.index(modified)
