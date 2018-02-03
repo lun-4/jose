@@ -15,10 +15,13 @@ SENTENCE_PRICE = '0.08'
 
 
 def make_textmodel(texter, data):
-    texter.model = markovify.NewlineText(data, texter.chain_length, **texter.model_kwargs)
+    """Make a text model and insert it into a texter object."""
+    texter.model = markovify.NewlineText(data, texter.chain_length,
+                                         **texter.model_kwargs)
 
 
 async def make_texter(texter_id, data, **kwargs):
+    """Generate a texter, given its ID and data to work with."""
     texter = Texter(texter_id, **kwargs)
     await texter.fill(data)
     return texter
@@ -105,10 +108,14 @@ class Texter:
         return str(res)
 
     def clear(self):
+        """
+        delete stuff out of the texter
+        """
         del self.model, self.refcount, self.chain_length, self.loop
 
 
 class Speak(Cog):
+    """José's markov cog."""
     def __init__(self, bot):
         super().__init__(bot)
         self.text_generators = {}
@@ -127,14 +134,15 @@ class Speak(Cog):
     def __unload(self):
         """Remove all texters from memory"""
         to_del = []
-        for tx in self.text_generators.values():
-            tx.clear()
-            to_del.append(tx.id)
+        for texter in self.text_generators.values():
+            texter.clear()
+            to_del.append(texter.id)
 
         for tx_id in to_del:
             del self.text_generators[tx_id]
 
     async def coll_task_func(self):
+        """Collect texters every minute."""
         try:
             while True:
                 await self.texter_collection()
@@ -171,6 +179,7 @@ class Speak(Cog):
         self.st_txc_runs += 1
 
     async def get_messages(self, guild, amount=2000) -> list:
+        """fetch messages from a guild. defaults to 2000 messages"""
         channel_id = await self.config.cfg_get(guild, 'speak_channel')
         channel = guild.get_channel(channel_id)
         if channel is None:
@@ -311,20 +320,25 @@ class Speak(Cog):
 
         prob = await self.config.cfg_get(ctx.guild, 'autoreply_prob')
         if prob is None:
-            log.warning('[autoreply] how can autoreply_prob be none??')
             return
 
         nick = ctx.me.nick
         if nick is not None:
             nick = f'{nick} '
-            prefixes = self.bot.config.SPEAK_PREFIXES + [nick,
-                                                         nick.lower(),
-                                                         nick.capitalize()]
+            prefixes = self.bot.config.SPEAK_PREFIXES + [nick.lower()]
         else:
             prefixes = self.bot.config.SPEAK_PREFIXES
 
+        for prefix in prefixes:
+            modified = prefix.replace(' ', ', ')
+            try:
+                prefixes.index(modified)
+            except ValueError:
+                prefixes.append(modified)
+
         autoreply = False
-        if not any(message.content.startswith(prefix) for prefix in prefixes):
+        cnt = message.content.lower()
+        if not any(cnt.startswith(prefix.lower()) for prefix in prefixes):
             if random.random() > prob:
                 return
         else:
