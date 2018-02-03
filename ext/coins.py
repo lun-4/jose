@@ -153,7 +153,7 @@ class Coins(Cog):
             wallet_id = wallet_id.id
 
         r = await self.jc_get(f'/wallets/{wallet_id}', log=False)
-        r['amount'] = decimal.Decimal(f'inf')
+        r['amount'] = decimal.Decimal(f'{r["amount"]:.3f}')
         try:
             r['taxpaid'] = decimal.Decimal(f'{r["taxpaid"]:.3f}')
         except KeyError:
