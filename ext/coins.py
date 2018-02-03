@@ -511,7 +511,7 @@ class Coins(Cog):
 
                 if acc_da == float('inf'):
                     acc_da = decimal.Decimal('-69')
-
+                
                 await acc_stmt.fetchval(account['id'], as_int, acc_da)
                 if as_int == AccountType.USER:
                     acc_dt = decimal.Decimal(account['taxpaid'])
@@ -558,7 +558,7 @@ class Coins(Cog):
     @commands.is_owner()
     async def spam(self, ctx, taskcount: int=200, timeout: int=30):
         """webscale memes
-
+        
         This will spawn an initial amount of [taskcount] tasks,
         with each one doing a transfer call.
 
@@ -588,7 +588,7 @@ class Coins(Cog):
     @commands.command()
     async def deleteaccount(self, ctx, confirm: bool=False):
         """Delete your JoséCoin account.
-
+        
         There is no going back from this operation.
 
         Use "y", "yes", and variants, to confirm it.
