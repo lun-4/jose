@@ -329,6 +329,9 @@ class Speak(Cog):
         else:
             prefixes = self.bot.config.SPEAK_PREFIXES
 
+        # ensure we are not working on references
+        prefixes = list(prefixes)
+
         for prefix in list(prefixes):
             modified = prefix.replace(' ', ', ')
             try:
