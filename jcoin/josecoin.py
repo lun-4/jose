@@ -190,7 +190,7 @@ async def transfer(request, sender_id):
         raise InputError('Account can not transfer to itself')
 
     try:
-        amount = round(amount, 3)
+        amount = round(amount, 2)
     except:
         raise InputError('Error rounding.')
 
@@ -222,7 +222,7 @@ async def transfer(request, sender_id):
     if receiver_lock:
         raise ConditionError('Receiver account is locked')
 
-    snd_amount = sender['amount']
+    snd_amount = decimal.Decimal(str(sender['amount']))
     if not is_inf(snd_amount) and amount > snd_amount:
         raise ConditionError(f'Not enough funds: {amount} > {snd_amount}')
 
@@ -261,7 +261,8 @@ async def transfer(request, sender_id):
 
     einf = str(ENCODED_INFINITY)
     # yes, we go back and forth.
-    amount = float(amount)
+    amount = decimal.Decimal(str(amount))
+    rcv_amount = decimal.Decimal(str(rcv_amount))
     return response.json({
         'sender_amount': einf if is_inf(snd_amount) else snd_amount - amount,
         'receiver_amount': einf if is_inf(rcv_amount) else rcv_amount + amount

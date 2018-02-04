@@ -77,7 +77,7 @@ class CoinConverter(commands.Converter):
             raise ba("You can't input values equal or higher to infinity.")
 
         try:
-            value = round(value, 3)
+            value = round(value, 2)
         except:
             raise ba('Rounding failed.')
 
