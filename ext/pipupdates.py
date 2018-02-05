@@ -11,7 +11,8 @@ log = logging.getLogger(__name__)
 
 
 def pip_freeze():
-    out = subprocess.check_output('env/bin/python -m pip freeze', shell=True)
+    """call pip freeze, get results"""
+    out = subprocess.check_output('python3.6 -m pip freeze', shell=True)
     return out
 
 
