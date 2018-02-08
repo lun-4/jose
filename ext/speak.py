@@ -28,6 +28,7 @@ async def make_texter(texter_id, data, **kwargs):
 
 
 class TexterFail(Exception):
+    """Error representing a failure while generating a Texter."""
     pass
 
 
@@ -475,7 +476,8 @@ class Speak(Cog):
         t2 = time.monotonic()
         delta = round((t2 - t1), 2)
 
-        await ctx.send(f'Spawned {len(self.bot.guilds)} tasks in {delta} seconds')
+        await ctx.send(f'Spawned {len(self.bot.guilds)} tasks'
+                       f' in {delta} seconds')
 
     @commands.command()
     async def txstat(self, ctx):
@@ -505,7 +507,9 @@ class Speak(Cog):
         em.description = ''
         for guild_id, tx in self.text_generators.items():
             guild = self.bot.get_guild(guild_id)
-            em.description += f'**{guild!s}**, `gid={guild_id} - refcount={tx.refcount}, words={tx.wordcount} lines={tx.linecount}` \n'
+            em.description += f'**{guild!s}**, `gid={guild_id} - ' \
+                              f'refcount={tx.refcount}, words={tx.wordcount}' \
+                              f' lines={tx.linecount}` \n'
 
         await ctx.send(embed=em)
 
@@ -523,6 +527,21 @@ class Speak(Cog):
                  f'Words: {tx.wordcount}\n',
                  f'Lines: {tx.linecount}\n')
         await ctx.send(''.join(lines))
+
+    @commands.command()
+    @commands.guild_only()
+    async def wordcount(self, ctx):
+        """Get top 10 of most used words, given the text sample."""
+        with ctx.typing():
+            messages = await self.get_messages(ctx.guild)
+            processed = ' '.join(messages).replace('\n', ' ')
+            count = collections.Counter((w for w in processed.split(' ')
+                                         if len(w) > 4))
+
+        common = count.most_common(10)
+        res = '\n'.join([f'`{word!r}: {count} times`'
+                         for (word, count) in common])
+        await ctx.send(res)
 
 
 def setup(bot):
