@@ -180,6 +180,7 @@ class Coins(Cog):
         """Ensure that things are sane, given ctx."""
         try:
             await self.create_wallet(ctx.bot.user)
+            await self.ensure_taxbank(ctx)
         except self.ConditionError:
             pass
 
