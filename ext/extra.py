@@ -129,8 +129,6 @@ class Extra(Cog, requires=['config']):
             person = ctx.author
 
         url = person.avatar_url_as(static_format='png')
-        if '.gif' in url:
-            url = f'{url}&discord_is_buggy_af=.gif'
 
         await ctx.send(url)
 
