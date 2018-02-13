@@ -303,7 +303,7 @@ class Coins(Cog):
 
     def _pcache_invalidate(self, user_id: int):
         """Invalidate the prob cache after 2 hours for one user."""
-        log.debug(f'popping {user_id} from cache')
+        # log.debug(f'popping {user_id} from cache')
         try:
             self.prob_cache.pop(user_id)
         except KeyError:
