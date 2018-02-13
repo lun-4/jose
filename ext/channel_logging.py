@@ -291,6 +291,10 @@ def setup(bot):
         handler = DiscordHandler(webhook, level=level)
         handler.setFormatter(formatter)
 
+        if level == logging.ERROR:
+            handler.addFilter(lambda record: 'Fatal error on transport TCPTransport'
+                              not in record.getMessage())
+
         root.addHandler(handler)
         bot.channel_handlers.append(handler)
 
