@@ -163,7 +163,6 @@ class Coins(Cog):
     async def create_wallet(self, thing):
         """Send a request to create a JoséCoin account."""
 
-        log.info('Creating account for %r', thing)
         acc_type = AccountType.USER if isinstance(thing, discord.abc.User) else \
             AccountType.TAXBANK
 
@@ -180,6 +179,10 @@ class Coins(Cog):
         """Ensure that things are sane, given ctx."""
         try:
             await self.create_wallet(ctx.bot.user)
+        except self.ConditionError:
+            pass
+
+        try:
             await self.ensure_taxbank(ctx)
         except self.ConditionError:
             pass
