@@ -442,6 +442,7 @@ class Extra(Cog, requires=['config']):
             await ctx.send(f'`{line}`')
 
     @commands.command()
+    @commands.guild_only()
     @commands.cooldown(1, 10, commands.BucketType.guild)
     async def nicediscrim(self, ctx):
         """ONLY GET NICE DISCRIM.
