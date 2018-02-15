@@ -567,11 +567,19 @@ async def get_wallets(request):
         ORDER BY amount {sorting}
         LIMIT {limit}
         """
+
+        # NOTE: very shitty hack to get only-taxbank fetching
+        # working.
+        if acc_type == AccountType.TAXBANK:
+            query = query.replace('account_amount.account_id = ANY(SELECT'
+                                  ' user_id FROM members)', '')
+            query = query.replace('AND', '')
         args = []
     elif key == 'taxpaid':
         query = f"""
         SELECT * FROM wallets_taxpaid
-        JOIN account_amount ON account_amount.account_id = wallets_taxpaid.user_id
+        JOIN account_amount
+        ON account_amount.account_id = wallets_taxpaid.user_id
         WHERE account_amount.account_id = ANY(SELECT user_id FROM members)
 
         ORDER BY taxpaid {sorting}
