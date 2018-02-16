@@ -525,6 +525,156 @@ class CoinsExt(Cog, requires=['coins']):
 
             self.loop.create_task(ctx.send(f'`{person}: {res}`'))
 
+    @commands.group(aliases=['txr'])
+    async def taxreturn(self, ctx):
+        """Manage tax returns.
+
+        Depending on how much tax you've paid, you
+        can request a tax return.
+
+        The returned money is calculated based on all your
+        transactions done to taxbanks.
+
+        NOTE: Only transactions that were done at the
+        time v3 was deployed are valid.
+
+        Of course, not all transactions will apply
+        to the tax return.
+
+        Only tax transactions which are above
+        your average amount will count to the total available
+        tax return money.
+
+        Plus, not all the "available tax return" money will
+        be promptly available to withdraw, once you withdraw,
+        only 10% of that amount is given to your wallet.
+        """
+        pass
+
+    async def txr_average(self, user: discord.User) -> decimal.Decimal:
+        """
+        Get the average amount of tax paid by the user.
+
+        Parameters
+        ----------
+        user: discord.User
+            User being checked
+
+        Returns
+        -------
+        decimal.Decimal
+            The average amount of tax paid by the user.
+        """
+        return await self.pool.fetchval("""
+        select avg(transactions.amount)
+        from transactions
+
+        join accounts on transactions.receiver = accounts.account_id
+
+        where transactions.sender=$1
+         and accounts.account_type=1
+         and transactions.taxreturn_used = false
+        """, user.id)
+
+    async def txr_transactions(self, user: discord.User) -> list:
+        """Get all tax transactions done by the user.
+
+        Only transactions that are above average count torwards
+        the list.
+
+        Returns
+        -------
+        list[asyncpg.Record]
+            List of transactions that satisfy the criteria.
+        """
+        avg = await self.txr_average(user)
+
+        return await self.pool.fetch("""
+        select *
+        from transactions
+
+        join accounts on transactions.receiver = accounts.account_id
+
+        where transactions.sender=$1
+         and accounts.account_type=1
+         and transactions.amount >= $2
+         and transactions.taxreturn_used = false
+        """, user.id, avg)
+
+    async def txr_total(self, user: discord.User) -> decimal.Decimal:
+        """Get the total amount of tax that is available
+        to be returned to the user.
+        """
+        avg = await self.txr_average(user)
+
+        return await self.pool.fetchval("""
+        select sum(transactions.amount) * 10/100
+        from transactions
+
+        join accounts on transactions.receiver = accounts.account_id
+
+        where transactions.sender=$1
+         and accounts.account_type=1
+         and transactions.amount >= $2
+         and transactions.taxreturn_used = false
+        """, user.id, avg)
+
+    @taxreturn.command(name='query', aliases=['q'])
+    async def taxreturn_check(self, ctx):
+        """Check your tax return situation.
+
+        Please, **PLEASE**, do 'j!help taxreturn' to
+        understand how this works.
+        """
+        total_average = await self.txr_average(ctx.author)
+        total_avail = await self.txr_total(ctx.author)
+        total_trans = await self.txr_transactions(ctx.author)
+
+        em = discord.Embed(title='Tax return situation',
+                           color=discord.Color.gold())
+
+        em.add_field(name='Average over tax paid',
+                     value=f'`{round(total_average, 2)}JC`')
+        em.add_field(name='Money available to return',
+                     value=f'`{round(total_avail, 2)}JC`')
+        em.add_field(name='Tax transactions that meet criteria',
+                     value=f'{len(total_trans)}')
+
+        await ctx.send(embed=em)
+
+    @taxreturn.command(name='withdraw')
+    async def taxreturn_withdraw(self, ctx):
+        """Withdraw your available tax return money.
+
+        This command has a cooldown of a week.
+        """
+
+        finish = await self.pool.fetchval("""
+        select finish
+        from taxreturn_cooldown
+        where user_id = $1
+        """, ctx.author.id)
+
+        now = datetime.datetime.utcnow()
+
+        if finish and finish > now:
+            delta = finish - now
+            raise self.SayException('\N{MANTELPIECE CLOCK}'
+                                    f'You have to wait {fmt_tdelta(delta)}.')
+        else:
+            await self.pool.execute("""
+            delete from taxreturn_cooldown
+            where user_id = $1
+            """, ctx.author.id)
+
+        await ctx.send('lmao')
+        # TODO: finish the implementation of this
+
+        await self.pool.execute("""
+        insert into taxreturn_cooldown (user_id, finish)
+        values ($1, now() + interval '1 week')
+        """, ctx.author.id)
+
 
 def setup(bot):
     bot.add_jose_cog(CoinsExt)

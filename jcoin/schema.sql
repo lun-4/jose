@@ -54,7 +54,9 @@ CREATE TABLE IF NOT EXISTS transactions (
        receiver bigint NOT NULL REFERENCES accounts (account_id) ON DELETE RESTRICT,
        amount numeric NOT NULL,
        /* so we can search for description='steal', or something */
-       description text DEFAULT 'transfer'
+       description text DEFAULT 'transfer',
+       taxreturn_used boolean DEFAULT false
+
 );
 
 /* If we want, we *could* group transactions */
@@ -89,3 +91,9 @@ CREATE TABLE IF NOT EXISTS steal_grace (
 CREATE VIEW steal_state as
 SELECT (steal_points.user_id, points, steal_cooldown.ctype, steal_cooldown.finish) FROM steal_points
 JOIN steal_cooldown ON steal_points.user_id = steal_cooldown.user_id;
+
+/* Tax return withdraw cooldown */
+CREATE TABLE IF NOT EXISTS taxreturn_cooldown (
+    user_id bigint NOT NULL PRIMARY KEY,
+    finish timestamp without time zone default now()
+);

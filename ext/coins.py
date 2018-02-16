@@ -88,15 +88,15 @@ class Coins(Cog):
 
     async def jc_get(self, route: str, payload: dict = None, **kwargs):
         """Make a GET request to JoséCoin API."""
-        return await self.generic_call('GET', route, payload, **kwargs)
+        return self.generic_call('GET', route, payload, **kwargs)
 
     async def jc_post(self, route: str, payload: dict = None, **kwargs):
         """Calls a route with POST."""
-        return await self.generic_call('POST', route, payload, **kwargs)
+        return self.generic_call('POST', route, payload, **kwargs)
 
     async def jc_delete(self, route: str, payload: dict = None, **kwargs):
         """Calls a route with DELETE."""
-        return await self.generic_call('DELETE', route, payload, **kwargs)
+        return self.generic_call('DELETE', route, payload, **kwargs)
 
     def get_name_raw(self, user_id: int, account=None):
         """Get a string representation of a user or guild.
