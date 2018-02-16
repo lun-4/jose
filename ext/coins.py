@@ -88,15 +88,15 @@ class Coins(Cog):
 
     async def jc_get(self, route: str, payload: dict = None, **kwargs):
         """Make a GET request to JoséCoin API."""
-        return self.generic_call('GET', route, payload, **kwargs)
+        return await self.generic_call('GET', route, payload, **kwargs)
 
     async def jc_post(self, route: str, payload: dict = None, **kwargs):
         """Calls a route with POST."""
-        return self.generic_call('POST', route, payload, **kwargs)
+        return await self.generic_call('POST', route, payload, **kwargs)
 
     async def jc_delete(self, route: str, payload: dict = None, **kwargs):
         """Calls a route with DELETE."""
-        return self.generic_call('DELETE', route, payload, **kwargs)
+        return await self.generic_call('DELETE', route, payload, **kwargs)
 
     def get_name_raw(self, user_id: int, account=None):
         """Get a string representation of a user or guild.
@@ -373,6 +373,8 @@ class Coins(Cog):
         if not probdata:
             return
 
+        # NOTE: for some reason probdata becomes a coroutine
+        # when we don't await inside jc_* methods
         prob = probdata['probability']
         prob = float(prob)
         if random.random() > prob:
