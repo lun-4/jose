@@ -166,8 +166,8 @@ class CoinsExt(Cog, requires=['coins']):
         acc = await self.coins.get_account(ctx.guild.id)
         await ctx.send(f'`{self.coins.get_name(ctx.guild)}: {acc["amount"]}`')
 
-    async def add_cooldown(self, user, c_type: str='prison',
-                           hours: int=DEFAULT_ARREST) -> int:
+    async def add_cooldown(self, user, c_type: str = 'prison',
+                           hours: int = DEFAULT_ARREST) -> int:
         """Add a steal cooldown to a user.
         """
 
@@ -619,15 +619,36 @@ class CoinsExt(Cog, requires=['coins']):
          and transactions.taxreturn_used = false
         """, user.id, avg)
 
+    async def txr_not_total(self, user: discord.User) -> decimal.Decimal:
+        avg = await self.txr_average(user)
+
+        return await self.pool.fetchval("""
+        select sum(transactions.amount)
+        from transactions
+
+        join accounts on transactions.receiver = accounts.account_id
+
+        where transactions.sender=$1
+         and accounts.account_type=1
+         and transactions.amount >= $2
+         and transactions.taxreturn_used = false
+        """, user.id, avg)
+
     @taxreturn.command(name='query', aliases=['q'])
     async def taxreturn_check(self, ctx):
         """Check your tax return situation.
 
         Please, **PLEASE**, do 'j!help taxreturn' to
         understand how this works.
+
+        Not reading the documentation then asking me
+        how does it work will grant you a very angery girl,
+        looking straight in your eyes, with fury in her eyes,
+        wanting to kill you, with an AK-47.
         """
         total_average = await self.txr_average(ctx.author)
         total_avail = await self.txr_total(ctx.author)
+        total_criteria = await self.txr_not_total(ctx.author)
         total_trans = await self.txr_transactions(ctx.author)
 
         em = discord.Embed(title='Tax return situation',
@@ -635,14 +656,16 @@ class CoinsExt(Cog, requires=['coins']):
 
         em.add_field(name='Average over tax paid',
                      value=f'`{round(total_average, 2)}JC`')
-        em.add_field(name='Money available to return',
+        em.add_field(name='Money that fits the criteria',
+                     value=f'`{round(total_criteria, 2)}JC`')
+        em.add_field(name='Withdrawable money',
                      value=f'`{round(total_avail, 2)}JC`')
         em.add_field(name='Tax transactions that meet criteria',
                      value=f'{len(total_trans)}')
 
         await ctx.send(embed=em)
 
-    @taxreturn.command(name='withdraw')
+    @taxreturn.command(name='withdraw', aliases=['w'])
     async def taxreturn_withdraw(self, ctx):
         """Withdraw your available tax return money.
 
@@ -667,8 +690,55 @@ class CoinsExt(Cog, requires=['coins']):
             where user_id = $1
             """, ctx.author.id)
 
-        await ctx.send('lmao')
-        # TODO: finish the implementation of this
+        transactions = await self.txr_transactions(ctx.author)
+
+        success, error = 0, 0
+        sent = decimal.Decimal(0)
+
+        log.debug(f'[txr] processing {ctx.author}, '
+                  f'{len(transactions)}')
+
+        for trans in transactions:
+            # apply 10% to the amount
+
+            # theres transactions.amount and accounts.amount
+            # we do a filter to get the right one
+            items = trans.items()
+            t_amount = next(v for k, v in items
+                            if isinstance(v, decimal.Decimal))
+
+            applied = t_amount * decimal.Decimal('0.1')
+
+            # the reverse transaction, as tax return
+            try:
+                await self.jcoin.transfer(trans['receiver'],
+                                          trans['sender'],
+                                          applied)
+
+                await self.pool.execute("""
+                update transactions
+                set taxreturn_used=true
+                where idx=$1
+                """, trans['idx'])
+
+                success += 1
+                sent += applied
+            except self.coins.TransferError as err:
+                log.exception('error on tax return reverse transfer op')
+                await ctx.send('Error while transferring from '
+                               f'`{self.jcoin.get_name(trans["receiver"])}` '
+                               f'amount: `{applied}JC` '
+                               f'`{err!r}`')
+
+                error += 1
+
+        sent = round(sent, 2)
+        log.debug(f'[txr] {ctx.author}, {success} succ, '
+                  f'{error} err, {sent}jc total')
+
+        await ctx.send(f'{success} success transactions, '
+                       f'{error} raised errors.\n'
+                       f'You got `{sent}JC` from tax returns.')
 
         await self.pool.execute("""
         insert into taxreturn_cooldown (user_id, finish)
