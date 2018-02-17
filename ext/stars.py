@@ -325,11 +325,12 @@ class Starboard(Cog, requires=['config']):
         """Send a debug log call with the star as a context."""
         channel_id = star.get('channel_id')
         guild_id = star.get('guild_id')
+        chan = self.bot.get_channel(channel_id)
 
         log.debug(f'{message}\n'
                   f'message {star.get("message_id")}\n'
-                  f'channel {self.bot.get_channel(channel_id)} {channel_id}\n'
-                  f'guild {self.bot.get_guild(guild_id)} {guild_id}')
+                  f'channel "{chan}" {channel_id}\n'
+                  f'guild "{self.bot.get_guild(guild_id)}" {guild_id}')
 
     async def update_starobj(self, star: dict):
         """Given a star object, update it in the database."""
