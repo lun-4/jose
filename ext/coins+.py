@@ -551,31 +551,6 @@ class CoinsExt(Cog, requires=['coins']):
         """
         pass
 
-    async def txr_average(self, user: discord.User) -> decimal.Decimal:
-        """
-        Get the average amount of tax paid by the user.
-
-        Parameters
-        ----------
-        user: discord.User
-            User being checked
-
-        Returns
-        -------
-        decimal.Decimal
-            The average amount of tax paid by the user.
-        """
-        return await self.pool.fetchval("""
-        select avg(transactions.amount)
-        from transactions
-
-        join accounts on transactions.receiver = accounts.account_id
-
-        where transactions.sender=$1
-         and accounts.account_type=1
-         and transactions.taxreturn_used = false
-        """, user.id)
-
     async def txr_transactions(self, user: discord.User) -> list:
         """Get all tax transactions done by the user.
 
@@ -587,8 +562,6 @@ class CoinsExt(Cog, requires=['coins']):
         list[asyncpg.Record]
             List of transactions that satisfy the criteria.
         """
-        avg = await self.txr_average(user)
-
         return await self.pool.fetch("""
         select *
         from transactions
@@ -597,15 +570,14 @@ class CoinsExt(Cog, requires=['coins']):
 
         where transactions.sender=$1
          and accounts.account_type=1
-         and transactions.amount >= $2
+         and transactions.amount >= 5
          and transactions.taxreturn_used = false
-        """, user.id, avg)
+        """, user.id)
 
     async def txr_total(self, user: discord.User) -> decimal.Decimal:
         """Get the total amount of tax that is available
         to be returned to the user.
         """
-        avg = await self.txr_average(user)
 
         return await self.pool.fetchval("""
         select sum(transactions.amount) * 10/100
@@ -615,13 +587,11 @@ class CoinsExt(Cog, requires=['coins']):
 
         where transactions.sender=$1
          and accounts.account_type=1
-         and transactions.amount >= $2
+         and transactions.amount >= 5
          and transactions.taxreturn_used = false
-        """, user.id, avg)
+        """, user.id)
 
     async def txr_not_total(self, user: discord.User) -> decimal.Decimal:
-        avg = await self.txr_average(user)
-
         return await self.pool.fetchval("""
         select sum(transactions.amount)
         from transactions
@@ -630,9 +600,9 @@ class CoinsExt(Cog, requires=['coins']):
 
         where transactions.sender=$1
          and accounts.account_type=1
-         and transactions.amount >= $2
+         and transactions.amount >= 5
          and transactions.taxreturn_used = false
-        """, user.id, avg)
+        """, user.id)
 
     @taxreturn.command(name='query', aliases=['q'])
     async def taxreturn_check(self, ctx):
@@ -646,7 +616,6 @@ class CoinsExt(Cog, requires=['coins']):
         looking straight in your eyes, with fury in her eyes,
         wanting to kill you, with an AK-47.
         """
-        total_average = await self.txr_average(ctx.author)
         total_avail = await self.txr_total(ctx.author)
         total_criteria = await self.txr_not_total(ctx.author)
         total_trans = await self.txr_transactions(ctx.author)
@@ -654,8 +623,6 @@ class CoinsExt(Cog, requires=['coins']):
         em = discord.Embed(title='Tax return situation',
                            color=discord.Color.gold())
 
-        em.add_field(name='Average over tax paid',
-                     value=f'`{round(total_average, 2)}JC`')
         em.add_field(name='Money that fits the criteria',
                      value=f'`{round(total_criteria, 2)}JC`')
         em.add_field(name='Withdrawable money',
