@@ -175,7 +175,27 @@ class Config(Cog):
         the command is invoked from.
         """
         channel = channel or ctx.channel
+        old = await self.cfg_get(ctx.guild, 'speak_channel')
         success = await self.cfg_set(ctx.guild, 'speak_channel', channel.id)
+
+        # invalidate texter
+        speak = self.bot.get_cog('Speak')
+        if not speak:
+            raise self.SayException('speak not loaded oops')
+
+        try:
+            log.debug(f'invalidating texter on {ctx.guild} {ctx.guild.id}, '
+                      f'{old} {old.id} => {channel} {channel.id}')
+
+            speak.text_generators.pop(ctx.guild.id)
+            await ctx.send('Your old texter referring to '
+                           f'{old.mention} was invalidated.')
+        except KeyError:
+            pass
+
+        if not success:
+            await ctx.send('No change happened. :x:')
+
         await ctx.success(success)
 
     @commands.command()
