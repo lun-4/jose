@@ -623,6 +623,10 @@ class CoinsExt(Cog, requires=['coins']):
         em = discord.Embed(title='Tax return situation',
                            color=discord.Color.gold())
 
+        if not total_criteria:
+            raise self.SayException("You don't have any transactions "
+                                    "that meet criteria")
+
         em.add_field(name='Money that fits the criteria',
                      value=f'`{round(total_criteria, 2)}JC`')
         em.add_field(name='Withdrawable money',
