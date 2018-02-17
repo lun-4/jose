@@ -321,28 +321,44 @@ class Starboard(Cog, requires=['config']):
                                               'guild_id': guild_id})
         return star
 
-    async def update_starobj(self, star):
-        log.debug('Updating star `mid=%d cid=%d gid=%d`',
-                  star.get('message_id'), star.get('channel_id'),
-                  star.get('guild_id'))
+    def debug_log(self, message: str, star: dict):
+        """Send a debug log call with the star as a context."""
+        channel_id = star.get('channel_id')
+        guild_id = star.get('guild_id')
 
-        await self.starboard_coll.update_one({'guild_id': star['guild_id'],
-                                              'message_id': star['message_id']},
-                                             {'$set': star})
+        log.debug(f'{message}\n'
+                  f'message {star.get("message_id")}\n'
+                  f'channel {self.bot.get_channel(channel_id)} {channel_id}\n'
+                  f'guild {self.bot.get_guild(guild_id)} {guild_id}')
 
-    async def delete_starobj(self, star, msg=None):
+    async def update_starobj(self, star: dict):
+        """Given a star object, update it in the database."""
+        self.debug_log('update star', star)
+
+        await self.starboard_coll.update_one(
+                {
+                    # guild_id and message_id serve as the "primary key"
+                    # of this.
+                    'guild_id': star['guild_id'],
+                    'message_id': star['message_id']
+                    },
+                {
+                    '$set': star
+                    })
+
+    async def delete_starobj(self, star: dict, msg=None):
         """Delete a star object from the starboard collection.
         Removes the message from starboard if provided.
         """
-        if msg is not None:
+        if msg:
             await msg.delete()
 
-        log.debug('Deleting star `mid=%d cid=%d gid=%d`',
-                  star.get('message_id'), star.get('channel_id'),
-                  star.get('guild_id'))
+        self.debug_log('deleting star', star)
 
-        return await self.starboard_coll.delete_one(
-            {'guild_id': star['guild_id'], 'message_id': star['message_id']})
+        return await self.starboard_coll.delete_one({
+            'guild_id': star['guild_id'],
+            'message_id': star['message_id']
+            })
 
     async def starboard_send(self, starboard: discord.TextChannel, star: dict,
                              message: discord.Message) -> discord.Message:
@@ -350,7 +366,7 @@ class Starboard(Cog, requires=['config']):
         title, embed = make_star_embed(star, message)
         return await starboard.send(title, embed=embed)
 
-    async def update_star(self, config, star, **kwargs):
+    async def update_star(self, config: dict, star: dict, **kwargs):
         """Update a star.
 
         Posts it to the starboard, edits if a message already exists.
