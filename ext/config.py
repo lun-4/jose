@@ -175,7 +175,7 @@ class Config(Cog):
         the command is invoked from.
         """
         channel = channel or ctx.channel
-        old = await self.cfg_get(ctx.guild, 'speak_channel')
+        old_id = await self.cfg_get(ctx.guild, 'speak_channel')
         success = await self.cfg_set(ctx.guild, 'speak_channel', channel.id)
 
         # invalidate texter
@@ -184,6 +184,11 @@ class Config(Cog):
             raise self.SayException('speak not loaded oops')
 
         try:
+            old = self.bot.get_channel(old_id)
+            if not old:
+                raise self.SayException('Old channel does not exist, '
+                                        'can not invalidate')
+
             log.debug(f'invalidating texter on {ctx.guild} {ctx.guild.id}, '
                       f'{old} {old.id} => {channel} {channel.id}')
 
