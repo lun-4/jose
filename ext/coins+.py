@@ -541,9 +541,8 @@ class CoinsExt(Cog, requires=['coins']):
         Of course, not all transactions will apply
         to the tax return.
 
-        Only tax transactions which are above
-        your average amount will count to the total available
-        tax return money.
+        Only tax transactions which are above 5JC will count
+        to the total available tax return money.
 
         Plus, not all the "available tax return" money will
         be promptly available to withdraw, once you withdraw,
