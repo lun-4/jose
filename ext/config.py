@@ -167,14 +167,13 @@ class Config(Cog):
     @commands.command(aliases=['speakchan'])
     @commands.guild_only()
     @is_moderator()
-    async def speakchannel(self, ctx, channel: discord.TextChannel=None):
+    async def speakchannel(self, ctx, channel):
         """Set the channel José will gather messages to feed
         to his markov generator.
-        
+
         By default, it will choose the same channel
         the command is invoked from.
         """
-        channel = channel or ctx.channel
         old_id = await self.cfg_get(ctx.guild, 'speak_channel')
         success = await self.cfg_set(ctx.guild, 'speak_channel', channel.id)
 
