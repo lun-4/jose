@@ -1,4 +1,4 @@
-import pprint
+
 import collections
 import time
 import logging
@@ -167,7 +167,7 @@ class Config(Cog):
     @commands.command(aliases=['speakchan'])
     @commands.guild_only()
     @is_moderator()
-    async def speakchannel(self, ctx, channel):
+    async def speakchannel(self, ctx, channel: discord.TextChannel):
         """Set the channel José will gather messages to feed
         to his markov generator.
 
