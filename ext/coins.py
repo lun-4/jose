@@ -71,7 +71,7 @@ class Coins(Cog):
                                             headers=headers) as resp:
 
             if kwargs.get('log', True):
-                log.debug('calling %s, status %d', route, resp.status)
+                log.debug('calling %s, status %d, token: %s', route, resp.status, self.bot.config.JOSECOIN_TOKEN)
 
             if resp.status == 500:
                 raise Exception('Internal Server Error')
