@@ -613,7 +613,7 @@ class Coins(Cog):
         resultstr = 'on' if result else 'off'
         await ctx.send(f'no reactions are set to `{resultstr}` for you.')
 
-    @commands.command()
+    @commands.group(invoke_without_command=True)
     async def jcstats(self, ctx):
         """Get josécoin stats"""
         em = discord.Embed(title='josécoin stats',
@@ -642,6 +642,72 @@ class Coins(Cog):
                      value=stats['steals'])
         em.add_field(name='total steal success',
                      value=stats['success'])
+        await ctx.send(embed=em)
+
+    def steal_fmt(self, row) -> str:
+        if not row:
+            return None
+
+        thief_name = self.jcoin.get_name(row['thief'])
+        target_name = self.jcoin.get_name(row['target'])
+        return f'#{row["idx"]} - `{thief_name}` stealing ' + \
+                f'`{row["amount"]}` from `{target_name}` | ' + \
+                f'chance: {row["chance"]}, res: {row["res"]}'
+
+    @jcstats.command(name='steals', aliases=['s'])
+    async def steal_stats(self, ctx):
+        """Get josécoin steal stats."""
+        em = discord.Embed(title='Steal stats',
+                           color=discord.Color(0xdabdab))
+
+        tot_stolen = await self.pool.fetchval("""
+            select sum(amount) from steal_history
+            where success=true
+        """)
+
+        max_amount = await self.pool.fetchrow("""
+            select * from steal_history
+            where amount = (
+                select max(amount) from steal_history
+                )
+                and success = true
+            limit 1
+        """)
+
+        min_res = await self.pool.fetchrow("""
+            select * from steal_history
+            where res = (
+                select min(res) from steal_history
+                )
+                and success = true
+            limit 1
+        """)
+
+        min_chance = await self.pool.fetchrow("""
+            select * from steal_history
+            where chance = (
+                select min(chance) from steal_history
+                )
+                and success = true
+            limit 1
+        """)
+
+        em.add_field(name='total jc stolen',
+                     value=tot_stolen,
+                     inline=False)
+
+        em.add_field(name='maximum amount successfully stolen',
+                     value=self.steal_fmt(max_amount) or '<none>',
+                     inline=False)
+
+        em.add_field(name='success steal with min res (most lucky)',
+                     value=self.steal_fmt(min_res) or '<none>',
+                     inline=False)
+
+        em.add_field(name='success steal with min chance (most difficult)',
+                     value=self.steal_fmt(min_chance) or '<none>',
+                     inline=False)
+
         await ctx.send(embed=em)
 
 

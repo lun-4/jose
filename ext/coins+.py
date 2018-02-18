@@ -440,8 +440,17 @@ class CoinsExt(Cog, requires=['coins']):
             log.info(f'[steal] chance={chance} res={res} amount={amount}'
                      f' t_amnt={t_amnt} '
                      f'thief={thief}[{thief.id}] target={target}[{target.id}]')
-            
-            if res < chance:
+
+            success = res < chance
+
+            # log steal
+            await self.pool.execute("""
+                insert into steal_history (thief, target, target_before,
+                    amount, success, chance, res)
+                values ($1, $2, $3, $4, $5, $6, $7)
+            """, thief.id, target.id, t_amnt, amount, success, chance, res)
+
+            if success:
                 # success
                 await c2.jc_post(f'/wallets/{thief.id}/steal_success')
                 transfer_info = await c2.transfer_str(target.id,

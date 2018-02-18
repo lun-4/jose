@@ -50,13 +50,14 @@ FROM wallets;
 CREATE TABLE IF NOT EXISTS transactions (
        idx serial PRIMARY KEY,
        transferred_at timestamp without time zone default now(),
+
        sender bigint NOT NULL REFERENCES accounts (account_id) ON DELETE RESTRICT,
        receiver bigint NOT NULL REFERENCES accounts (account_id) ON DELETE RESTRICT,
        amount numeric NOT NULL,
+
        /* so we can search for description='steal', or something */
        description text DEFAULT 'transfer',
        taxreturn_used boolean DEFAULT false
-
 );
 
 /* If we want, we *could* group transactions */
@@ -89,8 +90,31 @@ CREATE TABLE IF NOT EXISTS steal_grace (
 );
 
 CREATE VIEW steal_state as
-SELECT (steal_points.user_id, points, steal_cooldown.ctype, steal_cooldown.finish) FROM steal_points
-JOIN steal_cooldown ON steal_points.user_id = steal_cooldown.user_id;
+    SELECT (steal_points.user_id, points, steal_cooldown.ctype, steal_cooldown.finish)
+    FROM steal_points
+    JOIN steal_cooldown
+    ON steal_points.user_id = steal_cooldown.user_id;
+
+/* steal historic data */
+CREATE TABLE IF NOT EXISTS steal_history (
+    idx serial PRIMARY KEY,
+    steal_at timestamp without time zone default now(),
+    
+    /* who did what */
+    thief bigint NOT NULL REFERENCES accounts (account_id) ON DELETE RESTRICT,
+    target bigint NOT NULL REFERENCES accounts (account_id) ON DELETE RESTRICT,
+
+    /* target's wallet before the steal */
+    target_before numeric NOT NULL,
+
+    /* stole amount */
+    amount numeric NOT NULL,
+
+    /* steal success context */
+    success boolean NOT NULL,
+    chance float8 NOT NULL,
+    res float8 NOT NULL
+);
 
 /* Tax return withdraw cooldown */
 CREATE TABLE IF NOT EXISTS taxreturn_cooldown (
