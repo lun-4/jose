@@ -390,7 +390,7 @@ class Memes(Cog):
 
         for letter in sentence:
             if letter == ' ':
-                sentence2.append(' ')
+                sentence2.append(5 * ' ')
                 continue
 
             emoji = discord.utils.find(lambda emoji: emoji.name == f'Logo{letter.upper()}',
