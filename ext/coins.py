@@ -669,6 +669,7 @@ class Coins(Cog):
             select * from steal_history
             where amount = (
                 select max(amount) from steal_history
+                where success = true
                 )
                 and success = true
             limit 1
@@ -678,6 +679,7 @@ class Coins(Cog):
             select * from steal_history
             where res = (
                 select min(res) from steal_history
+                where success = true
                 )
                 and success = true
             limit 1
@@ -687,6 +689,7 @@ class Coins(Cog):
             select * from steal_history
             where chance = (
                 select min(chance) from steal_history
+                where success = true
                 )
                 and success = true
             limit 1
