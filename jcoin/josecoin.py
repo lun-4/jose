@@ -1,697 +1,239 @@
-"""
-jcoin/josecoin.py - main module for josécoin backend
-
-a neat webserver which handles josécoin transfers,
-wallets, database connections, authentication, etc
-"""
-import logging
-import asyncio
-import decimal
 import time
-from collections import defaultdict
+import pickle
+import logging
 
-import asyncpg
+import sys
+sys.path.append("..")
+import josecommon as jcommon
 
-from sanic import Sanic
-from sanic import response
+JOSECOIN_VERSION = '0.6'
 
-import config as jconfig
-from errors import GenericError, AccountNotFoundError, \
-        InputError, ConditionError
+import decimal
+decimal.getcontext().prec = 3
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
-app = Sanic()
-logging.basicConfig(level=logging.DEBUG)
-log = logging.getLogger(__name__)
-
-# constants
-AUTOCOIN_BASE_PROB = decimal.Decimal('0.012')
-PROB_CONSTANT = decimal.Decimal('1.003384590736')
-
-# !!!!! VERY IMPORTANT
-# the money type in psql doesn't handle Infinity or NaN,
-# so I have to "encode" infinity inside another number which
-# application wise is impossible, negative numbers do the job.
-ENCODED_INFINITY = -69
+logger.addHandler(jcommon.handler)
+logger.addHandler(jcommon.log_channel_handler)
 
+data = {}
+lock = False
+jose_id = jcommon.JOSE_ID
 
-def is_inf(decimal):
-    return decimal == ENCODED_INFINITY
+LEDGER_PATH = 'jcoin/josecoin-5.journal'
 
+def lockdb():
+    '''Locks JoséCoin database, no transactions can be done'''
+    global lock
+    lock = True
+    return lock
 
-class AccountType:
-    """Account types."""
-    USER = 0
-    TAXBANK = 1
+def unlockdb():
+    global lock
+    lock = False
+    return lock
 
+def ledger_data(fpath, data):
+    with open(fpath, 'a') as f:
+        f.write(data)
+    return
 
-# Exception handling
-@app.exception(GenericError)
-def handle_generic_error(request, exception):
-    """Handle generic errors from JoséCoin API"""
-    return response.json({
-        'error': True,
-        'message': exception.args[0]
-    }, status=exception.status_code)
-
-
-@app.get('/')
-async def index(_):
-    """Give simple index page."""
-    return response.text('josecoin v3 haha ye')
+def empty_acc(name, amnt, acctype=0):
+    if acctype == 0:
+        # user account
+        return {
+            'type': 0,
+            'amount': amnt,
+            'name': name,
 
+            # personal bank thing
+            'fakemoney': decimal.Decimal(0),
+            'actualmoney': decimal.Decimal(0),
 
-@app.middleware('request')
-async def request_check(request):
-    """Check the client token and deny if possible."""
-    try:
-        token = request.headers['Authorization']
-    except KeyError:
-        return response.json({
-            'error': 'no token provided'
-        }, status=403)
-
-    row = await request.app.db.fetchrow("""
-    SELECT client_id, client_name, auth_level FROM clients
-    WHERE token=$1
-    """, token)
-
-    if row is None:
-        log.info('token not found')
-        return response.json({
-            'error': 'unauthorized'
-        }, status=403)
-
-    client_id = row['client_id']
-    client_name = row['client_name']
-    auth_level = row['auth_level']
-    log.info(f'id={client_id} name={client_name} level={auth_level}')
-
-
-@app.get('/api/health')
-async def get_status(request) -> response:
-    """Simple response."""
-    t1 = time.monotonic()
-    await request.app.db.execute('SELECT 1')
-    t2 = time.monotonic()
-    delta = round((t2 - t1), 8)
-
-    return response.json({
-        'status': True,
-        'db_latency_sec': delta,
-    })
-
-
-@app.get('/api/wallets/<account_id:int>')
-async def get_wallet(request, account_id):
-    """Get a single wallet.
-
-    Can be user or taxbank.
-    """
-    account = await request.app.db.fetchrow("""
-    SELECT account_id, account_type, amount
-    FROM account_amount
-    WHERE account_id = $1
-    """, account_id)
-
-    if not account:
-        raise AccountNotFoundError('Account not found')
-
-    daccount = dict(account)
-    if account['account_type'] == AccountType.USER:
-        wallet = await request.app.db.fetchrow("""
-        SELECT taxpaid, steal_uses, steal_success
-        FROM wallets_taxpaid
-        WHERE user_id=$1
-        """, account_id)
-
-        daccount.update(dict(wallet))
-        return response.json(daccount)
-
-    return response.json(daccount)
-
-
-@app.post('/api/wallets/<account_id:int>')
-async def create_account(request, account_id):
-    """Create a single account.
-
-    Can be user or taxbank.
-    """
-    log.info('create %d', account_id)
-    account_type = int(request.json['type'])
-
-    try:
-        res = await request.app.db.execute("""
-        INSERT INTO accounts (account_id, account_type)
-        VALUES ($1, $2)
-        """, account_id, account_type)
-    except asyncpg.exceptions.UniqueViolationError:
-        raise ConditionError('Account exists')
-
-    if account_type == 0:
-        await request.app.db.execute("""
-        INSERT INTO wallets (user_id)
-        VALUES ($1)
-        """, account_id)
-
-    _, _, rows = res.split()
-    return response.json({'inserted': rows})
-
-
-@app.delete('/api/wallets/<account_id:int>')
-async def delete_account(request, account_id: int):
-    try:
-        await request.app.db.execute("""
-        DELETE FROM accounts
-        WHERE account_id = $1
-        """, account_id)
-
-        return response.json({
-            'success': True
-        })
-    except Exception as err:
-        log.exception('error while deleting')
-        return response.json({
-            'success': False,
-            'err': repr(err)
-        })
-
-
-@app.post('/api/wallets/<sender_id:int>/transfer')
-async def transfer(request, sender_id):
-    """Transfer money between users."""
-    try:
-        receiver_id = int(request.json['receiver'])
-        amount = decimal.Decimal(request.json['amount'])
-    except:
-        raise InputError('Invalid input')
-
-    if receiver_id == sender_id:
-        raise InputError('Account can not transfer to itself')
-
-    try:
-        amount = round(amount, 2)
-    except:
-        raise InputError('Error rounding.')
-
-    if amount < 0.01:
-        raise InputError('Negative amounts are not allowed')
-
-    # NOTE: this uses the view
-    accs = await request.app.db.fetch("""
-    SELECT * FROM account_amount
-    WHERE account_id=$1 or account_id=$2
-    """, sender_id, receiver_id)
-
-    accounts = {a['account_id']: a for a in accs}
-    sender = accounts.get(sender_id)
-    receiver = accounts.get(receiver_id)
-
-    if not sender:
-        raise AccountNotFoundError('Sender is missing account')
-
-    if not receiver:
-        raise AccountNotFoundError('Receiver is missing account')
-
-    sender_lock = request.app.account_locks[sender_id]
-    receiver_lock = request.app.account_locks[receiver_id]
-
-    if sender_lock:
-        raise ConditionError('Sender account is locked')
-
-    if receiver_lock:
-        raise ConditionError('Receiver account is locked')
-
-    snd_amount = decimal.Decimal(str(sender['amount']))
-    if not is_inf(snd_amount) and amount > snd_amount:
-        raise ConditionError(f'Not enough funds: {amount} > {snd_amount}')
-
-    rcv_amount = receiver['amount']
-
-    amount = str(amount)
-    async with request.app.db.acquire() as conn, conn.transaction():
-        # send it back to db
-        if not is_inf(snd_amount):
-            await conn.execute("""
-            UPDATE accounts
-            SET amount=accounts.amount - $1
-            WHERE account_id = $2
-            """, amount, sender_id)
-
-        if receiver['account_type'] == AccountType.TAXBANK and \
-                sender['account_type'] == AccountType.USER:
-            await conn.execute("""
-            UPDATE wallets
-            SET taxpaid=wallets.taxpaid + $1
-            WHERE user_id=$2
-            """, amount, sender_id)
-
-        if not is_inf(rcv_amount):
-            await conn.execute("""
-                UPDATE accounts
-                SET amount=accounts.amount + $1
-                WHERE account_id = $2
-            """, amount, receiver_id)
-
-        # log transaction
-        await conn.execute("""
-            INSERT INTO transactions (sender, receiver, amount)
-            VALUES ($1, $2, $3)
-        """, sender_id, receiver_id, amount)
-
-    einf = str(ENCODED_INFINITY)
-    # yes, we go back and forth.
-    amount = decimal.Decimal(str(amount))
-    rcv_amount = decimal.Decimal(str(rcv_amount))
-    return response.json({
-        'sender_amount': einf if is_inf(snd_amount) else snd_amount - amount,
-        'receiver_amount': einf if is_inf(rcv_amount) else rcv_amount + amount
-    })
-
-
-@app.post('/api/lock_accounts')
-async def lock_account(request):
-    """Lock an account from transfer operations."""
-    accounts = list(request.json['accounts'])
-    for acc_id in accounts:
-        request.app.account_locks[acc_id] = True
-
-    return response.json({
-        'status': True
-    })
-
-
-@app.post('/api/unlock_accounts')
-async def unlock_account(request):
-    """UnLock an account from transfer operations."""
-    accounts = list(request.json['accounts'])
-    for acc_id in accounts:
-        request.app.account_locks[acc_id] = False
-
-    return response.json({
-        'status': True
-    })
-
-
-@app.get('/api/check_lock')
-async def is_locked(request):
-    """Return if the account is locked or not."""
-    account_id = int(request.json['account_id'])
-    return response.json({
-        'locked': request.app.account_locks[account_id]
-    })
-
-
-@app.post('/api/wallets/<wallet_id:int>/steal_use')
-async def inc_steal_use(request, wallet_id: int):
-    """Increment a wallet's `steal_uses` field by one."""
-    async with request.app.db.acquire() as conn, conn.transaction():
-        res = await conn.execute("""
-        UPDATE wallets
-        SET steal_uses = steal_uses + 1
-        WHERE user_id=$1
-        """, wallet_id)
-
-        _, items = res.split()
-        items = int(items)
-        return response.json({
-            'success': bool(items),
-        })
-
-
-@app.post('/api/wallets/<wallet_id:int>/steal_success')
-async def inc_steal_success(request, wallet_id: int):
-    """Increment a wallet's `steal_success` field by one."""
-    async with request.app.db.acquire() as conn, conn.transaction():
-        res = await conn.execute("""
-        UPDATE wallets
-        SET steal_success = steal_success + 1
-        WHERE user_id=$1
-        """, wallet_id)
-
-        _, items = res.split()
-        items = int(items)
-        return response.json({
-            'success': bool(items),
-        })
-
-
-@app.get('/api/wallets/<wallet_id:int>/rank')
-async def wallet_rank(request, wallet_id: int):
-    """Caulculate the ranks of a wallet.
-
-    Returns more data if a guild id is provided
-    in the `guild_id` field, as json.
-    """
-    try:
-        guild_id = request.json.get('guild_id')
-    except AttributeError:
-        guild_id = None
-
-    global_rank = await request.app.db.fetchval("""
-    SELECT s.rank FROM (
-        SELECT accounts.account_id, rank() over (
-            ORDER BY accounts.amount DESC
-        ) FROM accounts WHERE account_type = $2
-    ) AS s WHERE s.account_id = $1
-    """, wallet_id, AccountType.USER)
-
-    if global_rank is None:
-        raise AccountNotFoundError('Account not found')
-
-    global_total = await request.app.db.fetchval("""
-    SELECT COUNT(*) FROM accounts WHERE account_type = $1
-    """, AccountType.USER)
-
-    taxes_total = await request.app.db.fetchval("""
-    SELECT COUNT(*) FROM wallets
-    """)
-
-    taxes_rank = await request.app.db.fetchval("""
-    SELECT s.rank FROM (
-        SELECT wallets.user_id, rank() over (
-            ORDER BY wallets.taxpaid DESC
-        ) FROM wallets
-    ) AS s WHERE s.user_id = $1
-    """, wallet_id)
-
-    res = {
-        'global': {
-            'rank': global_rank,
-            'total': global_total,
-        },
-        'taxes': {
-            'rank': taxes_rank,
-            'total': taxes_total,
+            # statistics for taxes
+            'taxpaid': decimal.Decimal(0),
+
+            # j!steal stuff
+            'times_stolen': 0,
+            'success_steal': 0,
+
+            # from what taxbank are you loaning from
+            'loaning_from': None,
+
+            # last tbank to get interest from
+            'interest_tbank': '',
         }
-    }
-
-    if guild_id:
-        local_total = await request.app.db.fetchval("""
-        SELECT COUNT(*) FROM accounts
-        JOIN members ON accounts.account_id = members.user_id
-        WHERE members.guild_id = $1
-        """, guild_id)
-
-        local_rank = await request.app.db.fetchval("""
-        SELECT s.rank FROM (
-            SELECT accounts.account_id, rank() over (
-                ORDER BY accounts.amount DESC
-            ) FROM accounts
-            JOIN members ON accounts.account_id = members.user_id
-            WHERE members.guild_id = $1
-        ) AS s WHERE s.account_id = $2
-        """, guild_id, wallet_id)
-
-        res['local'] = {
-            'rank': local_rank,
-            'total': local_total,
+    elif acctype == 1:
+        # tax bank
+        return {
+            'type': 1,
+            'name': name,
+            'amount': decimal.Decimal(-1),
+            'taxes': decimal.Decimal(0),
+            'loans': {},
         }
 
-    return response.json(res)
+def new_acc(id_acc, name, init_amnt=None, acctype=0):
+    if lock:
+        return False, 'database is locked'
 
+    if init_amnt is None and acctype == 0:
+        init_amnt = decimal.Decimal('3')
 
-async def getsum(request, acc_type: int) -> decimal.Decimal:
-    """Get the sum of all the amounts of a
-    specific account type."""
+    if id_acc in data:
+        return False, 'account already exists'
 
-    resp = await request.app.db.fetchrow("""
-    SELECT SUM(amount)::numeric FROM accounts WHERE account_type=$1
-    """, acc_type)
-    return resp['sum']
+    data[id_acc] = empty_acc(name, init_amnt, acctype)
+    return True, 'account made with success'
 
-async def get_count(request, acc_type: int) -> int:
-    """Get the total account count for a specific
-    account type."""
-    resp = await request.app.db.fetchrow("""
-    SELECT COUNT(*) FROM accounts WHERE account_type=$1
-    """, acc_type)
-    return resp['count']
+def get(id_acc):
+    if lock:
+        return False, 'database is locked'
 
+    if id_acc not in data:
+        return False, 'account doesn\'t exist, read `j!docs jcoin`'
+    return True, data[id_acc]
 
-async def get_gdp(request):
-    """Get the GDP (sum of all account amounts) in the economy"""
-    resp = await request.app.db.fetchrow("""
-    SELECT SUM(amount)::numeric FROM accounts;
-    """)
-    return resp['sum']
+def gen():
+    for acc_id in data:
+        acc = data[acc_id]
+        yield (acc_id, acc['name'], acc['amount'])
 
+def transfer(id_from, id_to, amnt, file_name=None):
+    if amnt < 0.001:
+        return False, 'very small transfer.'
 
-async def get_counts(request) -> dict:
-    """Get account counts"""
+    if file_name is None:
+        file_name = LEDGER_PATH
 
-    # TODO: add idx and use MAX(idx) instead of COUNT(*)
+    if lock:
+        return False, 'database is locked'
 
-    count = await request.app.db.fetchrow("""
-    SELECT COUNT(*) FROM accounts
-    """)
-    count = count['count']
+    amnt = decimal.Decimal(str(amnt))
 
-    usercount = await get_count(request, AccountType.USER)
-    txbcount = await get_count(request, AccountType.TAXBANK)
+    if amnt <= 0:
+        return False, "transfering zero or less than is prohibited"
 
-    return {
-        'accounts': count,
-        'user_accounts': usercount,
-        'txb_accounts': txbcount,
-    }
+    if not (id_from in data):
+        return False, "account to get funds doesn't exist"
 
-
-async def get_sums(request) -> dict:
-    """Get sum information about accounts."""
-    total_amount = await get_gdp(request)
-    user_amount = await getsum(request, AccountType.USER)
-    txb_amount = await getsum(request, AccountType.TAXBANK)
-
-    return {
-        'gdp': total_amount,
-        'user': user_amount,
-        'taxbank': txb_amount
-    }
-
-
-@app.get('/api/gdp')
-async def get_gdp_handler(request):
-    """Get the total amount of coins in the economy."""
-    return response.json(await get_sums(request))
-
-
-@app.get('/api/wallets/<wallet_id:int>/probability')
-async def get_wallet_probability(request, wallet_id: int):
-    wallet = await request.app.db.fetchrow("""
-    SELECT taxpaid FROM wallets_taxpaid
-    WHERE user_id=$1
-    """, wallet_id)
-    if not wallet:
-        raise AccountNotFoundError('Wallet not found')
-    taxpaid = wallet['taxpaid']
-
-    prob = AUTOCOIN_BASE_PROB
-
-    # Based on the tax paid.
-    taxpaid = decimal.Decimal(taxpaid)
-    if taxpaid >= 50:
-        raised = pow(PROB_CONSTANT, taxpaid)
-        prob += round(raised / 100, 5)
-
-    if prob > 0.042:
-        prob = 0.042
-
-    return response.json({
-        'probability': str(prob),
-    })
-
-
-@app.get('/api/wallets')
-async def get_wallets(request):
-    """Get wallets by specific criteria"""
-    key = request.json['key']
-    try:
-        reverse = bool(request.json['reverse'])
-    except (ValueError, TypeError, KeyError):
-        reverse = False
-
-    sorting = 'DESC' if reverse else 'ASC'
+    if not (id_to in data):
+        return False, "account to send funds doesn't exist"
 
     try:
-        guild_id = int(request.json['guild_id'])
-    except (ValueError, TypeError, KeyError):
-        guild_id = None
+        acc_from = data[id_from]
+        acc_to = data[id_to]
+    except Exception as e:
+        return False, str(e)
 
-    try:
-        limit = int(request.json['limit'])
-    except (ValueError, TypeError, KeyError):
-        limit = 20
+    logger.info("%s > %.6fJC > %s", \
+        acc_from['name'], amnt, acc_to['name'])
 
-    try:
-        acc_type = int(request.json['type'])
-    except (ValueError, TypeError, KeyError):
-        acc_type = -1
+    if acc_to['type'] == 1 or acc_from['type'] == 1:
+        # tax transfer
 
-    if limit <= 0 or limit > 60:
-        raise InputError('invalid limit range')
+        if acc_to['type'] == 1:
+            if not (acc_from['amount'] >= amnt):
+                return False, "account doesn't have enough funds to make this transaction"
 
-    query = ''
+            acc_to['taxes'] += amnt
+            acc_from['taxpaid'] += amnt
+            acc_from['amount'] -= amnt
 
-    # very ugly hack
-    acc_type_str = {
-        AccountType.USER: f'account_amount.account_type={AccountType.USER}',
-        AccountType.TAXBANK: 'account_amount.account_type'
-                             f'={AccountType.TAXBANK}',
-    }.get(acc_type, '')
+        elif acc_from['type'] == 1:
+            if not (acc_from['taxes'] >= amnt):
+                return False, "account doesn't have enough funds to make this transaction"
 
-    acc_type_str_w = ''
-    if acc_type_str:
-        acc_type_str_w = f'AND {acc_type_str}'
+            acc_from['taxes'] -= amnt
+            acc_to['amount'] += amnt
 
-    args = [guild_id]
+        ledger_data(file_name, "%f;TAXTR;%s;%s;%s\n" % \
+            (time.time(), id_from, id_to, amnt))
 
-    if key == 'local':
-        query = f"""
-        SELECT * FROM account_amount
-
-        JOIN members ON account_amount.account_id = members.user_id
-        WHERE members.guild_id = $1
-
-        ORDER BY amount {sorting}
-        LIMIT {limit}
-        """
-
-    # global / taxpaid checks if the user is in any mutual guild to avoid having unknown users in j!top
-    elif key == 'global':
-        query = f"""
-        SELECT * FROM account_amount
-        WHERE account_amount.account_id = ANY(SELECT user_id FROM members)
-        {acc_type_str_w}
-
-        ORDER BY amount {sorting}
-        LIMIT {limit}
-        """
-
-        # NOTE: very shitty hack to get only-taxbank fetching
-        # working.
-        if acc_type == AccountType.TAXBANK:
-            query = query.replace('account_amount.account_id = ANY(SELECT'
-                                  ' user_id FROM members)', '')
-            query = query.replace('AND', '')
-        args = []
-    elif key == 'taxpaid':
-        query = f"""
-        SELECT * FROM wallets_taxpaid
-        JOIN account_amount
-        ON account_amount.account_id = wallets_taxpaid.user_id
-        WHERE account_amount.account_id = ANY(SELECT user_id FROM members)
-
-        ORDER BY taxpaid {sorting}
-        LIMIT {limit}
-        """
-        args = []
-    elif key == 'taxbanks':
-        query = f"""
-        SELECT * FROM account_amount
-        WHERE account_type={AccountType.TAXBANK}
-
-        ORDER BY amount {sorting}
-        LIMIT {limit}
-        """
-        args = []
     else:
-        return response.json({
-            'success': False,
-            'status': 'invalid key',
-        })
+        if not (acc_from['amount'] >= amnt):
+            return False, "account doesn't have enough funds to make this transaction"
 
-    log.info(query)
-    rows = await request.app.db.fetch(query, *args)
-    return response.json(map(dict, rows))
+        acc_to['amount'] += amnt
+        acc_from['amount'] -= amnt
 
+        ledger_data(file_name, "%f;TR;%s;%s;%s\n" % \
+            (time.time(), id_from, id_to, amnt))
 
-@app.get('/api/stats')
-async def get_stats_handler(request):
-    """Get stats about it all."""
+    return True, "%s was sent from %s to %s" % (amnt, acc_from['name'], acc_to['name'])
 
-    gdp_data = await get_sums(request)
-    res = {
-        'gdp': gdp_data['gdp'],
-    }
+def ensure_exist(acc_id, attribute, val):
+    if attribute not in data[acc_id]:
+        data[acc_id][attribute] = val
 
-    res.update(await get_counts(request))
-
-    res['user_money'] = gdp_data['user']
-    res['txb_money'] = gdp_data['taxbank']
-
-    steal_uses = await request.app.db.fetchrow("""
-    SELECT SUM(steal_uses) FROM wallets
-    """)
-    steal_uses = steal_uses['sum']
-
-    steal_success = await request.app.db.fetchrow("""
-    SELECT SUM(steal_success) FROM wallets;
-    """)
-    steal_success = steal_success['sum']
-
-    res['steals'] = steal_uses
-    res['success'] = steal_success
-
-    return response.json(res)
-
-
-@app.post('/api/wallets/<user_id:int>/hidecoins')
-async def toggle_hidecoins(request, user_id: int):
-    async with request.app.db.acquire() as conn, conn.transaction():
-        await conn.execute("""
-        UPDATE wallets
-        SET hidecoins = not hidecoins
-        WHERE user_id = $1
-        """, user_id)
-
-        new_hidecoins = await conn.fetchrow("""
-        SELECT hidecoins FROM wallets
-        WHERE user_id = $1
-        """, user_id)
-        if not new_hidecoins:
-            raise AccountNotFoundError('Account not found')
-
-        return response.json({
-            'new_hidecoins': new_hidecoins['hidecoins']
-        })
-
-
-@app.get('/api/wallets/<user_id:int>/hidecoin_status')
-async def hidecoin_status(request, user_id: int):
-    hidecoins = await request.app.db.fetchrow("""
-    SELECT hidecoins FROM wallets
-    WHERE user_id = $1
-    """, user_id)
-    if not hidecoins:
-        raise AccountNotFoundError('Account not found')
-
-    return response.json({
-        'hidden': hidecoins['hidecoins']
-    })
-
-
-async def db_init(app):
-    """Initialize database"""
-    app.db = await asyncpg.create_pool(**jconfig.db)
-
-
-def main():
-    """Main entrypoint."""
-    loop = asyncio.get_event_loop()
-
-    server = app.create_server(host='0.0.0.0', port=8080)
-    app.account_locks = defaultdict(bool)
-    loop.create_task(server)
-    loop.create_task(db_init(app))
+def load(fname):
+    global data
     try:
-        loop.run_forever()
-    except KeyboardInterrupt:
-        loop.close()
-    except Exception:
-        log.exception('stopping')
-        loop.close()
+        with open(fname, 'rb') as f:
+            data = pickle.load(f)
+    except Exception as e:
+        return False, repr(e)
 
+    remove_itbank = False
 
-if __name__ == '__main__':
-    main()
+    for acc_id in data:
+        acc = data[acc_id]
+        if not isinstance(acc, dict):
+            if isinstance(acc, str):
+                if acc_id == 'interest_tbank':
+                    jcommon.logger.info("!!")
+                    remove_itbank = True
+                    continue
+                elif acc_id[0] == '_':
+                    continue
+
+            return False, ('%s is not an account, it is %r = %r' % (acc_id, type(acc), acc))
+
+        if acc_id.startswith('tbank'):
+            data[acc_id]['type'] = 1
+        else:
+            data[acc_id]['type'] = 0
+
+        if data[acc_id]['type'] == 0:
+            ensure_exist(acc_id, 'fakemoney', decimal.Decimal(0))
+            ensure_exist(acc_id, 'actualmoney', decimal.Decimal(0))
+            ensure_exist(acc_id, 'taxpaid', decimal.Decimal(0))
+            ensure_exist(acc_id, 'times_stolen', 0)
+            ensure_exist(acc_id, 'success_steal', 0)
+
+            ensure_exist(acc_id, 'loaning_from', None)
+            ensure_exist(acc_id, 'interest_tbank', '')
+
+        if data[acc_id]['type'] == 1:
+            ensure_exist(acc_id, 'name', acc_id)
+            ensure_exist(acc_id, 'amount', decimal.Decimal(-1))
+            ensure_exist(acc_id, 'loans', {})
+            ensure_exist(acc_id, 'taxes', decimal.Decimal(0))
+
+            if 'taxpayers' in data[acc_id]:
+                del data[acc_id]['taxpayers']
+
+    if remove_itbank:
+        del data['interest_tbank']
+
+    data[jose_id] = empty_acc('jose-bot', decimal.Decimal('Inf'), 0)
+    return True, "load %s" % fname
+
+def save(fname):
+    global data
+    try:
+        with open(fname, 'wb') as f:
+            pickle.dump(data, f)
+    except Exception as e:
+        return False, repr(e)
+
+    #ledger_data(fname.replace('db', 'journal'), '%f;SAVE;%r\n' % (time.time(), data))
+    return True, "save %s" % fname
+
+async def jcoin_control(userid, amount):
+    return transfer(userid, jose_id, amount, LEDGER_PATH)
+
+async def raw_save():
+    res = save('jcoin/josecoin.db')
+    return res
