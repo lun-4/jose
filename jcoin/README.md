@@ -1,4 +1,0 @@
-jcoin
--------
-
-JoséCoin system.
