@@ -111,10 +111,6 @@ class Basic(Cog):
         em.add_field(name='Guilds', value=f'{len(self.bot.guilds)}')
         em.add_field(name='Channels', value=f'{channels}')
 
-        gay_chans = sum(1 for c in self.bot.get_all_channels()
-                        if 'gay' in c.name.lower())
-        em.add_field(name='Gaynnels', value=gay_chans)
-
         em.add_field(name='Texters',
                      value=f'{len(self.bot.cogs["Speak"].text_generators)}/'
                      f'{len(self.bot.guilds)}')

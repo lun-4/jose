@@ -85,7 +85,7 @@ TRAINING = (
         'You HAHA REKT'
     ],
     [
-        "I'm gay lol",
+        "I'm a completely heterosexual christian woman lol",
         'Tatsu is just a side hoe'
     ],
     [

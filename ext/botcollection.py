@@ -13,15 +13,15 @@ WHITELIST = (
     295341979800436736,  # Memework
     319540379495956490,  # v2 testing serv
     380295555039100932,  # Comet Obversavotory / luma's home
-    319252487280525322,  # robert is gay
-    340609473439596546,  # slice is a furry that plays agario
-    191611344137617408,  # dan's 'haha gay pussy party'
+    319252487280525322,  # robert is a nice completely heterosexual young man
+    340609473439596546,  # slice is a giant, but completely heterosexual wolf that plays agario
+    191611344137617408,  # dan's 'haha completely straight pussy party'
     277919178340565002,  # lold - lolbot testing server
     248143597097058305,  # cyn private server
     291990349776420865,  # em's meme heaven
-    366513799404060672,  # dan's another gay guild
-    322885030806421509,  # heating's gay guild
-    350752456554184704,  # eric's gay guild
+    366513799404060672,  # dan's another heterosexual, Christian guild
+    322885030806421509,  # heating's womanlike and not gay guild
+    350752456554184704,  # eric's straight as a line guild
 )
 
 log = logging.getLogger(__name__)
