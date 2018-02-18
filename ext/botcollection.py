@@ -17,7 +17,7 @@ WHITELIST = (
     340609473439596546,  # slice is a furry that plays agario
     191611344137617408,  # dan's 'haha gay pussy party'
     277919178340565002,  # lold - lolbot testing server
-    248143597097058305,  # cyn bae's private server we gotta get 69
+    248143597097058305,  # cyn private server
     291990349776420865,  # em's meme heaven
     366513799404060672,  # dan's another gay guild
     322885030806421509,  # heating's gay guild
@@ -50,6 +50,15 @@ class BotCollection(Cog):
         else:
             return BOT_RATIO_MAX
 
+    def fallback(self, guild: discord.Guild, message: str):
+        """Send a message to the first channel we can send.
+
+        Serves as a fallback instad of DMing owner.
+        """
+        chan = next(c for c in guild.channels
+                    if guild.me.permissions_in(c).send_messages)
+        return chan.send(message)
+
     async def on_guild_join(self, guild):
         bots, humans, ratio = self.bot_human_ratio(guild)
         owner = guild.owner
@@ -64,18 +73,42 @@ class BotCollection(Cog):
         if ratio > bot_ratio:
             log.info(f'[bh:leave:guild_join] {ratio} > {bot_ratio},'
                      f' leaving {guild!s}')
+
+            explode_bh = ('This guild was classified as a bot collection, '
+                          f'josé automatically left. {ratio} > {bot_ratio}')
+            try:
+                await owner.send(explode_bh)
+            except discord.Forbidden:
+                await self.fallback(guild, explode_bh)
+
             return await guild.leave()
 
         if await self.bot.is_blocked_guild(guild.id):
-            await owner.send('Sorry. The guild you added José on is blocked. '
-                             'Appeal to the block at the support server'
-                             '(Use the invite provided in `j!invite`).')
+            blocked_msg = ('Sorry. The guild you added José on is blocked. '
+                           'Appeal to the block at the support server'
+                           '(Use the invite provided in `j!invite`).')
+
+            try:
+                await owner.send(blocked_msg)
+            except discord.Forbidden:
+                await self.fallback(guild, blocked_msg)
+
             return await guild.leave()
 
-        await owner.send('Hello, welcome to José!\n'
-                         "Discord's API Terms of Service requires me to tell you I log\n"
-                         'Command usage and errors to a special channel.\n'
-                         '**Only commands and errors are logged, no messages are logged, ever.**')
+        welcome = ('Hello, welcome to José!\n'
+
+                   "Discord's API Terms of Service requires me to"
+                   " tell you I log\n"
+
+                   'Command usage and errors to a special channel.\n'
+
+                   '**Only commands and errors are logged, no '
+                   'messages are logged, ever.**')
+
+        try:
+            await owner.send(welcome)
+        except discord.Forbidden:
+            await self.fallback(guild, welcome)
 
     async def on_member_join(self, member):
         guild = member.guild
@@ -89,13 +122,18 @@ class BotCollection(Cog):
         if ratio > bot_ratio:
             log.info(f'[bh:leave:member_join] leaving {guild!r} {guild.id},'
                      f' {ratio} ({len(bots)} / {len(humans)}) > {bot_ratio}')
+
+            bc_msg = ('Your guild became classified as a bot'
+                      'collection, josé automatically left.'
+                      f'{len(bots)} bots, '
+                      f'{len(humans)} humans, '
+                      f'{ratio}b/h > {bot_ratio}')
+
             try:
-                await guild.owner.send('Your guild was classified as a bot'
-                                       'collection, josé automatically left.'
-                                       f'{len(bots)} bots, {len(humans)} humans, '
-                                       f'{ratio}b/h, ratio is over {BOT_RATIO_MAX}')
-            except discord.HTTPException:
-                pass
+                await guild.owner.send(bc_msg)
+            except discord.Forbidden:
+                await self.fallback(guild, bc_msg)
+
             await guild.leave()
 
     @commands.command()
