@@ -383,7 +383,7 @@ class Memes(Cog):
         await ctx.send(text)
 
     @commands.command()
-    async def logo(self, ctx, sentence: commands.clean_content):
+    async def logo(self, ctx, *, sentence: commands.clean_content):
         """logo-ify!"""
         sentence2 = []
         guild = self.bot.get_guild(414595857468620800)
