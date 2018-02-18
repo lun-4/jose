@@ -393,7 +393,7 @@ class Memes(Cog):
                 sentence2.append(' ')
                 continue
 
-            emoji = discord.utils.find(lambda emoji: emoji.name == f'Logo{letter.uppercase()}',
+            emoji = discord.utils.find(lambda emoji: emoji.name == f'Logo{letter.upper()}',
                                        guild.emojis)
             if not emoji:
                 continue
