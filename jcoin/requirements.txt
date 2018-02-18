@@ -1,3 +1,0 @@
-sanic==0.7.0
-asyncpg==0.13.0
-voluptuous==0.10.5

@@ -1,28 +1,48 @@
 José
 =========
-Welcome to José! José is a multi-function Discord bot made with Python and discord.py.
 
-Requirements
-==========
-- Docker
-- Docker Compose
+*The documentation for José is available in English as well as in Portuguese*
 
-Installation
-============
-You can just copy and paste this probably:
+*Este arquivo em português pode ser encontrado em [README-pt.md](https://github.com/lkmnds/jose/blob/master/README-pt.md)*
+
+José is a general-purpose bot for Discord written in Python.
+
+**Redis and Python 3.5+ is needed**
+
+Instructions for Linuxes:
 ```bash
-git clone https://github.com/lnmds/jose.git
+$ git clone https://github.com/lkmnds/jose.git
+$ cd jose
+$ nano joseconfig.py
 
-cd jose
+# For Debian-based Linuxes
+$ sudo apt-get install gettext
 
-# fill in stuff from the example config file
-# as you wish
-nano joseconfig.py
-
-# profit
-sudo docker-compose up
+# Make sure pip references python 3.5+
+$ sudo pip install -U -r requirements.txt
 ```
 
-Example config file
-============
-You need a config to run José. There is a example config in `example_config.py`. copy that to `joseconfig.py` and fill it in. 
+Setup a cron job to make backups every hour:
+```
+0 * * * * /path/to/jose/backup.bash
+```
+
+Example `joseconfig.py` file:
+```python
+discord_token = 'DISCORD OAUTH2 BOT TOKEN'
+soundcloud_id = 'SOUNDCLOUD API ID'
+jcoin_path = 'jcoin/josecoin.db'
+WOLFRAMALPHA_APP_ID = 'WOLFRAM|ALPHA APP ID'
+OWM_APIKEY = 'OpenWeatherMap API Key'
+MAGICWORD_PATH = 'db/magicwords.json'
+```
+
+Run Redis somewhere:
+```
+redis-server jose/redis.conf
+```
+
+Starting:
+```
+python3 jose-bot.py
+```
