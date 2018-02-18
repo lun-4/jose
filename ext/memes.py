@@ -382,6 +382,26 @@ class Memes(Cog):
 
         await ctx.send(text)
 
+    @commands.command()
+    async def logo(self, ctx, sentence: commands.clean_content):
+        """logo-ify!"""
+        sentence2 = []
+        guild = self.bot.get_guild(414595857468620800)
+
+        for letter in sentence:
+            if letter == ' ':
+                sentence2.append(' ')
+                continue
+
+            emoji = discord.utils.find(lambda emoji: emoji.name == f'Logo{letter.uppercase()}',
+                                       guild.emojis)
+            if not emoji:
+                continue
+
+            sentence2.append(str(emoji))
+
+        await ctx.send(''.join(sentence2))
+
 
 def setup(bot):
     bot.add_cog(Memes(bot))
