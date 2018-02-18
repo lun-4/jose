@@ -226,6 +226,10 @@ class Speak(Cog):
 
     async def new_texter(self, guild, **kwargs):
         guild_messages = await self.get_messages_str(guild)
+        if len(guild_messages) < 100:
+            raise self.SayException('Selected channel has less than '
+                                    '100 characters. (`j!help speakchan`)')
+
         new_texter = await make_texter(guild.id, guild_messages, **kwargs)
 
         self.st_gen_totalms += new_texter.time_taken
