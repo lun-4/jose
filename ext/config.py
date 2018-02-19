@@ -240,6 +240,12 @@ class Config(Cog):
     @commands.is_owner()
     async def block(self, ctx, user: discord.User, *, reason: str = ''):
         """Block someone from using the bot, globally"""
+        basic = self.bot.get_cog('Basic')
+        await user.send('**You have been blocked from using José.**\n'
+                        f'reason: `{reason}`\n'
+                        'If you want to appeal this block, '
+                        f'drop by the support guild: {basic.support_inv}')
+
         await ctx.success(await self.block_one(user.id, 'user_id', reason))
 
     @commands.command()
@@ -252,7 +258,20 @@ class Config(Cog):
     @commands.is_owner()
     async def blockguild(self, ctx, guild_id: int, *, reason: str = ''):
         """Block an entire guild from using José."""
+        basic = self.bot.get_cog('Basic')
+        botcoll = self.bot.get_cog('BotCollection')
+
+        guild = self.bot.get_guild(guild_id)
+
+        await botcoll.fallback(guild, '**This guild has been blocked'
+                                      ' from using José.**\n'
+                                      f'reason: `{reason}`\n'
+                                      'If you want to appeal this block, '
+                                      'drop by the support guild: '
+                                      f'{basic.support_inv}')
+
         await ctx.success(await self.block_one(guild_id, 'guild_id', reason))
+        await guild.leave()
 
     @commands.command()
     @commands.is_owner()

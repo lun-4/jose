@@ -24,6 +24,7 @@ class Basic(Cog):
     """Basic commands."""
     def __init__(self, bot):
         super().__init__(bot)
+        self.support_inv = SUPPORT_SERVER
         self.process = psutil.Process(os.getpid())
 
     @commands.command(aliases=['p'])
