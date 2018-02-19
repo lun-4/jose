@@ -1,5 +1,6 @@
 import logging
 import asyncio
+import collections
 
 import discord
 
@@ -12,6 +13,10 @@ log = logging.getLogger(__name__)
 
 class Marry(Cog):
     """Relationships."""
+    def __init__(self, bot):
+        super().__init__(bot)
+        self.locks = collections.defaultdict(bool)
+
     async def get_rels(self, user_id: int) -> list:
         rels = await self.pool.fetch("""
             select rel_id from relationships
@@ -69,25 +74,35 @@ class Marry(Cog):
                 raise self.SayException('You are already with this person '
                                         f'(relationship id #{in_rel_id})')
 
-        await ctx.send(f'{who.mention}, {ctx.author.mention} has just '
-                       'proposed to you. Do you agree to marry them?\n'
-                       'Reply with y/n.')
+        if self.locks[who.id]:
+            raise self.SayException('Please wait.')
 
-        def yn_check(msg):
-            cnt = msg.content.lower()
-            chk1 = msg.author == who and msg.channel == ctx.channel
-            chk2 = any(x == cnt for x in ['yes', 'no', 'y', 'n'])
-            return chk1 and chk2
+        self.locks[who.id] = True
 
+        # critical session
         try:
-            message = await self.bot.wait_for('message',
-                                              timeout=30,
-                                              check=yn_check)
-        except asyncio.TimeoutError:
-            raise self.SayException('Timeout reached.')
+            await ctx.send(f'{who.mention}, {ctx.author.mention} has just '
+                           'proposed to you. Do you agree to marry them?\n'
+                           'Reply with y/n.')
 
-        if message.content in ['no', 'n']:
-            raise self.SayException(f'Invite denied, {ctx.author.mention}')
+            def yn_check(msg):
+                cnt = msg.content.lower()
+                chk1 = msg.author == who and msg.channel == ctx.channel
+                chk2 = any(x == cnt for x in ['yes', 'no', 'y', 'n'])
+                return chk1 and chk2
+
+            try:
+                message = await self.bot.wait_for('message',
+                                                  timeout=30,
+                                                  check=yn_check)
+            except asyncio.TimeoutError:
+                raise self.SayException(f'{ctx.author.mention}, '
+                                        'timeout reached.')
+
+            if message.content in ['no', 'n']:
+                raise self.SayException(f'Invite denied, {ctx.author.mention}')
+        finally:
+            self.locks[who.id] = False
 
         # get next available id
         if not rel_id:
@@ -146,7 +161,7 @@ class Marry(Cog):
 
         await ctx.send('\n'.join(res))
 
-    @commands.command()
+    @commands.command(aliases=['divorce'])
     async def breakup(self, ctx, rel_id: int):
         """Remove yourself from a relationship."""
         users = await self.get_users(rel_id)
