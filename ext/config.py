@@ -241,10 +241,13 @@ class Config(Cog):
     async def block(self, ctx, user: discord.User, *, reason: str = ''):
         """Block someone from using the bot, globally"""
         basic = self.bot.get_cog('Basic')
-        await user.send('**You have been blocked from using José.**\n'
-                        f'reason: `{reason}`\n'
-                        'If you want to appeal this block, '
-                        f'drop by the support guild: {basic.support_inv}')
+        try:
+            await user.send('**You have been blocked from using José.**\n'
+                            f'reason: `{reason}`\n'
+                            'If you want to appeal this block, '
+                            f'drop by the support guild: {basic.support_inv}')
+        except discord.Forbidden:
+            await ctx.send('Failed to DM user')
 
         await ctx.success(await self.block_one(user.id, 'user_id', reason))
 
@@ -263,12 +266,15 @@ class Config(Cog):
 
         guild = self.bot.get_guild(guild_id)
 
-        await botcoll.fallback(guild, '**This guild has been blocked'
-                                      ' from using José.**\n'
-                                      f'reason: `{reason}`\n'
-                                      'If you want to appeal this block, '
-                                      'drop by the support guild: '
-                                      f'{basic.support_inv}')
+        try:
+            await botcoll.fallback(guild, '**This guild has been blocked'
+                                          ' from using José.**\n'
+                                          f'reason: `{reason}`\n'
+                                          'If you want to appeal this block, '
+                                          'drop by the support guild: '
+                                          f'{basic.support_inv}')
+        except discord.Forbidden:
+            await ctx.send('Failed to message guild')
 
         await ctx.success(await self.block_one(guild_id, 'guild_id', reason))
         await guild.leave()
