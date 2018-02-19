@@ -81,6 +81,10 @@ class Coins(Cog):
                 msg = data.get('message')
                 for exc in err_list:
                     if exc.status_code == resp.status:
+                        if exc == AccountNotFoundError:
+                            raise AccountNotFoundError("Account not found, rea"
+                                                       "d the documentation "
+                                                       "at 'j!help Coins'")
                         raise exc(msg)
                 raise Exception(msg)
 
