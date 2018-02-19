@@ -59,3 +59,5 @@ JOSECOIN_TOKEN = 'something secret'
 # If on docker
 # JOSECOIN_API = 'http://josecoin:8080/api'
 
+# Where to put guild logs (join, leave, available, unavailable)
+GUILD_LOG_CHAN = 414977235762675713
