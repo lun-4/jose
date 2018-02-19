@@ -43,6 +43,11 @@ class Marry(Cog):
 
         Giving a relationship ID will turn that relationship into a
         poly (more than two) relationship.
+
+        You do not use the relationship ID given here to claim an ID.
+
+        Relationship IDs are generated based on
+        the last one generated, plus one.
         """
         new_relationship = rel_id is None
 
@@ -60,11 +65,11 @@ class Marry(Cog):
 
             if ctx.author.id not in users:
                 raise self.SayException('You are not in '
-                                        f'relationship id #{rel_id}')
+                                        f'relationship id {rel_id}')
 
             if who.id in users:
                 raise self.SayException('This person is already '
-                                        f'in relationship id #{rel_id}')
+                                        f'in relationship id {rel_id}')
 
         # get all relationships
         rels = await self.get_rels(ctx.author.id)
@@ -72,7 +77,7 @@ class Marry(Cog):
             users = await self.get_users(in_rel_id)
             if who.id in users:
                 raise self.SayException('You are already with this person '
-                                        f'(relationship id #{in_rel_id})')
+                                        f'(relationship id {in_rel_id})')
 
         if self.locks[who.id]:
             raise self.SayException('Please wait.')
