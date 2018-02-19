@@ -99,7 +99,7 @@ class Marry(Cog):
                 raise self.SayException(f'{ctx.author.mention}, '
                                         'timeout reached.')
 
-            if message.content.low() in ['no', 'n']:
+            if message.content.lower() in ['no', 'n']:
                 raise self.SayException(f'Invite denied, {ctx.author.mention}')
         finally:
             self.locks[who.id] = False
