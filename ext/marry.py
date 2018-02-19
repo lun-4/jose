@@ -18,9 +18,6 @@ class Marry(Cog):
             where user_id = $1
         """, user_id)
 
-        if not rels:
-            return None
-
         return [row['rel_id'] for row in rels]
 
     async def get_users(self, rel_id: int) -> list:
@@ -30,7 +27,7 @@ class Marry(Cog):
         """, rel_id)
 
         if not uids:
-            return None
+            return []
 
         return [row['user_id'] for row in uids]
 
