@@ -42,12 +42,18 @@ class GuildLog(Cog):
         await self.webhook.execute(embed=em)
 
     async def on_guild_remove(self, guild):
+        if not self.bot.is_ready():
+            return
+
         em = discord.Embed(title='Guild remove',
                            color=discord.Color.red())
         self.guild_embed(em, guild)
         await self.webhook.execute(embed=em)
 
     async def on_guild_unavailable(self, guild):
+        if not self.bot.is_ready():
+            return
+
         em = discord.Embed(title='Guild unavailable',
                            color=discord.Color(0xfcd15c))
 
@@ -55,6 +61,9 @@ class GuildLog(Cog):
         await self.webhook.execute(embed=em)
 
     async def on_guild_available(self, guild):
+        if not self.bot.is_ready():
+            return
+
         em = discord.Embed(title='Guild available',
                            color=discord.Color(0x00f00f))
 
