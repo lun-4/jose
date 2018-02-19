@@ -121,3 +121,10 @@ CREATE TABLE IF NOT EXISTS taxreturn_cooldown (
     user_id bigint NOT NULL PRIMARY KEY,
     finish timestamp without time zone default now()
 );
+
+/* <3 */
+CREATE TABLE relationships (
+    user_id bigint NOT NULL,
+    rel_id bigint NOT NULL,
+    PRIMARY KEY (user_id, rel_id)
+);
