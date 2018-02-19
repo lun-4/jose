@@ -41,6 +41,9 @@ class Marry(Cog):
         """
         new_relationship = rel_id is None
 
+        if who.bot:
+            raise self.SayException('no bots allowed')
+
         if who == ctx.author:
             raise self.SayException('no selfcest allowed')
 
