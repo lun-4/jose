@@ -402,7 +402,7 @@ class Memes(Cog):
 
         res = ''.join(sentence2)
         if not res:
-            await ctx.send('no')
+            return await ctx.send('no')
 
         await ctx.send(res)
 
