@@ -387,14 +387,23 @@ class Memes(Cog):
         """logo-ify!"""
         sentence2 = []
         guild = self.bot.get_guild(414595857468620800)
+        emoji_name = None
 
         for letter in sentence:
             if letter == ' ':
                 sentence2.append(5 * ' ')
                 continue
 
-            emoji = discord.utils.find(lambda emoji: emoji.name == f'Logo{letter.upper()}',
-                                       guild.emojis)
+            emoji_name = f'Logo{letter.upper()}'
+
+            if letter == '.':
+                emoji_name = 'LogoPeriod'
+
+            def _check(emoji):
+                return emoji.name == emoji_name
+
+            emoji = discord.utils.find(_check, guild.emojis)
+
             if not emoji:
                 continue
 
