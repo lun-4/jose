@@ -27,6 +27,7 @@ def is_moderator():
 
 
 class Config(Cog):
+    """Guild-specific configuration commands."""
     def __init__(self, bot):
         super().__init__(bot)
 

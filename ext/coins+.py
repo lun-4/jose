@@ -588,7 +588,7 @@ class CoinsExt(Cog, requires=['coins']):
         """
 
         return await self.pool.fetchval("""
-        select sum(transactions.amount) * 10/100
+        select sum(transactions.amount) * 25/100
         from transactions
 
         join accounts on transactions.receiver = accounts.account_id
@@ -686,7 +686,7 @@ class CoinsExt(Cog, requires=['coins']):
             t_amount = next(v for k, v in items
                             if isinstance(v, decimal.Decimal))
 
-            applied = t_amount * decimal.Decimal('0.1')
+            applied = t_amount * decimal.Decimal('0.25')
 
             # the reverse transaction, as tax return
             try:

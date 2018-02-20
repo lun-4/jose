@@ -420,7 +420,7 @@ class Coins(Cog):
             await ctx.not_ok()
             await ctx.send(f':x: `{err!r}`')
 
-    @commands.command()
+    @commands.command(aliases=['balance', 'bal'])
     async def wallet(self, ctx, person: discord.User = None):
         """Check your wallet details."""
         if not person:
