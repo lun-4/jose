@@ -400,7 +400,11 @@ class Memes(Cog):
 
             sentence2.append(str(emoji))
 
-        await ctx.send(''.join(sentence2))
+        res = ''.join(sentence2)
+        if not res:
+            await ctx.send('no')
+
+        await ctx.send(res)
 
 
 def setup(bot):
