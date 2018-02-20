@@ -398,6 +398,8 @@ class Memes(Cog):
 
             if letter == '.':
                 emoji_name = 'LogoPeriod'
+            elif letter == '!':
+                emoji_name = 'LogoExclam'
 
             def _check(emoji):
                 return emoji.name == emoji_name
