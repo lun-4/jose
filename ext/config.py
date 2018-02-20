@@ -63,7 +63,10 @@ class Config(Cog):
             'botblock': True,
             'speak_channel': None,
             'prefix': self.bot.config.prefix,
+
+            # autoreply stuff from Speak cog
             'autoreply_prob': 0,
+            'autoreply_disable': [],
             'fullwidth_prob': 0.1,
         }
 
@@ -81,9 +84,10 @@ class Config(Cog):
 
     async def unblock_one(self, user_id, k='user_id', reason=''):
         """Unblock one thing from jose."""
-        d = await self.block_coll.delete_one({k: user_id})
+        del_res = await self.block_coll.delete_one({k: user_id})
         self.bot.block_cache[user_id] = False
-        return d.deleted_count > 0
+
+        return del_res.deleted_count > 0
 
     async def ensure_cfg(self, guild, query=False) -> dict:
         """Get a configuration object for a guild.
@@ -123,18 +127,19 @@ class Config(Cog):
         self.config_cache[guild.id] = cfg
         return cfg
 
-    async def cfg_get(self, guild: discord.Guild, key: str) -> 'any':
+    async def cfg_get(self, guild: discord.Guild, key: str,
+                      default: 'any' = None) -> 'any':
         """Get a configuration key for a guild."""
         if key in self.config_cache[guild.id]:
             return self.config_cache[guild.id][key]
 
         cfg = await self.ensure_cfg(guild)
-        value = cfg.get(key)
 
-        # log.info('[cfg:get] %s[gid=%d] k=%r -> v=%r', \
-        #    guild, guild.id, key, value)
-
-        return value
+        try:
+            return cfg[key]
+        except KeyError:
+            cfg[key] = default
+            return default
 
     async def cfg_set(self, guild, key: str, value: 'any') -> bool:
         """Set a configuration key."""
