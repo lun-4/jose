@@ -554,29 +554,6 @@ class Speak(Cog):
                          for (word, count) in common])
         await ctx.send(res)
 
-    @commands.command()
-    @commands.guild_only()
-    async def artoggle(self, ctx, channel: discord.TextChannel):
-        """Toggle autoreply off/on in a channel.
-
-        By default, José autoreplies in all channels, if there are
-        some channels you don't want josé to autoreply on, use this command.
-
-        Use this command again to toggle it back on.
-        """
-        channels = await self.config.cfg_get(ctx.guild,
-                                             'autoreply_disable', [])
-
-        chan = channel.id
-        if chan in channels:
-            channels.remove(chan)
-        else:
-            channels.append(chan)
-
-        ok = await self.config.cfg_set(ctx.guild,
-                                       'autoreply_disable', channels)
-        await ctx.success(ok)
-
 
 def setup(bot):
     bot.add_cog(Speak(bot))
