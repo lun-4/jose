@@ -417,6 +417,11 @@ class Memes(Cog):
 
         await ctx.send(res)
 
+    @commands.command()
+    async def lesbian(self, ctx):
+        """are you led bian??"""
+        await ctx.send('https://www.youtube.com/watch?v=j3kyeOUrdS4')
+
 
 def setup(bot):
     bot.add_cog(Memes(bot))
