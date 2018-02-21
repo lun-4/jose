@@ -12,8 +12,8 @@ random = SystemRandom()
 log = logging.getLogger(__name__)
 
 PERCENTAGE_PER_TAXBANK = decimal.Decimal(0.275 / 100)
-TICKET_PRICE = 15
-TICKET_INCREASE = decimal.Decimal(35 / 100)
+TICKET_PRICE = 11
+TICKET_INCREASE = decimal.Decimal(65 / 100)
 
 
 class Lottery(Cog, requires=['coins']):
@@ -126,7 +126,8 @@ class Lottery(Cog, requires=['coins']):
                                   winner_id, amount_from_ticket)
         total += amount_from_ticket
 
-        await ctx.send(f'Sent a total of `{total:.2}` to the winner')
+        total = round(total, 3)
+        await ctx.send(f'Sent a total of `{total}` to the winner')
 
         r = await self.ticket_coll.delete_many({})
         await ctx.send(f'Deleted {r.deleted_count} tickets')
