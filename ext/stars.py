@@ -11,16 +11,23 @@ from discord.ext import commands
 from .common import Cog
 
 log = logging.getLogger(__name__)
-IMAGE_REGEX = re.compile('(https?:\/\/.*\.(?:png|jpeg|jpg|gif))', re.M | re.I)
-ID_REGEX = re.compile('\d+', re.M | re.I)
+
+# muh regex
+IMAGE_REGEX = re.compile(r'(https?:\/\/.*\.(?:png|jpeg|jpg|gif))', re.M | re.I)
+ID_REGEX = re.compile(r'\d+', re.M | re.I)
+EMOJI_REGEX = re.compile(r'<a?:\w+:(\d+)>', re.I)
+
+DEFAULT_STAR_EMOJI = '\N{WHITE MEDIUM STAR}'
 
 
-BLUE = 0x5dadec
-BRONZE = 0xc67931
-SILVER = 0xC0C0C0
-GOLD = 0xD4AF37
-RED = 0xff0000
-WHITE = 0xffffff
+class StarColor:
+    """:releaseColoure:"""
+    BLUE = 0x5dadec
+    BRONZE = 0xc67931
+    SILVER = 0xC0C0C0
+    GOLD = 0xD4AF37
+    RED = 0xff0000
+    WHITE = 0xffffff
 
 
 class StarAddError(Exception):
@@ -54,6 +61,16 @@ def empty_starconfig(guild) -> dict:
     return {
         'guild_id': guild.id,
         'starboard_id': None,
+
+        # can be int or str (unicode emoji)
+        # default star
+        'star_emoji': DEFAULT_STAR_EMOJI,
+
+        # list of allowed channels to
+        # have messages starred from
+
+        # if this is empty, all channels are allowed
+        'allowed_chans': [],
     }
 
 
@@ -78,17 +95,17 @@ def make_color(star, message):
     star_ratio = stars / get_humans(message)
 
     if star_ratio >= 0:
-        color = BLUE
+        color = StarColor.BLUE
     if star_ratio >= 0.1:
-        color = BRONZE
+        color = StarColor.BRONZE
     if star_ratio >= 0.2:
-        color = SILVER
+        color = StarColor.SILVER
     if star_ratio >= 0.4:
-        color = GOLD
+        color = StarColor.GOLD
     if star_ratio >= 0.8:
-        color = RED
+        color = StarColor.RED
     if star_ratio >= 1:
-        color = WHITE
+        color = StarColor.WHITE
 
     return color
 
@@ -120,7 +137,8 @@ def make_star_embed(star, message):
     star_emoji = get_emoji(star, message)
     embed_color = make_color(star, message)
 
-    title = f'{len(star["starrers"])} {star_emoji} {message.channel.mention}, ID: {message.id}'
+    title = (f'{len(star["starrers"])} {star_emoji} '
+             f'{message.channel.mention}, ID: {message.id}')
 
     content = message.content
     em = discord.Embed(description=content, colour=embed_color)
@@ -191,8 +209,8 @@ class Starboard(Cog, requires=['config']):
         """
 
         if await self.bot.is_blocked_guild(guild_id):
-            g = self.bot.get_guild(guild_id)
-            r = await self.starconfig_coll.delete_many({'guild_id': guild_id})
+            guild = self.bot.get_guild(guild_id)
+            r = await self.starconfig_coll.delete_many({'guild_id': guild.id})
 
             log.info(f'Deleted {r.deleted_count} sconfig: `{g.name}[g.id]`'
                      ' from blocking')
@@ -206,7 +224,8 @@ class Starboard(Cog, requires=['config']):
         """
         cfg = await self.get_starconfig(guild_id)
         if not cfg:
-            raise StarError('No starboard configuration was found for this guild')
+            raise StarError('No starboard configuration was '
+                            'found for this guild')
 
         return cfg
 
@@ -535,14 +554,40 @@ class Starboard(Cog, requires=['config']):
         res = await self.starconfig_coll.delete_many(config)
         return res.deleted_count > 0
 
+    def check_star(self, cfg: dict,
+                   emoji_partial: discord.PartialEmoji) -> bool:
+        """Check if the given partial reaction data
+        match the starbaord configuration data for custom star emotes.
+        """
+
+        star_emoji = cfg.get('star_emoji', DEFAULT_STAR_EMOJI)
+        is_star = False
+
+        # check unicode
+        if emoji_partial.name == star_emoji:
+            is_star = True
+
+        # check custom emotes (by id)
+        elif emoji_partial.id == star_emoji:
+            is_star = True
+
+        return is_star
+
+    def check_allow(self, cfg: dict, channel_id: int):
+        """Check if the current channel is allowed to have
+        messages starred from."""
+        allowed_chans = cfg.get('allowed_chans', [])
+
+        if not allowed_chans:
+            return
+
+        try:
+            allowed_chans.index(channel_id)
+        except ValueError:
+            raise StarError('Channel not allowed to be starred')
+
     async def on_raw_reaction_add(self, emoji_partial,
                                   message_id, channel_id, user_id):
-        if emoji_partial.is_custom_emoji():
-            return
-
-        if emoji_partial.name != '⭐':
-            return
-
         channel = self.bot.get_channel(channel_id)
         if not channel:
             return
@@ -551,9 +596,14 @@ class Starboard(Cog, requires=['config']):
         if not cfg:
             return
 
-        message = await channel.get_message(message_id)
+        is_star = self.check_star(cfg, emoji_partial)
+        if not is_star:
+            return
 
         try:
+            self.check_allow(cfg, channel_id)
+            message = await channel.get_message(message_id)
+
             if channel_id == cfg['starboard_id']:
                 # This reaction is coming from the starboard.
                 # we parse the message content and recall this function
@@ -579,12 +629,6 @@ class Starboard(Cog, requires=['config']):
 
     async def on_raw_reaction_remove(self, emoji_partial,
                                      message_id, channel_id, user_id):
-        if emoji_partial.is_custom_emoji():
-            return
-
-        if emoji_partial.name != '⭐':
-            return
-
         channel = self.bot.get_channel(channel_id)
         if not channel:
             return
@@ -593,22 +637,36 @@ class Starboard(Cog, requires=['config']):
         if not cfg:
             return
 
-        message = await channel.get_message(message_id)
+        is_star = self.check_star(cfg, emoji_partial)
+        if not is_star:
+            return
 
-        if channel_id == cfg['starboard_id']:
-            # This reaction is coming from the starboard.
-            # we parse the message content and recall this function
-            content = message.content
-
-            matches = ID_REGEX.findall(content)
-            new_message_id = int(matches[-1])
-            new_channel_id = int(matches[-2])
-
-            return await self.on_raw_reaction_remove(emoji_partial,
-                                                     new_message_id,
-                                                     new_channel_id, user_id)
+        allowed_chans = cfg.get('allowed_chans', [])
 
         try:
+            allowed_chans.index(channel_id)
+            raise StarError('Channel not allowed to be starred')
+        except ValueError:
+            pass
+
+        try:
+            self.check_allow(cfg, channel_id)
+            message = await channel.get_message(message_id)
+
+            if channel_id == cfg['starboard_id']:
+                # This reaction is coming from the starboard.
+                # we parse the message content and recall this function
+                content = message.content
+
+                matches = ID_REGEX.findall(content)
+                new_message_id = int(matches[-1])
+                new_channel_id = int(matches[-2])
+
+                return await self.on_raw_reaction_remove(emoji_partial,
+                                                         new_message_id,
+                                                         new_channel_id,
+                                                         user_id)
+
             await self.remove_star(message, user_id, cfg)
         except (StarError, StarRemoveError) as err:
             log.warning(f'raw_reaction_remove: {err!r}')
@@ -641,11 +699,15 @@ class Starboard(Cog, requires=['config']):
     @commands.has_permissions(manage_guild=True)
     async def starboard(self, ctx, channel_name: str):
         """Create a starboard channel.
-        
-        If the name specifies a NSFW channel, the starboard gets marked as NSFW.
 
-        NSFW starboards allow messages from NSFW channels to be starred without any censoring.
-        If your starboard gets marked as a SFW starboard, messages from NSFW channels get completly ignored.
+        If the name specifies a NSFW channel,
+        the starboard gets marked as NSFW.
+
+        NSFW starboards allow messages from NSFW
+        channels to be starred without any censoring.
+
+        If your starboard gets marked as a SFW starboard,
+        messages from NSFW channels get completly ignored.
         """
 
         guild = ctx.guild
@@ -658,8 +720,8 @@ class Starboard(Cog, requires=['config']):
 
         po = discord.PermissionOverwrite
         overwrites = {
-                guild.default_role: po(read_messages=True, send_messages=False),
-                guild.me: po(read_messages=True, send_messages=True),
+            guild.default_role: po(read_messages=True, send_messages=False),
+            guild.me: po(read_messages=True, send_messages=True),
         }
 
         try:
@@ -682,7 +744,8 @@ class Starboard(Cog, requires=['config']):
 
         res = await self.starconfig_coll.insert_one(config)
         if not res.acknowledged:
-            raise self.SayException('Failed to create starboard config (no ack)')
+            raise self.SayException('Failed to create '
+                                    'starboard config (mongo: no ack)')
 
         await ctx.send('All done, I guess!')
 
@@ -901,7 +964,8 @@ class Starboard(Cog, requires=['config']):
         current = ctx.channel.is_nsfw()
         schan = channel.is_nsfw()
         if not current and schan:
-            raise self.SayException(f'channel nsfw={current}, nsfw={schan}, nope')
+            raise self.SayException(f'channel nsfw={current}, '
+                                    f'nsfw={schan}, nope')
 
         title, embed = make_star_embed(star, message)
         await ctx.send(title, embed=embed)
@@ -933,6 +997,80 @@ class Starboard(Cog, requires=['config']):
             raise self.SayException(f'rip {err!r}')
 
         await ctx.ok()
+
+    @commands.command()
+    @commands.guild_only()
+    @commands.has_permissions(manage_guild=True)
+    async def sbsetc(self, ctx, emoji: str):
+        """Set a custom emote (or unicode emoji) as your starboard emote.
+
+        This does not check against bad values (like "a")
+        which are un-reactable. Use with caution.
+
+        Only people with the "Manage Server" permission
+        can use this command.
+        """
+
+        await self._get_starconfig(ctx.guild.id)
+        match = EMOJI_REGEX.match(emoji)
+
+        custom = bool(match)
+        emoji_res = ''
+
+        if not custom:
+            emoji_res = emoji
+        else:
+            try:
+                emoji_res = int(match.group(1))
+            except ValueError:
+                raise self.SayException(':x: Custom Emote ID is not a number')
+
+        await self.starconfig_coll.update_one(
+            {'guild_id': ctx.guild.id},
+            {'$set': {
+                'star_emoji': emoji_res
+                }
+             }
+        )
+
+        await ctx.ok()
+
+    @commands.command()
+    @commands.guild_only()
+    @commands.has_permissions(manage_guild=True)
+    async def sbtoggle(self, ctx, channel: discord.TextChannel):
+        """Toggle a channel's allowance on starboard.
+
+        By default, all channels are allowed to have
+        their messages starred.
+
+        As soon as you filter it to be at least 1 channel,
+        all the others will become blocked by default.
+        """
+        config = await self._get_starconfig(ctx.guild.id)
+
+        allowed_chans = config.get('allowed_chans', [])
+
+        try:
+            allowed_chans.remove(channel.id)
+            await ctx.send(f'<#{channel.id}> is **disallowed** to be starred')
+        except ValueError:
+            allowed_chans.append(channel.id)
+            await ctx.send(f'<#{channel.id}> is **allowed** to be starred')
+
+        if not allowed_chans:
+            await ctx.send('All channels are available to be starred')
+
+        await self.starconfig_coll.update_one(
+            {'guild_id': ctx.guild.id},
+            {'$set': {
+                'allowed_chans': allowed_chans,
+                }
+             }
+        )
+
+        await ctx.ok()
+
 
 
 def setup(bot):
