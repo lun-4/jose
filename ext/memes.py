@@ -415,7 +415,12 @@ class Memes(Cog):
         if not res:
             return await ctx.send('no')
 
-        await ctx.send(res)
+        try:
+            await ctx.send(res)
+        except discord.HTTPException:
+            await ctx.send('The resulting logofied message was too large. \n'
+                           'This is caused by how discord represents emotes '
+                           'internally.')
 
     @commands.command()
     async def lesbian(self, ctx):
