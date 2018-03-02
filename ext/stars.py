@@ -874,11 +874,18 @@ class Starboard(Cog, requires=['config']):
             return await ctx.send(f'Failed to retrieve message: {err!r}')
 
         _, em = make_star_embed(star, message)
-        starrers = [guild.get_member(starrer_id) or f'Unfindable {starrer_id}'
+        starrers = [(guild.get_member(starrer_id), starrer_id)
                     for starrer_id in star['starrers']]
 
-        em.add_field(name='Starrers', value=', '.join([m.display_name
-                                                       for m in starrers]))
+        def try_name(m, uid: int) -> str:
+            """Try to get a name for a member."""
+            if m is None:
+                return f'Unfindable {uid}'
+
+            return m.display_name
+
+        starrer_list = (try_name(m[0], m[1]) for m in starrers)
+        em.add_field(name='Starrers', value=', '.join(starrer_list))
         await ctx.send(embed=em)
 
     @commands.command()
