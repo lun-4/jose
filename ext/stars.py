@@ -874,7 +874,7 @@ class Starboard(Cog, requires=['config']):
             return await ctx.send(f'Failed to retrieve message: {err!r}')
 
         _, em = make_star_embed(star, message)
-        starrers = [guild.get_member(starrer_id)
+        starrers = [guild.get_member(starrer_id) or f'Unfindable {starrer_id}'
                     for starrer_id in star['starrers']]
 
         em.add_field(name='Starrers', value=', '.join([m.display_name
