@@ -4,6 +4,7 @@ import random
 import logging
 import re
 
+import pymongo
 import discord
 
 from discord.ext import commands
@@ -45,13 +46,20 @@ class StarError(Exception):
     pass
 
 
-def empty_star_object(message) -> dict:
+def empty_star_object(message: discord.Message) -> dict:
     """Empty star object generator"""
     return {
         'message_id': message.id,
         'channel_id': message.channel.id,
         'guild_id': message.guild.id,
+
+        # add a bit of context
+        'author_id': message.author.id,
+
         'starrers': [],
+
+        # NOTE: I really hate mongo.
+        'starrers_count': 0,
     }
 
 
@@ -76,19 +84,17 @@ def empty_starconfig(guild) -> dict:
 
 def get_humans(message) -> int:
     """Get all humans in a guild."""
-    l = sum(1 for m in message.guild.members if not m.bot)
+    humans = sum(1 for m in message.guild.members if not m.bot)
 
     # Since selfstarring isn't allowed,
     # we need to remove 1 from the total amount.
-    l -= 1
+    humans -= 1
 
-    if l < 0:
-        return 1
-
-    return l
+    return 1 if humans < 0 else humans
 
 
-def make_color(star, message):
+def make_color(star, message) -> int:
+    """Generate a color for a embed depending on its star ratio."""
     color = 0x0
     stars = len(star['starrers'])
 
@@ -110,7 +116,8 @@ def make_color(star, message):
     return color
 
 
-def get_emoji(star, message):
+def get_emoji(star, message) -> str:
+    """Generate a jose star emoji depending on its star ratio."""
     emoji = ''
     stars = len(star['starrers'])
 
@@ -167,6 +174,7 @@ def make_star_embed(star, message):
 
 
 def check_nsfw(guild, config, message):
+    """Check NSFW rules on channels and the current starboard."""
     starboard = guild.get_channel(config['starboard_id'])
     if starboard is None:
         raise StarError('No starboard found')
@@ -210,6 +218,7 @@ class Starboard(Cog, requires=['config']):
 
         if await self.bot.is_blocked_guild(guild_id):
             guild = self.bot.get_guild(guild_id)
+            g = guild
             r = await self.starconfig_coll.delete_many({'guild_id': guild.id})
 
             log.info(f'Deleted {r.deleted_count} sconfig: `{g.name}[g.id]`'
@@ -288,6 +297,7 @@ class Starboard(Cog, requires=['config']):
             raise StarAddError('Already starred')
         except ValueError:
             star['starrers'].append(author_id)
+            star['starrers_count'] += 1
 
         await self.update_starobj(star)
         return star
@@ -310,10 +320,11 @@ class Starboard(Cog, requires=['config']):
         try:
             star['starrers'].index(author_id)
             star['starrers'].remove(author_id)
+            star['starrers_count'] -= 1
         except ValueError:
             raise StarRemoveError("Author didn't star the message.")
 
-        if len(star['starrers']) < 1:
+        if star['starrers_count'] < 1:
             res = await self.starboard_coll.delete_many(
                 {'message_id': message.id, 'guild_id': guild_id})
 
@@ -336,6 +347,7 @@ class Starboard(Cog, requires=['config']):
             raise StarError('Star object not found to be reset')
 
         star['starrers'] = []
+        star['starrers_count'] = 0
         await self.starboard_coll.delete_one({'message_id': message.id,
                                               'guild_id': guild_id})
         return star
@@ -351,9 +363,10 @@ class Starboard(Cog, requires=['config']):
                   f'channel "{chan}" {channel_id}\n'
                   f'guild "{self.bot.get_guild(guild_id)}" {guild_id}')
 
-    async def update_starobj(self, star: dict):
+    async def update_starobj(self, star: dict, **kwargs):
         """Given a star object, update it in the database."""
-        self.debug_log('update star', star)
+        if kwargs.get('log', True):
+            self.debug_log('update star', star)
 
         await self.starboard_coll.update_one(
                 {
@@ -430,7 +443,7 @@ class Starboard(Cog, requires=['config']):
         except (KeyError, discord.errors.NotFound):
             star_message = None
 
-        if delete_mode or len(star['starrers']) < 1:
+        if delete_mode or star['starrers_count'] < 1:
             await self.delete_starobj(star, msg=star_message)
             return
 
@@ -469,6 +482,11 @@ class Starboard(Cog, requires=['config']):
             if not config:
                 config = await self._get_starconfig(message.guild.id)
 
+            allowed_chans = config.get('allowed_chans', [])
+            if message.channel.id not in allowed_chans:
+                raise StarAddError('Channel not allowed to '
+                                   'have starbaord operations')
+
             if hasattr(author_id, 'id'):
                 author_id = author_id.id
 
@@ -505,6 +523,11 @@ class Starboard(Cog, requires=['config']):
         try:
             if not config:
                 config = await self._get_starconfig(message.guild.id)
+
+            allowed_chans = config.get('allowed_chans', [])
+            if message.channel.id not in allowed_chans:
+                raise StarRemoveError('Channel not allowed to '
+                                      'have starbaord operations')
 
             if hasattr(author_id, 'id'):
                 author_id = author_id.id
@@ -645,9 +668,8 @@ class Starboard(Cog, requires=['config']):
 
         try:
             allowed_chans.index(channel_id)
-            raise StarError('Channel not allowed to be starred')
         except ValueError:
-            pass
+            raise StarError('Channel not allowed to be starred from')
 
         try:
             self.check_allow(cfg, channel_id)
@@ -671,11 +693,12 @@ class Starboard(Cog, requires=['config']):
         except (StarError, StarRemoveError) as err:
             log.warning(f'raw_reaction_remove: {err!r}')
         except Exception:
-            log.exception('remove_star @ reaction_remove, %s[cid=%d] %s[gid=%d]',
+            log.exception('reaction_remove, %s[cid=%d] %s[gid=%d]',
                           channel.name, channel.id,
                           channel.guild.name, channel.guild.id)
 
     async def on_raw_reaction_clear(self, message_id, channel_id):
+        """Remove all stars in the message."""
         channel = self.bot.get_channel(channel_id)
         if not channel:
             return
@@ -767,7 +790,8 @@ class Starboard(Cog, requires=['config']):
         res = await self.starconfig_coll.insert_one(config)
 
         if not res.acknowledged:
-            raise self.SayException('Failed to create starboard config (no ack)')
+            raise self.SayException('Failed to create starboard '
+                                    'config (no ack)')
             return
 
         await ctx.send('Done!')
@@ -795,7 +819,7 @@ class Starboard(Cog, requires=['config']):
     @commands.command()
     @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
-    async def stardelete(self, ctx, confirm: bool=False):
+    async def stardelete(self, ctx, confirm: bool = False):
         """Completly delete all starboard data from the guild.
 
         Follows the same logic as `j!stardetach`, but it
@@ -817,7 +841,7 @@ class Starboard(Cog, requires=['config']):
         try:
             message = await ctx.channel.get_message(message_id)
         except discord.NotFound:
-            return await ctx.send('Message not found')
+            return await ctx.send('Message not found in the current channel')
         except discord.Forbidden:
             return await ctx.send("Can't retrieve message")
         except discord.HTTPException as err:
@@ -837,7 +861,7 @@ class Starboard(Cog, requires=['config']):
         try:
             message = await ctx.channel.get_message(message_id)
         except discord.NotFound:
-            return await ctx.send('Message not found')
+            return await ctx.send('Message not found in the current channel')
         except discord.Forbidden:
             return await ctx.send("Can't retrieve message")
         except discord.HTTPException as err:
@@ -867,7 +891,7 @@ class Starboard(Cog, requires=['config']):
         try:
             message = await channel.get_message(message_id)
         except discord.NotFound:
-            return await ctx.send('Message not found')
+            return await ctx.send('Message not found in the channel')
         except discord.Forbidden:
             return await ctx.send("Can't retrieve message")
         except discord.HTTPException as err:
@@ -892,45 +916,79 @@ class Starboard(Cog, requires=['config']):
     @commands.guild_only()
     async def starstats(self, ctx):
         """Get statistics about your starboard."""
-        guild = ctx.guild
-        await self._get_starconfig(guild.id)
+        # This function is true hell.
+
+        guild_query = {'guild_id': ctx.guild.id}
+        await self._get_starconfig(ctx.guild.id)
 
         em = discord.Embed(title='Starboard statistics',
                            colour=discord.Colour(0xFFFF00))
 
-        total_stars = await self.starboard_coll.find(
-                {'guild_id': guild.id}).count()
-        em.add_field(name='Total messages starred', value=total_stars)
+        total_messages = await self.starboard_coll.find(guild_query).count()
+        em.add_field(name='Total messages starred',
+                     value=total_messages)
 
         starrers = collections.Counter()
-        # message with most stars
-        max_message = [0, None, None]
+        authors = collections.Counter()
 
-        guild_stars = self.starboard_coll.find({'guild_id': guild.id})
-        async for star in guild_stars:
-            _starrers = star['starrers']
-            if len(_starrers) > max_message[0]:
-                max_message = [len(_starrers), star['message_id'],
-                               star['channel_id']]
+        # calculate top 5
+        top_stars = await self.starboard_coll.find(guild_query)\
+            .sort('starrers_count', pymongo.DESCENDING).limit(5)\
+            .to_list(length=None)
+
+        # people who starred the most / received stars the most
+        all_stars = self.starboard_coll.find(guild_query)
+        async for star in all_stars:
+            authors[star['author_id']] += 1
 
             for starrer_id in star['starrers']:
                 starrers[starrer_id] += 1
 
-        mm = max_message
-        em.add_field(name='Most starred message',
-                     value=f'{mm[0]} Stars, ID {mm[1]} on <#{mm[2]}>')
+        # process top 5
+        res_sm = []
+        for (idx, star) in enumerate(top_stars):
+            stctx = (f'{star["message_id"]} @ <#{star["channel_id"]}> '
+                     f'({star["starrers_count"]} stars)')
 
-        # most_common is list of tuple (member_id, starcount)
-        most_common = starrers.most_common(3)
+            res_sm.append(f'{idx + 1}\N{COMBINING ENCLOSING KEYCAP} {stctx}')
 
-        for idx, data in enumerate(most_common):
-            member_id, star_count = data
-            member = guild.get_member(member_id)
-            if member is None:
+        em.add_field(name='Most starred messages',
+                     value='\n'.join(res_sm), inline=False)
+
+        # process people who received stars the most
+        mc_receivers = authors.most_common(5)
+        res_sr = []
+
+        for idx, data in enumerate(mc_receivers):
+            user_id, received_stars = data
+
+            # ALWAYS make sure the member is in the guild.
+            member = ctx.guild.get_member(user_id)
+            if not member:
                 continue
 
-            em.add_field(name=f'Starrer #{idx+1}',
-                         value=f'{member.mention} with {star_count} stars')
+            auctx = f'<@{user_id}> ({received_stars} stars)'
+            res_sr.append(f'{idx + 1}\N{COMBINING ENCLOSING KEYCAP} {auctx}')
+
+        em.add_field(name='Top 5 Star Receivers',
+                     value='\n'.join(res_sr), inline=False)
+
+        # process people who *gave* stars the most
+        mc_givers = starrers.most_common(5)
+        res_gr = []
+
+        for idx, data in enumerate(mc_givers):
+            member_id, star_count = data
+            member = ctx.guild.get_member(member_id)
+            if not member:
+                continue
+
+            srctx = f'{member.mention} ({star_count} stars)'
+            res_gr.append(f'{idx + 1}\N{COMBINING ENCLOSING KEYCAP} {srctx}')
+
+        em.add_field(name=f'Top 5 Star Givers',
+                     value='\n'.join(res_gr),
+                     inline=False)
 
         await ctx.send(embed=em)
 
@@ -941,11 +999,11 @@ class Starboard(Cog, requires=['config']):
         guild = ctx.guild
         await self._get_starconfig(ctx.guild.id)
         all_stars = await self.starboard_coll.find(
-                {'guild_id': guild.id}).count()
+            {'guild_id': guild.id}).count()
         random_idx = random.randint(0, all_stars)
 
         guild_stars_cur = self.starboard_coll.find(
-                {'guild_id': guild.id}).limit(1).skip(random_idx)
+            {'guild_id': guild.id}).limit(1).skip(random_idx)
 
         # ugly, I know.
         star = None
@@ -992,11 +1050,11 @@ class Starboard(Cog, requires=['config']):
         try:
             message = await channel.get_message(message_id)
         except discord.NotFound:
-            raise self.SayException('message not found')
+            raise self.SayException('Message not found in the current channel')
 
         star = await self.get_star(ctx.guild.id, message_id)
-        if star is None:
-            raise self.SayException('star object not found')
+        if not star:
+            raise self.SayException('Star object not found')
 
         try:
             await self.update_star(cfg, star, msg=message)
@@ -1009,7 +1067,7 @@ class Starboard(Cog, requires=['config']):
     @commands.command()
     @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
-    async def sbsetc(self, ctx, emoji: str):
+    async def sbsetc(self, ctx, emoji: str = None):
         """Set a custom emote (or unicode emoji) as your starboard emote.
 
         This does not check against bad values (like "a")
@@ -1018,8 +1076,17 @@ class Starboard(Cog, requires=['config']):
         Only people with the "Manage Server" permission
         can use this command.
         """
+        config = await self._get_starconfig(ctx.guild.id)
 
-        await self._get_starconfig(ctx.guild.id)
+        if not emoji:
+            emoji = config['star_emoji']
+            try:
+                emoji = self.bot.get_emoji(int(emoji))
+            except ValueError:
+                pass
+
+            return await ctx.send(f'The starboard emote is {str(emoji)}')
+
         match = EMOJI_REGEX.match(emoji)
 
         custom = bool(match)
@@ -1079,6 +1146,48 @@ class Starboard(Cog, requires=['config']):
 
         await ctx.ok()
 
+    @commands.command()
+    @commands.is_owner()
+    async def starhell(self, ctx):
+        """We are truly fucked in this world.
+
+        The madness provoked by MongoDB in this codebase
+        is beyond anything imaginable.
+
+        This command can't save us from the MongoDB monster.
+        """
+        all_stars = self.starboard_coll.find({})
+
+        skip_chan, skip_mess, succ_au, succ_sc = 0, 0, 0, 0
+        await ctx.send('HAHA we are fucking dead lets '
+                       'iterate over all stars in the world')
+
+        async for star in all_stars:
+            # god this is so shitty
+            star['starrers_count'] = len(star['starrers'])
+            await self.update_starobj(star, log=False)
+            succ_sc += 1
+
+            channel = self.bot.get_channel(star['channel_id'])
+            if not channel:
+                skip_chan += 1
+                continue
+
+            try:
+                message = await channel.get_message(star['message_id'])
+            except discord.NotFound:
+                skip_mess += 1
+                continue
+
+            star['author_id'] = message.author.id
+            await self.update_starobj(star, log=False)
+            succ_au += 1
+
+        await ctx.send(f'{skip_chan} stars skipped from no chan\n'
+                       f'{skip_mess} stars skipped from no message\n'
+                       f'{succ_au} success on updating authors\n'
+                       f'{succ_sc} success on updating starrer count\n'
+                       f'\n\ngod fuck my life')
 
 
 def setup(bot):
