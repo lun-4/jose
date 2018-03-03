@@ -1210,7 +1210,7 @@ class Starboard(Cog, requires=['config']):
                     f', message {star["message_id"]}'
                     f', author <@{star["author_id"]}>')
 
-            res_gs = f'{idx + 1}\N{COMBINING ENCLOSING KEYCAP} {sctx}'
+            res_gs.append(f'{idx + 1}\N{COMBINING ENCLOSING KEYCAP} {sctx}')
 
         em.add_field(name='Top messages',
                      value='\n'.join(res_gs),
