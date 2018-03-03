@@ -1178,6 +1178,9 @@ class Starboard(Cog, requires=['config']):
             except discord.NotFound:
                 skip_mess += 1
                 continue
+            except discord.Forbidden:
+                skip_mess += 1
+                continue
 
             star['author_id'] = message.author.id
             await self.update_starobj(star, log=False)
