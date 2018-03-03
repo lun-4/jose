@@ -939,6 +939,7 @@ class Starboard(Cog, requires=['config']):
     async def randomstar(self, ctx):
         """Get a random star from your starboard."""
         guild = ctx.guild
+        await self._get_starconfig(ctx.guild)
         all_stars = await self.starboard_coll.find(
                 {'guild_id': guild.id}).count()
         random_idx = random.randint(0, all_stars)
