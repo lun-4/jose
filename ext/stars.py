@@ -937,7 +937,8 @@ class Starboard(Cog, requires=['config']):
         # process top 5
         res_sm = []
         for (idx, star) in enumerate(top_stars):
-            stctx = (f'{star["message_id"]} @ <#{star["channel_id"]}> '
+            stctx = (f'<@{star["author_id"]}>, {star["message_id"]} '
+                     f'@ <#{star["channel_id"]}> '
                      f'({star["starrers_count"]} stars)')
 
             res_sm.append(f'{idx + 1}\N{COMBINING ENCLOSING KEYCAP} {stctx}')
@@ -1181,6 +1182,43 @@ class Starboard(Cog, requires=['config']):
                        f'{succ_au} success on updating authors\n'
                        f'{succ_sc} success on updating starrer count\n'
                        f'\n\ngod fuck my life')
+
+    @commands.command(aliases=['gss'])
+    @commands.cooldown(1, 10)
+    async def gstarstats(self, ctx):
+        """Global Starboard statistics.
+
+        This has a global cooldown of 1/10s.
+        """
+        em = discord.Embed(title='Global Starboard Stats',
+                           color=discord.Color(0xFFFF00))
+
+        # calculate global top 5
+        top_stars = await self.starboard_coll.find({}) \
+            .sort('starrers_count', pymongo.DESCENDING).limit(5) \
+            .to_list(length=None)
+
+        res_gs = []
+
+        for idx, star in enumerate(top_stars):
+            guild = self.bot.get_guild(star['guild_id'])
+            if not guild:
+                continue
+
+            sctx = (f'`{guild}` [{guild.id}]\n'
+                    f', channel <#{star["channel_id"]}>'
+                    f', message {star["message_id"]}'
+                    f', author <@{star["author_id"]}>')
+
+            res_gs = f'{idx + 1}\N{COMBINING ENCLOSING KEYCAP} {sctx}'
+
+        em.add_field(name='Top messages',
+                     value='\n'.join(res_gs),
+                     inline=False)
+
+        # TODO: top star givers / receivers
+
+        await ctx.send(embed=em)
 
 
 def setup(bot):
