@@ -1069,7 +1069,7 @@ class Starboard(Cog, requires=['config']):
         config = await self._get_starconfig(ctx.guild.id)
 
         if not emoji:
-            emoji = config['star_emoji']
+            emoji = config.get('star_emoji', DEFAULT_STAR_EMOJI)
             try:
                 emoji = self.bot.get_emoji(int(emoji))
             except ValueError:
