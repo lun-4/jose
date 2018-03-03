@@ -482,10 +482,7 @@ class Starboard(Cog, requires=['config']):
             if not config:
                 config = await self._get_starconfig(message.guild.id)
 
-            allowed_chans = config.get('allowed_chans', [])
-            if message.channel.id not in allowed_chans:
-                raise StarAddError('Channel not allowed to '
-                                   'have starbaord operations')
+            self.check_allow(config, message.channel.id)
 
             if hasattr(author_id, 'id'):
                 author_id = author_id.id
@@ -524,10 +521,7 @@ class Starboard(Cog, requires=['config']):
             if not config:
                 config = await self._get_starconfig(message.guild.id)
 
-            allowed_chans = config.get('allowed_chans', [])
-            if message.channel.id not in allowed_chans:
-                raise StarRemoveError('Channel not allowed to '
-                                      'have starbaord operations')
+            self.check_allow(config, message.channel.id)
 
             if hasattr(author_id, 'id'):
                 author_id = author_id.id
@@ -663,13 +657,6 @@ class Starboard(Cog, requires=['config']):
         is_star = self.check_star(cfg, emoji_partial)
         if not is_star:
             return
-
-        allowed_chans = cfg.get('allowed_chans', [])
-
-        try:
-            allowed_chans.index(channel_id)
-        except ValueError:
-            raise StarError('Channel not allowed to be starred from')
 
         try:
             self.check_allow(cfg, channel_id)
