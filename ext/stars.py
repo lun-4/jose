@@ -926,7 +926,10 @@ class Starboard(Cog, requires=['config']):
         # people who starred the most / received stars the most
         all_stars = self.starboard_coll.find(guild_query)
         async for star in all_stars:
-            authors[star['author_id']] += 1
+            try:
+                authors[star['author_id']] += 1
+            except KeyError:
+                pass
 
             for starrer_id in star['starrers']:
                 starrers[starrer_id] += 1
