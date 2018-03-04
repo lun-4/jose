@@ -135,12 +135,13 @@ class JoseBot(commands.Bot):
         # only escape single person pings when we are not normal_send
         if not kwargs.get('normal_send', False):
             content = content.replace('`', r'\`')
-            content = content.replace('@', '@\u200b')
+            content = content.replace('<@', '<@\u200b')
             content = content.replace('<#', '<#\u200b')
 
         # always escape role pings (@everyone) and @here
-        content = content.replace('&', '&\u200b')
+        content = content.replace('<@&', '<@&\u200b')
         content = content.replace('@here', '@\u200bhere')
+        content = content.replace('@everyone', '@\u200beveryone')
 
         return content
 
