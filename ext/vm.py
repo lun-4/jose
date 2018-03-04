@@ -162,11 +162,11 @@ class JoseVM:
     async def show_top(self):
         """Send a message containing the current top of the stack."""
         top = self.stack[len(self.stack) - 1]
-        await self.ctx.send(top)
+        await self.ctx.send(self.ctx.bot.clean_content(top))
 
     async def show_pop(self):
         """Send a message containing the result of a pop."""
-        await self.ctx.send(self.pop())
+        await self.ctx.send(self.ctx.bot.clean_content(self.pop()))
 
     async def view_stack(self):
         await self.ctx.send(self.stack)
