@@ -79,6 +79,14 @@ class JoseContext(commands.Context):
     async def err(self, msg):
         await self.send(f'\N{POLICE CARS REVOLVING LIGHT} {msg}')
 
+    def send(self, content='', **kwargs):
+        # FUCK EACH AND @EVERYONE OF YOU
+        # specially mary and gerd
+
+        # i hope this saves my life, forever.
+        nc = self.bot.clean_content(content)
+        return super().send(nc, **kwargs)
+
 
 class JoseBot(commands.Bot):
     """Main bot subclass."""
