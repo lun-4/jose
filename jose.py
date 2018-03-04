@@ -84,7 +84,7 @@ class JoseContext(commands.Context):
         # specially mary and gerd
 
         # i hope this saves my life, forever.
-        nc = self.bot.clean_content(content)
+        nc = self.bot.clean_content(content, normal_send=True)
         return super().send(nc, **kwargs)
 
 
@@ -127,13 +127,21 @@ class JoseBot(commands.Bot):
         """Returns if a guild is blocked to use José. Uses cache"""
         return await self.is_blocked(guild_id, 'guild_id')
 
-    def clean_content(self, content: str) -> str:
+    def clean_content(self, content: str, **kwargs) -> str:
         """Make a string clean of mentions and not breaking codeblocks"""
         content = str(content)
-        content = content.replace('`', '\'')
-        content = content.replace('@', '@\u200b')
+
+        # only escape codeblocks when we are not normal_send
+        # only escape single person pings when we are not normal_send
+        if not kwargs.get('normal_send', False):
+            content = content.replace('`', r'\`')
+            content = content.replace('@', '@\u200b')
+            content = content.replace('<#', '<#\u200b')
+
+        # always escape role pings (@everyone) and @here
         content = content.replace('&', '&\u200b')
-        content = content.replace('<#', '<#\u200b')
+        content = content.replace('@here', '@\u200bhere')
+
         return content
 
     async def on_command(self, ctx):
