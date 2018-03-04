@@ -151,7 +151,6 @@ class JoseVM:
         string_len = await self.read_size()
         string = await self.read_bytes(string_len)
         string = string.decode('utf-8')
-        await self.ctx.send(f'pushing {string_len} bytes, `{string!r}`')
         self.push(string)
 
     async def add_op(self):
