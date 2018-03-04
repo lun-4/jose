@@ -1,6 +1,7 @@
 import contextlib
+import struct
 import logging
-import io
+import base64
 
 from discord.ext import commands
 
@@ -9,82 +10,132 @@ from .common import Cog
 log = logging.getLogger(__name__)
 
 
+class VMError(Exception):
+    pass
+
+class VMEOFError(Exception):
+    pass
+
+
 class Instructions:
     """All the instructions in José VM Bytecode."""
     PUSH_INT = 1
-    PUSH_STR = 2
-    POP = 3
-    CALL_ADD = 4
+    VIEW = 2
+
+
+async def josevm_compile(program: str):
+    return b'\x01E\x00\x00\x00\x02'
 
 
 class JoseVM:
-    def __init__(self, program):
-        self.program = program
-        self.pc = 0
+    """An instance of the José Virutal Machine."""
+    def __init__(self, ctx, bytecode):
+        #: Command context, in the case we want to echo
+        self.ctx = ctx
+
+        #: Program bytecode
+        self.bytecode = bytecode
+
+        #: Program counter
+        self.pcounter = 0
+
+        #: Program stack and its length
         self.stack = []
-        self.handlers = {}
 
-    def read_byte(self):
-        self.pc += 1
-        return self.program[self.pc]
+        #: Loop counter, unused
+        self.lcounter = 0
 
-    def read_bytes(self, bytecount: int):
-        data = self.program[self.pc:self.pc + bytecount]
-        self.pc += bytecount
+        #: Instruction handlers
+        self.map = {
+            Instructions.PUSH_INT: self.push_int,
+            Instructions.VIEW: self.view_stack,
+        }
+
+    def push(self, val):
+        """Push to the program's stack."""
+        if len(self.stack) > 1000:
+            raise VMError('Stack overflow')
+
+        self.stack.append(val)
+
+    def pop(self):
+        """Pop from the program's stack."""
+        value = self.stack.pop()
+        return value
+
+    async def read_bytes(self, bytecount):
+        """Read an arbritary amount of bytes from the bytecode."""
+        data = self.bytecode[self.pcounter:self.pcounter+bytecount]
+        self.pcounter += bytecount
         return data
 
-    def pull_int(self):
-        return int(self.pull_bytes(4))
+    async def get_instruction(self) -> int:
+        """Read one byte, comparable to a instruction"""
+        data = await self.read_bytes(1)
+        return struct.unpack('B', data)[0]
 
-    def i_push(self):
-        a = self.pull_value()
-        self.stack.append(a)
+    async def push_int(self):
+        """Push an integer into the stack."""
+        data = await self.read_bytes(4)
+        integer = struct.unpack('i', data)[0]
+        self.push(integer)
 
-    def i_pop(self):
-        self.stack.pop()
+    async def view_stack(self):
+        await self.ctx.send(self.stack)
 
-    def i_add(self):
-        self.stack.append(self.stack.pop() + self.stack.pop())
-
-    def i_pprint(self):
-        print(self.stack.pop())
-
-    def execute(self):
-        """Execute."""
+    async def run(self):
+        """Run the VM in a loop."""
         while True:
+            if self.pcounter >= len(self.bytecode):
+                raise VMEOFError('Reached EOF of bytecode.')
+
+            instruction = await self.get_instruction()
             try:
-                inst = self.read_byte()
-                self.handler[self.read_byte()]
+                func = self.map[instruction]
             except KeyError:
-                break
+                raise VMError('Invalid instruction')
+            await func()
 
 
 class VM(Cog):
-    """José's virtual machine
+    """José's Virtual Machine.
 
-    This can execute José VM Bytecode.
+    This is a stack-based VM. There is no documentation other
+    than reading the VM's source.
+
+    You are allowed to have 1 VM running your code at a time.
     """
     def __init__(self, bot):
         super().__init__(bot)
 
-    @commands.command()
-    async def compile(self, code: str):
-        """Compile code to JoséVM Instructions"""
-        pass
+        self.vms = {}
+
+    async def assign_and_exec(self, ctx, bytecode: str):
+        """Create a VM, assign to the user and run the VM."""
+        if ctx.author in self.vms:
+            raise self.SayException('You already have a VM running.')
+
+        jvm = JoseVM(ctx, bytecode)
+        self.vms[ctx.author.id] = jvm
+
+        try:
+            await jvm.run()
+        except VMEOFError:
+            await ctx.send('Program reached end of execution.')
+
+        self.vms.pop(ctx.author.id)
 
     @commands.command()
-    async def execute(self, ctx, data: str):
-        vm = JoseVM(data)
-        out = io.StringIO()
+    async def run_compiled(self, ctx, data: str):
+        """Receive a base64 representation of your bytecode and run it."""
+        bytecode = base64.b64decode(data.encode('utf-8'))
+        await self.assign_and_exec(ctx, bytecode)
 
-        with contextlib.redirect_stdout(out):
-            vm.execute()
-
-        data = out.read()
-        if len(data) > 2000:
-            raise self.SayException('big output = big nono')
-
-        await ctx.send(data)
+    @commands.command()
+    async def run(self, ctx, program: str):
+        """compile & execute (compiler not done)"""
+        bytecode = await josevm_compile(program)
+        await self.assign_and_exec(ctx, bytecode)
 
 
 def setup(bot):
