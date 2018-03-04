@@ -1,7 +1,7 @@
-import contextlib
 import struct
 import logging
 import base64
+import binascii
 
 from discord.ext import commands
 
@@ -93,7 +93,7 @@ class JoseVM:
             try:
                 func = self.map[instruction]
             except KeyError:
-                raise VMError('Invalid instruction')
+                raise VMError(f'Invalid instruction: {instruction!r}')
             await func()
 
 
@@ -110,6 +110,18 @@ class VM(Cog):
 
         self.vms = {}
 
+    async def print_traceback(self, ctx, vm, err):
+        """Print a traceback of the VM."""
+
+        message = (f'```\n{"="*10} José VM Error {"="*10}\n'
+                   f'\tprogram counter: {vm.pcounter}, '
+                   f'total bytecode len: {len(vm.bytecode)}\n'
+                   f'\tstack: {vm.stack!r}\n'
+                   f'\terror: {err.args[0]}\n'
+                   '\n```')
+
+        raise self.SayException(message)
+
     async def assign_and_exec(self, ctx, bytecode: str):
         """Create a VM, assign to the user and run the VM."""
         if ctx.author in self.vms:
@@ -122,18 +134,23 @@ class VM(Cog):
             await jvm.run()
         except VMEOFError:
             await ctx.send('Program reached end of execution.')
-
-        self.vms.pop(ctx.author.id)
+        except VMError as err:
+            await self.print_traceback(ctx, jvm, err)
+        finally:
+            self.vms.pop(ctx.author.id)
 
     @commands.command()
     async def run_compiled(self, ctx, data: str):
         """Receive a base64 representation of your bytecode and run it."""
-        bytecode = base64.b64decode(data.encode('utf-8'))
+        try:
+            bytecode = base64.b64decode(data.encode('utf-8'))
+        except binascii.Error:
+            raise self.SayException('Invalid base64.')
         await self.assign_and_exec(ctx, bytecode)
 
     @commands.command()
     async def run(self, ctx, program: str):
-        """compile & execute (compiler not done)"""
+        """runs a predefined program."""
         bytecode = await josevm_compile(program)
         await self.assign_and_exec(ctx, bytecode)
 
