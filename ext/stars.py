@@ -937,6 +937,9 @@ class Starboard(Cog, requires=['config']):
         # process top 5
         res_sm = []
         for (idx, star) in enumerate(top_stars):
+            if 'author_id' not in star:
+                continue
+
             stctx = (f'<@{star["author_id"]}>, {star["message_id"]} '
                      f'@ <#{star["channel_id"]}> '
                      f'({star["starrers_count"]} stars)')
@@ -1201,6 +1204,9 @@ class Starboard(Cog, requires=['config']):
         res_gs = []
 
         for idx, star in enumerate(top_stars):
+            if 'author_id' not in star:
+                continue
+
             guild = self.bot.get_guild(star['guild_id'])
             if not guild:
                 continue
