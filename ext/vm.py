@@ -2,7 +2,11 @@ import struct
 import logging
 import base64
 import binascii
+import contextlib
+import io
+import inspect
 
+import discord
 from discord.ext import commands
 
 from .common import Cog
@@ -76,6 +80,7 @@ class JoseVM:
 
         #: Program bytecode
         self.bytecode = bytecode
+        self.running_op = -1
 
         #: Program counter
         self.pcounter = 0
@@ -188,23 +193,24 @@ class JoseVM:
     async def show_top(self):
         """Send a message containing the current top of the stack."""
         top = self.stack[len(self.stack) - 1]
-        await self.ctx.send(self.ctx.bot.clean_content(top))
+        print(top)
 
     async def show_pop(self):
         """Send a message containing the result of a pop."""
-        await self.ctx.send(self.ctx.bot.clean_content(self.pop()))
+        print(self.pop())
 
     async def view_stack(self):
-        await self.ctx.send(self.stack)
+        print(self.stack)
 
     async def run(self):
         """Run the VM in a loop."""
         while True:
             if self.pcounter >= len(self.bytecode):
-                raise VMEOFError('Reached EOF of bytecode.')
+                return
 
             instruction = await self.get_instruction()
             try:
+                self.running_op = instruction
                 func = self.map[instruction]
             except KeyError:
                 raise VMError(f'Invalid instruction: {instruction!r}')
@@ -226,15 +232,32 @@ class VM(Cog):
 
     async def print_traceback(self, ctx, vm, err):
         """Print a traceback of the VM."""
+        em = discord.Embed(title='José VM error',
+                           color=discord.Color.red())
 
-        message = (f'```\n{"="*10} José VM Error {"="*10}\n'
-                   f'\tprogram counter: {vm.pcounter}, '
-                   f'total bytecode len: {len(vm.bytecode)}\n'
-                   f'\tstack: {vm.stack!r}\n'
-                   f'\terror: {err.args[0]}\n'
-                   '\n```')
+        em.add_field(name='program counter',
+                     value=vm.pcounter,
+                     inline=False)
 
-        raise self.SayException(message)
+        em.add_field(name='stack at moment of crash',
+                     value=repr(vm.stack),
+                     inline=True)
+
+        # I'm already hating dir() enough.
+        attributes = inspect.getmembers(Instructions,
+                                        lambda a: not inspect.isroutine(a))
+
+        names = [a for a in attributes if
+                 not(a[0].startswith('__') and a[0].endswith('__'))]
+        rev_names = {v: k for k, v in names}
+
+        em.add_field(name='executing instruction',
+                     value=rev_names.get(vm.running_op))
+
+        em.add_field(name='error',
+                     value=repr(err))
+
+        await ctx.send(embed=em)
 
     async def assign_and_exec(self, ctx, bytecode: str):
         """Create a VM, assign to the user and run the VM."""
@@ -244,11 +267,19 @@ class VM(Cog):
         jvm = JoseVM(ctx, bytecode)
         self.vms[ctx.author.id] = jvm
 
+        em = discord.Embed(title='José VM',
+                           color=discord.Color.blurple())
+
         try:
-            await jvm.run()
-        except VMEOFError:
-            await ctx.send('Program reached end of execution.')
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                await jvm.run()
+
+            em.add_field(name='Output', value=out.getvalue() or '<no stdout>')
+            await ctx.send(embed=em)
         except VMError as err:
+            await self.print_traceback(ctx, jvm, err)
+        except Exception as err:
             await self.print_traceback(ctx, jvm, err)
         finally:
             self.vms.pop(ctx.author.id)
