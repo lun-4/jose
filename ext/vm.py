@@ -37,8 +37,35 @@ class Instructions:
     VIEW = 9
 
 
-async def josevm_compile(program: str):
-    return b'\x01E\x00\x00\x00\x02'
+def encode_inst(int_inst) -> bytes:
+    return struct.pack('B', int_inst)
+
+
+async def assembler(ctx, program: str):
+    lines = program.split('\n')
+    bytecode = []
+
+    for line in lines:
+        words = line.split(' ')
+        command = words[0]
+
+        if command == 'pushint':
+            bytecode.append(encode_inst(Instructions.PUSH_INT))
+            num = int(words[1])
+            bytecode.append(struct.pack('i', num))
+        elif command == 'pushstr':
+            bytecode.append(encode_inst(Instructions.PUSH_STR))
+            string = ' '.join(words[1:])
+            bytecode.append(struct.pack('Q', len(string)))
+            bytecode.append(string.encode('utf-8'))
+        elif command == 'pop':
+            bytecode.append(encode_inst(Instructions.SHOW_POP))
+        elif command == 'add':
+            bytecode.append(encode_inst(Instructions.ADD))
+        else:
+            raise ctx.cog.SayException(f'Invalid instruction: `{command}`')
+
+    return b''.join(bytecode)
 
 
 class JoseVM:
@@ -230,16 +257,16 @@ class VM(Cog):
     async def run_compiled(self, ctx, data: str):
         """Receive a base64 representation of your bytecode and run it."""
         try:
-            bytecode = base64.b64decode(data.encode('utf-8'))
+            bytecode = base64.b85decode(data.encode('utf-8'))
         except binascii.Error:
             raise self.SayException('Invalid base64.')
         await self.assign_and_exec(ctx, bytecode)
 
     @commands.command()
-    async def run(self, ctx, program: str):
-        """runs a predefined program."""
-        bytecode = await josevm_compile(program)
-        await self.assign_and_exec(ctx, bytecode)
+    async def assemble(self, ctx, *, program: str):
+        """Call the assembler on your code."""
+        bytecode = await assembler(ctx, program)
+        await ctx.send(base64.b85encode(bytecode).decode('utf-8'))
 
 
 def setup(bot):
