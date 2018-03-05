@@ -257,7 +257,7 @@ class VM(Cog):
     async def run_compiled(self, ctx, data: str):
         """Receive a base64 representation of your bytecode and run it."""
         try:
-            bytecode = base64.b85decode(data.encode('utf-8'))
+            bytecode = base64.b64decode(data.encode('utf-8'))
         except binascii.Error:
             raise self.SayException('Invalid base64.')
         await self.assign_and_exec(ctx, bytecode)
@@ -266,7 +266,13 @@ class VM(Cog):
     async def assemble(self, ctx, *, program: str):
         """Call the assembler on your code."""
         bytecode = await assembler(ctx, program)
-        await ctx.send(base64.b85encode(bytecode).decode('utf-8'))
+        await ctx.send(base64.b64encode(bytecode).decode('utf-8'))
+
+    @commands.command()
+    async def run(self, ctx, *, program: str):
+        """Assemble code and execute."""
+        bytecode = await assembler(ctx, program)
+        await self.assign_and_exec(ctx, bytecode)
 
 
 def setup(bot):
