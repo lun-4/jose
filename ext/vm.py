@@ -5,6 +5,7 @@ import binascii
 import contextlib
 import io
 import inspect
+import time
 
 import discord
 from discord.ext import commands
@@ -80,7 +81,12 @@ class JoseVM:
 
         #: Program bytecode
         self.bytecode = bytecode
+
+        #: Holds current instruction being executed
         self.running_op = -1
+
+        #: Executed op count
+        self.op_count = 0
 
         #: Program counter
         self.pcounter = 0
@@ -214,7 +220,9 @@ class JoseVM:
                 func = self.map[instruction]
             except KeyError:
                 raise VMError(f'Invalid instruction: {instruction!r}')
+
             await func()
+            self.op_count += 1
 
 
 class VM(Cog):
@@ -272,10 +280,19 @@ class VM(Cog):
 
         try:
             out = io.StringIO()
+            t_start = time.monotonic()
             with contextlib.redirect_stdout(out):
                 await jvm.run()
+            t_end = time.monotonic()
 
-            em.add_field(name='Output', value=out.getvalue() or '<no stdout>')
+            time_taken = round((t_end - t_start) * 1000, 4)
+
+            em.add_field(name='executed instructions',
+                         value=jvm.op_count, inline=False)
+            em.add_field(name='time taken',
+                         value=f'`{time_taken}ms`', inline=False)
+            em.add_field(name='output',
+                         value=out.getvalue() or '<no stdout>')
             await ctx.send(embed=em)
         except VMError as err:
             await self.print_traceback(ctx, jvm, err)
