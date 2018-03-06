@@ -35,6 +35,7 @@ CHECK_FAILURE_PHRASES = [
     'br?',
     'u died [real] [Not ClickBait]',
     'rEEEEEEEEEEEEE',
+    'you didn\'t buy gold',
     'not enough permissions lul',
     'you sure you can run this?',
 ]
@@ -42,6 +43,7 @@ CHECK_FAILURE_PHRASES = [
 BAD_ARG_MESSAGES = [
     'dude give me the right thing',
     'u can\'t give me this and think i can do something',
+    'come to brazil',
     'succ',
     'i\'m not a god, fix your args',
     'why. just why',
