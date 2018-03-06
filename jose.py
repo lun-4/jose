@@ -41,9 +41,9 @@ CHECK_FAILURE_PHRASES = [
 
 BAD_ARG_MESSAGES = [
     'dude give me the right thing',
-    'u can\'t give me this and think i can do something',
+    "u can't give me this and think i can do something",
     'succ',
-    'i\'m not a god, fix your args',
+    "i'm not a god, fix your args",
     'why. just why',
 ]
 
