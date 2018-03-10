@@ -605,8 +605,12 @@ class Starboard(Cog, requires=['config']):
 
     async def on_raw_reaction_add(self, emoji_partial,
                                   message_id, channel_id, user_id):
+        """Handle a reaction add."""
         channel = self.bot.get_channel(channel_id)
         if not channel:
+            return
+
+        if isinstance(channel, discord.DMChannel):
             return
 
         cfg = await self.get_starconfig(channel.guild.id)
@@ -650,6 +654,9 @@ class Starboard(Cog, requires=['config']):
         if not channel:
             return
 
+        if isinstance(channel, discord.DMChannel):
+            return
+
         cfg = await self.get_starconfig(channel.guild.id)
         if not cfg:
             return
@@ -688,6 +695,9 @@ class Starboard(Cog, requires=['config']):
         """Remove all stars in the message."""
         channel = self.bot.get_channel(channel_id)
         if not channel:
+            return
+
+        if isinstance(channel, discord.DMChannel):
             return
 
         cfg = await self.get_starconfig(channel.guild.id)
