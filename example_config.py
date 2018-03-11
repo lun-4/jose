@@ -21,13 +21,6 @@ MSFT_TRANSLATION = {
 # set those to whatever
 SPEAK_PREFIXES = ['josé ', 'José ', 'jose ', 'Jose ']
 
-# enable/disable datadog reporting
-datadog = False
-
-# https://github.com/lnmds/elixir-docsearch
-# fill in the address of the server
-elixir_docsearch = 'localhost:6969'
-
 # channel for interesting packets
 PACKET_CHANNEL = 361685197852508173
 
@@ -53,11 +46,14 @@ postgres = {
 
 JOSECOIN_API = 'http://0.0.0.0:8080/api'
 
-# generated using ./jcoin/client_add.py
-JOSECOIN_TOKEN = 'something secret'
-
 # If on docker
 # JOSECOIN_API = 'http://josecoin:8080/api'
 
+# generated using ./jcoin/client_add.py
+JOSECOIN_TOKEN = 'something secret'
+
 # Where to put guild logs (join, leave, available, unavailable)
-GUILD_LOG_CHAN = 414977235762675713
+GUILD_LOG_CHAN = 'a webhook url'
+
+# Where to warn the bot owner about event thresholds
+METRICS_WEBHOOK = 'a webhook url'
