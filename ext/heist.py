@@ -252,7 +252,7 @@ class JoinSession:
         await ctx.send(embed=em)
         fmt = ('Your taxbank got stolen from a heist.\n'
                f'The {len(self.users)} thieves got {self.fine}JC.\n'
-               f'Server that stole: `{ctx.guild}`')
+               f'Server that stole: `{ctx.guild} [{ctx.guild.id}]`')
         await self.target_send(fmt)
 
     async def force_finish(self) -> 'any':
