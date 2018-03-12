@@ -447,7 +447,7 @@ class Coins(Cog):
 
         acc = await self.get_account(guild_id)
 
-        await ctx.send(f'\N{BANK} `{self.get_name(acc)}` > '
+        await ctx.send(f'\N{BANK} `{self.get_name(acc["id"])}` > '
                        f'`{acc["amount"]:.2f}JC`')
 
     @commands.command(name='transfer')
