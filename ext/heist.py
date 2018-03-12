@@ -250,8 +250,10 @@ class JoinSession:
         em.add_field(name='Outcome',
                      value=f'Transferred {self.fine} to {len(self.users)}')
         await ctx.send(embed=em)
-        await self.target_send(f'Your taxbank got stolen from a heist, the '
-                               f'thieves got {self.fine}JC')
+        fmt = ('Your taxbank got stolen from a heist.\n'
+               f'The {len(self.users)} thieves got {self.fine}JC.\n'
+               f'Server that stole: `{ctx.guild}`')
+        await self.target_send(fmt)
 
     async def force_finish(self) -> 'any':
         """Force the join session to finish
