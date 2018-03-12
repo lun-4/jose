@@ -429,8 +429,26 @@ class Coins(Cog):
         account = await self.get_account(person.id)
 
         await ctx.send(f'`{self.get_name(person.id)}` > '
-                       f'`{account["amount"]:.2f}`, paid '
+                       f'`{account["amount"]:.2f}JC`, paid '
                        f'`{account["taxpaid"]:.2f}JC` as tax.')
+
+    @commands.command(aliases=['txw', 'txb', 'txbal', 'txbalance'])
+    async def txwallet(self, ctx, guild_id: int = None):
+        """Check a taxbank's wallet.
+
+        Shows the current taxbank as default.
+        """
+        # NOTE: we don't use discord.Guild converter
+        #  because in the case jose leaves a guild we should
+        #  kinda still be able to query a taxbank
+
+        if not guild_id:
+            guild_id = ctx.guild.id
+
+        acc = await self.get_account(guild_id)
+
+        await ctx.send(f'\N{BANK} `{self.get_name(acc)}` > '
+                       f'`{acc["amount"]:.2f}JC`')
 
     @commands.command(name='transfer')
     async def _transfer(self, ctx,
