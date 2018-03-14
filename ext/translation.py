@@ -56,7 +56,7 @@ class Translation(Cog):
     async def translate(self, ctx, to_lang: str, *, sentence: str):
         """Translate from one language to another."""
         to_lang = self.bot.clean_content(to_lang).lower()
-        to_lang = to_lang.replace("jp", "ja")
+        to_lang = to_lang.replace("jp", "ja").replace("zh-CHS", "cn")
         sentence = self.bot.clean_content(sentence)
 
         tax = len(sentence) * TAX_PER_CHAR
