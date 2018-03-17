@@ -119,6 +119,9 @@ class Metrics(Cog):
             log.exception('sample task rip')
 
     async def on_message(self, message):
+        if message.author.bot:
+            return
+
         self.current_state['message'] += 1
 
     async def on_command(self, ctx):
