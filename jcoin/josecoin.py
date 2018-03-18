@@ -557,11 +557,13 @@ async def get_wallets(request):
         LIMIT {limit}
         """
 
-    # global / taxpaid checks if the user is in any mutual guild to avoid having unknown users in j!top
+    # global / taxpaid checks if the user is in any mutual guild
+    # to avoid having unknown users in j!top
     elif key == 'global':
         query = f"""
         SELECT * FROM account_amount
         WHERE account_amount.account_id = ANY(SELECT user_id FROM members)
+        AND account_amount.amount != 0
         {acc_type_str_w}
 
         ORDER BY amount {sorting}
