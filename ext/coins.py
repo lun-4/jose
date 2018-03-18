@@ -84,7 +84,8 @@ class Coins(Cog):
                         if exc == AccountNotFoundError:
                             raise AccountNotFoundError("Account not found, rea"
                                                        "d the documentation "
-                                                       "at 'j!help Coins'")
+                                                       "at 'j!help Coins' "
+                                                       "(CASE-SENSITIVE)")
                         raise exc(msg)
                 raise Exception(msg)
 
