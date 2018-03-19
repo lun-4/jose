@@ -603,6 +603,28 @@ class Starboard(Cog, requires=['config']):
         except ValueError:
             raise StarError('Channel not allowed to be starred')
 
+    async def _sbhandle(self, message, sbctx, cfg):
+        channel_id = sbctx['channel_id']
+        user_id = sbctx['user_id']
+
+        if channel_id == cfg['starboard_id'] and \
+                user_id != self.bot.user.id:
+            # This reaction is coming from the starboard.
+            content = message.content
+            log.debug(f'parsing things out from {content!r}')
+
+            matches = ID_REGEX.findall(content)
+            try:
+                new_message_id = int(matches[-1])
+                new_channel_id = int(matches[-2])
+                return new_message_id, new_channel_id
+            except (IndexError, ValueError):
+                # no matches found, rip.
+                log.warning(f'[sbhandle] failure parsing {content!r}')
+                return None, None
+
+        return None, None
+
     async def on_raw_reaction_add(self, emoji_partial,
                                   message_id, channel_id, user_id):
         """Handle a reaction add."""
@@ -625,16 +647,12 @@ class Starboard(Cog, requires=['config']):
             self.check_allow(cfg, channel_id)
             message = await channel.get_message(message_id)
 
-            if channel_id == cfg['starboard_id']:
-                # This reaction is coming from the starboard.
-                # we parse the message content and recall this function
-                content = message.content
-                log.debug(f'parsing things out from {content!r}')
+            new_message_id, new_channel_id = await self._sbhandle(message, {
+                'channel_id': channel_id,
+                'user_id': user_id,
+            }, cfg)
 
-                matches = ID_REGEX.findall(content)
-                new_message_id = int(matches[-1])
-                new_channel_id = int(matches[-2])
-
+            if new_message_id and new_channel_id:
                 return await self.on_raw_reaction_add(emoji_partial,
                                                       new_message_id,
                                                       new_channel_id,
@@ -669,15 +687,12 @@ class Starboard(Cog, requires=['config']):
             self.check_allow(cfg, channel_id)
             message = await channel.get_message(message_id)
 
-            if channel_id == cfg['starboard_id']:
-                # This reaction is coming from the starboard.
-                # we parse the message content and recall this function
-                content = message.content
+            new_message_id, new_channel_id = await self._sbhandle(message, {
+                'channel_id': channel_id,
+                'user_id': user_id,
+            }, cfg)
 
-                matches = ID_REGEX.findall(content)
-                new_message_id = int(matches[-1])
-                new_channel_id = int(matches[-2])
-
+            if new_message_id and new_channel_id:
                 return await self.on_raw_reaction_remove(emoji_partial,
                                                          new_message_id,
                                                          new_channel_id,
