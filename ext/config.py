@@ -185,26 +185,16 @@ class Config(Cog):
 
         # invalidate texter
         speak = self.bot.get_cog('Speak')
-        if not speak:
-            raise self.SayException('speak not loaded oops')
+        old = self.bot.get_channel(old_id)
+        if speak and old:
+            try:
+                log.debug(f'invalidating texter on {ctx.guild} '
+                          f'{ctx.guild.id}, {old} {old.id} '
+                          f'=> {channel} {channel.id}')
 
-        try:
-            old = self.bot.get_channel(old_id)
-            if not old:
-                raise self.SayException('Old channel does not exist, '
-                                        'can not invalidate')
-
-            log.debug(f'invalidating texter on {ctx.guild} {ctx.guild.id}, '
-                      f'{old} {old.id} => {channel} {channel.id}')
-
-            speak.text_generators.pop(ctx.guild.id)
-            await ctx.send('Your old texter referring to '
-                           f'{old.mention} was invalidated.')
-        except KeyError:
-            pass
-
-        if not success:
-            await ctx.send('No change happened. :x:')
+                speak.text_generators.pop(ctx.guild.id)
+            except KeyError:
+                pass
 
         await ctx.success(success)
 
