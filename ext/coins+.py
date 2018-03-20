@@ -557,7 +557,7 @@ class CoinsExt(Cog, requires=['coins']):
         be promptly available to withdraw, once you withdraw,
         only 10% of that amount is given to your wallet.
         """
-        pass
+        await ctx.invoke(self.bot.get_command('help'), command='txr')
 
     async def txr_transactions(self, user: discord.User) -> list:
         """Get all tax transactions done by the user.
