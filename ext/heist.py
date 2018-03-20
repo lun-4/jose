@@ -251,7 +251,8 @@ class JoinSession:
                      value=f'Transferred {self.fine} to {len(self.users)}')
         await ctx.send(embed=em)
         fmt = ('Your taxbank got stolen from a heist.\n'
-               f'The {len(self.users)} thieves got {self.fine}JC.\n'
+               f'The {len(self.users)} thieves got a total of {self.fine}JC.\n'
+               f'Each thief got {self.fine/len(self.users)}JC.\n'
                f'Server that stole: `{ctx.guild} [{ctx.guild.id}]`')
         await self.target_send(fmt)
 
