@@ -573,9 +573,16 @@ async def get_wallets(request):
         # NOTE: very shitty hack to get only-taxbank fetching
         # working.
         if acc_type == AccountType.TAXBANK:
-            query = query.replace('account_amount.account_id = ANY(SELECT'
-                                  ' user_id FROM members)', '')
-            query = query.replace('AND', '')
+            query = f"""
+            SELECT * FROM account_amount
+            WHERE
+             account_amount.amount != 0
+             {acc_type_str_w}
+
+            ORDER BY amount {sorting}
+            LIMIT {limit}
+            """
+
         args = []
     elif key == 'taxpaid':
         query = f"""

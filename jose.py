@@ -1,7 +1,6 @@
 import logging
 import random
 import time
-import sys
 import asyncio
 import pathlib
 import importlib
@@ -196,8 +195,8 @@ class JoseBot(commands.Bot):
             if isinstance(orig, self.cogs['Coins'].TransferError):
                 return await ctx.send(f'JoséCoin error: `{orig!r}`')
 
-            return await ctx.send(':b:ot machine :b:roke```py'
-                                  f'\n{error.original!r}```')
+            return await ctx.send('An error happened during command exeuction:'
+                                  f'```py\n{error.original!r}```')
 
         if isinstance(error, commands.errors.BadArgument):
             return await ctx.send('bad argument — '
