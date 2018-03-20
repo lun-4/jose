@@ -110,7 +110,6 @@ class Metrics(Cog):
     async def sample_task(self):
         try:
             while True:
-                log.debug('metrics sampling')
                 await self.sample()
                 await asyncio.sleep(60)
         except asyncio.CancelledError:
