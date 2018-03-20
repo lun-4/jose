@@ -5,6 +5,7 @@ import sys
 import asyncio
 import pathlib
 import importlib
+import collections
 
 import discord
 import aiohttp
@@ -174,6 +175,11 @@ class JoseBot(commands.Bot):
 
             if isinstance(orig, SayException):
                 arg0 = orig.args[0]
+
+                if ctx.guild is None:
+                    dm = collections.namedtuple('DM', 'id')
+                    ctx.guild = dm(ctx.author.id)
+
                 log.warning('SayException: %s[%d] %s %r => %r', ctx.guild,
                             ctx.guild.id, ctx.author, content, arg0)
 
@@ -220,8 +226,8 @@ class JoseBot(commands.Bot):
         # we put this one because MissingPermissions might be a
         # disguised CheckFailure
         if isinstance(error, commands.errors.CheckFailure):
-            await ctx.err('check generic error — '
-                          f'{random.choice(CHECK_FAILURE_PHRASES)}')
+            checks = [c.__qualname__.split('.')[0] for c in ctx.command.checks]
+            await ctx.err(f'check error — checks: `{", ".join(checks)}`')
 
     async def on_error(self, event_method, *args, **kwargs):
         # TODO: analyze current exception
