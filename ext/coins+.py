@@ -534,7 +534,7 @@ class CoinsExt(Cog, requires=['coins']):
 
             self.loop.create_task(ctx.send(f'`{person}: {res}`'))
 
-    @commands.group(aliases=['txr'])
+    @commands.group(aliases=['txr'], invoke_without_command=True)
     async def taxreturn(self, ctx):
         """Manage tax returns.
 
