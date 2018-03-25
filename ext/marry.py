@@ -77,8 +77,8 @@ class Marry(Cog):
         where user1 = $1 or user2 = $2
         """, ctx.author.id, who.id)
 
-        if restraint:
-            return await ctx.send(f"You can not marry {ctx.author}.")
+        if restraint is not None:
+            return await ctx.send(f"You can not marry {who}.")
 
         # get all relationships
         rels = await self.get_rels(ctx.author.id)
