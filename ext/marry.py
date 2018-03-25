@@ -215,7 +215,7 @@ class Marry(Cog):
         WHERE user1 = $1 AND user2 = $2
         """, ctx.author.id, user.id)
 
-        if restraint is None:
+        if restraint is not None:
             return await ctx.send('To remove a restraint, use '
                                   f'`{ctx.prefix}restrainoff`')
 
