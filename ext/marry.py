@@ -210,7 +210,7 @@ class Marry(Cog):
             return await ctx.send('no')
 
         restraint = await self.pool.fetchrow("""
-        SELECT true
+        SELECT user1
         FROM restrains
         WHERE user1 = $1 AND user2 = $2
         """, ctx.author.id, user.id)
