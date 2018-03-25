@@ -212,8 +212,8 @@ class Marry(Cog):
         restraint = await self.pool.fetchrow("""
         SELECT true
         FROM restrains
-        WHERE user1 = $1
-        """)
+        WHERE user1 = $1 AND user2 = $2
+        """, ctx.author.id, user.id)
 
         if restraint is None:
             return await ctx.send('To remove a restraint, use '
