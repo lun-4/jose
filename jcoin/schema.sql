@@ -128,3 +128,10 @@ CREATE TABLE relationships (
     rel_id bigint NOT NULL,
     PRIMARY KEY (user_id, rel_id)
 );
+
+/* </3 */
+CREATE TABLE restrains (
+    user1 bigint,
+    user2 bigint,
+    PRIMARY KEY(user1, user2)
+); -- just made this up really quickly

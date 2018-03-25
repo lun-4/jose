@@ -56,7 +56,7 @@ class BotCollection(Cog):
 
         Serves as a fallback instad of DMing owner.
         """
-        chan = next(c for c in guild.channels
+        chan = next(c for c in guild.text_channels
                     if guild.me.permissions_in(c).send_messages)
         return chan.send(message)
 

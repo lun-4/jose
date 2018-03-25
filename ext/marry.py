@@ -71,6 +71,15 @@ class Marry(Cog):
                 raise self.SayException('This person is already '
                                         f'in relationship id {rel_id}')
 
+        restraint = await self.pool.fetchrow("""
+        select user1, user2
+        from restrains
+        where user1 = $1 or user2 = $2
+        """, ctx.author.id, who.id)
+
+        if restraint:
+            return await ctx.send(f"You can not marry {ctx.author}.")
+
         # get all relationships
         rels = await self.get_rels(ctx.author.id)
         for in_rel_id in rels:
@@ -194,6 +203,48 @@ class Marry(Cog):
 
         await ctx.ok()
 
+    @commands.command()
+    async def restrain(self, ctx, user: discord.User):
+        """Restrain someone from marrying you."""
+        if user == ctx.author:
+            return await ctx.send('no')
+
+        restraint = await self.pool.fetchrow("""
+        SELECT true
+        FROM restrains
+        WHERE user1 = $1
+        """)
+
+        if restraint is None:
+            return await ctx.send('To remove a restraint, use '
+                                  f'`{ctx.prefix}restrainoff`')
+
+        await self.pool.execute("""
+        INSERT INTO restrains (user1, user2)
+        VALUES ($1, $2)
+        """, ctx.author.id, user.id)
+
+        await ctx.ok()
+
+    @commands.command()
+    async def restrainoff(self, ctx, user: discord.User):
+        """Remove a restraint."""
+        user2 = await self.pool.fetchval("""
+        select user2
+        from restrains
+        where user1 = $1 and user2 = $2
+        """, ctx.author.id, user.id)
+
+        if not user2:
+            return await ctx.send("You don't have any restraints to "
+                                  "that person")
+
+        await self.pool.execute("""
+        DELETE FROM restrains
+        WHERE user1 = $1 AND user2 = $2
+        """, ctx.author.id, user.id)
+
+        await ctx.ok()
 
 
 def setup(bot):
