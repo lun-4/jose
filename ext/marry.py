@@ -77,8 +77,18 @@ class Marry(Cog):
         where user1 = $1 or user1 = $2
         """, ctx.author.id, who.id)
 
-        if restraint is not None:
+        grest = await self.pool.fetchrow("""
+        select user1
+        from restrains
+        where (user1 = $1 or user1 = $2) and user2 = -1
+        """, ctx.author.id, who.id)
+
+        if restraint:
             return await ctx.send(f"You can not marry {who}.")
+
+        if grest:
+            return await ctx.send(f'{self.bot.get_user(grest)} '
+                                  'has global restraints enabled.')
 
         # get all relationships
         rels = await self.get_rels(ctx.author.id)
@@ -203,7 +213,7 @@ class Marry(Cog):
 
         await ctx.ok()
 
-    @commands.command()
+    @commands.group(invoke_without_command=True)
     async def restrain(self, ctx, user: discord.User):
         """Restrain someone from marrying you."""
         if user == ctx.author:
@@ -226,7 +236,30 @@ class Marry(Cog):
 
         await ctx.ok()
 
-    @commands.command()
+    @restrain.command(name='everyone')
+    async def restrain_everyone(self, ctx):
+        """Restrain everyone from marrying you.
+
+        Does not make a restraint for each user available in the world.
+        """
+        restraint = await self.pool.fetchval("""
+        SELECT user1
+        FROM restrains
+        WHERE user1 = $1 AND user2 = -1
+        """, ctx.author.id)
+
+        if restraint:
+            return await ctx.send('To turn off global restraints, '
+                                  f'use `{ctx.prefix}restrainoff everyone`')
+
+        await self.pool.execute("""
+        INSERT INTO restrains (user1, user2)
+        VALUES ($1, -1)
+        """, ctx.author.id)
+
+        await ctx.ok()
+
+    @commands.group(invoke_without_command=True)
     async def restrainoff(self, ctx, user: discord.User):
         """Remove a restraint."""
         user2 = await self.pool.fetchval("""
@@ -243,6 +276,29 @@ class Marry(Cog):
         DELETE FROM restrains
         WHERE user1 = $1 AND user2 = $2
         """, ctx.author.id, user.id)
+
+        await ctx.ok()
+
+    @restrainoff.command(name='everyone')
+    async def restrainoff_everyone(self, ctx):
+        """Turn off restraints for everyone.
+
+        Does not remove already existing restraints
+        """
+        restraint = await self.pool.fetchval("""
+        SELECT user1
+        FROM restrains
+        WHERE user1 = $1 AND user2 = -1
+        """, ctx.author.id)
+
+        if not restraint:
+            return await ctx.send('To turn on global restraints, '
+                                  f'use `{ctx.prefix}restrain everyone`')
+
+        await self.pool.execute("""
+        DELETE FROM restrains
+        WHERE user1 = $1
+        """, ctx.author.id)
 
         await ctx.ok()
 
