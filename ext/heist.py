@@ -272,31 +272,18 @@ class JoinSession:
         RuntimeError
             If no task is provided to the session.
         """
-        # NOTE: I do not know how well this works.
+
         guild = self.ctx.guild
-        log.info(f'Forcing a finish at {guild!s}[{guild.id}]')
+
         self.finish.set()
+        log.info(f'Forcing a finish at {guild!r}.')
 
         if self.task is None:
-            raise RuntimeError('wat')
+            raise RuntimeError('No task to finish.')
 
-        # since Task.exception() returns None
-        # I had to setup err as a string by default
-        err = 'nothing'
-        while err == 'nothing':
-            try:
-                log.info(f'waiting for exception {self.finish.is_set()}')
-                err = self.task.exception()
-            except asyncio.InvalidStateError:
-                await asyncio.sleep(1)
-
-        if err is not None:
-            raise err
-
-        log.info('getting result')
-        res = self.task.result()
-        log.info(f'result = {res!r}')
-        return res
+        # asyncio.gather puts the result in a list as it can accept multiple inputs
+        # we want to return the dict the task returns, so we return the first returned item
+        return (await asyncio.gather(self.task))[0]
 
     def destroy(self):
         self.finish.set()
@@ -308,6 +295,7 @@ class Heist(Cog):
     Heisting works by stealing taxbanks(see "j!help taxes" for a quick
     explanation on them) of other guilds/servers.
     """
+
     def __init__(self, bot):
         super().__init__(bot)
         self.sessions = {}
@@ -359,7 +347,7 @@ class Heist(Cog):
 
     async def check_user(self, ctx, session: JoinSession):
         """Check if this user can enter the session
-        
+
         Paramters
         ---------
         ctx: `Context`
