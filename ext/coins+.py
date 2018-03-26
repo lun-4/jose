@@ -374,6 +374,7 @@ class CoinsExt(Cog, requires=['coins']):
         Rules:
          - You can't steal less than 0.01JC.
          - You can't steal if you have less than 6JC.
+         - You can't steal more than double your current wallet.
          - You can't steal from targets who are in grace period.
          - You, by default, have 3 stealing points, and you lose
             one each time you use the steal command successfully.
@@ -387,7 +388,7 @@ class CoinsExt(Cog, requires=['coins']):
 
         if thief == target:
             raise self.SayException('You can not steal from yourself')
-        
+
         # make sure both have accounts
         try:
             thief_acc = await c2.get_account(thief.id)
@@ -406,6 +407,10 @@ class CoinsExt(Cog, requires=['coins']):
         if target_acc['amount'] < 3:
             raise self.SayException('Target has less than `3JC`, '
                                     'cannot steal them')
+
+        if amount > 2 * thief_acc['amount']:
+            raise self.SayException('You can not steal more than double '
+                                    'your current wallet amount.')
 
         try:
             await c2.lock(thief.id, target.id)
