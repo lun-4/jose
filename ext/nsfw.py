@@ -1,6 +1,7 @@
 import logging
 import random
 import urllib.parse
+import collections
 
 import aiohttp
 import discord
@@ -28,7 +29,7 @@ class BooruProvider:
         return post['author']
 
     @classmethod
-    async def get_posts(cls, bot, tags, *, limit=5):
+    async def get_posts(cls, bot, tags, *, limit=15):
         headers = {
             'User-Agent': 'Yiffmobile v2 (José, https://github.com/lnmds/jose)'
         }
@@ -84,12 +85,39 @@ class GelBooru(BooruProvider):
 
 
 class NSFW(Cog, requires=['config']):
+    """NSFW commands.
+
+    Fetching works on a "non-repeataibility" basis (unless
+    the bot restarts). This means that with each set of tags
+    you give for José to search, it will record the given post
+    and make sure it doesn't repeat again.
+    """
     def __init__(self, bot):
         super().__init__(bot)
         self.whip_coll = self.config.jose_db['whip']
+        self.repeat_cache = collections.defaultdict(dict)
 
-    async def booru(self, ctx, booru, tags):
-        if '[jose:no_nsfw]' in ctx.channel.topic:
+    def key(self, tags):
+        return ','.join(tags)
+
+    def mark_post(self, ctx, tags: list, post: dict):
+        """Mark this post as seen."""
+        cache = self.repeat_cache[ctx.guild.id]
+
+        k = self.key(tags)
+        used = cache.get(k, [])
+        used.append(post['id'])
+        cache[k] = used
+
+    def filter(self, ctx, tags: list, posts):
+        """Filter the posts so we get the only posts
+        that weren't seen."""
+        cache = self.repeat_cache[ctx.guild.id]
+        used_posts = cache.get(self.key(tags), [])
+        return list(filter(lambda post: post['id'] not in used_posts, posts))
+
+    async def booru(self, ctx, booru, tags: list):
+        if ctx.channel.topic and '[jose:no_nsfw]' in ctx.channel.topic:
             return
         # taxxx
         await self.jcoin.pricing(ctx, self.prices['API'])
@@ -97,12 +125,18 @@ class NSFW(Cog, requires=['config']):
         try:
             # grab posts
             posts = await booru.get_posts(ctx.bot, tags)
+            posts = self.filter(ctx, tags, posts)
 
             if not posts:
-                return await ctx.send('Found nothing.')
+                return await ctx.send('Found nothing.\n'
+                                      '(this can be caused by an exhaustion '
+                                      'of the tags `{ctx.prefix}help NSFW`)')
 
             # grab random post
             post = random.choice(posts)
+
+            self.mark_post(ctx, tags, post)
+
             post_id = post.get('id')
             post_author = booru.get_author(post)
 
@@ -120,14 +154,15 @@ class NSFW(Cog, requires=['config']):
             # hypnohub doesn't have this
             if 'fav_count' in post and 'score' in post:
                 embed.add_field(name='Votes/Favorites',
-                                value=f"{post['score']} votes, {post['fav_count']} favorites")
+                                value=f"{post['score']} votes, "
+                                      f"{post['fav_count']} favorites")
 
             # send
             await ctx.send(embed=embed)
         except BooruError as err:
             raise self.SayException(f'Error while fetching posts: `{err!r}`')
         except aiohttp.ClientError as err:
-            log.exception('client error')
+            log.exception('nsfw client error')
             raise self.SayException(f'Something went wrong. Sorry! `{err!r}`')
 
     @commands.command()
@@ -143,7 +178,7 @@ class NSFW(Cog, requires=['config']):
         """Randomly searches Hypnohub for posts."""
         async with ctx.typing():
             await self.booru(ctx, HypnohubBooru, tags)
-                
+
     @commands.command()
     @commands.is_nsfw()
     async def gelbooru(self, ctx, *tags):
