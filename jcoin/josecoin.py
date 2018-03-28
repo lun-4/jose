@@ -120,7 +120,7 @@ async def get_wallet(request, account_id):
     daccount = dict(account)
     if account['account_type'] == AccountType.USER:
         wallet = await request.app.db.fetchrow("""
-        SELECT taxpaid, steal_uses, steal_success
+        SELECT taxpaid, steal_uses, steal_success, ubank
         FROM wallets_taxpaid
         WHERE user_id=$1
         """, account_id)
@@ -222,24 +222,63 @@ async def transfer(request, sender_id):
     if receiver_lock:
         raise ConditionError('Receiver account is locked')
 
+    # does sender have enough money?
     snd_amount = decimal.Decimal(str(sender['amount']))
-    if not is_inf(snd_amount) and amount > snd_amount:
+    snd_enough = snd_amount > amount
+    bank_enough = False
+
+    rtype = receiver['account_type']
+    stype = sender['account_type']
+    is_tax_transfer = rtype == AccountType.TAXBANK and \
+        stype == AccountType.USER
+
+    if is_tax_transfer:
+        snd_bank = await request.app.db.fetchval("""
+        SELECT ubank
+        FROM wallets_taxpaid
+        WHERE user_id = $1
+        """, sender_id)
+        snd_bank = decimal.Decimal(str(snd_bank))
+
+        # does bank have enough money?
+        bank_enough = snd_bank > amount
+
+    if not is_tax_transfer and not is_inf(snd_amount) and not snd_enough:
         raise ConditionError(f'Not enough funds: {amount} > {snd_amount}')
+
+    enough = snd_enough or bank_enough
+    if is_tax_transfer and not enough:
+        raise ConditionError(f'Tax transfer did not find any available funds.')
 
     rcv_amount = receiver['amount']
 
     amount = str(amount)
     async with request.app.db.acquire() as conn, conn.transaction():
-        # send it back to db
-        if not is_inf(snd_amount):
+        if is_tax_transfer:
+            if bank_enough:
+                # subtract from user bank
+                await conn.execute("""
+                UPDATE wallets
+                SET ubank = ubank - $1
+                WHERE user_id = $2
+                """, amount, sender_id)
+            elif not is_inf(snd_amount):
+                # subtract from user wallet
+                await conn.execute("""
+                UPDATE accounts
+                SET amount=accounts.amount - $1
+                WHERE account_id = $2
+                """, amount, sender_id)
+        elif not is_inf(snd_amount):
+            # normal method of operation,
+            # subtract from accounts.amount
             await conn.execute("""
             UPDATE accounts
             SET amount=accounts.amount - $1
             WHERE account_id = $2
             """, amount, sender_id)
 
-        if receiver['account_type'] == AccountType.TAXBANK and \
-                sender['account_type'] == AccountType.USER:
+        if is_tax_transfer:
             await conn.execute("""
             UPDATE wallets
             SET taxpaid=wallets.taxpaid + $1
@@ -266,6 +305,43 @@ async def transfer(request, sender_id):
     return response.json({
         'sender_amount': einf if is_inf(snd_amount) else snd_amount - amount,
         'receiver_amount': einf if is_inf(rcv_amount) else rcv_amount + amount
+    })
+
+
+@app.post('/api/wallets/<wallet_id:int>/deposit')
+async def bank_deposit(request, wallet_id):
+    amount = decimal.Decimal(request.json['amount'])
+
+    account = await request.app.db.fetchrow("""
+    SELECT account_id, account_type, amount
+    FROM account_amount
+    WHERE account_id = $1
+    """, wallet_id)
+
+    if not account:
+        raise AccountNotFoundError('Account not found')
+
+    if account['account_type'] != AccountType.USER:
+        raise ConditionError('Account is not taxbank')
+
+    if account['amount'] < amount:
+        raise ConditionError('Not enough funds')
+
+    async with request.app.db.acquire() as conn, conn.transaction():
+        await conn.execute("""
+        UPDATE accounts
+        SET amount = amount - $1
+        WHERE account_id = $2
+        """, str(amount), wallet_id)
+
+        await conn.execute("""
+        UPDATE wallets
+        SET ubank = ubank + $1
+        WHERE user_id = $2
+        """, str(amount), wallet_id)
+
+    return response.json({
+        'status': True,
     })
 
 

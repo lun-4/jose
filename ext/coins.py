@@ -163,6 +163,12 @@ class Coins(Cog):
             r['taxpaid'] = decimal.Decimal(f'{r["taxpaid"]:.3f}')
         except KeyError:
             pass
+
+        try:
+            r['ubank'] = decimal.Decimal(f'{r["ubank"]:.3f}')
+        except KeyError:
+            pass
+
         return r
 
     async def create_wallet(self, thing):
@@ -429,9 +435,25 @@ class Coins(Cog):
 
         account = await self.get_account(person.id)
 
-        await ctx.send(f'`{self.get_name(person.id)}` > '
+        await ctx.send(f'`{self.get_name(person.id)}` : '
                        f'`{account["amount"]:.2f}JC`, paid '
-                       f'`{account["taxpaid"]:.2f}JC` as tax.')
+                       f'`{account["taxpaid"]:.2f}JC` as tax.\n'
+                       f'`{account["ubank"]:.2f}JC` in the personal bank.')
+
+    @commands.command()
+    async def bankdeposit(self, ctx, amount: CoinConverter):
+        """Deposit in your personal bank.
+
+        You can not withdraw from this bank.
+
+        Nobody else (other than José) can access
+        this money once deposited.
+        """
+        resp = await self.jc_post(f'/wallets/{ctx.author.id}/deposit', {
+            'amount': str(amount),
+        })
+
+        await ctx.success(resp['status'])
 
     @commands.command(aliases=['txw', 'txb', 'txbal', 'txbalance'])
     async def txwallet(self, ctx, guild_id: int = None):
