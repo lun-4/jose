@@ -415,13 +415,26 @@ class Coins(Cog):
 
     @commands.command()
     async def account(self, ctx):
-        """Create a JoséCoin wallet."""
+        """Create a JoséCoin wallet.
+
+        How do get money????
+
+        JoséCoins work based on your activity.
+        This mean that with every message that you send
+        you have a probability of getting a random JC reward.
+
+        Upon getting the reward, José will react to your message
+        with 💰. If you want to not show it, use j!hidecoins.
+
+        No, spamming won't work. Rewards have a 1 hour cooldown.
+        """
         try:
             await self.ensure_taxbank(ctx)
             await self.get_account(ctx.author.id)
             return await ctx.send('You already have an account.')
         except AccountNotFoundError:
             await self.create_wallet(ctx.author)
+            await ctx.send('Please read the docs at `j!help account`')
             await ctx.ok()
         except Exception as err:
             await ctx.not_ok()
