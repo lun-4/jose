@@ -184,7 +184,7 @@ class JoinSession:
                 continue
 
             # put them in normal jail
-            await self.cext.add_cooldown(jailed)
+            await self.cext.add_cooldown(jailed, 'prison', 12)
 
         em = self.get_embed(res)
 
@@ -244,7 +244,7 @@ class JoinSession:
                 log.warning(f'transfer failed {err!r}')
 
             # using hardcoded because we cant import coins+
-            await self.cext.add_cooldown(user, 'points', 7)
+            await self.cext.add_cooldown(user, 'points', 12)
 
         em = self.get_embed(res)
         em.add_field(name='Outcome',
