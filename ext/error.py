@@ -43,7 +43,7 @@ class ErrorHandling(Cog):
             if isinstance(orig, self.bot.cogs['Coins'].TransferError):
                 return await ctx.send(f'JoséCoin error: `{orig!r}`')
 
-            return await ctx.send('An error happened during command exeuction:'
+            return await ctx.send('An error happened during command execution:'
                                   f'```py\n{error.original!r}```')
 
         if isinstance(error, commands.errors.BadArgument):
