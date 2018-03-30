@@ -52,7 +52,8 @@ class Basic(Cog):
     async def random(self, ctx, n_min: int, n_max: int):
         """Get a random number."""
         if n_min < -1e100 or n_max > 1e100:
-            return await ctx.send('Your values are outside the range `[-1e100, 1e100]`')
+            return await ctx.send('Your values are outside the range '
+                                  '`[-1e100, 1e100]`')
 
         if n_min > n_max:
             await ctx.send("`min > max` u wot")
@@ -64,11 +65,13 @@ class Basic(Cog):
     @commands.command(aliases=['choose', 'choice'])
     async def pick(self, ctx, *choices: commands.clean_content):
         """Pick a random element."""
+        choices = [x.strip() for x in choices]
         choices = set(choices)
+
         if len(choices) <= 1:
             return await ctx.send("dude what")
-        choices = list(choices)
 
+        choices = list(choices)
         await ctx.send(random.choice(choices))
 
     @commands.command()
