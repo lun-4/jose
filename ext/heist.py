@@ -184,7 +184,7 @@ class JoinSession:
                 continue
 
             # put them in normal jail
-            await self.cext.add_cooldown(jailed, 'prison', 12)
+            await self.cext.add_cooldown(jailed, 'prison', 24)
 
         em = self.get_embed(res)
 
