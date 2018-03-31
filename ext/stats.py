@@ -20,6 +20,7 @@ def empty_stats(c_name):
 
 class Statistics(Cog, requires=['config']):
     """Bot stats stuff."""
+
     def __init__(self, bot):
         super().__init__(bot)
 
@@ -37,8 +38,8 @@ class Statistics(Cog, requires=['config']):
     async def basic_measures(self):
         await self.gauge('jose.guilds', len(self.bot.guilds))
         await self.gauge('jose.users', len(self.bot.users))
-        await self.gauge('jose.channels', sum(1 for c
-                                              in self.bot.get_all_channels()))
+        await self.gauge('jose.channels',
+                         sum(1 for c in self.bot.get_all_channels()))
 
     async def starboard_stats(self):
         """Pushes starboard statistics to datadog."""
@@ -124,8 +125,11 @@ class Statistics(Cog, requires=['config']):
             await self.cstats_coll.insert_one(empty_stats(c_name))
 
         await self.increment('jose.complete_commands')
-        await self.cstats_coll.update_one({'name': c_name},
-                                          {'$inc': {'uses': 1}})
+        await self.cstats_coll.update_one({
+            'name': c_name
+        }, {'$inc': {
+            'uses': 1
+        }})
 
     async def on_message(self, message):
         await self.increment('jose.recv_messages')
@@ -135,7 +139,7 @@ class Statistics(Cog, requires=['config']):
                  f' {guild.member_count} members')
 
     @commands.command(aliases=['cstats'])
-    async def command_stats(self, ctx, limit: int=10):
+    async def command_stats(self, ctx, limit: int = 10):
         """Show most used commands."""
         if limit > 20 or limit < 1:
             await ctx.send('no')

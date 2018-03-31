@@ -1,4 +1,3 @@
-
 class GenericError(Exception):
     """Generic API error."""
     status_code = 500
@@ -24,5 +23,7 @@ class ConditionError(TransferError):
     status_code = 412
 
 
-err_list = [GenericError, TransferError, AccountNotFoundError,
-            InputError, ConditionError]
+err_list = [
+    GenericError, TransferError, AccountNotFoundError, InputError,
+    ConditionError
+]

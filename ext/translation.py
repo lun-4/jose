@@ -14,6 +14,7 @@ TAX_PER_CHAR = decimal.Decimal('0.022')
 
 class Translation(Cog):
     """Microsoft's Translation API."""
+
     def __init__(self, bot):
         super().__init__(bot)
         self.APIROUTE = 'https://api.microsofttranslator.com/V2/Http.svc'
@@ -30,8 +31,8 @@ class Translation(Cog):
         """Make a request to the translation API."""
         qs = urllib.parse.urlencode(qs_dict)
         url = f'{self.APIROUTE}{route}?{qs}'
-        async with self.bot.session.request(method, url,
-                                            headers=self.subkey_headers) as r:
+        async with self.bot.session.request(
+                method, url, headers=self.subkey_headers) as r:
             return r
 
     async def get(self, route: str, qs: dict) -> 'any':
@@ -90,8 +91,8 @@ class Translation(Cog):
         translated = list(root.itertext())[0]
         translated = self.bot.clean_content(translated)
 
-        log.debug('[translate] %r [%s] => %r [%s]',
-                  sentence, detected, translated, to_lang)
+        log.debug('[translate] %r [%s] => %r [%s]', sentence, detected,
+                  translated, to_lang)
 
         res = [
             f'detected language: {detected}',

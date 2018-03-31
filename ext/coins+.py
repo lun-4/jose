@@ -58,8 +58,9 @@ class CoinsExt(Cog, requires=['coins']):
 
         table = Table('pos', 'name', 'account id', field)
         for idx, account in enumerate(filtered):
-            table.add_row(str(idx + 1), account['_name'],
-                          str(account['account_id']), str(account[field]))
+            table.add_row(
+                str(idx + 1), account['_name'], str(account['account_id']),
+                str(account[field]))
 
         rendered = await table.render(loop=self.loop)
 
@@ -69,7 +70,7 @@ class CoinsExt(Cog, requires=['coins']):
             await ctx.send(f'```\n{rendered}```')
 
     @commands.command()
-    async def top(self, ctx, mode: str='g', limit: int=10):
+    async def top(self, ctx, mode: str = 'g', limit: int = 10):
         """Show accounts by specific criteria.
 
         'global' means all accounts in josé.
@@ -88,19 +89,21 @@ class CoinsExt(Cog, requires=['coins']):
             raise self.SayException('invalid limit')
 
         if mode == 'g':
-            accounts = await self.coins.jc_get('/wallets', {
-                'key': 'global',
-                'reverse': True,
-                'type': self.coins.AccountType.USER,
-                'limit': limit,
-            })
+            accounts = await self.coins.jc_get(
+                '/wallets', {
+                    'key': 'global',
+                    'reverse': True,
+                    'type': self.coins.AccountType.USER,
+                    'limit': limit,
+                })
         elif mode == 'l':
-            accounts = await self.coins.jc_get('/wallets', {
-                'key': 'local',
-                'guild_id': ctx.guild.id,
-                'reverse': True,
-                'limit': limit
-            })
+            accounts = await self.coins.jc_get(
+                '/wallets', {
+                    'key': 'local',
+                    'guild_id': ctx.guild.id,
+                    'reverse': True,
+                    'limit': limit
+                })
         elif mode == 't':
             accounts = await self.coins.jc_get('/wallets', {
                 'key': 'taxpaid',
@@ -134,27 +137,24 @@ class CoinsExt(Cog, requires=['coins']):
     @commands.command(name='prices')
     async def _prices(self, ctx):
         """Show price information about commands."""
-        em = discord.Embed(title='Pricing',
-                           color=discord.Color(0x2192bc))
+        em = discord.Embed(title='Pricing', color=discord.Color(0x2192bc))
         descriptions = {
-            'OPR': ('Operational tax for high-load commands',
-                    ('yt', 'datamosh'),
-                    ),
+            'OPR': (
+                'Operational tax for high-load commands',
+                ('yt', 'datamosh'),
+            ),
             'API': ('API tax (includes the NSFW commands)',
-                    ('xkcd', 'wolframalpha', 'weather', 'money',
-                     'urban')
-                    ),
-            'TRN': ('Translation tax',
-                    ('translate',)
-                    ),
+                    ('xkcd', 'wolframalpha', 'weather', 'money', 'urban')),
+            'TRN': ('Translation tax', ('translate', )),
         }
 
         for category in self.prices:
             price = self.prices[category]
-            em.add_field(name=f'Category: {category}, Price: {price}',
-                         value=f'{descriptions[category][0]}: '
-                               f'{", ".join(descriptions[category][1])}',
-                         inline=False)
+            em.add_field(
+                name=f'Category: {category}, Price: {price}',
+                value=f'{descriptions[category][0]}: '
+                f'{", ".join(descriptions[category][1])}',
+                inline=False)
 
         await ctx.send(embed=em)
 
@@ -166,7 +166,9 @@ class CoinsExt(Cog, requires=['coins']):
         acc = await self.coins.get_account(ctx.guild.id)
         await ctx.send(f'`{self.coins.get_name(ctx.guild)}: {acc["amount"]}`')
 
-    async def add_cooldown(self, user, c_type: str = 'prison',
+    async def add_cooldown(self,
+                           user,
+                           c_type: str = 'prison',
                            hours: int = DEFAULT_ARREST) -> int:
         """Add a steal cooldown to a user.
         """
@@ -264,8 +266,7 @@ class CoinsExt(Cog, requires=['coins']):
             points = {'points': 3}
 
         if points['points'] < 1:
-            await self.add_cooldown(thief, CooldownTypes.points,
-                                    DEFAULT_REGEN)
+            await self.add_cooldown(thief, CooldownTypes.points, DEFAULT_REGEN)
             raise self.SayException('\N{FACE WITH TEARS OF JOY}'
                                     ' You ran out of stealing points!'
                                     f' wait {DEFAULT_REGEN} hours.')
@@ -277,8 +278,7 @@ class CoinsExt(Cog, requires=['coins']):
         """, thief.id)
 
         if (points['points'] - 1) < 1:
-            await self.add_cooldown(thief, CooldownTypes.points,
-                                    DEFAULT_REGEN)
+            await self.add_cooldown(thief, CooldownTypes.points, DEFAULT_REGEN)
 
     async def add_grace(self, target: discord.User, hours: int):
         """Add a grace period to the target.
@@ -302,8 +302,7 @@ class CoinsExt(Cog, requires=['coins']):
         VALUES ($1, now() + interval '{hours} hours')
         """, target.id)
 
-    async def arrest(self, ctx,
-                     amount: decimal.Decimal) -> tuple:
+    async def arrest(self, ctx, amount: decimal.Decimal) -> tuple:
         """Arrest the thief.
         
         Returns
@@ -344,8 +343,11 @@ class CoinsExt(Cog, requires=['coins']):
                                 f'arrested! {message}\n{hours}h in jail.\n'
                                 f'`{transfer_info}`')
 
-    def steal_info(self, res: float, chance: float,
-                   transfer_info: str, hours: int = None):
+    def steal_info(self,
+                   res: float,
+                   chance: float,
+                   transfer_info: str,
+                   hours: int = None):
         """Show the information about the success / failure of a steal."""
         msg_res = [f'`[chance: {chance} | res: {res}]`']
 
@@ -458,8 +460,8 @@ class CoinsExt(Cog, requires=['coins']):
             if success:
                 # success
                 await c2.jc_post(f'/wallets/{thief.id}/steal_success')
-                transfer_info = await c2.transfer_str(target.id,
-                                                      thief.id, amount)
+                transfer_info = await c2.transfer_str(target.id, thief.id,
+                                                      amount)
 
                 try:
                     await target.send(':gun: **You were robbed!** '
@@ -499,9 +501,10 @@ class CoinsExt(Cog, requires=['coins']):
         """, author.id)
 
         if points:
-            em.add_field(name='remaining stealing points',
-                         value=points['points'],
-                         inline=False)
+            em.add_field(
+                name='remaining stealing points',
+                value=points['points'],
+                inline=False)
 
         for idx, cooldown in enumerate(cooldowns):
             c_type = cooldown['ctype']
@@ -511,18 +514,20 @@ class CoinsExt(Cog, requires=['coins']):
             r_sec = remaining.total_seconds()
             expired = ' [EXPIRED]' if r_sec < 0 else ''
 
-            em.add_field(name=f'cooldown {idx}{expired}',
-                         value=f'{c_type_str}: `{fmt_tdelta(remaining)}`',
-                         inline=False)
+            em.add_field(
+                name=f'cooldown {idx}{expired}',
+                value=f'{c_type_str}: `{fmt_tdelta(remaining)}`',
+                inline=False)
 
         if grace:
             # get timedelta
             remaining = grace['finish'] - now
             r_sec = remaining.total_seconds()
             expired = '[EXPIRED] ' if r_sec < 0 else ''
-            em.add_field(name=f'{expired}grace period',
-                         value=f'`{fmt_tdelta(remaining)}`',
-                         inline=False)
+            em.add_field(
+                name=f'{expired}grace period',
+                value=f'`{fmt_tdelta(remaining)}`',
+                inline=False)
 
         await ctx.send(embed=em)
 
@@ -633,19 +638,21 @@ class CoinsExt(Cog, requires=['coins']):
         total_criteria = await self.txr_not_total(ctx.author)
         total_trans = await self.txr_transactions(ctx.author)
 
-        em = discord.Embed(title='Tax return situation',
-                           color=discord.Color.gold())
+        em = discord.Embed(
+            title='Tax return situation', color=discord.Color.gold())
 
         if not total_criteria:
             raise self.SayException("You don't have any transactions "
                                     "that meet criteria")
 
-        em.add_field(name='Money that fits the criteria',
-                     value=f'`{round(total_criteria, 2)}JC`')
-        em.add_field(name='Withdrawable money',
-                     value=f'`{round(total_avail, 2)}JC`')
-        em.add_field(name='Tax transactions that meet criteria',
-                     value=f'{len(total_trans)}')
+        em.add_field(
+            name='Money that fits the criteria',
+            value=f'`{round(total_criteria, 2)}JC`')
+        em.add_field(
+            name='Withdrawable money', value=f'`{round(total_avail, 2)}JC`')
+        em.add_field(
+            name='Tax transactions that meet criteria',
+            value=f'{len(total_trans)}')
 
         await ctx.send(embed=em)
 
@@ -679,8 +686,7 @@ class CoinsExt(Cog, requires=['coins']):
         success, error = 0, 0
         sent = decimal.Decimal(0)
 
-        log.debug(f'[txr] processing {ctx.author}, '
-                  f'{len(transactions)}')
+        log.debug(f'[txr] processing {ctx.author}, ' f'{len(transactions)}')
 
         for trans in transactions:
             # apply 10% to the amount
@@ -688,15 +694,14 @@ class CoinsExt(Cog, requires=['coins']):
             # theres transactions.amount and accounts.amount
             # we do a filter to get the right one
             items = trans.items()
-            t_amount = next(v for k, v in items
-                            if isinstance(v, decimal.Decimal))
+            t_amount = next(
+                v for k, v in items if isinstance(v, decimal.Decimal))
 
             applied = t_amount * decimal.Decimal('0.25')
 
             # the reverse transaction, as tax return
             try:
-                await self.jcoin.transfer(trans['receiver'],
-                                          trans['sender'],
+                await self.jcoin.transfer(trans['receiver'], trans['sender'],
                                           applied)
 
                 await self.pool.execute("""

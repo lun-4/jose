@@ -35,8 +35,9 @@ class BooruProvider:
         }
 
         tags = urllib.parse.quote(' '.join(tags), safe='')
-        async with bot.session.get(f'{cls.url}&limit={limit}&tags={tags}',
-                                   headers=headers) as resp:
+        async with bot.session.get(
+                f'{cls.url}&limit={limit}&tags={tags}',
+                headers=headers) as resp:
             results = await resp.json()
             if not results:
                 return []
@@ -92,6 +93,7 @@ class NSFW(Cog, requires=['config']):
     you give for José to search, it will record the given post
     and make sure it doesn't repeat again.
     """
+
     def __init__(self, bot):
         super().__init__(bot)
         self.whip_coll = self.config.jose_db['whip']
@@ -140,8 +142,8 @@ class NSFW(Cog, requires=['config']):
             post_id = post.get('id')
             post_author = booru.get_author(post)
 
-            log.info('%d posts from %s, chose %d', len(posts),
-                     booru.__name__, post_id)
+            log.info('%d posts from %s, chose %d', len(posts), booru.__name__,
+                     post_id)
 
             tags = (post['tags'].replace('_', '\\_'))[:500]
 
@@ -153,9 +155,10 @@ class NSFW(Cog, requires=['config']):
 
             # hypnohub doesn't have this
             if 'fav_count' in post and 'score' in post:
-                embed.add_field(name='Votes/Favorites',
-                                value=f"{post['score']} votes, "
-                                      f"{post['fav_count']} favorites")
+                embed.add_field(
+                    name='Votes/Favorites',
+                    value=f"{post['score']} votes, "
+                    f"{post['fav_count']} favorites")
 
             # send
             await ctx.send(embed=embed)
@@ -194,7 +197,7 @@ class NSFW(Cog, requires=['config']):
 
     @commands.command()
     @commands.cooldown(5, 1800, commands.BucketType.user)
-    async def whip(self, ctx, *, person: discord.User=None):
+    async def whip(self, ctx, *, person: discord.User = None):
         """Whip someone.
 
         If no arguments provided, shows how many whips you
@@ -222,8 +225,11 @@ class NSFW(Cog, requires=['config']):
             }
             await self.whip_coll.insert_one(whip)
 
-        await self.whip_coll.update_one({'user_id': uid},
-                                        {'$inc': {'whips': 1}})
+        await self.whip_coll.update_one({
+            'user_id': uid
+        }, {'$inc': {
+            'whips': 1
+        }})
 
         await ctx.send(f'**{ctx.author}** whipped **{person}** '
                        f'They have been whipped {whip["whips"] + 1} times.')

@@ -37,9 +37,8 @@ class Texter:
 
     This class holds information about a markov chain generator.
     """
-    __slots__ = ('loop', 'id', 'refcount', 'chain_length',
-                 'model', 'wordcount', 'linecount', 'time_taken', 
-                 'model_kwargs')
+    __slots__ = ('loop', 'id', 'refcount', 'chain_length', 'model',
+                 'wordcount', 'linecount', 'time_taken', 'model_kwargs')
 
     def __init__(self, texter_id, **kwargs):
         self.loop = kwargs.pop('loop', None)
@@ -65,8 +64,7 @@ class Texter:
         """Fill a texter with its text model."""
         t_start = time.monotonic()
 
-        future_textmodel = self.loop.run_in_executor(None,
-                                                     make_textmodel,
+        future_textmodel = self.loop.run_in_executor(None, make_textmodel,
                                                      self, data)
         await future_textmodel
 
@@ -100,9 +98,8 @@ class Texter:
         while res is None:
             if count > 3:
                 break
-            future_sentence = self.loop.run_in_executor(None,
-                                                        self._sentence,
-                                                        char_limit)
+            future_sentence = self.loop.run_in_executor(
+                None, self._sentence, char_limit)
             res = await future_sentence
             count += 1
 
@@ -117,6 +114,7 @@ class Texter:
 
 class Speak(Cog):
     """José's markov cog."""
+
     def __init__(self, bot):
         super().__init__(bot)
         self.text_generators = {}
@@ -294,8 +292,7 @@ class Speak(Cog):
             # and taxbank have 0 JC)
             if not recursive:
                 await self.sentence_tax(ctx, 'txb'
-                                        if mode == 'user'
-                                        else 'user', True)
+                                        if mode == 'user' else 'user', True)
 
     async def make_sentence(self, ctx, char_limit=None, priority='user'):
         with ctx.typing():
@@ -357,19 +354,17 @@ class Speak(Cog):
             if ctx.channel.id in disabled:
                 return
         else:
-            log.info(
-                '[autoreply:speak_prefix] %s(%d), %s(%d) - %r',
-                message.guild, message.guild.id, message.author,
-                message.author.id, message.content
-            )
+            log.info('[autoreply:speak_prefix] %s(%d), %s(%d) - %r',
+                     message.guild, message.guild.id, message.author,
+                     message.author.id, message.content)
             autoreply = True
 
         if self.generating.get(ctx.guild.id):
             return
 
         try:
-            sentence = await self.make_sentence(ctx, None,
-                                                'txb' if autoreply else 'user')
+            sentence = await self.make_sentence(ctx, None, 'txb'
+                                                if autoreply else 'user')
         except self.SayException as err:
             sentence = f'Failed to generate a sentence: `{err.args[0]!r}`'
 
@@ -502,10 +497,14 @@ class Speak(Cog):
         res = ['refcount | texters']
         res += [f'{r}        | {txc}' for (r, txc) in refcounts.most_common()]
 
-        res += [f'avg tx gen: {self.st_gen_totalms / self.st_gen_count}'
-                ' ms/generated']
-        res += [f'avg txc run: {self.st_txc_totalms / self.st_txc_runs}'
-                ' ms/runs']
+        res += [
+            f'avg tx gen: {self.st_gen_totalms / self.st_gen_count}'
+            ' ms/generated'
+        ]
+        res += [
+            f'avg txc run: {self.st_txc_totalms / self.st_txc_runs}'
+            ' ms/runs'
+        ]
 
         res = '\n'.join(res)
         await ctx.send(f'```{res}```')
@@ -534,8 +533,7 @@ class Speak(Cog):
         if not tx:
             return await ctx.send('No texter loaded for this guild')
 
-        lines = (f'Refcount: {tx.refcount}\n',
-                 f'Words: {tx.wordcount}\n',
+        lines = (f'Refcount: {tx.refcount}\n', f'Words: {tx.wordcount}\n',
                  f'Lines: {tx.linecount}\n')
         await ctx.send(''.join(lines))
 
@@ -546,12 +544,12 @@ class Speak(Cog):
         with ctx.typing():
             messages = await self.get_messages(ctx.guild)
             processed = ' '.join(messages).replace('\n', ' ')
-            count = collections.Counter((w for w in processed.split(' ')
-                                         if len(w) > 4))
+            count = collections.Counter(
+                (w for w in processed.split(' ') if len(w) > 4))
 
         common = count.most_common(10)
-        res = '\n'.join([f'`{word!r}: {count} times`'
-                         for (word, count) in common])
+        res = '\n'.join(
+            [f'`{word!r}: {count} times`' for (word, count) in common])
         await ctx.send(res)
 
 

@@ -28,6 +28,7 @@ def is_moderator():
 
 class Config(Cog):
     """Guild-specific configuration commands."""
+
     def __init__(self, bot):
         super().__init__(bot)
 
@@ -127,7 +128,9 @@ class Config(Cog):
         self.config_cache[guild.id] = cfg
         return cfg
 
-    async def cfg_get(self, guild: discord.Guild, key: str,
+    async def cfg_get(self,
+                      guild: discord.Guild,
+                      key: str,
                       default: 'any' = None) -> 'any':
         """Get a configuration key for a guild."""
         if key in self.config_cache[guild.id]:
@@ -144,11 +147,14 @@ class Config(Cog):
     async def cfg_set(self, guild, key: str, value: 'any') -> bool:
         """Set a configuration key."""
         await self.ensure_cfg(guild)
-        res = await self.config_coll.update_one({'guild_id': guild.id},
-                                                {'$set': {key: value}})
+        res = await self.config_coll.update_one({
+            'guild_id': guild.id
+        }, {'$set': {
+            key: value
+        }})
 
-        log.debug('[cfg:set] %s[gid=%d] k=%r <- v=%r',
-                  guild, guild.id, key, value)
+        log.debug('[cfg:set] %s[gid=%d] k=%r <- v=%r', guild, guild.id, key,
+                  value)
 
         self.config_cache[guild.id][key] = value
         return res.modified_count > 0
@@ -264,11 +270,11 @@ class Config(Cog):
 
         try:
             await botcoll.fallback(guild, '**This guild has been blocked'
-                                          ' from using José.**\n'
-                                          f'reason: `{reason}`\n'
-                                          'If you want to appeal this block, '
-                                          'drop by the support guild: '
-                                          f'{basic.support_inv}')
+                                   ' from using José.**\n'
+                                   f'reason: `{reason}`\n'
+                                   'If you want to appeal this block, '
+                                   'drop by the support guild: '
+                                   f'{basic.support_inv}')
         except discord.Forbidden:
             await ctx.send('Failed to message guild')
 
@@ -312,8 +318,8 @@ class Config(Cog):
         if not (1 < len(prefix) < 20):
             return await ctx.send('Prefixes need to be 1-20 characters long')
 
-        return await ctx.success(await self.cfg_set(ctx.guild,
-                                                    'prefix', prefix))
+        return await ctx.success(await self.cfg_set(ctx.guild, 'prefix',
+                                                    prefix))
 
     @commands.command()
     @commands.guild_only()
@@ -334,9 +340,8 @@ class Config(Cog):
             return await ctx.send('Add `Send Messages` '
                                   'permission to josé please')
 
-        return await ctx.success(await self.cfg_set(ctx.guild,
-                                                    'notify_channel',
-                                                    channel.id))
+        return await ctx.success(await self.cfg_set(
+            ctx.guild, 'notify_channel', channel.id))
 
     @commands.command()
     @commands.guild_only()
@@ -349,8 +354,8 @@ class Config(Cog):
 
         Use this command again to toggle it back on.
         """
-        channels = await self.config.cfg_get(ctx.guild,
-                                             'autoreply_disable', [])
+        channels = await self.config.cfg_get(ctx.guild, 'autoreply_disable',
+                                             [])
 
         chan = channel.id
         if chan in channels:
@@ -358,8 +363,8 @@ class Config(Cog):
         else:
             channels.append(chan)
 
-        ok = await self.config.cfg_set(ctx.guild,
-                                       'autoreply_disable', channels)
+        ok = await self.config.cfg_set(ctx.guild, 'autoreply_disable',
+                                       channels)
         await ctx.success(ok)
 
     @commands.command()
@@ -373,8 +378,10 @@ class Config(Cog):
             coll = self.jose_db[coll_name]
             counts[coll_name] = await coll.count()
 
-        coll_counts = '\n'.join([f'{collname:20} | {count}'
-                                 for collname, count in counts.most_common()])
+        coll_counts = '\n'.join([
+            f'{collname:20} | {count}'
+            for collname, count in counts.most_common()
+        ])
         coll_counts = f'```\n{coll_counts}```'
         await ctx.send(coll_counts)
 

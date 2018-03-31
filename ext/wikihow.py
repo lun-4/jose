@@ -12,9 +12,10 @@ log = logging.getLogger(__name__)
 async def custom_getjson(ctx, url: str) -> dict:
     """Get JSON from a website with custom useragent."""
     log.debug('Requesting %s', url)
-    resp = await ctx.bot.session.get(url, headers={
-        'User-Agent': ctx.cog.USER_AGENT,
-    })
+    resp = await ctx.bot.session.get(
+        url, headers={
+            'User-Agent': ctx.cog.USER_AGENT,
+        })
     return await resp.json()
 
 
@@ -46,8 +47,8 @@ class WikiHow(Cog):
         page_count = wh_query["searchinfo"]["totalhits"]
         display_count = page_count if page_count < 5 else 5
 
-        log.debug(f'total results: {page_count}, ' +
-                  f'displaying {display_count}')
+        log.debug(
+            f'total results: {page_count}, ' + f'displaying {display_count}')
 
         if not display_count:
             raise self.SayException('No pages found')
@@ -76,15 +77,15 @@ class WikiHow(Cog):
             embed_text.append(f'**[{page["title"]}]({url}) '
                               f'({page["counter"]} views)**')
 
-        e = discord.Embed(title='WikiHow results for '
-                                f'`"{urllib.parse.unquote(query)}"`',
-                          url='https://www.wikihow.com/wikiHowTo?'
-                              f'search={query}',
-                          description='\n'.join(embed_text))
+        e = discord.Embed(
+            title='WikiHow results for '
+            f'`"{urllib.parse.unquote(query)}"`',
+            url='https://www.wikihow.com/wikiHowTo?'
+            f'search={query}',
+            description='\n'.join(embed_text))
         e.set_image(url=image_link)
         await ctx.send(embed=e)
 
 
 def setup(bot):
     bot.add_cog(WikiHow(bot))
-

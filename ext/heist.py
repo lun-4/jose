@@ -157,13 +157,12 @@ class JoinSession:
         rs = res['success']
         em.color = discord.Color.green() if rs else discord.Color.red()
 
-        em.add_field(name='Chance & Res',
-                     value=f'{res["chance"]}, {res["result"]:.2}',
-                     inline=False)
+        em.add_field(
+            name='Chance & Res',
+            value=f'{res["chance"]}, {res["result"]:.2}',
+            inline=False)
 
-        em.add_field(name='Success',
-                     value=rs,
-                     inline=False)
+        em.add_field(name='Success', value=rs, inline=False)
 
         return em
 
@@ -188,15 +187,18 @@ class JoinSession:
 
         em = self.get_embed(res)
 
-        jailed_mentions = ' '.join([f'<@{jailed}>'
-                                    for jailed in res['jailed']])
-        em.add_field(name='Users in jail',
-                     value=jailed_mentions or '<none>', inline=False)
+        jailed_mentions = ' '.join(
+            [f'<@{jailed}>' for jailed in res['jailed']])
+        em.add_field(
+            name='Users in jail',
+            value=jailed_mentions or '<none>',
+            inline=False)
 
-        saved_mentions = ' '.join([f'<@{saved}>'
-                                   for saved in res['saved']])
-        em.add_field(name='Users not in jail',
-                     value=saved_mentions or '<none>', inline=False)
+        saved_mentions = ' '.join([f'<@{saved}>' for saved in res['saved']])
+        em.add_field(
+            name='Users not in jail',
+            value=saved_mentions or '<none>',
+            inline=False)
 
         await ctx.send(embed=em)
 
@@ -247,8 +249,9 @@ class JoinSession:
             await self.cext.add_cooldown(user, 'points', 12)
 
         em = self.get_embed(res)
-        em.add_field(name='Outcome',
-                     value=f'Transferred {self.fine} to {len(self.users)}')
+        em.add_field(
+            name='Outcome',
+            value=f'Transferred {self.fine} to {len(self.users)}')
         await ctx.send(embed=em)
         fmt = ('Your taxbank got stolen from a heist.\n'
                f'The {len(self.users)} thieves got a total of {self.fine}JC.\n'
@@ -374,8 +377,7 @@ class Heist(Cog):
                                     f"(`{session.fine}JC`)")
 
     @commands.group(invoke_without_command=True)
-    async def heist(self, ctx,
-                    target: GuildConverter, amount: CoinConverter):
+    async def heist(self, ctx, target: GuildConverter, amount: CoinConverter):
         """Heist a server.
 
         This works better if you have more people joining in your heist.
@@ -466,23 +468,25 @@ class Heist(Cog):
         """Get your current heist join session."""
         session = self.get_sess(ctx)
 
-        em = discord.Embed(title='Current heist status',
-                           color=discord.Color.blurple())
+        em = discord.Embed(
+            title='Current heist status', color=discord.Color.blurple())
 
-        em.add_field(name='Guild being attacked',
-                     value=f'`{session.target!s}` [{session.target.id}]',
-                     inline=False)
+        em.add_field(
+            name='Guild being attacked',
+            value=f'`{session.target!s}` [{session.target.id}]',
+            inline=False)
 
-        em.add_field(name='Amount being heisted',
-                     value=f'`{session.amount!s}`JC',
-                     inline=False)
+        em.add_field(
+            name='Amount being heisted',
+            value=f'`{session.amount!s}`JC',
+            inline=False)
 
         users_in_heist = []
         for user_id in session.users:
             users_in_heist.append(f'<@{user_id}>')
 
-        em.add_field(name='Current users in the heist',
-                     value=' '.join(users_in_heist))
+        em.add_field(
+            name='Current users in the heist', value=' '.join(users_in_heist))
 
         await ctx.send(embed=em)
 

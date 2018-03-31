@@ -13,6 +13,7 @@ log = logging.getLogger(__name__)
 
 class Marry(Cog):
     """Relationships."""
+
     def __init__(self, bot):
         super().__init__(bot)
         self.locks = collections.defaultdict(bool)
@@ -116,9 +117,8 @@ class Marry(Cog):
                 return chk1 and chk2
 
             try:
-                message = await self.bot.wait_for('message',
-                                                  timeout=30,
-                                                  check=yn_check)
+                message = await self.bot.wait_for(
+                    'message', timeout=30, check=yn_check)
             except asyncio.TimeoutError:
                 raise self.SayException(f'{ctx.author.mention}, '
                                         'timeout reached.')
@@ -172,14 +172,12 @@ class Marry(Cog):
 
         rel_ids = [row['rel_id'] for row in rel_ids]
 
-        rels = {rel_id: await self.get_users(rel_id)
-                for rel_id in rel_ids}
+        rels = {rel_id: await self.get_users(rel_id) for rel_id in rel_ids}
         res = []
 
         for rel_id, user_ids in rels.items():
             user_ids.remove(who.id)
-            user_list = ', '.join(self.jcoin.get_name(uid)
-                                  for uid in user_ids)
+            user_list = ', '.join(self.jcoin.get_name(uid) for uid in user_ids)
 
             res.append(f'#{rel_id}: `{user_list}`')
 

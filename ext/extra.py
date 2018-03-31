@@ -17,9 +17,9 @@ from .common import Cog
 log = logging.getLogger(__name__)
 
 RXKCD_ENDPOINT = 'http://0.0.0.0:8080/search'
-MEME_DISCRIMS = ['0420', '2600', '1337', '0666', '0000',
-                 '1234', '5678', '4321'
-                 ]
+MEME_DISCRIMS = [
+    '0420', '2600', '1337', '0666', '0000', '1234', '5678', '4321'
+]
 
 
 def is_palindrome(string):
@@ -31,7 +31,9 @@ def is_repeating(string):
         main_substring = string[:i]
 
         # get all other substrings
-        chunks = [string[n:n+i] for n in range(0, len(string), 1 if not i else i)]
+        chunks = [
+            string[n:n + i] for n in range(0, len(string), 1 if not i else i)
+        ]
 
         # check if selected main substring matches
         # all other substrings
@@ -45,14 +47,15 @@ def is_repeating(string):
 # Borrowed from https://rosettacode.org/wiki/Miller%E2%80%93Rabin_primality_test#Python:_Proved_correct_up_to_large_N
 # Thanks Rosetta Code!
 
+
 def _try_composite(a, d, n, s):
     if pow(a, d, n) == 1:
         return False
     for i in range(s):
-        if pow(a, 2**i * d, n) == n-1:
+        if pow(a, 2**i * d, n) == n - 1:
             return False
-    return True # n  is definitely composite
- 
+    return True  # n  is definitely composite
+
 
 def is_prime(n, _precision_for_huge_n=16):
     if n in _known_primes or n in (0, 1):
@@ -63,27 +66,31 @@ def is_prime(n, _precision_for_huge_n=16):
     while not d % 2:
         d, s = d >> 1, s + 1
     # Returns exact according to http://primes.utm.edu/prove/prove2_3.html
-    if n < 1373653: 
+    if n < 1373653:
         return not any(_try_composite(a, d, n, s) for a in (2, 3))
-    if n < 25326001: 
+    if n < 25326001:
         return not any(_try_composite(a, d, n, s) for a in (2, 3, 5))
-    if n < 118670087467: 
-        if n == 3215031751: 
+    if n < 118670087467:
+        if n == 3215031751:
             return False
         return not any(_try_composite(a, d, n, s) for a in (2, 3, 5, 7))
-    if n < 2152302898747: 
+    if n < 2152302898747:
         return not any(_try_composite(a, d, n, s) for a in (2, 3, 5, 7, 11))
-    if n < 3474749660383: 
-        return not any(_try_composite(a, d, n, s) for a in (2, 3, 5, 7, 11, 13))
-    if n < 341550071728321: 
-        return not any(_try_composite(a, d, n, s) for a in (2, 3, 5, 7, 11, 13, 17))
+    if n < 3474749660383:
+        return not any(
+            _try_composite(a, d, n, s) for a in (2, 3, 5, 7, 11, 13))
+    if n < 341550071728321:
+        return not any(
+            _try_composite(a, d, n, s) for a in (2, 3, 5, 7, 11, 13, 17))
     # otherwise
-    return not any(_try_composite(a, d, n, s) 
-                   for a in _known_primes[:_precision_for_huge_n])
+    return not any(
+        _try_composite(a, d, n, s)
+        for a in _known_primes[:_precision_for_huge_n])
 
 
 _known_primes = [2, 3]
 _known_primes += [x for x in range(5, 1000, 2) if is_prime(x)]
+
 
 async def is_nice_discrim(member):
     discrim_s = member.discriminator
@@ -108,6 +115,7 @@ async def is_nice_discrim(member):
 
 class Extra(Cog, requires=['config']):
     """Extra commands that don't fit in any other cogs."""
+
     def __init__(self, bot):
         super().__init__(bot)
 
@@ -159,8 +167,8 @@ class Extra(Cog, requires=['config']):
         await ctx.send(f'xkcd {info["num"]} => {info["img"]}')
 
     async def _do_rxkcd(self, ctx, terms):
-        async with self.bot.session.post(RXKCD_ENDPOINT,
-                                         json={'search': terms}) as r:
+        async with self.bot.session.post(
+                RXKCD_ENDPOINT, json={'search': terms}) as r:
             if r.status != 200:
                 raise self.SayException(f'Got a not good error code: {r.code}')
 
@@ -182,8 +190,8 @@ class Extra(Cog, requires=['config']):
             await ctx.send(embed=em)
 
     async def _do_rxkcd_debug(self, ctx):
-        async with self.bot.session.post(RXKCD_ENDPOINT,
-                                         json={'search': 'standards'}) as r:
+        async with self.bot.session.post(
+                RXKCD_ENDPOINT, json={'search': 'standards'}) as r:
             await ctx.send(repr(r))
             await ctx.send(await r.text())
 
@@ -216,9 +224,8 @@ class Extra(Cog, requires=['config']):
         with ctx.typing():
             html_content = await self.http_get(url)
 
-            future_re = self.loop.run_in_executor(None, re.findall,
-                                                  r'href=\"\/watch\?v=(.{11})',
-                                                  html_content)
+            future_re = self.loop.run_in_executor(
+                None, re.findall, r'href=\"\/watch\?v=(.{11})', html_content)
 
             search_results = await future_re
 
@@ -235,8 +242,9 @@ class Extra(Cog, requires=['config']):
         }
 
         if await self.get_description(user_id) is not None:
-            await self.description_coll.update_one({'id': user_id},
-                                                   {'$set': desc_obj})
+            await self.description_coll.update_one({
+                'id': user_id
+            }, {'$set': desc_obj})
         else:
             await self.description_coll.insert_one(desc_obj)
 
@@ -268,17 +276,16 @@ class Extra(Cog, requires=['config']):
         guild_accounts, all_accounts = r_guild['total'], r_global['total']
         tax_rank, tax_global = r_tax['rank'], r_tax['total']
 
-        em.add_field(name='JC Rank',
-                     value=f'{guild_rank}/{guild_accounts}, '
-                           f'{global_rank}/{all_accounts} globally')
+        em.add_field(
+            name='JC Rank',
+            value=f'{guild_rank}/{guild_accounts}, '
+            f'{global_rank}/{all_accounts} globally')
 
-        em.add_field(name='JoséCoin Wallet',
-                     value=f'{account["amount"]}JC')
-        em.add_field(name='Tax paid',
-                     value=f'{account["taxpaid"]}JC')
+        em.add_field(name='JoséCoin Wallet', value=f'{account["amount"]}JC')
+        em.add_field(name='Tax paid', value=f'{account["taxpaid"]}JC')
 
-        em.add_field(name='Tax rank',
-                     value=f'{tax_rank} / {tax_global} globally')
+        em.add_field(
+            name='Tax rank', value=f'{tax_rank} / {tax_global} globally')
 
         try:
             s_success = account['steal_success']
@@ -287,10 +294,11 @@ class Extra(Cog, requires=['config']):
             ratio = s_success / s_uses
             ratio = round((ratio * 100), 3)
 
-            em.add_field(name='Stealing',
-                         value=f'{s_uses} tries, '
-                               f'{s_success} success, '
-                               f'ratio of success: {ratio}/steal')
+            em.add_field(
+                name='Stealing',
+                value=f'{s_uses} tries, '
+                f'{s_success} success, '
+                f'ratio of success: {ratio}/steal')
         except ZeroDivisionError:
             pass
 
@@ -305,8 +313,8 @@ class Extra(Cog, requires=['config']):
         if maybe_member:
             user = maybe_member
 
-        em = discord.Embed(title='Profile card',
-                           colour=self.mkcolor(user.name))
+        em = discord.Embed(
+            title='Profile card', colour=self.mkcolor(user.name))
 
         if user.avatar_url:
             em.set_thumbnail(url=user.avatar_url)
@@ -318,19 +326,16 @@ class Extra(Cog, requires=['config']):
         em.set_footer(text=f'{emoji_repr} | User ID: {user.id}')
 
         if isinstance(user, discord.Member) and (user.nick is not None):
-            em.add_field(name='Name',
-                         value=f'{user.nick} ({user.name})')
+            em.add_field(name='Name', value=f'{user.nick} ({user.name})')
         else:
-            em.add_field(name='Name',
-                         value=user.name)
+            em.add_field(name='Name', value=user.name)
 
         description = await self.get_description(user.id)
         if description is not None:
             em.add_field(name='Description', value=description)
 
         delta = datetime.datetime.utcnow() - user.created_at
-        em.add_field(name='Account age',
-                     value=f'{self.delta_str(delta)}')
+        em.add_field(name='Account age', value=f'{self.delta_str(delta)}')
 
         try:
             account = await self.jcoin.get_account(user.id)
@@ -410,8 +415,8 @@ class Extra(Cog, requires=['config']):
             raise self.SayException('No URL for elixir-docsearch'
                                     ' found in configuration.')
 
-        async with self.bot.session.get(f'http://{base}/search',
-                                        json={'query': terms}) as r:
+        async with self.bot.session.get(
+                f'http://{base}/search', json={'query': terms}) as r:
             if r.status != 200:
                 raise self.SayException(f'{r.status} is not 200, rip.')
 

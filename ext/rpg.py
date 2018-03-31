@@ -10,23 +10,18 @@ from .common import Cog
 log = logging.getLogger(__name__)
 LEVEL_CONSTANT = 0.24
 
+ITEMS = {}
 
-ITEMS = {
+SKILLS = {}
 
-}
+SHOPS = {}
 
-SKILLS = {
-}
-
-SHOPS = {
-}
-
-QUESTS = {
-}
+QUESTS = {}
 
 
 class RPG(Cog):
     """RPG module."""
+
     def __init__(self, bot):
         super().__init__(bot)
 
@@ -99,22 +94,20 @@ class RPG(Cog):
             e.set_thumbnail(url=person.avatar_url)
 
         # calculate XP and levels
-        e.add_field(name='Level',
-                    value=str(self.get_level(inv)))
+        e.add_field(name='Level', value=str(self.get_level(inv)))
 
         xp_next_level = self.get_next_level_xp(inv)
-        e.add_field(name='XP',
-                    value=f'{inv["xp"]} / {xp_next_level} XP')
+        e.add_field(name='XP', value=f'{inv["xp"]} / {xp_next_level} XP')
 
         amount = (await self.jcoin.get_account(person.id))['amount']
-        e.add_field(name='Money',
-                    value=f'{amount}JC')
+        e.add_field(name='Money', value=f'{amount}JC')
 
         # items
-        e.add_field(name='Items',
-                    value='\u200b' + '\n'.join(
-                        f'`{name}` - {count}' for (name, count)
-                        in inv['items'].items()))
+        e.add_field(
+            name='Items',
+            value='\u200b' +
+            '\n'.join(f'`{name}` - {count}'
+                      for (name, count) in inv['items'].items()))
 
         await ctx.send(embed=e)
 

@@ -1,4 +1,3 @@
-
 from discord.ext import commands
 
 from .common import Cog
@@ -14,6 +13,7 @@ ROLE_ID = 332410139762098178
 
 class Subscribe(Cog):
     """Subscribe to a role and participate in José's development!"""
+
     def __init__(self, bot):
         super().__init__(bot)
 

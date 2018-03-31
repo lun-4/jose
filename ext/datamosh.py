@@ -82,8 +82,9 @@ def datamosh_jpg(source_image: 'io.BytesIO', iterations: int) -> 'io.BytesIO':
 
 class Datamosh(Cog):
     """Datamosh command"""
+
     @commands.command()
-    async def datamosh(self, ctx, url: str, iterations: int=10):
+    async def datamosh(self, ctx, url: str, iterations: int = 10):
         """Datamosh an image.
 
         Sometimes the result given by `j!datamosh` doesn't have any thumbnail,

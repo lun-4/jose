@@ -23,7 +23,6 @@ RI_TABLE = {
     '7': ':seven:',
     '8': ':eight:',
     '9': ':nine:',
-
     '.': ':record_button:',
     '!': ':exclamation:',
     '?': ':question:',
@@ -33,8 +32,10 @@ RI_TABLE = {
 
 # implement letters
 RI_STR = '🇦🇧🇨🇩🇪🇫🇬🇭🇮🇯🇰🇱🇲🇳🇴🇵🇶🇷🇸🇹🇺🇻🇼🇽🇾🇿'
-RI_TABLE.update({letter: RI_STR[string.ascii_lowercase.find(letter)] for
-                 letter in string.ascii_lowercase})
+RI_TABLE.update({
+    letter: RI_STR[string.ascii_lowercase.find(letter)]
+    for letter in string.ascii_lowercase
+})
 
 
 class Memes(Cog):
@@ -67,8 +68,9 @@ class Memes(Cog):
     async def update_meme(self, new_meme):
         """Update a new meme into the database."""
 
-        await self.memes_coll.update_one({'name': new_meme['name']},
-                                         {'$set': new_meme})
+        await self.memes_coll.update_one({
+            'name': new_meme['name']
+        }, {'$set': new_meme})
 
     async def search_memes(self, name):
         """Get a list of memes that have names that are close to

@@ -11,7 +11,6 @@ from joseconfig import PACKET_CHANNEL, LEVELS
 
 log = logging.getLogger(__name__)
 
-
 LOG_LEVEL = logging.DEBUG
 LOGGER_SILENCE = ['discord', 'websockets']
 
@@ -84,7 +83,8 @@ class DiscordHandler(logging.Handler):
         for line in msg.split('\n'):
             # if this is a small codeblock and goes over multiple messages it will break out
             # so we check that each chunk (besides the first) starts and stops with a backtick
-            for idx, chunk in enumerate(line[x:x + 1994] for x in range(0, len(line), 1994)):
+            for idx, chunk in enumerate(
+                    line[x:x + 1994] for x in range(0, len(line), 1994)):
                 # ugh
                 if not chunk.endswith('`'):
                     chunk = f'{chunk}`'
@@ -101,7 +101,8 @@ class DiscordHandler(logging.Handler):
             paginator = commands.Paginator(prefix='```py\n', suffix='```')
 
             for line in trace.split('\n'):
-                for chunk in (line[x:x + 1987] for x in range(0, len(line), 1987)):
+                for chunk in (line[x:x + 1987]
+                              for x in range(0, len(line), 1987)):
                     paginator.add_line(chunk)
 
             for page in paginator.pages:
@@ -164,7 +165,7 @@ class DiscordFormatter(logging.Formatter):
             logging.DEBUG: '\N{CONSTRUCTION SIGN}',
             logging.INFO: '\N{ENVELOPE}',
             logging.WARNING: '\N{WARNING SIGN}',
-            logging.ERROR:'\N{HEAVY EXCLAMATION MARK SYMBOL}',
+            logging.ERROR: '\N{HEAVY EXCLAMATION MARK SYMBOL}',
         }
 
         if emoji is not None:
@@ -275,8 +276,7 @@ def setup(bot):
     formatter = DiscordFormatter(
         '`[%(asctime)s]` %(levelname)s `[%(name)s]` `%(message)s`',
         datefmt='%H:%M:%S',
-        emoji=CUSTOM_LEVELS
-    )
+        emoji=CUSTOM_LEVELS)
 
     # silence loggers
     # force them to info
@@ -286,7 +286,8 @@ def setup(bot):
 
     # add all channel loggers from the config
     for level, url in LEVELS.items():
-        webhook = discord.Webhook.from_url(url, adapter=discord.AsyncWebhookAdapter(bot.session))
+        webhook = discord.Webhook.from_url(
+            url, adapter=discord.AsyncWebhookAdapter(bot.session))
 
         handler = DiscordHandler(webhook, level=level)
         handler.setFormatter(formatter)

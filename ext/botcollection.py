@@ -30,6 +30,7 @@ log = logging.getLogger(__name__)
 
 class BotCollection(Cog):
     """Bot collection commands."""
+
     def bot_human_ratio(self, guild):
         bots = [member for member in guild.members if member.bot]
         humans = [member for member in guild.members if not member.bot]
@@ -56,8 +57,9 @@ class BotCollection(Cog):
 
         Serves as a fallback instad of DMing owner.
         """
-        chan = next(c for c in guild.text_channels
-                    if guild.me.permissions_in(c).send_messages)
+        chan = next(
+            c for c in guild.text_channels
+            if guild.me.permissions_in(c).send_messages)
         return chan.send(message)
 
     async def on_guild_join(self, guild):
@@ -97,15 +99,11 @@ class BotCollection(Cog):
             return await guild.leave()
 
         welcome = ('Hello, welcome to José!\n'
-
                    "Discord's API Terms of Service requires me to"
                    " tell you I log\n"
-
                    'Command usage and errors to a special channel.\n'
-
                    '**Only commands and errors are logged, no '
                    'messages are logged, ever.**\n'
-
                    '**Disclaimer:** José is free software maintained by'
                    'the hard work of many volunteers keeping it up. **SPAM '
                    'IS NOT TOLERATED.**')

@@ -26,17 +26,19 @@ class Lottery(Cog, requires=['coins']):
     The winner gets 0.275% of money from the top 40 taxbanks.
     This amount also increases with more people buying tickets.
     """
+
     def __init__(self, bot):
         super().__init__(bot)
         self.ticket_coll = self.config.jose_db['lottery']
 
     async def get_taxbanks(self):
-        return await self.coins.jc_get('/wallets', {
-            'key': 'global',
-            'reverse': True,
-            'type': self.coins.AccountType.TAXBANK,
-            'limit': 40,
-        })
+        return await self.coins.jc_get(
+            '/wallets', {
+                'key': 'global',
+                'reverse': True,
+                'type': self.coins.AccountType.TAXBANK,
+                'limit': 40,
+            })
 
     @commands.group(aliases=['l'], invoke_without_command=True)
     async def lottery(self, ctx):
@@ -112,8 +114,8 @@ class Lottery(Cog, requires=['coins']):
                     decimal.Decimal(account['amount'])
 
             try:
-                await self.jcoin.transfer(account['account_id'],
-                                          winner_id, amount)
+                await self.jcoin.transfer(account['account_id'], winner_id,
+                                          amount)
                 total += amount
             except Exception as err:
                 await ctx.send(f'err txb tx: {err!r}')
@@ -122,8 +124,8 @@ class Lottery(Cog, requires=['coins']):
 
         amount_people = await self.ticket_coll.count()
         amount_from_ticket = TICKET_INCREASE * amount_people * TICKET_PRICE
-        await self.jcoin.transfer(self.bot.user.id,
-                                  winner_id, amount_from_ticket)
+        await self.jcoin.transfer(self.bot.user.id, winner_id,
+                                  amount_from_ticket)
         total += amount_from_ticket
 
         total = round(total, 3)
@@ -152,17 +154,17 @@ class Lottery(Cog, requires=['coins']):
                                     'recommended to join it, use '
                                     f'`{ctx.prefix}invite`')
 
-        ticket = await self.ticket_coll.find_one({'user_id':
-                                                  ctx.author.id})
+        ticket = await self.ticket_coll.find_one({'user_id': ctx.author.id})
         if ticket:
             raise self.SayException('You already bought a ticket.')
 
         # Pay 20jc to jose
-        await self.coins.transfer(ctx.author.id,
-                                  self.bot.user.id, TICKET_PRICE)
+        await self.coins.transfer(ctx.author.id, self.bot.user.id,
+                                  TICKET_PRICE)
 
         await self.ticket_coll.insert_one({'user_id': ctx.author.id})
-        await lottery_log.send(f'In lottery: `{ctx.author!s}, {ctx.author.id}`')
+        await lottery_log.send(f'In lottery: `{ctx.author!s}, {ctx.author.id}`'
+                               )
         await ctx.ok()
 
 

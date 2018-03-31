@@ -23,6 +23,7 @@ EVENT_THRESHOLD = {
 
 class Metrics(Cog):
     """Metrics subsystem."""
+
     def __init__(self, bot):
         super().__init__(bot)
 
@@ -84,8 +85,8 @@ class Metrics(Cog):
 
             if delta > EVENT_THRESHOLD[k]:
                 # this event is above the threshold, we warn!
-                warn.append((k, self.current_state[k],
-                             average, delta, threshold))
+                warn.append((k, self.current_state[k], average, delta,
+                             threshold))
 
         # this only really works if we already made 3 samples
         if warn and self.samples > 3:
@@ -139,7 +140,6 @@ class Metrics(Cog):
         await ctx.send(f'Messages received: {state["message"]}\n'
                        f'Commands received: {state["command"]}\n'
                        f'Commands completed: {state["command_compl"]}\n'
-
                        'Commands which raised errors: '
                        f'{state["command_error"]}\n')
 

@@ -8,6 +8,7 @@ import time
 
 from typing import List
 
+
 class Table:
     def __init__(self, *column_titles: str):
         self._rows = [column_titles]
@@ -53,7 +54,8 @@ class Table:
             return "|".join(columns)
 
         # column title is centered in the middle of each field
-        title_row = "|".join(f" {field:^{self._widths[index]}} " for index, field in enumerate(self._rows[0]))
+        title_row = "|".join(f" {field:^{self._widths[index]}} "
+                             for index, field in enumerate(self._rows[0]))
         separator_row = "+".join("-" * (width + 2) for width in self._widths)
 
         drawn = [title_row, separator_row]
@@ -66,12 +68,13 @@ class Table:
 
         return "\n".join(drawn)
 
-    async def render(self, loop: asyncio.AbstractEventLoop=None):
+    async def render(self, loop: asyncio.AbstractEventLoop = None):
         """Returns a rendered version of the table."""
         loop = loop or asyncio.get_event_loop()
 
         func = functools.partial(self._render)
         return await loop.run_in_executor(None, func)
+
 
 class Timer:
     """Context manager to measure how long the indented block takes to run."""

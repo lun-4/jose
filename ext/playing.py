@@ -17,6 +17,7 @@ log = logging.getLogger(__name__)
 
 class PlayingStatus(Cog):
     """Playing status shit"""
+
     def __init__(self, bot):
         super().__init__(bot)
         self.rotate_task = None
@@ -39,8 +40,8 @@ class PlayingStatus(Cog):
         fmt = f'{msg} | v{self.JOSE_VERSION} | {self.bot.config.prefix}help'
 
         log.info('game: type=%d v=%r', g_type, fmt)
-        await self.bot.change_presence(game=discord.Game(type=g_type,
-                                                         name=fmt))
+        await self.bot.change_presence(
+            game=discord.Game(type=g_type, name=fmt))
 
     async def rotate_loop(self):
         try:

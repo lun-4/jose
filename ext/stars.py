@@ -55,7 +55,6 @@ def empty_star_object(message: discord.Message) -> dict:
 
         # add a bit of context
         'author_id': message.author.id,
-
         'starrers': [],
 
         # NOTE: I really hate mongo.
@@ -163,11 +162,16 @@ def make_star_embed(star, message):
     attch = message.attachments
     if attch:
         attch_url = attch[0].url
-        if attch_url.lower().endswith(('png', 'jpeg', 'jpg', 'gif',)):
+        if attch_url.lower().endswith((
+                'png',
+                'jpeg',
+                'jpg',
+                'gif',
+        )):
             em.set_image(url=attch_url)
         else:
-            attachments = '\n'.join([f'[Attachment]({attch_s.url})'
-                                     for attch_s in attch])
+            attachments = '\n'.join(
+                [f'[Attachment]({attch_s.url})' for attch_s in attch])
             em.description += attachments
 
     return title, em
@@ -193,6 +197,7 @@ class Starboard(Cog, requires=['config']):
 
     lol starboard u kno the good shit
     """
+
     def __init__(self, bot):
         super().__init__(bot)
         self.bot.simple_exc.extend([StarError, StarAddError, StarRemoveError])
@@ -240,8 +245,10 @@ class Starboard(Cog, requires=['config']):
 
     async def get_star(self, guild_id: int, message_id: int):
         """Get a star object from a guild+message ID pair."""
-        return await self.starboard_coll.find_one({'message_id': message_id,
-                                                   'guild_id': guild_id})
+        return await self.starboard_coll.find_one({
+            'message_id': message_id,
+            'guild_id': guild_id
+        })
 
     async def janitor_task(self, guild_id: int):
         """Deletes all star objects that refer to a specific Guild ID.
@@ -258,8 +265,7 @@ class Starboard(Cog, requires=['config']):
             g = self.bot.get_guild(guild_id)
 
             log.warning('[janitor] Deleted %d star objects from '
-                        'janitoring %s[%d]',
-                        res.deleted_count, g.name, g.id)
+                        'janitoring %s[%d]', res.deleted_count, g.name, g.id)
 
         except:
             log.exception('error on janitor task')
@@ -325,17 +331,22 @@ class Starboard(Cog, requires=['config']):
             raise StarRemoveError("Author didn't star the message.")
 
         if star['starrers_count'] < 1:
-            res = await self.starboard_coll.delete_many(
-                {'message_id': message.id, 'guild_id': guild_id})
+            res = await self.starboard_coll.delete_many({
+                'message_id':
+                message.id,
+                'guild_id':
+                guild_id
+            })
 
             if res.deleted_count != 1:
                 log.error(f'Deleted {res.deleted_count} document from 0 stars,'
                           ' different than 1')
             return star
 
-        await self.starboard_coll.update_one({'message_id': message.id,
-                                              'guild_id': guild_id},
-                                             {'$set': star})
+        await self.starboard_coll.update_one({
+            'message_id': message.id,
+            'guild_id': guild_id
+        }, {'$set': star})
         return star
 
     async def raw_remove_all(self, config: dict,
@@ -348,8 +359,10 @@ class Starboard(Cog, requires=['config']):
 
         star['starrers'] = []
         star['starrers_count'] = 0
-        await self.starboard_coll.delete_one({'message_id': message.id,
-                                              'guild_id': guild_id})
+        await self.starboard_coll.delete_one({
+            'message_id': message.id,
+            'guild_id': guild_id
+        })
         return star
 
     def debug_log(self, message: str, star: dict):
@@ -369,15 +382,13 @@ class Starboard(Cog, requires=['config']):
             self.debug_log('update star', star)
 
         await self.starboard_coll.update_one(
-                {
-                    # guild_id and message_id serve as the "primary key"
-                    # of this.
-                    'guild_id': star['guild_id'],
-                    'message_id': star['message_id']
-                    },
-                {
-                    '$set': star
-                    })
+            {
+                # guild_id and message_id serve as the "primary key"
+                # of this.
+                'guild_id': star['guild_id'],
+                'message_id': star['message_id']
+            },
+            {'$set': star})
 
     async def delete_starobj(self, star: dict, msg=None):
         """Delete a star object from the starboard collection.
@@ -389,9 +400,11 @@ class Starboard(Cog, requires=['config']):
         self.debug_log('deleting star', star)
 
         return await self.starboard_coll.delete_one({
-            'guild_id': star['guild_id'],
-            'message_id': star['message_id']
-            })
+            'guild_id':
+            star['guild_id'],
+            'message_id':
+            star['message_id']
+        })
 
     async def starboard_send(self, starboard: discord.TextChannel, star: dict,
                              message: discord.Message) -> discord.Message:
@@ -458,8 +471,10 @@ class Starboard(Cog, requires=['config']):
 
         return
 
-    async def add_star(self, message: discord.Message,
-                       author_id: int, config: dict = None) -> dict:
+    async def add_star(self,
+                       message: discord.Message,
+                       author_id: int,
+                       config: dict = None) -> dict:
         """Add a star to a message.
 
         Parameters
@@ -497,8 +512,10 @@ class Starboard(Cog, requires=['config']):
 
         return star
 
-    async def remove_star(self, message: discord.Message,
-                          author_id: int, config: dict=None) -> dict:
+    async def remove_star(self,
+                          message: discord.Message,
+                          author_id: int,
+                          config: dict = None) -> dict:
         """Remove a star from a message.
 
         Parameters
@@ -536,7 +553,7 @@ class Starboard(Cog, requires=['config']):
 
         return star
 
-    async def remove_all(self, message: discord.Message, config: dict=None):
+    async def remove_all(self, message: discord.Message, config: dict = None):
         """Remove all stars from a message.
 
         Parameters
@@ -565,8 +582,7 @@ class Starboard(Cog, requires=['config']):
             Success/Failure of the operation.
         """
         guild = self.bot.get_guild(config['guild_id'])
-        log.debug('Deleting starconfig for %s[%d]',
-                  guild.name, guild.id)
+        log.debug('Deleting starconfig for %s[%d]', guild.name, guild.id)
 
         res = await self.starconfig_coll.delete_many(config)
         return res.deleted_count > 0
@@ -625,8 +641,8 @@ class Starboard(Cog, requires=['config']):
 
         return None, None
 
-    async def on_raw_reaction_add(self, emoji_partial,
-                                  message_id, channel_id, user_id):
+    async def on_raw_reaction_add(self, emoji_partial, message_id, channel_id,
+                                  user_id):
         """Handle a reaction add."""
         channel = self.bot.get_channel(channel_id)
         if not channel:
@@ -647,27 +663,26 @@ class Starboard(Cog, requires=['config']):
             self.check_allow(cfg, channel_id)
             message = await channel.get_message(message_id)
 
-            new_message_id, new_channel_id = await self._sbhandle(message, {
-                'channel_id': channel_id,
-                'user_id': user_id,
-            }, cfg)
+            new_message_id, new_channel_id = await self._sbhandle(
+                message, {
+                    'channel_id': channel_id,
+                    'user_id': user_id,
+                }, cfg)
 
             if new_message_id and new_channel_id:
-                return await self.on_raw_reaction_add(emoji_partial,
-                                                      new_message_id,
-                                                      new_channel_id,
-                                                      user_id)
+                return await self.on_raw_reaction_add(
+                    emoji_partial, new_message_id, new_channel_id, user_id)
 
             await self.add_star(message, user_id, cfg)
         except (StarError, StarAddError) as err:
             log.warning(f'raw_reaction_add: {err!r}')
         except Exception:
             log.exception('add_star @ reaction_add, %s[cid=%d] %s[gid=%d]',
-                          channel.name, channel.id,
-                          channel.guild.name, channel.guild.id)
+                          channel.name, channel.id, channel.guild.name,
+                          channel.guild.id)
 
-    async def on_raw_reaction_remove(self, emoji_partial,
-                                     message_id, channel_id, user_id):
+    async def on_raw_reaction_remove(self, emoji_partial, message_id,
+                                     channel_id, user_id):
         channel = self.bot.get_channel(channel_id)
         if not channel:
             return
@@ -687,24 +702,23 @@ class Starboard(Cog, requires=['config']):
             self.check_allow(cfg, channel_id)
             message = await channel.get_message(message_id)
 
-            new_message_id, new_channel_id = await self._sbhandle(message, {
-                'channel_id': channel_id,
-                'user_id': user_id,
-            }, cfg)
+            new_message_id, new_channel_id = await self._sbhandle(
+                message, {
+                    'channel_id': channel_id,
+                    'user_id': user_id,
+                }, cfg)
 
             if new_message_id and new_channel_id:
-                return await self.on_raw_reaction_remove(emoji_partial,
-                                                         new_message_id,
-                                                         new_channel_id,
-                                                         user_id)
+                return await self.on_raw_reaction_remove(
+                    emoji_partial, new_message_id, new_channel_id, user_id)
 
             await self.remove_star(message, user_id, cfg)
         except (StarError, StarRemoveError) as err:
             log.warning(f'raw_reaction_remove: {err!r}')
         except Exception:
             log.exception('reaction_remove, %s[cid=%d] %s[gid=%d]',
-                          channel.name, channel.id,
-                          channel.guild.name, channel.guild.id)
+                          channel.name, channel.id, channel.guild.name,
+                          channel.guild.id)
 
     async def on_raw_reaction_clear(self, message_id, channel_id):
         """Remove all stars in the message."""
@@ -726,8 +740,8 @@ class Starboard(Cog, requires=['config']):
             log.warning(f'raw_reaction_clear: {err!r}')
         except Exception:
             log.exception('remove_all @ reaction_clear, %s[cid=%d] %s[gid=%d]',
-                          channel.name, channel.id,
-                          channel.guild.name, channel.guild.id)
+                          channel.name, channel.id, channel.guild.name,
+                          channel.guild.id)
 
     @commands.command()
     @commands.guild_only()
@@ -812,7 +826,7 @@ class Starboard(Cog, requires=['config']):
     @commands.command()
     @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
-    async def stardetach(self, ctx, confirm: bool=False):
+    async def stardetach(self, ctx, confirm: bool = False):
         """Detaches José from your starboard.
 
         Detaching means José will remove your starboard's configuration.
@@ -933,12 +947,11 @@ class Starboard(Cog, requires=['config']):
         guild_query = {'guild_id': ctx.guild.id}
         await self._get_starconfig(ctx.guild.id)
 
-        em = discord.Embed(title='Starboard statistics',
-                           colour=discord.Colour(0xFFFF00))
+        em = discord.Embed(
+            title='Starboard statistics', colour=discord.Colour(0xFFFF00))
 
         total_messages = await self.starboard_coll.find(guild_query).count()
-        em.add_field(name='Total messages starred',
-                     value=total_messages)
+        em.add_field(name='Total messages starred', value=total_messages)
 
         starrers = collections.Counter()
         authors = collections.Counter()
@@ -971,8 +984,10 @@ class Starboard(Cog, requires=['config']):
 
             res_sm.append(f'{idx + 1}\N{COMBINING ENCLOSING KEYCAP} {stctx}')
 
-        em.add_field(name='Most starred messages',
-                     value='\n'.join(res_sm), inline=False)
+        em.add_field(
+            name='Most starred messages',
+            value='\n'.join(res_sm),
+            inline=False)
 
         # process people who received stars the most
         mc_receivers = authors.most_common(5)
@@ -989,8 +1004,8 @@ class Starboard(Cog, requires=['config']):
             auctx = f'<@{user_id}> ({received_stars} stars)'
             res_sr.append(f'{idx + 1}\N{COMBINING ENCLOSING KEYCAP} {auctx}')
 
-        em.add_field(name='Top 5 Star Receivers',
-                     value='\n'.join(res_sr), inline=False)
+        em.add_field(
+            name='Top 5 Star Receivers', value='\n'.join(res_sr), inline=False)
 
         # process people who *gave* stars the most
         mc_givers = starrers.most_common(5)
@@ -1005,9 +1020,8 @@ class Starboard(Cog, requires=['config']):
             srctx = f'{member.mention} ({star_count} stars)'
             res_gr.append(f'{idx + 1}\N{COMBINING ENCLOSING KEYCAP} {srctx}')
 
-        em.add_field(name=f'Top 5 Star Givers',
-                     value='\n'.join(res_gr),
-                     inline=False)
+        em.add_field(
+            name=f'Top 5 Star Givers', value='\n'.join(res_gr), inline=False)
 
         await ctx.send(embed=em)
 
@@ -1017,12 +1031,14 @@ class Starboard(Cog, requires=['config']):
         """Get a random star from your starboard."""
         guild = ctx.guild
         await self._get_starconfig(ctx.guild.id)
-        all_stars = await self.starboard_coll.find(
-            {'guild_id': guild.id}).count()
+        all_stars = await self.starboard_coll.find({
+            'guild_id': guild.id
+        }).count()
         random_idx = random.randint(0, all_stars)
 
-        guild_stars_cur = self.starboard_coll.find(
-            {'guild_id': guild.id}).limit(1).skip(random_idx)
+        guild_stars_cur = self.starboard_coll.find({
+            'guild_id': guild.id
+        }).limit(1).skip(random_idx)
 
         # ugly, I know.
         star = None
@@ -1119,13 +1135,11 @@ class Starboard(Cog, requires=['config']):
             except ValueError:
                 raise self.SayException(':x: Custom Emote ID is not a number')
 
-        await self.starconfig_coll.update_one(
-            {'guild_id': ctx.guild.id},
-            {'$set': {
-                'star_emoji': emoji_res
-                }
-             }
-        )
+        await self.starconfig_coll.update_one({
+            'guild_id': ctx.guild.id
+        }, {'$set': {
+            'star_emoji': emoji_res
+        }})
 
         await ctx.ok()
 
@@ -1155,13 +1169,11 @@ class Starboard(Cog, requires=['config']):
         if not allowed_chans:
             await ctx.send('All channels are available to be starred')
 
-        await self.starconfig_coll.update_one(
-            {'guild_id': ctx.guild.id},
-            {'$set': {
-                'allowed_chans': allowed_chans,
-                }
-             }
-        )
+        await self.starconfig_coll.update_one({
+            'guild_id': ctx.guild.id
+        }, {'$set': {
+            'allowed_chans': allowed_chans,
+        }})
 
         await ctx.ok()
 
@@ -1218,8 +1230,8 @@ class Starboard(Cog, requires=['config']):
 
         This has a global cooldown of 1/10s.
         """
-        em = discord.Embed(title='Global Starboard Stats',
-                           color=discord.Color(0xFFFF00))
+        em = discord.Embed(
+            title='Global Starboard Stats', color=discord.Color(0xFFFF00))
 
         # calculate global top 5
         top_stars = await self.starboard_coll.find({}) \
@@ -1243,9 +1255,8 @@ class Starboard(Cog, requires=['config']):
 
             res_gs.append(f'{idx + 1}\N{COMBINING ENCLOSING KEYCAP} {sctx}')
 
-        em.add_field(name='Top messages',
-                     value='\n'.join(res_gs),
-                     inline=False)
+        em.add_field(
+            name='Top messages', value='\n'.join(res_gs), inline=False)
 
         # TODO: top star givers / receivers
 

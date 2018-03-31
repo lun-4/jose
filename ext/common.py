@@ -24,14 +24,17 @@ class SayException(Exception):
 class GuildConverter(commands.Converter):
     """Convert the name of a guild to
     a Guild object."""
+
     async def convert(self, ctx, arg):
         bot = ctx.bot
 
         try:
             guild_id = int(arg)
         except ValueError:
+
             def is_guild(g):
                 return arg.lower() == g.name.lower()
+
             guild = discord.utils.find(is_guild, bot.guilds)
 
             if guild is None:
@@ -49,6 +52,7 @@ class CoinConverter(commands.Converter):
 
     Also checks if the user has an account
     """
+
     async def convert(self, ctx, argument):
         ba = commands.BadArgument
         coins = ctx.bot.get_cog('Coins')
@@ -94,6 +98,7 @@ class CoinConverter(commands.Converter):
 
 class FuzzyMember(commands.Converter):
     """Fuzzy matching for member objects"""
+
     async def convert(self, ctx, arg):
         arg = arg.lower()
         ms = ctx.guild.members
@@ -122,8 +127,8 @@ class FuzzyMember(commands.Converter):
                 scores[m.id] = score
 
         try:
-            sortedkeys = sorted(scores.keys(),
-                                key=lambda k: scores[k], reverse=True)
+            sortedkeys = sorted(
+                scores.keys(), key=lambda k: scores[k], reverse=True)
             return sortedkeys[0]
         except IndexError:
             raise commands.BadArgument('No user was found')
@@ -134,6 +139,7 @@ class Cog:
 
     Provides common functions to cogs.
     """
+
     def __init__(self, bot):
         self.bot = bot
         self.loop = bot.loop

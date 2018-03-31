@@ -10,7 +10,6 @@ from .common import Cog
 from .utils import Timer
 from jose import JoseBot
 
-
 log = logging.getLogger(__name__)
 
 
@@ -31,11 +30,15 @@ class State(Cog, requires=['config']):
 
     async def on_member_join(self, member: discord.Member):
         async with self.db.acquire() as conn:
-            await conn.execute('INSERT INTO members (guild_id, user_id) VALUES ($1, $2)', member.guild.id, member.id)
+            await conn.execute(
+                'INSERT INTO members (guild_id, user_id) VALUES ($1, $2)',
+                member.guild.id, member.id)
 
     async def on_member_remove(self, member: discord.Member):
         async with self.db.acquire() as conn:
-            await conn.execute('DELETE FROM members WHERE guild_id = $1 AND user_id = $2', member.guild.id, member.id)
+            await conn.execute(
+                'DELETE FROM members WHERE guild_id = $1 AND user_id = $2',
+                member.guild.id, member.id)
 
     async def on_guild_join(self, guild: discord.Guild):
         await self.sync_guild(guild)
@@ -43,7 +46,8 @@ class State(Cog, requires=['config']):
 
     async def on_guild_remove(self, guild: discord.Guild):
         async with self.db.acquire() as conn:
-            await conn.execute('DELETE FROM members WHERE guild_id = $1', guild.id)
+            await conn.execute('DELETE FROM members WHERE guild_id = $1',
+                               guild.id)
 
     async def full_sync(self):
         await self.bot.wait_until_ready()
@@ -53,8 +57,7 @@ class State(Cog, requires=['config']):
         # since the connection pool has 10 connections we might as well use them
         with Timer() as timer:
             await asyncio.gather(
-                *[self.sync_guild(x) for x in self.bot.guilds]
-            )
+                *[self.sync_guild(x) for x in self.bot.guilds])
 
         log.info(f'synced full state, took {timer}')
 
@@ -62,7 +65,8 @@ class State(Cog, requires=['config']):
         async with self.db.acquire() as conn:
 
             # calculate which users left, which users are new
-            results = await conn.fetch('SELECT user_id FROM members WHERE guild_id = $1', guild.id)
+            results = await conn.fetch(
+                'SELECT user_id FROM members WHERE guild_id = $1', guild.id)
 
             new_members = []
             stale_members = []
@@ -77,8 +81,12 @@ class State(Cog, requires=['config']):
                     stale_members.append((guild.id, user_id))
 
             # insert new members, delete old ones
-            await conn.executemany('INSERT INTO members (guild_id, user_id) VALUES ($1, $2)', new_members)
-            await conn.executemany('DELETE FROM members WHERE guild_id = $1 AND user_id = $2', stale_members)
+            await conn.executemany(
+                'INSERT INTO members (guild_id, user_id) VALUES ($1, $2)',
+                new_members)
+            await conn.executemany(
+                'DELETE FROM members WHERE guild_id = $1 AND user_id = $2',
+                stale_members)
 
 
 def setup(bot: JoseBot):

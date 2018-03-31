@@ -45,13 +45,18 @@ def codeblock(text: str, *, lang: str = '') -> str:
 log = logging.getLogger(__name__)
 
 IMPLICIT_RETURN_STOP_WORDS = {
-    'continue', 'break', 'raise', 'yield', 'with',
-    'assert', 'del', 'import', 'pass', 'return', 'from'
+    'continue', 'break', 'raise', 'yield', 'with', 'assert', 'del', 'import',
+    'pass', 'return', 'from'
 }
 
 
 class Code(Converter):
-    def __init__(self, *, wrap_code=False, strip_ticks=True, indent_width=4, implicit_return=False):
+    def __init__(self,
+                 *,
+                 wrap_code=False,
+                 strip_ticks=True,
+                 indent_width=4,
+                 implicit_return=False):
         """
         A converter that extracts code out of code blocks and inline code formatting.
 
@@ -84,16 +89,19 @@ class Code(Converter):
 
         if self.wrap_code:
             # wrap in a coroutine and indent
-            result = 'async def func():\n' + textwrap.indent(result, ' ' * self.indent_width)
+            result = 'async def func():\n' + textwrap.indent(
+                result, ' ' * self.indent_width)
 
         if self.wrap_code and self.implicit_return:
             last_line = result.splitlines()[-1]
 
             # if the last line isn't indented and not returning, add it
             first_word = last_line.strip().split(' ')[0]
-            no_stop = all(first_word != word for word in IMPLICIT_RETURN_STOP_WORDS)
+            no_stop = all(
+                first_word != word for word in IMPLICIT_RETURN_STOP_WORDS)
             if not last_line[4:].startswith(' ') and no_stop:
-                last_line = (' ' * self.indent_width) + 'return ' + last_line[4:]
+                last_line = (
+                    ' ' * self.indent_width) + 'return ' + last_line[4:]
 
             result = '\n'.join(result.splitlines()[:-1] + [last_line])
 
@@ -105,7 +113,9 @@ def format_syntax_error(e: SyntaxError) -> str:
     if e.text is None:
         return '```py\n{0.__class__.__name__}: {0}\n```'.format(e)
     # display a nice arrow
-    return '```py\n{0.text}{1:>{0.offset}}\n{2}: {0}```'.format(e, '^', type(e).__name__)
+    return '```py\n{0.text}{1:>{0.offset}}\n{2}: {0}```'.format(
+        e, '^',
+        type(e).__name__)
 
 
 class Exec(Cog):
@@ -126,7 +136,10 @@ class Exec(Cog):
             return await ctx.send(*args, **kwargs)
 
         def better_dir(*args, **kwargs) -> List[str]:
-            return [n for n in dir(*args, **kwargs) if not n.endswith('__') and not n.startswith('__')]
+            return [
+                n for n in dir(*args, **kwargs)
+                if not n.endswith('__') and not n.startswith('__')
+            ]
 
         env = {
             'bot': ctx.bot,
@@ -149,7 +162,6 @@ class Exec(Cog):
             # last result
             '_': self.last_result,
             '_p': self.previous_code,
-
             'dir': better_dir,
         }
 
@@ -181,7 +193,8 @@ class Exec(Cog):
                 pass
 
             # send stream and what we have
-            return await ctx.send(codeblock(traceback.format_exc(limit=7), lang='py'))
+            return await ctx.send(
+                codeblock(traceback.format_exc(limit=7), lang='py'))
 
         # code was good, grab stdout
         stream = stdout.getvalue()
@@ -226,8 +239,8 @@ class Exec(Cog):
 
     @command(name='eval', aliases=['exec', 'debug'], hidden=True)
     @is_bot_admin()
-    async def _eval(self, ctx, *, code: Code(wrap_code=True,
-                                             implicit_return=True)):
+    async def _eval(self, ctx, *, code: Code(
+            wrap_code=True, implicit_return=True)):
         """ Executes Python code. """
 
         # store previous code

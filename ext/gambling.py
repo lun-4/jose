@@ -18,6 +18,7 @@ X6_EMOJI = [':eggplant:']
 
 class Gambling(Cog, requires=['coins']):
     """Gambling commands."""
+
     def __init__(self, bot):
         super().__init__(bot)
         self.duels = {}
@@ -83,8 +84,8 @@ class Gambling(Cog, requires=['coins']):
                     any(x in cnt for x in ['y', 'n', 'Y', 'N'])
 
             try:
-                msg = await self.bot.wait_for('message',
-                                              timeout=10, check=yn_check)
+                msg = await self.bot.wait_for(
+                    'message', timeout=10, check=yn_check)
             except asyncio.TimeoutError:
                 raise self.SayException('timeout reached')
 
@@ -115,8 +116,8 @@ class Gambling(Cog, requires=['coins']):
                 return msg.channel == ctx.channel and msg.author.id in duelists
 
             try:
-                msg = await self.bot.wait_for('message',
-                                              timeout=5, check=duel_check)
+                msg = await self.bot.wait_for(
+                    'message', timeout=5, check=duel_check)
             except asyncio.TimeoutError:
                 raise self.SayException('u guys suck.')
 
@@ -168,8 +169,7 @@ class Gambling(Cog, requires=['coins']):
 
         if applied_amount > 0:
             try:
-                await self.jcoin.transfer(ctx.guild.id,
-                                          ctx.author.id,
+                await self.jcoin.transfer(ctx.guild.id, ctx.author.id,
                                           applied_amount)
             except self.jcoin.TransferError as err:
                 raise self.SayException(f'err(g->a, a): {err!r}')

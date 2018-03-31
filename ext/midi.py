@@ -9,11 +9,9 @@ from midiutil import MIDIFile
 
 from .common import Cog
 
-
-LETTER_PITCH_MAP = {    
+LETTER_PITCH_MAP = {
     " ": 0,
     "-": 0,
-
     "a": 34,
     "A": 35,
     "b": 36,
@@ -66,7 +64,6 @@ LETTER_PITCH_MAP = {
     "Y": 83,
     "z": 84,
     "Z": 85,
-
     "0": 86,
     "1": 87,
     "2": 88,
@@ -78,7 +75,6 @@ LETTER_PITCH_MAP = {
     "8": 94,
     "9": 95,
 }
-
 
 log = logging.getLogger(__name__)
 
@@ -109,9 +105,9 @@ class MIDI(Cog):
             except IndexError:
                 duration = 1
 
-            await self.loop.run_in_executor(None, midi_file.addNote,
-                                            0, channel_index, note,
-                                            index, duration, 100)
+            await self.loop.run_in_executor(None, midi_file.addNote, 0,
+                                            channel_index, note, index,
+                                            duration, 100)
 
     async def make_midi(self, tempo: int, data: str) -> MIDIFile:
         midi_file = MIDIFile(1)
@@ -155,8 +151,11 @@ class MIDI(Cog):
         return buffer.getvalue().decode('utf-8')
 
     @commands.command()
-    async def midi(self, ctx: commands.Context,
-                   tempo: int=120, *, data: str=None):
+    async def midi(self,
+                   ctx: commands.Context,
+                   tempo: int = 120,
+                   *,
+                   data: str = None):
         """
         Convert text to MIDI. Multiple channels can be used by splitting text with |.
         Letters are converted to their pitch values using a mapping.

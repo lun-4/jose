@@ -75,6 +75,7 @@ async def assembler(ctx, program: str):
 
 class JoseVM:
     """An instance of the José Virutal Machine."""
+
     def __init__(self, ctx, bytecode):
         #: Command context, in the case we want to echo
         self.ctx = ctx
@@ -101,17 +102,12 @@ class JoseVM:
         self.map = {
             Instructions.PUSH_INT: self.push_int,
             Instructions.PUSH_UINT: self.push_uint,
-
             Instructions.PUSH_LONG: self.push_long,
             Instructions.PUSH_ULONG: self.push_ulong,
-
             Instructions.PUSH_STR: self.push_str,
-
             Instructions.SHOW_TOP: self.show_top,
             Instructions.SHOW_POP: self.show_pop,
-
             Instructions.ADD: self.add_op,
-
             Instructions.VIEW: self.view_stack,
         }
 
@@ -129,7 +125,7 @@ class JoseVM:
 
     async def read_bytes(self, bytecount):
         """Read an arbritary amount of bytes from the bytecode."""
-        data = self.bytecode[self.pcounter:self.pcounter+bytecount]
+        data = self.bytecode[self.pcounter:self.pcounter + bytecount]
         self.pcounter += bytecount
         return data
 
@@ -233,6 +229,7 @@ class VM(Cog):
 
     You are allowed to have 1 VM running your code at a time.
     """
+
     def __init__(self, bot):
         super().__init__(bot)
 
@@ -240,30 +237,27 @@ class VM(Cog):
 
     async def print_traceback(self, ctx, vm, err):
         """Print a traceback of the VM."""
-        em = discord.Embed(title='José VM error',
-                           color=discord.Color.red())
+        em = discord.Embed(title='José VM error', color=discord.Color.red())
 
-        em.add_field(name='program counter',
-                     value=vm.pcounter,
-                     inline=False)
+        em.add_field(name='program counter', value=vm.pcounter, inline=False)
 
-        em.add_field(name='stack at moment of crash',
-                     value=repr(vm.stack),
-                     inline=True)
+        em.add_field(
+            name='stack at moment of crash', value=repr(vm.stack), inline=True)
 
         # I'm already hating dir() enough.
         attributes = inspect.getmembers(Instructions,
                                         lambda a: not inspect.isroutine(a))
 
-        names = [a for a in attributes if
-                 not(a[0].startswith('__') and a[0].endswith('__'))]
+        names = [
+            a for a in attributes
+            if not (a[0].startswith('__') and a[0].endswith('__'))
+        ]
         rev_names = {v: k for k, v in names}
 
-        em.add_field(name='executing instruction',
-                     value=rev_names.get(vm.running_op))
+        em.add_field(
+            name='executing instruction', value=rev_names.get(vm.running_op))
 
-        em.add_field(name='error',
-                     value=repr(err))
+        em.add_field(name='error', value=repr(err))
 
         await ctx.send(embed=em)
 
@@ -275,8 +269,7 @@ class VM(Cog):
         jvm = JoseVM(ctx, bytecode)
         self.vms[ctx.author.id] = jvm
 
-        em = discord.Embed(title='José VM',
-                           color=discord.Color.blurple())
+        em = discord.Embed(title='José VM', color=discord.Color.blurple())
 
         try:
             out = io.StringIO()
@@ -287,12 +280,11 @@ class VM(Cog):
 
             time_taken = round((t_end - t_start) * 1000, 4)
 
-            em.add_field(name='executed instructions',
-                         value=jvm.op_count, inline=False)
-            em.add_field(name='time taken',
-                         value=f'`{time_taken}ms`', inline=False)
-            em.add_field(name='output',
-                         value=out.getvalue() or '<no stdout>')
+            em.add_field(
+                name='executed instructions', value=jvm.op_count, inline=False)
+            em.add_field(
+                name='time taken', value=f'`{time_taken}ms`', inline=False)
+            em.add_field(name='output', value=out.getvalue() or '<no stdout>')
             await ctx.send(embed=em)
         except VMError as err:
             await self.print_traceback(ctx, jvm, err)

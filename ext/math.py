@@ -35,13 +35,9 @@ OWM_ICONS = {
     '50d': W_MIST,
 }
 
-RESULT_PODS = {
-    'Result', 'Plot', 'Plots', 'Solution', 'Derivative'
-}
+RESULT_PODS = {'Result', 'Plot', 'Plots', 'Solution', 'Derivative'}
 
-UNECESSARY_PODS = {
-    'Input', 'Input interpretation'
-}
+UNECESSARY_PODS = {'Input', 'Input interpretation'}
 
 
 def pod_finder(pod_list):
@@ -89,6 +85,7 @@ def pod_finder(pod_list):
 
 class Math(Cog):
     """Math related commands."""
+
     def __init__(self, bot):
         super().__init__(bot)
 
@@ -115,7 +112,8 @@ class Math(Cog):
             try:
                 res = await asyncio.wait_for(future, 13)
             except asyncio.TimeoutError:
-                await ctx.send('\N{HOURGLASS WITH FLOWING SAND} Timeout reached.')
+                await ctx.send(
+                    '\N{HOURGLASS WITH FLOWING SAND} Timeout reached.')
                 return
             except Exception as err:
                 await ctx.send(f'\N{CRYING FACE} Error: `{err!r}`')
@@ -160,12 +158,12 @@ class Math(Cog):
         await self.jcoin.pricing(ctx, self.prices['API'])
 
         try:
-            future = self.loop.run_in_executor(None,
-                                               self.owm.weather_at_place,
+            future = self.loop.run_in_executor(None, self.owm.weather_at_place,
                                                location)
             observation = await future
         except Exception as err:
-            raise self.SayException(f'Error retrieving weather data: `{err!r}`')
+            raise self.SayException(
+                f'Error retrieving weather data: `{err!r}`')
 
         w = observation.get_weather()
 
@@ -180,18 +178,22 @@ class Math(Cog):
 
         o_location = observation.get_location()
 
-        em.add_field(name='Location',
-                     value=f'{o_location.get_name()}')
-        em.add_field(name='Situation',
-                     value=f'{status} {icon}')
-        em.add_field(name='Temperature',
-                     value=f'`{_wg("celsius")} °C, {_wg("fahrenheit")} °F, {_wg("kelvin")} K`')
+        em.add_field(name='Location', value=f'{o_location.get_name()}')
+        em.add_field(name='Situation', value=f'{status} {icon}')
+        em.add_field(
+            name='Temperature',
+            value=
+            f'`{_wg("celsius")} °C, {_wg("fahrenheit")} °F, {_wg("kelvin")} K`'
+        )
 
         await ctx.send(embed=em)
 
     @commands.command()
-    async def money(self, ctx, amount: str,
-                    currency_from: str = '', currency_to: str = ''):
+    async def money(self,
+                    ctx,
+                    amount: str,
+                    currency_from: str = '',
+                    currency_to: str = ''):
         """Convert currencies."""
 
         currency_from = currency_from.upper()

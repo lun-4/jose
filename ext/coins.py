@@ -17,7 +17,6 @@ sys.path.append('..')
 from jcoin.errors import GenericError, TransferError, \
         AccountNotFoundError, InputError, ConditionError, err_list
 
-
 log = logging.getLogger(__name__)
 REWARD_COOLDOWN = 18000
 
@@ -33,6 +32,7 @@ class AccountType:
 class Coins(Cog):
     """JoséCoin v3
     """
+
     def __init__(self, bot):
         super().__init__(bot)
         self.base_url = bot.config.JOSECOIN_API
@@ -56,19 +56,18 @@ class Coins(Cog):
     @property
     def headers(self):
         """Get the headers for a josécoin request."""
-        return {
-            'Authorization': self.bot.config.JOSECOIN_TOKEN
-        }
+        return {'Authorization': self.bot.config.JOSECOIN_TOKEN}
 
-    async def generic_call(self, method: str, route: str,
-                           payload: dict = None, **kwargs) -> 'any':
+    async def generic_call(self,
+                           method: str,
+                           route: str,
+                           payload: dict = None,
+                           **kwargs) -> 'any':
         """Generic call to any JoséCoin API route."""
         route = self.route(route)
         headers = self.headers
-        async with self.bot.session.request(method,
-                                            route,
-                                            json=payload,
-                                            headers=headers) as resp:
+        async with self.bot.session.request(
+                method, route, json=payload, headers=headers) as resp:
 
             if kwargs.get('log', True):
                 log.debug('calling %s, status %d', route, resp.status)
@@ -208,9 +207,8 @@ class Coins(Cog):
         guild_id: int
             The guild's ID.
         """
-        rank_data = await self.jc_get(f'/wallets/{account_id}/rank', {
-            'guild_id': guild_id
-        })
+        rank_data = await self.jc_get(f'/wallets/{account_id}/rank',
+                                      {'guild_id': guild_id})
         return rank_data
 
     async def ranks(self, user_id: int, guild: discord.Guild) -> tuple:
@@ -235,10 +233,12 @@ class Coins(Cog):
         if _to_id:
             to_id = _to_id
 
-        res = await self.jc_post(f'/wallets/{from_id}/transfer', {
-            'receiver': to_id,
-            'amount': str(amount)
-        }, log=False)
+        res = await self.jc_post(
+            f'/wallets/{from_id}/transfer', {
+                'receiver': to_id,
+                'amount': str(amount)
+            },
+            log=False)
 
         sender_name = self.get_name(from_id)
         receiver_name = self.get_name(to_id)
@@ -274,16 +274,13 @@ class Coins(Cog):
 
     async def sink(self, user_id: int, amount: decimal.Decimal):
         """Send money back to José."""
-        return await self.transfer(user_id,
-                                   self.bot.user.id,
-                                   amount)
+        return await self.transfer(user_id, self.bot.user.id, amount)
 
     async def zero(self, user_id: int, where: 'any' = None) -> str:
         """Zero an account"""
         account = await self.get_account(user_id)
         target = where or self.bot.user.id
-        return await self.transfer_str(user_id, target,
-                                       account['amount'])
+        return await self.transfer_str(user_id, target, account['amount'])
 
     def to_acclist(self, users: list) -> list:
         account_ids = []
@@ -299,21 +296,17 @@ class Coins(Cog):
 
     async def lock(self, *users):
         """Lock accounts from transfer operations."""
-        await self.jc_post('/lock_accounts', {
-            'accounts': self.to_acclist(users)
-        })
+        await self.jc_post('/lock_accounts',
+                           {'accounts': self.to_acclist(users)})
 
     async def unlock(self, *users):
         """Unlock accounts from transfer operations."""
-        await self.jc_post('/unlock_accounts', {
-            'accounts': self.to_acclist(users)
-        })
+        await self.jc_post('/unlock_accounts',
+                           {'accounts': self.to_acclist(users)})
 
     async def is_locked(self, account_id: int):
         """Check if an account is locked"""
-        return await self.jc_get('/check_lock', {
-            'account_id': account_id
-        })
+        return await self.jc_get('/check_lock', {'account_id': account_id})
 
     def _pcache_invalidate(self, user_id: int):
         """Invalidate the prob cache after 2 hours for one user."""
@@ -374,8 +367,9 @@ class Coins(Cog):
             if author_id in self.prob_cache:
                 probdata = self.prob_cache[author_id]
             else:
-                probdata = await self.jc_get(f'/wallets/{author_id}/'
-                                             'probability', log=False)
+                probdata = await self.jc_get(
+                    f'/wallets/{author_id}/'
+                    'probability', log=False)
                 self.pcache_set(author_id, probdata)
         except AccountNotFoundError:
             self.pcache_set(author_id, None)
@@ -394,8 +388,7 @@ class Coins(Cog):
             return
 
         try:
-            await self.transfer(self.bot.user.id,
-                                author_id, to_give)
+            await self.transfer(self.bot.user.id, author_id, to_give)
 
             self.rewards[author_id] = time.monotonic() + REWARD_COOLDOWN
             if message.guild.large:
@@ -487,8 +480,8 @@ class Coins(Cog):
                        f'`{acc["amount"]:.2f}JC`')
 
     @commands.command(name='transfer')
-    async def _transfer(self, ctx,
-                        receiver: discord.User, amount: CoinConverter):
+    async def _transfer(self, ctx, receiver: discord.User,
+                        amount: CoinConverter):
         """Transfer coins between you and someone else."""
         if receiver.bot:
             raise self.SayException('Receiver can not be a bot')
@@ -512,15 +505,16 @@ class Coins(Cog):
             person = ctx.author
 
         res = await self.get_ranks(person.id, ctx.guild.id)
-        em = discord.Embed(title=f'Rank data for {person}',
-                           color=discord.Color(0x540786))
+        em = discord.Embed(
+            title=f'Rank data for {person}', color=discord.Color(0x540786))
 
         for cat in res:
             data = res[cat]
-            em.add_field(name=cat.capitalize(),
-                         value=f'#{data["rank"]} out from '
-                               f'{data["total"]} accounts',
-                         inline=False)
+            em.add_field(
+                name=cat.capitalize(),
+                value=f'#{data["rank"]} out from '
+                f'{data["total"]} accounts',
+                inline=False)
 
         await ctx.send(embed=em)
 
@@ -586,7 +580,7 @@ class Coins(Cog):
         await ctx.send(f'Inserted {acount} accounts, {ucount} users')
 
     @commands.command()
-    async def coinprob(self, ctx, person: discord.User=None):
+    async def coinprob(self, ctx, person: discord.User = None):
         """Get your coin probability values."""
         if not person:
             person = ctx.author
@@ -618,7 +612,7 @@ class Coins(Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def spam(self, ctx, taskcount: int=200, timeout: int=30):
+    async def spam(self, ctx, taskcount: int = 200, timeout: int = 30):
         """webscale memes
 
         This will spawn an initial amount of [taskcount] tasks,
@@ -634,8 +628,7 @@ class Coins(Cog):
 
             with Timer() as timer:
                 for i in range(taskcount):
-                    coro = self.transfer(ctx.bot.user.id,
-                                         ctx.author.id, 0.1)
+                    coro = self.transfer(ctx.bot.user.id, ctx.author.id, 0.1)
                     t = self.loop.create_task(coro)
                     tasks.append(t)
 
@@ -648,7 +641,7 @@ class Coins(Cog):
             taskcount *= 2
 
     @commands.command()
-    async def deleteaccount(self, ctx, confirm: bool=False):
+    async def deleteaccount(self, ctx, confirm: bool = False):
         """Delete your JoséCoin account.
 
         There is no going back from this operation.
@@ -674,32 +667,23 @@ class Coins(Cog):
     @commands.group(invoke_without_command=True)
     async def jcstats(self, ctx):
         """Get josécoin stats"""
-        em = discord.Embed(title='josécoin stats',
-                           color=discord.Color.gold())
+        em = discord.Embed(title='josécoin stats', color=discord.Color.gold())
 
         stats = await self.jc_get('/stats')
 
-        em.add_field(name='total transfers currently',
-                     value=self.transfers_done)
+        em.add_field(
+            name='total transfers currently', value=self.transfers_done)
 
-        em.add_field(name='total accounts',
-                     value=stats['accounts'])
-        em.add_field(name='total user accounts',
-                     value=stats['user_accounts'])
-        em.add_field(name='total taxbanks',
-                     value=stats['txb_accounts'])
+        em.add_field(name='total accounts', value=stats['accounts'])
+        em.add_field(name='total user accounts', value=stats['user_accounts'])
+        em.add_field(name='total taxbanks', value=stats['txb_accounts'])
 
-        em.add_field(name='total money',
-                     value=stats['gdp'])
-        em.add_field(name='total user money',
-                     value=stats['user_money'])
-        em.add_field(name='total taxbank money',
-                     value=stats['txb_money'])
+        em.add_field(name='total money', value=stats['gdp'])
+        em.add_field(name='total user money', value=stats['user_money'])
+        em.add_field(name='total taxbank money', value=stats['txb_money'])
 
-        em.add_field(name='total steals done',
-                     value=stats['steals'])
-        em.add_field(name='total steal success',
-                     value=stats['success'])
+        em.add_field(name='total steals done', value=stats['steals'])
+        em.add_field(name='total steal success', value=stats['success'])
         await ctx.send(embed=em)
 
     def steal_fmt(self, row) -> str:
@@ -715,8 +699,7 @@ class Coins(Cog):
     @jcstats.command(name='steals', aliases=['s'])
     async def steal_stats(self, ctx):
         """Get josécoin steal stats."""
-        em = discord.Embed(title='Steal stats',
-                           color=discord.Color(0xdabdab))
+        em = discord.Embed(title='Steal stats', color=discord.Color(0xdabdab))
 
         tot_stolen = await self.pool.fetchval("""
             select sum(amount) from steal_history
@@ -753,21 +736,22 @@ class Coins(Cog):
             limit 1
         """)
 
-        em.add_field(name='total jc stolen',
-                     value=tot_stolen,
-                     inline=False)
+        em.add_field(name='total jc stolen', value=tot_stolen, inline=False)
 
-        em.add_field(name='maximum amount successfully stolen',
-                     value=self.steal_fmt(max_amount) or '<none>',
-                     inline=False)
+        em.add_field(
+            name='maximum amount successfully stolen',
+            value=self.steal_fmt(max_amount) or '<none>',
+            inline=False)
 
-        em.add_field(name='success steal with min res (most lucky)',
-                     value=self.steal_fmt(min_res) or '<none>',
-                     inline=False)
+        em.add_field(
+            name='success steal with min res (most lucky)',
+            value=self.steal_fmt(min_res) or '<none>',
+            inline=False)
 
-        em.add_field(name='success steal with min chance (most difficult)',
-                     value=self.steal_fmt(min_chance) or '<none>',
-                     inline=False)
+        em.add_field(
+            name='success steal with min chance (most difficult)',
+            value=self.steal_fmt(min_chance) or '<none>',
+            inline=False)
 
         await ctx.send(embed=em)
 

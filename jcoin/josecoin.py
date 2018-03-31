@@ -19,7 +19,6 @@ import config as jconfig
 from errors import GenericError, AccountNotFoundError, \
         InputError, ConditionError
 
-
 app = Sanic()
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__name__)
@@ -49,10 +48,12 @@ class AccountType:
 @app.exception(GenericError)
 def handle_generic_error(request, exception):
     """Handle generic errors from JoséCoin API"""
-    return response.json({
-        'error': True,
-        'message': exception.args[0]
-    }, status=exception.status_code)
+    return response.json(
+        {
+            'error': True,
+            'message': exception.args[0]
+        },
+        status=exception.status_code)
 
 
 @app.get('/')
@@ -67,9 +68,7 @@ async def request_check(request):
     try:
         token = request.headers['Authorization']
     except KeyError:
-        return response.json({
-            'error': 'no token provided'
-        }, status=403)
+        return response.json({'error': 'no token provided'}, status=403)
 
     row = await request.app.db.fetchrow("""
     SELECT client_id, client_name, auth_level FROM clients
@@ -78,9 +77,7 @@ async def request_check(request):
 
     if row is None:
         log.info('token not found')
-        return response.json({
-            'error': 'unauthorized'
-        }, status=403)
+        return response.json({'error': 'unauthorized'}, status=403)
 
     client_id = row['client_id']
     client_name = row['client_name']
@@ -166,15 +163,10 @@ async def delete_account(request, account_id: int):
         WHERE account_id = $1
         """, account_id)
 
-        return response.json({
-            'success': True
-        })
+        return response.json({'success': True})
     except Exception as err:
         log.exception('error while deleting')
-        return response.json({
-            'success': False,
-            'err': repr(err)
-        })
+        return response.json({'success': False, 'err': repr(err)})
 
 
 @app.post('/api/wallets/<sender_id:int>/transfer')
@@ -303,8 +295,10 @@ async def transfer(request, sender_id):
     amount = decimal.Decimal(str(amount))
     rcv_amount = decimal.Decimal(str(rcv_amount))
     return response.json({
-        'sender_amount': einf if is_inf(snd_amount) else snd_amount - amount,
-        'receiver_amount': einf if is_inf(rcv_amount) else rcv_amount + amount
+        'sender_amount':
+        einf if is_inf(snd_amount) else snd_amount - amount,
+        'receiver_amount':
+        einf if is_inf(rcv_amount) else rcv_amount + amount
     })
 
 
@@ -352,9 +346,7 @@ async def lock_account(request):
     for acc_id in accounts:
         request.app.account_locks[acc_id] = True
 
-    return response.json({
-        'status': True
-    })
+    return response.json({'status': True})
 
 
 @app.post('/api/unlock_accounts')
@@ -364,18 +356,14 @@ async def unlock_account(request):
     for acc_id in accounts:
         request.app.account_locks[acc_id] = False
 
-    return response.json({
-        'status': True
-    })
+    return response.json({'status': True})
 
 
 @app.get('/api/check_lock')
 async def is_locked(request):
     """Return if the account is locked or not."""
     account_id = int(request.json['account_id'])
-    return response.json({
-        'locked': request.app.account_locks[account_id]
-    })
+    return response.json({'locked': request.app.account_locks[account_id]})
 
 
 @app.post('/api/wallets/<wallet_id:int>/steal_use')
@@ -496,6 +484,7 @@ async def getsum(request, acc_type: int) -> decimal.Decimal:
     """, acc_type)
     return resp['sum']
 
+
 async def get_count(request, acc_type: int) -> int:
     """Get the total account count for a specific
     account type."""
@@ -539,11 +528,7 @@ async def get_sums(request) -> dict:
     user_amount = await getsum(request, AccountType.USER)
     txb_amount = await getsum(request, AccountType.TAXBANK)
 
-    return {
-        'gdp': total_amount,
-        'user': user_amount,
-        'taxbank': txb_amount
-    }
+    return {'gdp': total_amount, 'user': user_amount, 'taxbank': txb_amount}
 
 
 @app.get('/api/gdp')
@@ -611,9 +596,11 @@ async def get_wallets(request):
 
     # very ugly hack
     acc_type_str = {
-        AccountType.USER: f'account_amount.account_type={AccountType.USER}',
-        AccountType.TAXBANK: 'account_amount.account_type'
-                             f'={AccountType.TAXBANK}',
+        AccountType.USER:
+        f'account_amount.account_type={AccountType.USER}',
+        AccountType.TAXBANK:
+        'account_amount.account_type'
+        f'={AccountType.TAXBANK}',
     }.get(acc_type, '')
 
     acc_type_str_w = ''
@@ -737,9 +724,7 @@ async def toggle_hidecoins(request, user_id: int):
         if not new_hidecoins:
             raise AccountNotFoundError('Account not found')
 
-        return response.json({
-            'new_hidecoins': new_hidecoins['hidecoins']
-        })
+        return response.json({'new_hidecoins': new_hidecoins['hidecoins']})
 
 
 @app.get('/api/wallets/<user_id:int>/hidecoin_status')
@@ -751,9 +736,7 @@ async def hidecoin_status(request, user_id: int):
     if not hidecoins:
         raise AccountNotFoundError('Account not found')
 
-    return response.json({
-        'hidden': hidecoins['hidecoins']
-    })
+    return response.json({'hidden': hidecoins['hidecoins']})
 
 
 async def db_init(app):

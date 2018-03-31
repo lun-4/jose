@@ -18,6 +18,7 @@ class Actions:
     UNBAN = 3
     SOFTBAN = 4
 
+
 ACTION_AS_AUDITLOG = [None, 'kick', 'ban', 'unban', None]
 
 
@@ -28,13 +29,15 @@ def is_moderator():
 
         member = ctx.guild.get_member(ctx.author.id)
         perms = ctx.channel.permissions_for(member)
-        return (ctx.author.id == ctx.bot.owner_id) or perms.kick_members or perms.ban_members 
-    
+        return (ctx.author.id == ctx.bot.owner_id
+                ) or perms.kick_members or perms.ban_members
+
     return commands.check(_is_moderator)
 
 
 class Moderation(Cog, requires=['config']):
     """Moderation system."""
+
     def __init__(self, bot):
         super().__init__(bot)
         self.modcfg_coll = self.config.jose_db['mod_config']
@@ -85,12 +88,14 @@ class Moderation(Cog, requires=['config']):
 
         em.set_footer(text='Created')
 
-        em.set_author(name=str(member),
-                      icon_url=member.avatar_url or member.default_avatar_url)
-        
+        em.set_author(
+            name=str(member),
+            icon_url=member.avatar_url or member.default_avatar_url)
+
         em.add_field(name='ID', value=member.id)
-        em.add_field(name='Account age',
-                     value=f'`{self.account_age(member.created_at)}`')
+        em.add_field(
+            name='Account age',
+            value=f'`{self.account_age(member.created_at)}`')
 
         await logchannel.send(embed=em)
 
@@ -104,11 +109,12 @@ class Moderation(Cog, requires=['config']):
         log.debug('[modlog] Logging removal of %r', member)
 
         em = discord.Embed(title='Member Remove', colour=discord.Colour.red())
-        em.timestamp = datetime.datetime.utcnow() 
+        em.timestamp = datetime.datetime.utcnow()
 
         em.set_footer(text='Created')
-        em.set_author(name=str(member),
-                      icon_url=member.avatar_url or member.default_avatar_url)
+        em.set_author(
+            name=str(member),
+            icon_url=member.avatar_url or member.default_avatar_url)
 
         fields = {
             'ID': member.id,
@@ -118,7 +124,7 @@ class Moderation(Cog, requires=['config']):
 
         for name, value in fields.items():
             em.add_field(name=name, value=value)
-        
+
         await logchannel.send(embed=em)
 
     async def on_member_ban(self, guild, user):
@@ -137,10 +143,12 @@ class Moderation(Cog, requires=['config']):
 
     def modlog_fmt(self, data):
         user = data['user']
-        fmt = (f'**{ACTION_AS_AUDITLOG[data["action"]].capitalize()}** | Case {data["action_id"]}\n'
-               f'**User**: {user} ({user.id})\n'
-               f'**Reason**: {data["reason"].get("reason") or "No reason provided"}\n'
-               f'**Responsible Moderator**: {data.get("reason", {}).get("moderator", None)}\n')
+        fmt = (
+            f'**{ACTION_AS_AUDITLOG[data["action"]].capitalize()}** | Case {data["action_id"]}\n'
+            f'**User**: {user} ({user.id})\n'
+            f'**Reason**: {data["reason"].get("reason") or "No reason provided"}\n'
+            f'**Responsible Moderator**: {data.get("reason", {}).get("moderator", None)}\n'
+        )
         return fmt
 
     async def add_mod_entry(self, modcfg, data):
@@ -178,7 +186,7 @@ class Moderation(Cog, requires=['config']):
 
         await message.edit(content=self.modlog_fmt(old_data))
 
-    async def kick_handler(self, modcfg, guild, user, reason, **kwargs): 
+    async def kick_handler(self, modcfg, guild, user, reason, **kwargs):
         """Handle the 'kick' action, creates an entry."""
         data = {
             'guild': guild,
@@ -188,8 +196,11 @@ class Moderation(Cog, requires=['config']):
             'action_id': modcfg['last_action_id'] + 1,
         }
 
-        await self.modcfg_coll.update_one({'guild_id': guild.id},
-                                          {'$inc': {'last_action_id': 1}})
+        await self.modcfg_coll.update_one({
+            'guild_id': guild.id
+        }, {'$inc': {
+            'last_action_id': 1
+        }})
         await self.add_mod_entry(modcfg, data)
 
     async def ban_handler(self, modcfg, guild, user, reason, **kwargs):
@@ -202,8 +213,11 @@ class Moderation(Cog, requires=['config']):
             'action_id': modcfg['last_action_id'] + 1,
         }
 
-        await self.modcfg_coll.update_one({'guild_id': guild.id},
-                                          {'$inc': {'last_action_id': 1}})
+        await self.modcfg_coll.update_one({
+            'guild_id': guild.id
+        }, {'$inc': {
+            'last_action_id': 1
+        }})
         await self.add_mod_entry(modcfg, data)
 
     async def reason_handler(self, modcfg, guild, user, reason, **kwargs):
@@ -229,8 +243,11 @@ class Moderation(Cog, requires=['config']):
             'action_id': modcfg['last_action_id'] + 1,
         }
 
-        await self.modcfg_coll.update_one({'guild_id': guild.id},
-                                          {'$inc': {'last_action_id': 1}})
+        await self.modcfg_coll.update_one({
+            'guild_id': guild.id
+        }, {'$inc': {
+            'last_action_id': 1
+        }})
         await self.add_mod_entry(modcfg, data)
 
     async def modlog(self, action, guild, user, **kwargs):
@@ -270,8 +287,8 @@ class Moderation(Cog, requires=['config']):
             action_as_auditlog = getattr(discord.AuditLogAction,
                                          ACTION_AS_AUDITLOG[action])
             try:
-                async for entry in guild.audit_logs(limit=10,
-                                                    action=action_as_auditlog):
+                async for entry in guild.audit_logs(
+                        limit=10, action=action_as_auditlog):
                     if entry.target.id != user.id:
                         continue
 
@@ -348,8 +365,13 @@ class Moderation(Cog, requires=['config']):
         """
         modconfig = await self._modcfg_get(ctx.guild)
         _reason = {'reason': reason, 'moderator': ctx.author}
-        await self.modlog(Actions.REASON, ctx.guild, None, reason=_reason,
-                          action_id=action_id, modconfig=modconfig)
+        await self.modlog(
+            Actions.REASON,
+            ctx.guild,
+            None,
+            reason=_reason,
+            action_id=action_id,
+            modconfig=modconfig)
         await ctx.ok()
 
     @commands.command()
@@ -366,8 +388,12 @@ class Moderation(Cog, requires=['config']):
             raise self.SayException(f'wtf is happening discord `{err!r}`')
 
         _reason = {'reason': reason, 'moderator': ctx.author}
-        await self.modlog(Actions.KICK, ctx.guild, member,
-                          reason=_reason, modconfig=modconfig)
+        await self.modlog(
+            Actions.KICK,
+            ctx.guild,
+            member,
+            reason=_reason,
+            modconfig=modconfig)
         await ctx.ok()
 
     @commands.command()
@@ -388,8 +414,12 @@ class Moderation(Cog, requires=['config']):
             self.ignore.pop((member.id, guild.id))
 
         _reason = {'reason': reason, 'moderator': ctx.author}
-        await self.modlog(Actions.BAN, ctx.guild, member,
-                          reason=_reason, modconfig=modconfig)
+        await self.modlog(
+            Actions.BAN,
+            ctx.guild,
+            member,
+            reason=_reason,
+            modconfig=modconfig)
         await ctx.ok()
 
 

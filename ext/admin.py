@@ -7,7 +7,6 @@ from discord.ext import commands
 from .utils import Table, Timer
 from .common import Cog, shell
 
-
 log = logging.getLogger(__name__)
 
 
@@ -33,7 +32,6 @@ def no_codeblock(text: str) -> str:
 
 
 class Admin(Cog, requires=['config']):
-
     @property
     def db(self) -> asyncpg.pool.Pool:
         cfg = self.bot.get_cog('Config')

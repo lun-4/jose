@@ -20,14 +20,11 @@ asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 log = logging.getLogger(__name__)
 
-
 extensions = [
     'channel_logging',  # loading at start to get the logger to run
-
     'config',
     'admin',
     'exec',
-
     'state',
 ]
 
@@ -90,6 +87,7 @@ class JoseContext(commands.Context):
 
 class JoseBot(commands.Bot):
     """Main bot subclass."""
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -157,8 +155,8 @@ class JoseBot(commands.Bot):
         location = '[DM]' if isinstance(ctx.channel, discord.DMChannel) else \
                    f'[Guild {guild.name} {guild.id}]'
 
-        log.info('%s [cmd] %s(%d) "%s" checks=%s', location, author,
-                 author.id, content, ','.join(checks) or '(none)')
+        log.info('%s [cmd] %s(%d) "%s" checks=%s', location, author, author.id,
+                 content, ','.join(checks) or '(none)')
 
     async def on_error(self, event_method, *args, **kwargs):
         # TODO: analyze current exception

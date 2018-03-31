@@ -37,8 +37,9 @@ class ErrorHandling(Cog):
                           f'\n{orig!r}')
                 return await ctx.send(f'Error: `{error.original!r}`')
             else:
-                log.exception(f'Errored at {content!r} from {ctx.author!s}',
-                              exc_info=orig)
+                log.exception(
+                    f'Errored at {content!r} from {ctx.author!s}',
+                    exc_info=orig)
 
             if isinstance(orig, self.bot.cogs['Coins'].TransferError):
                 return await ctx.send(f'JoséCoin error: `{orig!r}`')
@@ -47,8 +48,7 @@ class ErrorHandling(Cog):
                                   f'```py\n{error.original!r}```')
 
         if isinstance(error, commands.errors.BadArgument):
-            return await ctx.send('bad argument —  '
-                                  f'{error!s}')
+            return await ctx.send('bad argument —  ' f'{error!s}')
 
         if isinstance(error, commands.errors.CommandOnCooldown):
             return
