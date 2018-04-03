@@ -57,3 +57,6 @@ GUILD_LOG_CHAN = 'a webhook url'
 
 # Where to warn the bot owner about event thresholds
 METRICS_WEBHOOK = 'a webhook url'
+
+
+GUILD_LOGGING = 'a webhook url'

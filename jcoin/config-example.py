@@ -7,3 +7,5 @@ db = {
     # host is only needed in docker
     # 'host': '',
 }
+
+port = 8080
