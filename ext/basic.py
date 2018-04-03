@@ -69,7 +69,8 @@ class Basic(Cog):
         choices = set(choices)
 
         if len(choices) <= 1:
-            return await ctx.send("dude what")
+            return await ctx.send('Insert more things. Or at least '
+                                  'more different things')
 
         choices = list(choices)
         await ctx.send(random.choice(choices))
