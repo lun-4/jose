@@ -748,7 +748,7 @@ def main():
     """Main entrypoint."""
     loop = asyncio.get_event_loop()
 
-    server = app.create_server(host='0.0.0.0', port=jconfig.get("port", 8080))
+    server = app.create_server(host='0.0.0.0', port=getattr(jconfig, 'port', 8080))
     app.account_locks = defaultdict(bool)
     loop.create_task(server)
     loop.create_task(db_init(app))
