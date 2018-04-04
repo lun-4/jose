@@ -390,8 +390,10 @@ class Heist(Cog):
          - If your heist fails, all participants of the heist will be sentenced
             to jail or not, its random.
 
-         - If your heist succeedes, you get a type 1 cooldown of 7 hours.
+         - If your heist succeedes, you get a type 1 cooldown of 12 hours.
            it will show you are "regenerating your steal points".
+
+         - If your heist fails, you get a type 2 cooldown of 24 hours.
         """
         if amount > 200:
             return await ctx.send('Cannot heist more than 200JC.')
