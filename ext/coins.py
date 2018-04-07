@@ -538,7 +538,7 @@ class Coins(Cog):
 
         await ctx.send(embed=em)
 
-    @commands.command(aliases='jcp')
+    @commands.command(aliases=['jcp'])
     async def jcping(self, ctx):
         """Check if the JoséCoin API is up."""
         res = None
