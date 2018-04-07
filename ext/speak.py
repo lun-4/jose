@@ -58,7 +58,8 @@ class Texter:
         self.model_kwargs = kwargs
 
     def __repr__(self):
-        return f'<Texter refcount={self.refcount} wordcount={self.wordcount}>'
+        return (f'<Texter id={self.id} '
+                f'refcount={self.refcount} wordcount={self.wordcount}>')
 
     async def fill(self, data):
         """Fill a texter with its text model."""
@@ -218,7 +219,8 @@ class Speak(Cog):
             raise TexterFail("Can't read from the channel, "
                              "setup your permissions!")
 
-    async def get_messages_str(self, guild, amount=2000):
+    async def get_messages_str(self, guild, amount=2000) -> str:
+        """Call get_messages, return a string afterwards"""
         m = await self.get_messages(guild, amount)
         return '\n'.join(m)
 
@@ -294,7 +296,8 @@ class Speak(Cog):
                 await self.sentence_tax(ctx, 'txb'
                                         if mode == 'user' else 'user', True)
 
-    async def make_sentence(self, ctx, char_limit=None, priority='user'):
+    async def make_sentence(self, ctx,
+                            char_limit=None, priority='user') -> str:
         with ctx.typing():
             try:
                 texter = await self.get_texter(ctx.guild)
@@ -304,6 +307,9 @@ class Speak(Cog):
 
         await self.sentence_tax(ctx, priority)
         sentence = await texter.sentence(char_limit)
+
+        self.bot.dispatch('markov', ctx)
+
         return sentence
 
     async def on_message(self, message):
@@ -365,13 +371,17 @@ class Speak(Cog):
         try:
             sentence = await self.make_sentence(ctx, None, 'txb'
                                                 if autoreply else 'user')
+
+            self.bot.dispatch('markov_prefixed', ctx)
         except self.SayException as err:
             sentence = f'Failed to generate a sentence: `{err.args[0]!r}`'
 
         try:
             await ctx.send(sentence)
         except discord.HTTPException:
-            pass  # no need to log not having permissions, as this occurs pretty often
+            # no need to log not permission errors,
+            # as this occurs pretty often
+            pass
 
     @commands.command()
     @commands.is_owner()
@@ -380,7 +390,7 @@ class Speak(Cog):
         before = len(self.text_generators)
         t_start = time.monotonic()
 
-        for i in range(amount):
+        for _ in range(amount):
             await self.texter_collection()
 
         after = len(self.text_generators)
@@ -398,6 +408,8 @@ class Speak(Cog):
             guild_id = ctx.guild.id
 
         guild = self.bot.get_guild(guild_id)
+
+        # TODO: maybe see if delta is too long and warn?
         t1 = time.monotonic()
         await self.new_texter(guild)
         t2 = time.monotonic()
@@ -417,6 +429,7 @@ class Speak(Cog):
             return
 
         sentence = await self.make_sentence(ctx)
+        self.bot.dispatch('markov_command', ctx)
         await ctx.send(sentence)
 
     @commands.command(hidden=True)
@@ -459,11 +472,15 @@ class Speak(Cog):
         await ctx.send(' '.join(res))
 
     async def stress_one(self, ctx, guild):
+        """Force a recreation of a texter with big refcount for a guild."""
         await self.txstress_semaphore.acquire()
 
         try:
             texter = await self.new_texter(guild)
-            texter.refcount = 5
+
+            # go above 5, really.
+            # since new_texter can take a lot of time
+            texter.refcount = 10
             await ctx.send(f'Success for `{guild!r}[{guild.id}]`')
         except TexterFail:
             await ctx.send(f'Failed for `{guild!r}[{guild.id}]`')
@@ -477,6 +494,8 @@ class Speak(Cog):
         t1 = time.monotonic()
 
         for guild in self.bot.guilds:
+            # we can be safe stress_one will acquire its semaphore
+            # and not overload everything at the same time.
             self.loop.create_task(self.stress_one(ctx, guild))
 
         t2 = time.monotonic()
@@ -487,23 +506,29 @@ class Speak(Cog):
 
     @commands.command()
     async def txstat(self, ctx):
-        """Show statistics about all texters"""
-        tg = self.text_generators
+        """Show statistics about all texters.
+
+         - 'tx gen time' is the time taken to generate one texter.
+
+         - 'txc cycle time' is the time from one cycle of the texter
+        garbage collector.
+        """
+        txg = self.text_generators
 
         refcounts = collections.Counter()
-        for gid, tx in tg.items():
-            refcounts[tx.refcount] += 1
+        for _, texter in txg.items():
+            refcounts[texter.refcount] += 1
 
         res = ['refcount | texters']
         res += [f'{r}        | {txc}' for (r, txc) in refcounts.most_common()]
 
         res += [
-            f'avg tx gen: {self.st_gen_totalms / self.st_gen_count}'
-            ' ms/generated'
+            f'avg tx gen time: {self.st_gen_totalms / self.st_gen_count}'
+            f' ms, {self.st_gen_count} generated'
         ]
         res += [
-            f'avg txc run: {self.st_txc_totalms / self.st_txc_runs}'
-            ' ms/runs'
+            f'avg txc cycle time: {self.st_txc_totalms / self.st_txc_runs}'
+            f' ms, {self.st_txc_runs} runs'
         ]
 
         res = '\n'.join(res)
@@ -515,11 +540,17 @@ class Speak(Cog):
         """Get info about all loaded texters."""
         em = discord.Embed(colour=discord.Colour.blurple())
         em.description = ''
-        for guild_id, tx in self.text_generators.items():
+        for guild_id, texter in self.text_generators.items():
             guild = self.bot.get_guild(guild_id)
-            em.description += f'**{guild!s}**, `gid={guild_id} - ' \
-                              f'refcount={tx.refcount}, words={tx.wordcount}' \
-                              f' lines={tx.linecount}` \n'
+
+            if not guild:
+                em.description += '{texter!r} not found\n'
+                continue
+
+            em.description += (f'**{guild!s}**, `gid={guild_id} - '
+                               f'refcount={texter.refcount}, '
+                               f'words={texter.wordcount} '
+                               f'lines={texter.linecount}` \n')
 
         await ctx.send(embed=em)
 
