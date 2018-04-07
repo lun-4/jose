@@ -70,7 +70,7 @@ class Coins(Cog):
                 method, route, json=payload, headers=headers) as resp:
 
             if kwargs.get('log', True):
-                log.debug('calling %s, status %d', route, resp.status)
+                log.debug(f'called {route!r}, status {resp.status}')
 
             if resp.status == 500:
                 raise Exception('Internal Server Error')
@@ -86,6 +86,8 @@ class Coins(Cog):
                                                        "at 'j!help Coins' "
                                                        "(CASE-SENSITIVE)")
                         raise exc(msg)
+
+                # generic exception for unknown error codes
                 raise Exception(msg)
 
             return data
@@ -173,7 +175,8 @@ class Coins(Cog):
     async def create_wallet(self, thing):
         """Send a request to create a JoséCoin account."""
 
-        acc_type = AccountType.USER if isinstance(thing, discord.abc.User) else \
+        acc_type = AccountType.USER \
+            if isinstance(thing, discord.abc.User) else \
             AccountType.TAXBANK
 
         rows = await self.jc_post(f'/wallets/{thing.id}', {
@@ -246,6 +249,8 @@ class Coins(Cog):
         self.transfers_done += 1
         msg = f'{sender_name} > {amount} > {receiver_name}'
         log.info(msg)
+
+        # NOTE: log level 60 is used by the ChannelLogging cog!
         log.log(60, msg)
 
         return res
@@ -276,13 +281,19 @@ class Coins(Cog):
         """Send money back to José."""
         return await self.transfer(user_id, self.bot.user.id, amount)
 
-    async def zero(self, user_id: int, where: 'any' = None) -> str:
-        """Zero an account"""
+    async def zero(self, user_id: int, where=None) -> str:
+        """Zero an account.
+
+        This transfers all their money to José.
+        """
         account = await self.get_account(user_id)
         target = where or self.bot.user.id
+
+        # nope, can not use sink()
         return await self.transfer_str(user_id, target, account['amount'])
 
     def to_acclist(self, users: list) -> list:
+        """Convert a list of user objects to a list of account IDs."""
         account_ids = []
         for u in users:
             uid = getattr(u, 'id', None)
@@ -316,11 +327,16 @@ class Coins(Cog):
         except KeyError:
             pass
 
-    def pcache_set(self, author_id: int, value: 'any'):
+    def pcache_set(self, author_id: int, value):
+        """Set a value for a user in the probability cache"""
         self.prob_cache[author_id] = value
+
+        # NOTE: this feels like Redis, but I don't want to use
+        #  Redis, so we use a dict! (webscale! no sockets!)
         self.loop.call_later(7200, self._pcache_invalidate, author_id)
 
     async def pricing(self, ctx, base_tax: decimal.Decimal) -> str:
+        """Tax someone."""
         await self.ensure_ctx(ctx)
         base_tax = decimal.Decimal(base_tax)
 
@@ -401,9 +417,9 @@ class Coins(Cog):
 
             try:
                 await message.add_reaction('\N{MONEY BAG}')
-            except:
-                log.debug('autocoin failed to add reaction')
-        except:
+            except Exception as e:
+                log.exception('autocoin failed to add reaction')
+        except Exception as e:
             log.exception('autocoin error')
 
     @commands.command()
@@ -431,7 +447,9 @@ class Coins(Cog):
             await ctx.ok()
         except Exception as err:
             await ctx.not_ok()
-            await ctx.send(f':x: `{err!r}`')
+
+            # raise it to logging
+            raise err
 
     @commands.command(aliases=['balance', 'bal'])
     async def wallet(self, ctx, person: discord.User = None):
@@ -470,6 +488,8 @@ class Coins(Cog):
         # NOTE: we don't use discord.Guild converter
         #  because in the case jose leaves a guild we should
         #  kinda still be able to query a taxbank
+
+        # TODO: maybe a custom converter..? TaxbankAccount...?
 
         if not guild_id:
             guild_id = ctx.guild.id
@@ -518,15 +538,16 @@ class Coins(Cog):
 
         await ctx.send(embed=em)
 
-    @commands.command()
+    @commands.command(aliases='jcp')
     async def jcping(self, ctx):
         """Check if the JoséCoin API is up."""
         res = None
         with Timer() as timer:
             try:
                 res = await self.jc_get('/health')
-                up = res['status']
-                if not up:
+                alive = res['status']
+
+                if not alive:
                     return await ctx.send('JoséCoin API is not ok.')
             except Exception as e:
                 return await ctx.send(f'Failed to contact JoséCoin API {e!r}')
@@ -534,64 +555,21 @@ class Coins(Cog):
         await ctx.send(f'`{timer}`, db: `{res["db_latency_sec"]*1000}ms`')
 
     @commands.command()
-    @commands.is_owner()
-    async def migrate(self, ctx):
-        """Migrate JoséCoin data from Mongo -> Postgres"""
-        await ctx.send('migrating shit')
-        cur = self.jcoin.jcoin_coll.find()
-        db = self.bot.get_cog("Config").db
-
-        async with db.acquire() as conn:
-            acc_stmt = await conn.prepare("""
-            INSERT INTO accounts
-            (account_id, account_type, amount)
-            VALUES
-            ($1, $2, $3::numeric::money)
-            """)
-
-            user_stmt = await conn.prepare("""
-            INSERT INTO wallets
-            (user_id, taxpaid, steal_uses, steal_success)
-            VALUES
-            ($1, $2::numeric::money, $3, $4)
-            """)
-
-            ucount, acount = 0, 0
-            async for account in cur:
-                atype = account['type']
-
-                # fug
-                acc_da = decimal.Decimal(account['amount'])
-                as_int = AccountType.USER if atype == 'user' \
-                    else AccountType.TAXBANK
-
-                if acc_da == float('inf'):
-                    acc_da = decimal.Decimal('-69')
-
-                await acc_stmt.fetchval(account['id'], as_int, acc_da)
-                if as_int == AccountType.USER:
-                    acc_dt = decimal.Decimal(account['taxpaid'])
-                    await user_stmt.fetchval(account['id'], acc_dt,
-                                             account['times_stolen'],
-                                             account['success_steal'])
-                    ucount += 1
-                acount += 1
-
-        await ctx.send(f'Inserted {acount} accounts, {ucount} users')
-
-    @commands.command()
     async def coinprob(self, ctx, person: discord.User = None):
-        """Get your coin probability values."""
+        """Get your coin probability values.
+
+        Use 'j!help account' to know what does it mean.
+        """
         if not person:
             person = ctx.author
 
         data = await self.jc_get(f'/wallets/{person.id}/probability')
-        p = float(data['probability'])
-        await ctx.send(f'You have a {p * 100}%/message chance')
+        prob = float(data['probability'])
+        await ctx.send(f'You have a {prob * 100}%/message chance')
 
     @commands.command()
     async def jcgetraw(self, ctx):
-        """Get raw info on your wallet"""
+        """Get the raw information on your wallet."""
         with Timer() as timer:
             wallet = await self.get_account(ctx.author.id)
         res = pprint.pformat(wallet)
@@ -600,7 +578,10 @@ class Coins(Cog):
     @commands.command()
     @commands.is_owner()
     async def write(self, ctx, person: discord.User, amount: str):
-        """Overwrite someone's wallet"""
+        """Overwrite someone's wallet.
+
+        Only bot owner can use this command.
+        """
         with Timer() as timer:
             await self.pool.execute("""
             UPDATE accounts
@@ -613,7 +594,10 @@ class Coins(Cog):
     @commands.command()
     @commands.is_owner()
     async def spam(self, ctx, taskcount: int = 200, timeout: int = 30):
-        """webscale memes
+        """webscale memes.
+
+        This was made to spam the current API and know its limits.
+        Only bot owner can use this command.
 
         This will spawn an initial amount of [taskcount] tasks,
         with each one doing a transfer call.
@@ -636,7 +620,7 @@ class Coins(Cog):
             self.loop.create_task(ctx.send(f'{taskcount} tasks in {timer}'))
 
             if pending:
-                return await ctx.send(f'stopping from {lp} > 0 pending')
+                return await ctx.send(f'pending {len(pending)} > 0')
 
             taskcount *= 2
 
@@ -692,9 +676,9 @@ class Coins(Cog):
 
         thief_name = self.jcoin.get_name(row['thief'])
         target_name = self.jcoin.get_name(row['target'])
-        return f'#{row["idx"]} - `{thief_name}` stealing ' + \
-                f'`{row["amount"]}` from `{target_name}` | ' + \
-                f'chance: {row["chance"]}, res: {row["res"]}'
+        return (f'#{row["idx"]} - `{thief_name}` stealing '
+                f'`{row["amount"]}` from `{target_name}` | '
+                f'chance: {row["chance"]}, res: {row["res"]}')
 
     @jcstats.command(name='steals', aliases=['s'])
     async def steal_stats(self, ctx):

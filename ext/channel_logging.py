@@ -15,7 +15,7 @@ LOG_LEVEL = logging.DEBUG
 LOGGER_SILENCE = ['discord', 'websockets']
 
 CUSTOM_LEVELS = {
-    60: '\N{MONEY BAG}'  # 60 is used for transactions
+    60: '\N{MONEY BAG}'  # 60 is used for transactions (coins cog)
 }
 
 
@@ -32,7 +32,8 @@ class DiscordHandler(logging.Handler):
     """
     A custom logging handler which sends records to a Discord webhook.
 
-    Messages are queued internally and only sent every 5 seconds to avoid waiting due to ratelimits.
+    Messages are queued internally and only sent every 5 seconds
+    to avoid waiting due to ratelimits.
 
     Parameters
     ----------
@@ -69,7 +70,8 @@ class DiscordHandler(logging.Handler):
 
     def emit(self, record: logging.LogRecord):
         if record.levelno != self.level:
-            return  # only log the handlers level to the handlers channel, not above
+            # only log the handlers level to the handlers channel, not above
+            return
 
         msg = self.format(record)
 
@@ -81,8 +83,9 @@ class DiscordHandler(logging.Handler):
 
         # the actual log message
         for line in msg.split('\n'):
-            # if this is a small codeblock and goes over multiple messages it will break out
-            # so we check that each chunk (besides the first) starts and stops with a backtick
+            # if this is a small codeblock and goes over multiple messages
+            # it will break out. so we check that each chunk 
+            # (besides the first) starts and stops with a backtick
             for idx, chunk in enumerate(
                     line[x:x + 1994] for x in range(0, len(line), 1994)):
                 # ugh
@@ -93,7 +96,8 @@ class DiscordHandler(logging.Handler):
 
                 self._buffer.append(chunk)
 
-        # the traceback, sent separately to be in a big codeblock for syntax highlighting
+        # the traceback, sent separately to be in a
+        # big codeblock for syntax highlighting
         if trace is not None:
             # cut off the original codeblock
             trace = trace[6:-3]
@@ -146,16 +150,21 @@ class DiscordHandler(logging.Handler):
 
 class DiscordFormatter(logging.Formatter):
     """
-    Custom logging formatter meant to use in combination with the DiscordHandler.
+    Custom logging formatter meant to use in
+    combination with the DiscordHandler.
 
-    The formatter puts exceptions into a big codeblock to properly highlight them in Discord
-    as well as allowing to pass emoji which will replace the level (name) to allow seeing what's going on easier.
+    The formatter puts exceptions into a big codeblock to
+    properly highlight them in Discord as well as allowing to pass emoji
+    which will replace the level (name) to allow seeing what's going on easier.
 
     Parameters
     ----------
     emoji : Dict[int, str]
-        Dictionary of logging levels and characters which will replace the level name or 'Level <int>' in the log.
-        By default the DEBUG, INFO, WARNING and ERROR levels have emoji set, but these can be overwritten.
+        Dictionary of logging levels and characters which will replace the
+        level name or 'Level <int>' in the log.
+
+        By default the DEBUG, INFO, WARNING and ERROR levels have emoji set,
+        but these can be overwritten.
     """
 
     def __init__(self, fmt=None, datefmt=None, style='%', *, emoji=None):
@@ -186,7 +195,9 @@ class DiscordFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord):
         """
         Format the specified record as text.
-        This implementation is directly copied from the superclass, only adding the codeblock to the traceback.
+
+        This implementation is directly copied from the superclass,
+        only adding the codeblock to the traceback.
         """
 
         record.message = clean_content(record.getMessage())
@@ -206,7 +217,8 @@ class DiscordFormatter(logging.Formatter):
             if s[-1:] != "\n":
                 s = s + "\n"
 
-            # add a codeblock so the DiscordHandler can properly split the error into multiple messages if needed
+            # add a codeblock so the DiscordHandler can properly split
+            # the error into multiple messages if needed
             s = f'{s}```py\n{record.exc_text}```'
 
         if record.stack_info:
@@ -292,9 +304,16 @@ def setup(bot):
         handler = DiscordHandler(webhook, level=level)
         handler.setFormatter(formatter)
 
+        # Somehow this line of logging keeps spitting out errors
+        # while the entirety of the bot keeps up.
+
+        # this was somehow made by the coins cog but I don't see
+        # what might be wrong with it.
+
         if level == logging.ERROR:
-            handler.addFilter(lambda record: 'Fatal error on transport TCPTransport'
-                              not in record.getMessage())
+            line = 'Fatal error on transport TCPTransport'
+
+            handler.addFilter(lambda record: line not in record.getMessage())
 
         root.addHandler(handler)
         bot.channel_handlers.append(handler)
@@ -303,6 +322,7 @@ def setup(bot):
 
 
 def teardown(bot):
+    """Shutdown all logging when turning off this cog."""
     root = logging.getLogger()
 
     for handler in bot.channel_handlers:
