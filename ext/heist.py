@@ -170,9 +170,14 @@ class JoinSession:
         """Put people in jail."""
         ctx = self.ctx
 
+        transferred = decimal.Decimal(0)
+        thief_transferred = 0
+
         for user_id in self.users:
             try:
                 await self.coins.transfer(user_id, self.target.id, self.fine)
+                transferred += self.fine
+                thief_transferred += 1
             except self.coins.TransferError:
                 await self.coins.zero(user_id)
 
@@ -202,6 +207,13 @@ class JoinSession:
 
         await ctx.send(embed=em)
 
+        fmt = ('Some thief(s) tried to steal from your taxbank. They failed!\n'
+               f'{thief_transferred} thief(s) paid {self.fine}JC\n'
+               f'In the end, you all god {transferred}JC!\n'
+               f'There were {len(self.users)} thiefs in total.\n'
+               f'Server that stole: `{ctx.guild} [{ctx.guild.id}]`')
+        await self.target_send(fmt)
+
     async def target_send(self, msg):
         """Send a message to the target guild.
 
@@ -220,7 +232,12 @@ class JoinSession:
         if not notify:
             return
 
-        await notify.send(msg)
+        try:
+            await notify.send(msg)
+        except discord.Forbidden:
+            log.warning('Failed to send {msg!r} to '
+                        '{self.target!r} {self.target.id}')
+            return
 
     async def process_heist(self, res: dict):
         """Process the result given by :meth:`JoinSession.do_heist`"""
@@ -252,7 +269,9 @@ class JoinSession:
         em.add_field(
             name='Outcome',
             value=f'Transferred {self.fine} to {len(self.users)}')
+
         await ctx.send(embed=em)
+
         fmt = ('Your taxbank got stolen from a heist.\n'
                f'The {len(self.users)} thieves got a total of {self.fine}JC.\n'
                f'Each thief got {self.fine/len(self.users)}JC.\n'
