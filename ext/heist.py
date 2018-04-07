@@ -209,7 +209,7 @@ class JoinSession:
 
         fmt = ('Some thief(s) tried to steal from your taxbank. They failed!\n'
                f'{thief_transferred} thief(s) paid {self.fine}JC\n'
-               f'In the end, you all god {transferred}JC!\n'
+               f'In the end, the taxbank got {transferred}JC!\n'
                f'There were {len(self.users)} thiefs in total.\n'
                f'Server that stole: `{ctx.guild} [{ctx.guild.id}]`')
         await self.target_send(fmt)
