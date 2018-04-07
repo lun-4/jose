@@ -75,7 +75,7 @@ class Marry(Cog):
         restraint = await self.pool.fetchrow("""
         select user1, user2
         from restrains
-        where user1 = $1 or user1 = $2
+        where (user1 = $1 and user2 = $2) or (user1 = $2 and user2 = $1)
         """, ctx.author.id, who.id)
 
         grest = await self.pool.fetchrow("""
