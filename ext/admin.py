@@ -1,5 +1,6 @@
 import traceback
 import logging
+import re
 
 import asyncpg
 from discord.ext import commands
@@ -79,12 +80,18 @@ class Admin(Cog, requires=['config']):
             try:
                 self.bot.unload_extension('ext.' + ext)
                 self.bot.load_extension('ext.' + ext)
+                log.info(f'Reloaded {ext}')
             except Exception as err:
-                await ctx.send(f'```{traceback.format_exc()}```')
+                await ctx.send('OOPSIE WOOPSIE!!\nUwu We made a fucky wucky!\n'
+                               'A wittle fucko boingo!```py\n'
+                               f'{traceback.format_exc()}\n```')
+
                 return
-            log.info(f'Reloaded {ext}')
-            m = ctx.send(f':ok_hand: Reloaded `{ext}`')
-            self.bot.loop.create_task(m)
+
+            # don't block the coro waiting for a message send
+            # since we might cause state inconsistencies
+            msg = ctx.send(f':ok_hand: Reloaded `{ext}`')
+            self.bot.loop.create_task(msg)
 
     @commands.command()
     @commands.is_owner()
@@ -99,6 +106,33 @@ class Admin(Cog, requires=['config']):
     async def update(self, ctx):
         """im lazy"""
         await ctx.invoke(self.bot.get_command('shell'), command='git pull')
+
+    @commands.command()
+    @commands.is_owner()
+    async def urel(self, ctx):
+        """Update and reload automatically.
+
+        Thanks aveao (github). <3
+        """
+        with ctx.typing():
+            out = await shell('git pull')
+
+        await ctx.send(f"```\n{out}\n```\n")
+
+        # regex magic from ave <3
+        to_reload = re.findall(r'ext/([a-z]*).py[ ]*\|', out)
+
+        if not to_reload:
+            return await ctx.send('No cogs found to reload')
+
+        if 'coins' in to_reload:
+            to_reload.pop('coins')
+
+            # enforce coins is loaded BEFORE anything else
+            to_reload.insert(0, 'coins')
+
+        # offload actual reloading to reload command
+        await ctx.invoke(self.bot.get_command('reload'), *to_reload)
 
     @commands.command(typing=True)
     @commands.is_owner()
