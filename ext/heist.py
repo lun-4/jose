@@ -129,9 +129,9 @@ class JoinSession:
         incr = increase_people
         chance = BASE_HEIST_CHANCE + ((amnt / samnt) + incr) * HEIST_CONSTANT
 
-        # trim it to 60% success
-        if chance > 6:
-            chance = 6
+        # trim it to 50% success
+        if chance > 5:
+            chance = 5
 
         result = random.uniform(0, 10)
         res.update({
