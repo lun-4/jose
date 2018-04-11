@@ -43,6 +43,7 @@ UNECESSARY_PODS = {'Input', 'Input interpretation'}
 def pod_finder(pod_list):
     """Finds a probable pod."""
     log.debug('pod_finder: going to score %d pods', len(pod_list))
+    log.debug(f'pod_finder {pod_list!r}')
     pod_scores = {}
 
     for pod in pod_list:
