@@ -60,6 +60,10 @@ def pod_finder(pod_list):
         if pod.get('@title') in UNECESSARY_PODS:
             score -= 100
 
+        if 'subpod' not in pod:
+            # ignore pods without subpod
+            continue
+
         if isinstance(pod['subpod'], list):
             # subpod has an image
             score += 10 + (len(pod['subpod']) * 10)
