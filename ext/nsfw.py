@@ -132,7 +132,7 @@ class NSFW(Cog, requires=['config']):
             if not posts:
                 return await ctx.send('Found nothing.\n'
                                       '(this can be caused by an exhaustion '
-                                      'of the tags `{ctx.prefix}help NSFW`)')
+                                      f'of the tags `{ctx.prefix}help NSFW`)')
 
             # grab random post
             post = random.choice(posts)
