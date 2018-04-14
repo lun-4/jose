@@ -41,7 +41,7 @@ class PlayingStatus(Cog):
 
         log.info('game: type=%d v=%r', g_type, fmt)
         await self.bot.change_presence(
-            game=discord.Game(type=g_type, name=fmt))
+            activity=discord.Game(type=g_type, name=fmt))
 
     async def rotate_loop(self):
         try:
