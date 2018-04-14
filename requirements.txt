@@ -5,7 +5,7 @@ motor==1.2.1
 uvloop==0.9.1
 
 markovify==0.7.1
-psutil==5.4.3
+psutil==5.4.5
 wolframalpha==3.0.1
 pyowm==2.8.0
 Pillow==5.1.0
