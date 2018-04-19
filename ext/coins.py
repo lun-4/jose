@@ -346,7 +346,9 @@ class Coins(Cog):
             raise self.SayException("You don't have a JoséCoin wallet, "
                                     f'use the `account` command.')
 
-        amount = account['amount']
+        # use both amount and ubank to calc taxpay
+        amount = account['amount'] + account['ubank']
+
         gdp = await self.jc_get('/gdp')
         gdp = gdp['gdp']
 
