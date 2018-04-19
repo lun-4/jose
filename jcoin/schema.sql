@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS wallets (
     steal_success int DEFAULT 0,
 
     /* secondary user wallets, more of a bank */
-    ubank money DEFAULT 0
+    ubank money DEFAULT 10
 );
 
 CREATE VIEW wallets_taxpaid as
