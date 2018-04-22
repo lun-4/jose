@@ -63,13 +63,6 @@ CREATE TABLE IF NOT EXISTS transactions (
     taxreturn_used boolean DEFAULT false
 );
 
-/* If we want, we *could* group transactions */
-CREATE TABLE IF NOT EXISTS blockchain (
-    prev_hash text,
-    blockstamp timestamp without time zone,
-    block_data jsonb
-);
-
 
 /* Steal related stuff */
 CREATE TYPE cooldown_type AS ENUM ('prison', 'points');
@@ -137,4 +130,19 @@ CREATE TABLE restrains (
     user1 bigint,
     user2 bigint,
     PRIMARY KEY(user1, user2)
-); -- just made this up really quickly
+);
+
+-- Profile badges
+CREATE TABLE badges (
+    badge_id bigint PRIMARY KEY,
+    name text NOT NULL,
+    emoji text NOT NULL,
+    description text NOT NULL,
+    price float8 NOT NULL
+);
+
+CREATE TABLE badge_users (
+    user_id bigint NOT NULL REFERENCES accounts (account_id) ON DELETE CASCADE,
+    badge bigint REFERENCES badges (badge_id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, badge)
+);

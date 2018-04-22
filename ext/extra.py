@@ -1,9 +1,7 @@
 import logging
 import re
 import random
-import hashlib
 import urllib.parse
-import datetime
 import collections
 import time
 import json
@@ -119,13 +117,8 @@ class Extra(Cog, requires=['config']):
     def __init__(self, bot):
         super().__init__(bot)
 
-        self.description_coll = self.config.jose_db['descriptions']
-
         self.socket_stats = collections.Counter()
         self.sock_start = time.monotonic()
-
-        p1 = '([a-zA-Z0-9]| |\'|\"|\!|\%|\<|\>|\:|\.|\,|\;|\*|\~|\n)'
-        self.description_regex = re.compile(p1)
 
     async def on_socket_response(self, data):
         self.socket_stats[data.get('t')] += 1
@@ -153,7 +146,7 @@ class Extra(Cog, requires=['config']):
 
             try:
                 as_int = int(number)
-            except:
+            except (TypeError, ValueError):
                 as_int = -1
 
             if number == 'rand':
@@ -167,8 +160,8 @@ class Extra(Cog, requires=['config']):
         await ctx.send(f'xkcd {info["num"]} => {info["img"]}')
 
     async def _do_rxkcd(self, ctx, terms):
-        async with self.bot.session.post(
-                RXKCD_ENDPOINT, json={'search': terms}) as r:
+        async with self.bot.session.post(RXKCD_ENDPOINT,
+                                         json={'search': terms}) as r:
             if r.status != 200:
                 raise self.SayException(f'Got a not good error code: {r.code}')
 
@@ -235,137 +228,6 @@ class Extra(Cog, requires=['config']):
 
         await ctx.send(f'http://www.youtube.com/watch?v={search_results[0]}')
 
-    async def set_description(self, user_id, description):
-        desc_obj = {
-            'id': user_id,
-            'description': description,
-        }
-
-        if await self.get_description(user_id) is not None:
-            await self.description_coll.update_one({
-                'id': user_id
-            }, {'$set': desc_obj})
-        else:
-            await self.description_coll.insert_one(desc_obj)
-
-    async def get_description(self, user_id):
-        dobj = await self.description_coll.find_one({'id': user_id})
-        if dobj is None:
-            return None
-        return dobj['description']
-
-    def mkcolor(self, name):
-        colorval = int(hashlib.md5(name.encode("utf-8")).hexdigest()[:6], 16)
-        return discord.Colour(colorval)
-
-    def delta_str(self, delta):
-        seconds = delta.total_seconds()
-        years = seconds / 60 / 60 / 24 / 365.25
-        days = seconds / 60 / 60 / 24
-        if years >= 1:
-            return f'{years:.2f} years'
-        else:
-            return f'{days:.2f} days'
-
-    async def fill_jcoin(self, account, user, em, ctx):
-        ranks = await self.jcoin.get_ranks(user.id, ctx.guild.id)
-        r_global, r_tax, r_guild = ranks['global'], ranks['taxes'], \
-            ranks['local']
-
-        guild_rank, global_rank = r_guild['rank'], r_global['rank']
-        guild_accounts, all_accounts = r_guild['total'], r_global['total']
-        tax_rank, tax_global = r_tax['rank'], r_tax['total']
-
-        em.add_field(
-            name='JC Rank',
-            value=f'{guild_rank}/{guild_accounts}, '
-            f'{global_rank}/{all_accounts} globally')
-
-        em.add_field(name='JoséCoin Wallet', value=f'{account["amount"]}JC')
-        em.add_field(name='Tax paid', value=f'{account["taxpaid"]}JC')
-
-        em.add_field(
-            name='Tax rank', value=f'{tax_rank} / {tax_global} globally')
-
-        try:
-            s_success = account['steal_success']
-            s_uses = account['steal_uses']
-
-            ratio = s_success / s_uses
-            ratio = round((ratio * 100), 3)
-
-            em.add_field(
-                name='Stealing',
-                value=f'{s_uses} tries, '
-                f'{s_success} success, '
-                f'ratio of success: {ratio}/steal')
-        except ZeroDivisionError:
-            pass
-
-    @commands.command()
-    @commands.guild_only()
-    async def profile(self, ctx, *, user: discord.User = None):
-        """Get profile cards."""
-        if user is None:
-            user = ctx.author
-
-        maybe_member = ctx.guild.get_member(user.id)
-        if maybe_member:
-            user = maybe_member
-
-        em = discord.Embed(
-            title='Profile card', colour=self.mkcolor(user.name))
-
-        if user.avatar_url:
-            em.set_thumbnail(url=user.avatar_url)
-
-        raw_repr = await self.get_json('https://api.getdango.com/api/'
-                                       f'emoji?q={user.name}')
-
-        emoji_repr = ''.join(emoji['text'] for emoji in raw_repr['results'])
-        em.set_footer(text=f'{emoji_repr} | User ID: {user.id}')
-
-        if isinstance(user, discord.Member) and (user.nick is not None):
-            em.add_field(name='Name', value=f'{user.nick} ({user.name})')
-        else:
-            em.add_field(name='Name', value=user.name)
-
-        description = await self.get_description(user.id)
-        if description is not None:
-            em.add_field(name='Description', value=description)
-
-        delta = datetime.datetime.utcnow() - user.created_at
-        em.add_field(name='Account age', value=f'{self.delta_str(delta)}')
-
-        try:
-            account = await self.jcoin.get_account(user.id)
-            await self.fill_jcoin(account, user, em, ctx)
-        except self.jcoin.AccountNotFoundError:
-            pass
-
-        await ctx.send(embed=em)
-
-    @commands.command()
-    async def setdesc(self, ctx, *, description: str = ''):
-        """Set your profile card description."""
-        description = description.strip()
-
-        if len(description) > 80:
-            raise self.SayException('3 long 5 me pls bring it down dud')
-
-        notmatch = re.sub(self.description_regex, '', description)
-        if notmatch:
-            raise self.SayException('there are non-allowed characters.')
-
-        if not description:
-            raise self.SayException('pls put something')
-
-        if description.count('\n') > 10:
-            raise self.SayException('too many newlines')
-
-        await self.set_description(ctx.author.id, description)
-        await ctx.ok()
-
     @commands.command()
     async def sockstats(self, ctx):
         """Event count through the websocket."""
@@ -415,8 +277,8 @@ class Extra(Cog, requires=['config']):
             raise self.SayException('No URL for elixir-docsearch'
                                     ' found in configuration.')
 
-        async with self.bot.session.get(
-                f'http://{base}/search', json={'query': terms}) as r:
+        async with self.bot.session.get(f'http://{base}/search',
+                                        json={'query': terms}) as r:
             if r.status != 200:
                 raise self.SayException(f'{r.status} is not 200, rip.')
 
@@ -429,7 +291,8 @@ class Extra(Cog, requires=['config']):
             em.description = ''
             for (entry, score) in res:
                 name = entry.split('/')[-1].replace('.html', '')
-                em.description += f'[{name}](https://hexdocs.pm{entry}) ({score * 100}%)\n'
+                em.description += (f'[{name}](https://hexdocs.pm{entry}) '
+                                   f'({score * 100}%)\n')
 
             await ctx.send(embed=em)
 
@@ -440,8 +303,8 @@ class Extra(Cog, requires=['config']):
         http://pages.cs.wisc.edu/~ballard/bofh/
         """
         async with self.bot.session.get('http://pages.cs.wisc.edu'
-                                        '/~ballard/bofh/excuses') as r:
-            data = await r.text()
+                                        '/~ballard/bofh/excuses') as resp:
+            data = await resp.text()
             lines = data.split('\n')
             line = random.choice(lines)
             await ctx.send(f'`{line}`')
