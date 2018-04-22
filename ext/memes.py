@@ -5,7 +5,7 @@ import asyncio
 import re
 
 from io import BytesIO
-from urllib.parse import quoteplus
+from urllib.parse import quote_plus
 from random import randrange
 
 import discord
@@ -447,11 +447,11 @@ class Memes(Cog):
 
         api_base = 'https://orly-appstore.herokuapp.com/generate?'
 
-        url = api_base + (f'title={quoteplus(title)}&top_text='
-                          f'{quoteplus(top_text)}&image_code='
+        url = api_base + (f'title={quote_plus(title)}&top_text='
+                          f'{quote_plus(top_text)}&image_code='
                           f'{randrange(0, 41)}&theme={randrange(0, 17)}'
-                          f'&author={quoteplus(author)}&guide_text='
-                          f'{quoteplus(guide)}'
+                          f'&author={quote_plus(author)}&guide_text='
+                          f'{quote_plus(guide)}'
                           '&guide_text_placement=bottom_right')
 
         try:
