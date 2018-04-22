@@ -100,6 +100,9 @@ class Profile(Cog, requires=['config', 'coins']):
             where user_id = $1
         """, ctx.author.id)
 
+        if not emojis:
+            return
+
         embed.add_field(name='Badges',
                         value=''.join((b['emoji'] for b in emojis)))
 
