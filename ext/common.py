@@ -1,6 +1,7 @@
 import asyncio
 import decimal
 import logging
+import io
 
 import discord
 from discord.ext import commands
@@ -172,6 +173,10 @@ class Cog:
     async def http_get(self, url):
         async with self.bot.session.get(url) as resp:
             return await resp.text()
+
+    async def http_read(self, url):
+        async with self.bot.session.get(url) as resp:
+            return io.BytesIO(await resp.read())
 
     @property
     def config(self):

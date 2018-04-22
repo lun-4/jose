@@ -4,8 +4,13 @@ import urllib.parse
 import asyncio
 import re
 
+from io import BytesIO
+from urllib.parse import quoteplus
+from random import randrange
+
 import discord
 import pymongo
+import aiohttp
 
 from discord.ext import commands
 from .common import Cog, WIDE_MAP
@@ -428,6 +433,35 @@ class Memes(Cog):
     async def lesbian(self, ctx):
         """are you led bian??"""
         await ctx.send('https://www.youtube.com/watch?v=j3kyeOUrdS4')
+
+    @commands.command()
+    @commands.cooldown(1, 2, commands.BucketType.user)
+    async def orly(self, ctx, title, guide, author, *, top_text=''):
+        """
+        Generates O'Reilly book covers.
+
+        Original code from dogbot. (https://github.com/slice/dogbot).
+        """
+
+        # Modified to follow josé's general style guide.
+
+        api_base = 'https://orly-appstore.herokuapp.com/generate?'
+
+        url = api_base + (f'title={quoteplus(title)}&top_text='
+                          f'{quoteplus(top_text)}&image_code='
+                          f'{randrange(0, 41)}&theme={randrange(0, 17)}'
+                          f'&author={quoteplus(author)}&guide_text='
+                          f'{quoteplus(guide)}'
+                          '&guide_text_placement=bottom_right')
+
+        try:
+            async with ctx.typing():
+                bio = await self.http_read(url)
+                await ctx.send(file=discord.File(filename='orly.png',
+                                                 fp=bio))
+        except aiohttp.ClientError:
+            await ctx.send("Couldn't contact the API.")
+
 
 
 def setup(bot):
