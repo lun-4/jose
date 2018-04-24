@@ -202,7 +202,7 @@ class Starboard(Cog, requires=['config']):
         super().__init__(bot)
         self.bot.simple_exc.extend([StarError, StarAddError, StarRemoveError])
 
-        # prevent race conditions
+        # prevent race conditions on all starboard operations
         self._locks = collections.defaultdict(asyncio.Lock)
 
         # janitor
@@ -224,9 +224,10 @@ class Starboard(Cog, requires=['config']):
         if await self.bot.is_blocked_guild(guild_id):
             guild = self.bot.get_guild(guild_id)
             g = guild
-            r = await self.starconfig_coll.delete_many({'guild_id': guild.id})
+            res = await self.starconfig_coll.delete_many(
+                {'guild_id': g.id})
 
-            log.info(f'Deleted {r.deleted_count} sconfig: `{g.name}[g.id]`'
+            log.info(f'Deleted {res.deleted_count} sconfig: `{g.name}[g.id]`'
                      ' from blocking')
             return
 
@@ -243,7 +244,7 @@ class Starboard(Cog, requires=['config']):
 
         return cfg
 
-    async def get_star(self, guild_id: int, message_id: int):
+    async def get_star(self, guild_id: int, message_id: int) -> dict:
         """Get a star object from a guild+message ID pair."""
         return await self.starboard_coll.find_one({
             'message_id': message_id,
@@ -267,7 +268,7 @@ class Starboard(Cog, requires=['config']):
             log.warning('[janitor] Deleted %d star objects from '
                         'janitoring %s[%d]', res.deleted_count, g.name, g.id)
 
-        except:
+        except Exception:
             log.exception('error on janitor task')
         finally:
             self.janitor_semaphore.release()
@@ -659,6 +660,11 @@ class Starboard(Cog, requires=['config']):
         if not is_star:
             return
 
+        # ignore blocked people
+        if await self.bot.is_blocked_guild(channel.guild.id) or \
+                await self.bot.is_blocked(user_id):
+            return
+
         try:
             self.check_allow(cfg, channel_id)
             message = await channel.get_message(message_id)
@@ -698,6 +704,11 @@ class Starboard(Cog, requires=['config']):
         if not is_star:
             return
 
+        # ignore blocked people
+        if await self.bot.is_blocked_guild(channel.guild.id) or \
+                await self.bot.is_blocked(user_id):
+            return
+
         try:
             self.check_allow(cfg, channel_id)
             message = await channel.get_message(message_id)
@@ -733,8 +744,12 @@ class Starboard(Cog, requires=['config']):
         if not cfg:
             return
 
-        message = await channel.get_message(message_id)
+        # ignore blocked stuff
+        if await self.bot.is_blocked_guild(channel.guild.id):
+            return
+
         try:
+            message = await channel.get_message(message_id)
             await self.remove_all(message, cfg)
         except (StarError, StarRemoveError) as err:
             log.warning(f'raw_reaction_clear: {err!r}')

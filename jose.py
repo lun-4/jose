@@ -162,7 +162,8 @@ class JoseBot(commands.Bot):
         # TODO: analyze current exception
         # and simplify the logging to WARN
         # if it is on self.simple_exc
-        log.exception('Got an error while running the %s event', event_method)
+        log.exception(f'evt error ({event_method}) '
+                      'args={args!r} kwargs={kwargs!r}')
 
     async def on_message(self, message):
         if message.author.bot:
@@ -253,7 +254,7 @@ async def get_prefix(bot, message) -> list:
         log.warning('config cog not found')
         return [config.prefix]
 
-    custom = await config_cog.cfg_get(message.guild, "prefix")
+    custom = await config_cog.cfg_get(message.guild, 'prefix')
     if custom == bot.config.prefix:
         return custom
 
