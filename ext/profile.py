@@ -223,7 +223,10 @@ class Profile(Cog, requires=['config', 'coins']):
 
     @badge.command(name='buy')
     async def badge_buy(self, ctx, badge_id: int):
-        """Buy a badge"""
+        """Buy a badge. This is not a tax transfer.
+
+        (your personal bank does not apply to badge buying)
+        """
         badge = await self.pool.fetchrow("""
             select name, emoji, description, price
             from badges
@@ -232,6 +235,15 @@ class Profile(Cog, requires=['config', 'coins']):
 
         if not badge:
             raise self.SayException('No badge found with that ID.')
+
+        bdg_user = await self.pool.execute("""
+            select user_id
+            from badge_users
+            where user_id = $1 and badge = $2
+        """, ctx.author.id, badge_id)
+
+        if bdg_user is not None:
+            raise self.SayException('You already bought that badge.')
 
         await self.coins.transfer(ctx.author.id,
                                   self.bot.user.id, badge['price'])
@@ -250,7 +262,7 @@ class Profile(Cog, requires=['config', 'coins']):
     @badge.command(name='bootstrap')
     @commands.is_owner()
     async def bootstrap(self, ctx):
-        """Bootstrap a handful of badges"""
+        """Insert/bootstrap a handful of badges in an empty badge table."""
         badges = [
             [0, 'badger', '\N{OK HAND SIGN}', 'Bought a badge', 1],
             [1, 'angery', '<:blobangery:437365762597060618>',
