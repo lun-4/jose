@@ -17,7 +17,7 @@ class Profile(Cog, requires=['config', 'coins']):
 
         self.description_coll = self.config.jose_db['descriptions']
 
-        regex = '([a-zA-Z0-9]| |\'|\"|\!|\%|\<|\>|\:|\.|\,|\;|\*|\~|\n)'
+        regex = r'([a-zA-Z0-9]| |\'|\"|\!|\%|\<|\>|\:|\.|\,|\;|\*|\~|\n)'
         self.description_regex = re.compile(regex)
 
     async def set_description(self, user_id: int, description: str):
@@ -51,12 +51,14 @@ class Profile(Cog, requires=['config', 'coins']):
         seconds = delta.total_seconds()
         years = seconds / 60 / 60 / 24 / 365.25
         days = seconds / 60 / 60 / 24
+
         if years >= 1:
             return f'{years:.2f} years'
-        else:
-            return f'{days:.2f} days'
+
+        return f'{days:.2f} days'
 
     async def fill_jcoin(self, account, user, em, ctx):
+        """Fill the embed with josécoin information."""
         ranks = await self.jcoin.get_ranks(user.id, ctx.guild.id)
         r_global, r_tax, r_guild = ranks['global'], ranks['taxes'], \
             ranks['local']
@@ -87,11 +89,12 @@ class Profile(Cog, requires=['config', 'coins']):
                 name='Stealing',
                 value=f'{s_uses} tries, '
                 f'{s_success} success, '
-                f'ratio of success: {ratio}/steal')
+                f'ratio of success: {ratio}')
         except ZeroDivisionError:
             pass
 
     async def fill_badges(self, ctx, embed):
+        """Fill the badges for the profile embed."""
         emojis = await self.pool.fetch("""
             select badges.emoji
             from badge_users

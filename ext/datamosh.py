@@ -81,10 +81,9 @@ def datamosh_jpg(source_image: 'io.BytesIO', iterations: int) -> 'io.BytesIO':
 
 
 class Datamosh(Cog):
-    """Datamosh command"""
-
+    """Datamosh."""
     @commands.command()
-    async def datamosh(self, ctx, url: str, iterations: int = 10):
+    async def datamosh(self, ctx, url: str, iterations: int = 1):
         """Datamosh an image.
 
         Sometimes the result given by `j!datamosh` doesn't have any thumbnail,
@@ -92,7 +91,7 @@ class Datamosh(Cog):
         hope it doesn't break the file again).
         """
 
-        if iterations > 129:
+        if iterations > 10:
             return await ctx.send('too much lul')
 
         await self.jcoin.pricing(ctx, self.prices['OPR'])
