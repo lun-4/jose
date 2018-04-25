@@ -97,7 +97,10 @@ class Datamosh(Cog):
 
         await self.jcoin.pricing(ctx, self.prices['OPR'])
 
+        dt1 = time.monotonic()
         data = await get_data(url)
+        dt2 = time.monotonic()
+        ddelta = round((dt2 - dt1) * 1000, 6)
 
         source_image = io.BytesIO(data.getvalue())
         try:
@@ -121,12 +124,12 @@ class Datamosh(Cog):
             t1 = time.monotonic()
             output_image = await future
             t2 = time.monotonic()
-
-            delta = round(t2 - t1, 5)
+            pdelta = round((t2 - t1) * 1000, 5)
 
             # send file
             output_file = discord.File(output_image, 'datamoshed.jpg')
-            await ctx.send(f'took {delta} seconds', file=output_file)
+            await ctx.send(f'took {ddelta}ms on download.\n'
+                           f'{pdelta}ms on processing.', file=output_file)
 
             # done
             output_image.close()
