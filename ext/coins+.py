@@ -463,15 +463,26 @@ class CoinsExt(Cog, requires=['coins']):
                 transfer_info = await c2.transfer_str(target.id, thief.id,
                                                       amount)
 
+                grace = GRACE_PERIOD
+
+                if t_amnt > 200:
+                    # decrease grace period the richer you are
+                    temp = t_amnt * (0.3 * t_amnt)
+                    grace -= (temp / amount) * 0.001
+
                 try:
+                    grace_s = f'{grace}h grace period' if grace > 0 else \
+                        '(NO GRACE AVAILABLE)'
                     await target.send(':gun: **You were robbed!** '
                                       f'The thief(`{thief}`) stole '
                                       f'{amount} from you. '
-                                      f'{GRACE_PERIOD}h grace period')
+                                      f'{grace_s}')
                 except:
                     pass
 
-                await self.add_grace(target, GRACE_PERIOD)
+                if grace > 0:
+                    await self.add_grace(target, GRACE_PERIOD)
+
                 self.steal_info(res, chance, transfer_info)
             else:
                 # jail
