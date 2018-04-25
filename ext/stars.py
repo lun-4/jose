@@ -14,7 +14,8 @@ from .common import Cog
 log = logging.getLogger(__name__)
 
 # muh regex
-IMAGE_REGEX = re.compile(r'(https?:\/\/.*\.(?:png|jpeg|jpg|gif))', re.M | re.I)
+IMAGE_REGEX = re.compile(r'(https?:\/\/.*\.(?:png|jpeg|jpg|gif|webp))',
+                         re.M | re.I)
 ID_REGEX = re.compile(r'\d+', re.M | re.I)
 EMOJI_REGEX = re.compile(r'<a?:\w+:(\d+)>', re.I)
 

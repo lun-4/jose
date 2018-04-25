@@ -163,7 +163,7 @@ class JoseBot(commands.Bot):
         # and simplify the logging to WARN
         # if it is on self.simple_exc
         log.exception(f'evt error ({event_method}) '
-                      'args={args!r} kwargs={kwargs!r}')
+                      f'args={args!r} kwargs={kwargs!r}')
 
     async def on_message(self, message):
         if message.author.bot:

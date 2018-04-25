@@ -302,9 +302,7 @@ class Memes(Cog):
             'No',
             'Maybe',
             'Potentially',
-            'Answer hazy',
             'Only in your dreams',
-            'Ask later',
         ])
 
         await ctx.send(f'**{ctx.author.name}**, :8ball: said {answer}.')

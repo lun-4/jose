@@ -3,6 +3,7 @@ import asyncio
 import time
 import random
 import collections
+import re
 
 import discord
 import markovify
@@ -12,6 +13,9 @@ from .common import Cog
 
 log = logging.getLogger(__name__)
 SENTENCE_PRICE = '0.08'
+
+URL_REGEX = re.compile('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\)'
+                       ',]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', re.I)
 
 
 def make_textmodel(texter, data):
@@ -190,6 +194,7 @@ class Speak(Cog):
         try:
             messages = []
             async for message in channel.history(limit=amount):
+
                 author = message.author
                 if author == self.bot.user or author.bot:
                     continue
@@ -209,10 +214,19 @@ class Speak(Cog):
                 if starts_prefix:
                     continue
 
-                messages.append(message.clean_content)
+                messages.append(message.clean_content.strip())
+
+            new_msgs = []
+            for clean_content in messages:
+                # filter urls out of a message
+                content = re.sub(URL_REGEX, '', clean_content)
+                content = content.strip()
+
+                if content:
+                    new_msgs.append(content)
 
             self.generating[guild.id] = False
-            return messages
+            return new_msgs
         except discord.Forbidden:
             log.info(f'[get_messages] Forbidden from {guild.name}[{guild.id}]')
             self.generating[guild.id] = False
