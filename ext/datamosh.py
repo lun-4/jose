@@ -1,4 +1,5 @@
 import io
+import time
 from random import randint
 
 import discord
@@ -117,11 +118,15 @@ class Datamosh(Cog):
             future = self.bot.loop.run_in_executor(None, datamosh_jpg,
                                                    source_image, iterations)
 
+            t1 = time.monotonic()
             output_image = await future
+            t2 = time.monotonic()
+
+            delta = round(t2 - t1, 5)
 
             # send file
             output_file = discord.File(output_image, 'datamoshed.jpg')
-            await ctx.send('datamoshed:', file=output_file)
+            await ctx.send(f'took {delta} seconds', file=output_file)
 
             # done
             output_image.close()
