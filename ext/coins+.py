@@ -467,8 +467,8 @@ class CoinsExt(Cog, requires=['coins']):
 
                 if t_amnt > 200:
                     # decrease grace period the richer you are
-                    temp = t_amnt * (0.3 * t_amnt)
-                    grace -= (temp / amount) * 0.001
+                    temp = t_amnt * (decimal.Decimal('0.3') * t_amnt)
+                    grace -= (temp / amount) * decimal.Decimal(0.001)
 
                 try:
                     grace_s = f'{grace}h grace period' if grace > 0 else \
