@@ -619,7 +619,9 @@ class Coins(Cog):
                     tasks.append(t)
 
                 done, pending = await asyncio.wait(tasks, timeout=timeout)
-            self.loop.create_task(ctx.send(f'{taskcount} tasks in {timer}'))
+
+            self.loop.create_task(ctx.send(f'{done} done tasks in '
+                                           f'{timer} ({pending} pending)'))
 
             if pending:
                 return await ctx.send(f'pending {len(pending)} > 0')
