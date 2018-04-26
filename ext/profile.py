@@ -239,7 +239,7 @@ class Profile(Cog, requires=['config', 'coins']):
         if not badge:
             raise self.SayException('No badge found with that ID.')
 
-        bdg_user = await self.pool.execute("""
+        bdg_user = await self.pool.fetchval("""
             select user_id
             from badge_users
             where user_id = $1 and badge = $2
