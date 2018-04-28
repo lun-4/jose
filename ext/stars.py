@@ -379,6 +379,7 @@ class Starboard(Cog, requires=['config']):
         chan = self.bot.get_channel(channel_id)
 
         log.debug(f'{message}\n'
+                  f'{star["starrers_count"]} starrers right now\n'
                   f'message {star.get("message_id")}\n'
                   f'channel "{chan}" {channel_id}\n'
                   f'guild "{self.bot.get_guild(guild_id)}" {guild_id}')
@@ -386,7 +387,9 @@ class Starboard(Cog, requires=['config']):
     async def update_starobj(self, star: dict, **kwargs):
         """Given a star object, update it in the database."""
         if kwargs.get('log', True):
-            self.debug_log('update star', star)
+            self.debug_log('update star - '
+                           f'{star["starrers_count"]} sc '
+                           f'VS {len(star["starrers"])} ls', star)
 
         await self.starboard_coll.update_one(
             {
@@ -464,12 +467,15 @@ class Starboard(Cog, requires=['config']):
             star_message = None
 
         starcount = star['starrers_count']
-        below_threshold = starcount < config.get('threshold', 1)
-        above_threshold = starcount >= config.get('threshold', 1)
+        threshold = config.get('threshold', 1)
+        below_threshold = starcount < threshold
+        above_threshold = starcount >= threshold
 
-        # delete message if below threshold (default 1)
-        if delete_mode or below_threshold:
+        if delete_mode:
             return await self.delete_starobj(star, msg=star_message)
+
+        if below_threshold and star_message is not None:
+            await star_message.delete()
 
         # do update/send here
         # if it isnt above threshold, we shouldn't do anything
@@ -479,7 +485,7 @@ class Starboard(Cog, requires=['config']):
         if star_message is None:
             star_message = await self.starboard_send(starboard, star, message)
             star['star_message_id'] = star_message.id
-            await self.update_starobj(star)
+            await self.update_starobj(star, log=False)
         else:
             title, embed = make_star_embed(star, kwargs.get('msg'))
             await star_message.edit(content=title, embed=embed)
@@ -1246,52 +1252,6 @@ class Starboard(Cog, requires=['config']):
         })
 
         await ctx.ok()
-
-    @commands.command()
-    @commands.is_owner()
-    async def starhell(self, ctx):
-        """We are truly fucked in this world.
-
-        The madness provoked by MongoDB in this codebase
-        is beyond anything imaginable.
-
-        This command can't save us from the MongoDB monster.
-        """
-        all_stars = self.starboard_coll.find({})
-
-        skip_chan, skip_mess, succ_au, succ_sc = 0, 0, 0, 0
-        await ctx.send('HAHA we are fucking dead lets '
-                       'iterate over all stars in the world')
-
-        async for star in all_stars:
-            # god this is so shitty
-            star['starrers_count'] = len(star['starrers'])
-            await self.update_starobj(star, log=False)
-            succ_sc += 1
-
-            channel = self.bot.get_channel(star['channel_id'])
-            if not channel:
-                skip_chan += 1
-                continue
-
-            try:
-                message = await channel.get_message(star['message_id'])
-            except discord.NotFound:
-                skip_mess += 1
-                continue
-            except discord.Forbidden:
-                skip_mess += 1
-                continue
-
-            star['author_id'] = message.author.id
-            await self.update_starobj(star, log=False)
-            succ_au += 1
-
-        await ctx.send(f'{skip_chan} stars skipped from no chan\n'
-                       f'{skip_mess} stars skipped from no message\n'
-                       f'{succ_au} success on updating authors\n'
-                       f'{succ_sc} success on updating starrer count\n'
-                       f'\n\ngod fuck my life')
 
     @commands.command(aliases=['gss'])
     @commands.cooldown(1, 10)
