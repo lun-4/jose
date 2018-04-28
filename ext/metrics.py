@@ -36,6 +36,8 @@ class Metrics(Cog):
         self.sum_state = collections.defaultdict(int)
         self.samples = 0
 
+        self.sep_state = {}
+
         self.last_state = None
         self.empty_state()
 
@@ -58,6 +60,13 @@ class Metrics(Cog):
             'command_compl': 0,
         }
 
+        self.sep_state = {
+            'message': collections.Counter(),
+            'command': collections.Counter(),
+            'command_error': collections.Counter(),
+            'command_compl': collections.Counter(),
+        }
+
     def submit_state(self):
         """Submit current state to the sum of states."""
         self.samples += 1
@@ -68,6 +77,28 @@ class Metrics(Cog):
     def get_average_state(self):
         """Get the average state"""
         return {k: (v / self.samples) for k, v in self.sum_state.items()}
+
+    def show_common(self, res: list, event: str, common: int = 5):
+        common = self.sep_state[event].most_common(common)
+
+        for (idx, (any_id, count)) in enumerate(common):
+            cause = self.bot.get_guild(any_id) or self.bot.get_user(any_id)
+            res.append(f'- #{idx} `{cause!s} [{cause.id}]`: {count}\n')
+
+    async def call_owner(self, warn):
+        if not self.owner:
+            self.owner = (await self.bot.application_info()).owner
+
+        res = [f'{self.owner.mention}\n']
+
+        for (event, cur_state, average, delta, threshold) in warn:
+            res.append(f'\tEvent `{event}`, current: {cur_state}, '
+                       f'average: {average}, delta: {delta}, '
+                       f'threshold: {threshold}\n')
+
+            self.show_common(res, event)
+
+        await self.webhook.execute('\n'.join(res))
 
     async def sample(self):
         """Sample current data."""
@@ -88,18 +119,10 @@ class Metrics(Cog):
                 warn.append((k, self.current_state[k], average, delta,
                              threshold))
 
+        log.debug(warn)
         # this only really works if we already made 3 samples
         if warn and self.samples > 3:
-            if not self.owner:
-                self.owner = (await self.bot.application_info()).owner
-
-            res = [f'{self.owner.mention}!!\n']
-            for (event, cur_state, average, delta, threshold) in warn:
-                res.append(f'\tEvent `{event}`, current: {cur_state}, '
-                           f'average: {average}, delta: {delta}, '
-                           f'threshold: {threshold}\n')
-
-            await self.webhook.execute('\n'.join(res))
+            await self.call_owner(warn)
 
         # set last_state to a copy of current_state
         self.last_state = dict(self.current_state)
@@ -124,14 +147,26 @@ class Metrics(Cog):
 
         self.current_state['message'] += 1
 
+        key = message.guild.id if message.guild else message.author.id
+        self.sep_state['message'][key] += 1
+
     async def on_command(self, ctx):
         self.current_state['command'] += 1
+
+        key = ctx.guild.id if ctx.guild else ctx.author.id
+        self.sep_state['command'][key] += 1
 
     async def on_command_error(self, ctx, error):
         self.current_state['command_error'] += 1
 
+        key = ctx.guild.id if ctx.guild else ctx.author.id
+        self.sep_state['command_error'][key] += 1
+
     async def on_command_completion(self, ctx):
         self.current_state['command_compl'] += 1
+
+        key = ctx.guild.id if ctx.guild else ctx.author.id
+        self.sep_state['command_compl'][key] += 1
 
     @commands.command()
     async def mstate(self, ctx):
