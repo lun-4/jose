@@ -8,6 +8,7 @@ import pymongo
 import discord
 
 from discord.ext import commands
+from discord.raw_models import RawReactionActionEvent
 
 from .common import Cog
 
@@ -79,6 +80,10 @@ def empty_starconfig(guild) -> dict:
 
         # if this is empty, all channels are allowed
         'allowed_chans': [],
+
+        #: how many stars until a starboard message
+        #  is posted?
+        'threshold': 1,
     }
 
 
@@ -643,9 +648,13 @@ class Starboard(Cog, requires=['config']):
 
         return None, None
 
-    async def on_raw_reaction_add(self, emoji_partial, message_id, channel_id,
-                                  user_id):
+    async def on_raw_reaction_add(self, payload):
         """Handle a reaction add."""
+        emoji_partial = payload.emoji
+        message_id = payload.message_id
+        channel_id = payload.channel_id
+        user_id = payload.user_id
+
         channel = self.bot.get_channel(channel_id)
         if not channel:
             return
@@ -677,8 +686,13 @@ class Starboard(Cog, requires=['config']):
                 }, cfg)
 
             if new_message_id and new_channel_id:
-                return await self.on_raw_reaction_add(
-                    emoji_partial, new_message_id, new_channel_id, user_id)
+                payload = RawReactionActionEvent({
+                    'message_id': new_message_id,
+                    'new_channel_id': new_channel_id,
+                    'user_id': user_id,
+                }, emoji_partial)
+
+                return await self.on_raw_reaction_add(payload)
 
             await self.add_star(message, user_id, cfg)
         except (StarError, StarAddError) as err:
@@ -688,8 +702,11 @@ class Starboard(Cog, requires=['config']):
                           channel.name, channel.id, channel.guild.name,
                           channel.guild.id)
 
-    async def on_raw_reaction_remove(self, emoji_partial, message_id,
-                                     channel_id, user_id):
+    async def on_raw_reaction_remove(self, payload):
+        emoji_partial = payload.emoji
+        message_id = payload.message_id
+        channel_id = payload.channel_id
+        user_id = payload.user_id
         channel = self.bot.get_channel(channel_id)
         if not channel:
             return
@@ -721,8 +738,13 @@ class Starboard(Cog, requires=['config']):
                 }, cfg)
 
             if new_message_id and new_channel_id:
-                return await self.on_raw_reaction_remove(
-                    emoji_partial, new_message_id, new_channel_id, user_id)
+                payload = RawReactionActionEvent({
+                    'message_id': new_message_id,
+                    'new_channel_id': new_channel_id,
+                    'user_id': user_id,
+                }, emoji_partial)
+
+                return await self.on_raw_reaction_remove(payload)
 
             await self.remove_star(message, user_id, cfg)
         except (StarError, StarRemoveError) as err:
@@ -732,8 +754,11 @@ class Starboard(Cog, requires=['config']):
                           channel.name, channel.id, channel.guild.name,
                           channel.guild.id)
 
-    async def on_raw_reaction_clear(self, message_id, channel_id):
+    async def on_raw_reaction_clear(self, payload):
         """Remove all stars in the message."""
+        message_id = payload.message_id
+        channel_id = payload.channel_id
+
         channel = self.bot.get_channel(channel_id)
         if not channel:
             return
@@ -1190,6 +1215,29 @@ class Starboard(Cog, requires=['config']):
         }, {'$set': {
             'allowed_chans': allowed_chans,
         }})
+
+        await ctx.ok()
+
+    @commands.command()
+    @commands.guild_only()
+    @commands.has_permissions(manage_guild=True)
+    async def sbthreshold(self, ctx, stars: int):
+        """Set a threshold for stars.
+
+        Unfinished command.
+        """
+        await self._get_starconfig(ctx.guild.id)
+
+        if stars < 1:
+            raise self.SayException('Invalid threshold.')
+
+        await self.starconfig_coll.update_one({
+            'guild_id': ctx.guild.id
+        }, {
+            '$set': {
+                'threshold': stars,
+            }
+        })
 
         await ctx.ok()
 
