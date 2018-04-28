@@ -1234,9 +1234,7 @@ class Starboard(Cog, requires=['config']):
     @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
     async def sbthreshold(self, ctx, stars: int):
-        """Set a threshold for stars.
-
-        Unfinished command.
+        """Set a threshold for stars to enter starboard.
         """
         await self._get_starconfig(ctx.guild.id)
 
