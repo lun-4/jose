@@ -463,11 +463,19 @@ class Starboard(Cog, requires=['config']):
         except (KeyError, discord.errors.NotFound):
             star_message = None
 
-        if delete_mode or star['starrers_count'] < 1:
-            await self.delete_starobj(star, msg=star_message)
-            return
+        starcount = star['starrers_count']
+        below_threshold = starcount < config.get('threshold', 1)
+        above_threshold = starcount >= config.get('threshold', 1)
+
+        # delete message if below threshold (default 1)
+        if delete_mode or below_threshold:
+            return await self.delete_starobj(star, msg=star_message)
 
         # do update/send here
+        # if it isnt above threshold, we shouldn't do anything
+        if not above_threshold:
+            return
+
         if star_message is None:
             star_message = await self.starboard_send(starboard, star, message)
             star['star_message_id'] = star_message.id
@@ -475,8 +483,6 @@ class Starboard(Cog, requires=['config']):
         else:
             title, embed = make_star_embed(star, kwargs.get('msg'))
             await star_message.edit(content=title, embed=embed)
-
-        return
 
     async def add_star(self,
                        message: discord.Message,
