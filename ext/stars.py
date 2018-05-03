@@ -700,7 +700,7 @@ class Starboard(Cog, requires=['config']):
             if new_message_id and new_channel_id:
                 payload = RawReactionActionEvent({
                     'message_id': new_message_id,
-                    'new_channel_id': new_channel_id,
+                    'channel_id': new_channel_id,
                     'user_id': user_id,
                 }, emoji_partial)
 
@@ -752,7 +752,7 @@ class Starboard(Cog, requires=['config']):
             if new_message_id and new_channel_id:
                 payload = RawReactionActionEvent({
                     'message_id': new_message_id,
-                    'new_channel_id': new_channel_id,
+                    'channel_id': new_channel_id,
                     'user_id': user_id,
                 }, emoji_partial)
 
