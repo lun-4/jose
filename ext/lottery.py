@@ -14,6 +14,7 @@ log = logging.getLogger(__name__)
 PERCENTAGE_PER_TAXBANK = decimal.Decimal(0.275 / 100)
 TICKET_PRICE = 11
 TICKET_INCREASE = decimal.Decimal(65 / 100)
+LOTTERY_COOLDOWN = 5
 
 
 class Lottery(Cog, requires=['coins']):
@@ -30,8 +31,10 @@ class Lottery(Cog, requires=['coins']):
     def __init__(self, bot):
         super().__init__(bot)
         self.ticket_coll = self.config.jose_db['lottery']
+        self.cdown_coll = self.config.jose_db['lottery_cooldown']
 
     async def get_taxbanks(self):
+        """Fetch taxbanks for lottery."""
         return await self.coins.jc_get(
             '/wallets', {
                 'key': 'global',
@@ -75,36 +78,49 @@ class Lottery(Cog, requires=['coins']):
 
         await ctx.send(embed=em)
 
-    @lottery.command()
-    @commands.is_owner()
-    async def roll(self, ctx):
-        """Roll a winner from the pool"""
-
-        joseguild = self.bot.get_guild(self.bot.config.JOSE_GUILD)
-        if not joseguild:
-            raise self.SayException('`config error`: José guild not found.')
-
+    async def lottery_send(self, message: str):
         lottery_log = self.bot.get_channel(self.bot.config.LOTTERY_LOG)
         if not lottery_log:
             raise self.SayException('`config error`: log channel not found.')
 
+        return await lottery_log.send(message)
+
+    def get_jose_guild(self):
+        joseguild = self.bot.get_guild(self.bot.config.JOSE_GUILD)
+        if not joseguild:
+            raise self.SayException('`config error`: José guild not found.')
+
+        return joseguild
+
+    @lottery.command()
+    @commands.is_owner()
+    async def roll(self, ctx):
+        """Roll a winner from the pool"""
+        joseguild = self.get_jose_guild()
         cur = self.ticket_coll.find()
 
         # !!! bad code !!!
         # this is not WEBSCALE
         all_users = await cur.to_list(length=None)
-
-        winner = random.choice(all_users)
-        winner_id = winner['user_id']
+        winner_id = random.choice(all_users)['user_id']
 
         if not any(m.id == ctx.author.id for m in joseguild.members):
             raise self.SayException(f'selected winner, <@{winner_id}> '
                                     'is not in jose guild. ignoring!')
 
         u_winner = self.bot.get_user(winner_id)
-        await lottery_log.send(f'**Winner!** `{u_winner!s}, {u_winner.id}`')
+        if u_winner is None:
+            return await ctx.send('Winner is unfindable user.')
 
+        await self.lottery_send(f'**Winner!** `{u_winner!s}, {u_winner.id}`')
         await ctx.send(f'Winner: <@{winner_id}>, transferring will take time')
+
+        # insert user into cooldown
+        await self.cdown_coll.delete_many({'user_id': winner_id})
+        await self.cdown_coll.insert_one({
+            'user_id': winner_id,
+            'rolls_wait': LOTTERY_COOLDOWN,
+        })
 
         # business logic is here
         total = decimal.Decimal(0)
@@ -120,39 +136,41 @@ class Lottery(Cog, requires=['coins']):
             except Exception as err:
                 await ctx.send(f'err txb tx: {err!r}')
 
-            await asyncio.sleep(0.2)
+            await asyncio.sleep(0.1)
 
         amount_people = await self.ticket_coll.count()
         amount_from_ticket = TICKET_INCREASE * amount_people * TICKET_PRICE
         await self.jcoin.transfer(self.bot.user.id, winner_id,
                                   amount_from_ticket)
-        total += amount_from_ticket
 
+        total += amount_from_ticket
         total = round(total, 3)
         await ctx.send(f'Sent a total of `{total}` to the winner')
 
-        r = await self.ticket_coll.delete_many({})
-        await ctx.send(f'Deleted {r.deleted_count} tickets')
+        # check out all current winners
+        upd = await self.cdown_coll.update_many({}, {'$inc', {'rolls_wait', -1}})
+        await ctx.send(f'Updated {upd.modified_count} winner wait documents')
+
+        delt = await self.ticket_coll.delete_many({})
+        await ctx.send(f'Deleted {delt.deleted_count} tickets')
 
     @lottery.command()
     async def enter(self, ctx):
         """Enter the weekly lottery.
-        You will pay 20JC for a ticket.
+        You will pay 11JC for a ticket.
         """
         # Check if the user is in jose guild
-        joseguild = self.bot.get_guild(self.bot.config.JOSE_GUILD)
-        if not joseguild:
-            raise self.SayException('`config error`: José guild not found.')
-
-        lottery_log = self.bot.get_channel(self.bot.config.LOTTERY_LOG)
-        if not lottery_log:
-            raise self.SayException('`config error`: log channel not found.')
+        joseguild = self.get_jose_guild()
 
         if ctx.author not in joseguild.members:
             raise self.SayException("You are not in José's server. "
                                     'For means of transparency, it is '
                                     'recommended to join it, use '
                                     f'`{ctx.prefix}invite`')
+
+        win = await self.cdown_coll.find_one({'user_id': ctx.author.id})
+        if win and win['rolls_wait'] > 0:
+            raise self.SayException(f'You have to wait {win["rolls_wait"]} rolls.')
 
         ticket = await self.ticket_coll.find_one({'user_id': ctx.author.id})
         if ticket:
@@ -163,8 +181,7 @@ class Lottery(Cog, requires=['coins']):
                                   TICKET_PRICE)
 
         await self.ticket_coll.insert_one({'user_id': ctx.author.id})
-        await lottery_log.send(f'In lottery: `{ctx.author!s}, {ctx.author.id}`'
-                               )
+        await self.lottery_send(f'In lottery: `{ctx.author!s}, {ctx.author.id}`')
         await ctx.ok()
 
 
