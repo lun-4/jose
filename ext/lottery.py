@@ -148,7 +148,7 @@ class Lottery(Cog, requires=['coins']):
         await ctx.send(f'Sent a total of `{total}` to the winner')
 
         # check out all current winners
-        upd = await self.cdown_coll.update_many({}, {'$inc', {'rolls_wait', -1}})
+        upd = await self.cdown_coll.update_many({}, {'$inc': {'rolls_wait': -1}})
         await ctx.send(f'Updated {upd.modified_count} winner wait documents')
 
         delt = await self.ticket_coll.delete_many({})
