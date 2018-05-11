@@ -83,6 +83,9 @@ class Metrics(Cog):
 
         for (idx, (any_id, count)) in enumerate(common):
             cause = self.bot.get_guild(any_id) or self.bot.get_user(any_id)
+            if not cause:
+                res.append(f'- #{idx} `<unknown cause> [{any_id}]`: {count}\n')
+                continue
             res.append(f'- #{idx} `{cause!s} [{cause.id}]`: {count}\n')
 
     async def call_owner(self, warn):
