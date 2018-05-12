@@ -64,16 +64,8 @@ class Basic(Cog):
 
     @commands.command(aliases=['choose', 'choice'])
     async def pick(self, ctx, *choices: commands.clean_content):
-        """Pick a random element."""
-        choices = [x.strip() for x in choices]
-        choices = set(choices)
-
-        if len(choices) <= 1:
-            return await ctx.send('Insert more things. Or at least '
-                                  'more different things')
-
-        choices = list(choices)
-        await ctx.send(random.choice(choices))
+        """Disabled command."""
+        await ctx.send('This command is disabled and will be removed soon.')
 
     @commands.command()
     async def version(self, ctx):
