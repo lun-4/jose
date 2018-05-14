@@ -367,6 +367,22 @@ class Config(Cog):
                                        channels)
         await ctx.success(ok)
 
+
+    @commands.command()
+    @commands.guild_only()
+    async def arlist(self, ctx):
+        """Show the channels that josé can or can not autoreply to."""
+        embed = discord.Embed(title='Autoreply is disabled in')
+        channels = await self.config.cfg_get(ctx.guild, 'autoreply_disable', [])
+
+        if channels:
+            embed.description = ' '.join(f'<#{channel}>' for channel in channels)
+        else:
+            embed.description = '<no channels>'
+
+        await ctx.send(embed=embed)
+
+
     @commands.command()
     @commands.is_owner()
     async def dbstats(self, ctx):
