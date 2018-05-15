@@ -235,7 +235,7 @@ class JoinSession:
         try:
             await notify.send(msg)
         except discord.Forbidden:
-            log.warning('Failed to send {msg!r} to '
+            log.warning(f'Failed to send {msg!r} to '
                         '{self.target!r} {self.target.id}')
             return
 
