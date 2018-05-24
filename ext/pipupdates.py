@@ -64,7 +64,7 @@ class PipUpdates(Cog):
             if pkgname in self.requirements:
                 cur_version = self.requirements[pkgname]
 
-                pkgdata = await self.get_json('http://pypi.python.org/'
+                pkgdata = await self.get_json('http://pypi.org/'
                                               f'pypi/{pkgname}/json')
                 new_version = pkgdata['info']['version']
 
