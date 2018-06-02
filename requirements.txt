@@ -3,7 +3,7 @@ git+https://github.com/Rapptz/discord.py@rewrite
 
 asyncpg==0.15.0
 motor==1.2.2
-uvloop==0.10.0
+uvloop==0.10.1
 
 markovify==0.7.1
 psutil==5.4.5
