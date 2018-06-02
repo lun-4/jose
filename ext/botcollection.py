@@ -104,9 +104,9 @@ class BotCollection(Cog):
                    'Command usage and errors to a special channel.\n'
                    '**Only commands and errors are logged, no '
                    'messages are logged, ever.**\n'
-                   '**Disclaimer:** José is free software maintained by'
-                   'the hard work of many volunteers keeping it up. **SPAM '
-                   'IS NOT TOLERATED.**')
+                   '**Disclaimer:** José is free and open source software'
+                   ' maintained by the hard work of many volunteers.\n'
+                   '\n**SPAM IS NOT TOLERATED.**')
 
         try:
             await owner.send(welcome)
