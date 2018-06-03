@@ -125,11 +125,13 @@ class Admin(Cog, requires=['config']):
         if not to_reload:
             return await ctx.send('No cogs found to reload')
 
-        if 'coins' in to_reload:
-            to_reload.pop('coins')
+        try:
+            to_reload.remove('coins')
 
-            # enforce coins is loaded BEFORE anything else
+            # enforce coins to be reloaded before every other module
             to_reload.insert(0, 'coins')
+        except ValueError:
+            pass
 
         # offload actual reloading to reload command
         await ctx.invoke(self.bot.get_command('reload'), *to_reload)
