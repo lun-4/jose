@@ -282,7 +282,7 @@ class CoinsExt(Cog, requires=['coins']):
 
     async def add_grace(self, target: discord.User, hours: int):
         """Add a grace period to the target.
-        
+
         Removes an existing grace period.
         """
         grace = await self.pool.fetch("""
@@ -304,7 +304,7 @@ class CoinsExt(Cog, requires=['coins']):
 
     async def arrest(self, ctx, amount: decimal.Decimal) -> tuple:
         """Arrest the thief.
-        
+
         Returns
         -------
         tuple

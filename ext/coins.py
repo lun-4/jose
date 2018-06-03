@@ -50,7 +50,7 @@ class Coins(Cog):
         self.TransferError = TransferError
         self.ConditionError = ConditionError
 
-    def route(self, route):
+    def _route(self, route):
         return f'{self.base_url}{route}'
 
     @property
@@ -64,7 +64,7 @@ class Coins(Cog):
                            payload: dict = None,
                            **kwargs) -> 'any':
         """Generic call to any JoséCoin API route."""
-        route = self.route(route)
+        route = self._route(route)
         headers = self.headers
         async with self.bot.session.request(
                 method, route, json=payload, headers=headers) as resp:
@@ -367,13 +367,26 @@ class Coins(Cog):
 
         author_id = message.author.id
         guild_id = message.guild.id
+
         user_blocked = await self.bot.is_blocked(author_id)
         guild_blocked = await self.bot.is_blocked_guild(guild_id)
         if user_blocked or guild_blocked:
             return
 
         now = time.monotonic()
-        # TODO: check if user is in jail
+
+        cext = self.bot.get_cog('CoinsExt')
+        if not cext:
+            return
+
+        # This is a better idea than copypasting the
+        # code for check_cooldowns here.
+        try:
+            await cext.check_cooldowns(message.author)
+        except self.SayException as err:
+            msg = err.args[0]
+            if 'prison' in msg:
+                return
 
         # manage reward cooldowns
         last_reward = self.rewards.get(author_id, 0)
